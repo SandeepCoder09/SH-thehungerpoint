@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SH The Hunger Point</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <h1 class="logo">SH The Hunger Point</h1>
+  </header>
+
+  <main class="content">
+    <section class="hero">
+      <h2>Delicious. Fast. Fresh.</h2>
+      <p>Order your favorite Momo, Finger, or Tea now!</p>
+    </section>
+
+    <section class="menu">
+      <div class="menu-item" data-item="Momo">
+        <h3>Momo</h3>
+        <p>₹10 / 5 pieces</p>
+        <div class="controls">
+          <button class="qty-btn" data-action="dec">−</button>
+          <span class="qty">1</span>
+          <button class="qty-btn" data-action="inc">+</button>
+          <button class="order-btn">Order Now</button>
+        </div>
+      </div>
+
+      <div class="menu-item" data-item="Finger">
+        <h3>Finger</h3>
+        <p>₹10 / plate</p>
+        <div class="controls">
+          <button class="qty-btn" data-action="dec">−</button>
+          <span class="qty">1</span>
+          <button class="qty-btn" data-action="inc">+</button>
+          <button class="order-btn">Order Now</button>
+        </div>
+      </div>
+
+      <div class="menu-item" data-item="Tea">
+        <h3>Tea</h3>
+        <p>₹10 / cup</p>
+        <div class="controls">
+          <button class="qty-btn" data-action="dec">−</button>
+          <span class="qty">1</span>
+          <button class="qty-btn" data-action="inc">+</button>
+          <button class="order-btn">Order Now</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="order-status" class="hidden">
+      <h3>Order Confirmed 🎉</h3>
+      <p id="eta-text"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 | SH - The Hunger Point</p>
+  </footer>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
