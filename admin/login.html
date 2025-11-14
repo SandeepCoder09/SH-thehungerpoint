@@ -1,26 +1,29 @@
-<!DOCTYPE html>
-<html>
+<!-- admin/login.html -->
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Login | SH Hunger Point</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Login — SH The Hunger Point</title>
   <link rel="stylesheet" href="login.css" />
+  <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
+
+  <!-- make sure this file exists and contains your Firebase web config -->
+  <script src="../home/firebase-config.js"></script>
 </head>
 <body>
+  <main class="login-wrap">
+    <div class="login-card">
+      <h1>Admin login</h1>
+      <input id="email" type="email" placeholder="Email" autocomplete="username" />
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+      <button id="loginBtn" class="btn">Sign in</button>
+      <p id="error" class="error"></p>
+    </div>
+  </main>
 
-<div class="login-box">
-  <h2>Admin Login</h2>
-
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-
-  <button id="loginBtn">Login</button>
-
-  <p id="errorMsg"></p>
-</div>
-
-<script src="login.js"></script>
+  <script src="login.js"></script>
 </body>
 </html>
