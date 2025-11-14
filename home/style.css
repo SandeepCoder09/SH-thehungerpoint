@@ -125,3 +125,65 @@ body {
   color: white;
   font-weight: 600;
 }
+
+/* ================================
+   TOAST NOTIFICATION STYLES
+================================ */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 260px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.toast.info {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+/* ================================
+   BUTTON ENHANCEMENTS
+================================ */
+.order-btn {
+  transition: 0.3s ease;
+}
+
+.order-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.order-btn.processing {
+  background: #34495e !important;
+  cursor: wait !important;
+}
