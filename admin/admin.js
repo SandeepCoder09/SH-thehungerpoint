@@ -1,3 +1,67 @@
+// ------------------ PUSH NOTIFICATIONS ------------------
+(async function () {
+  const VAPID_KEY =
+    "BL2JfJOy_iHaa_nsMU_aeY3mXO4QtNJrPTs2Qebq-SGgKMjd2uMDJdNZoQgs56_pVNBkILNctiyKIrBOETb8oCk";
+
+  if (!("serviceWorker" in navigator)) {
+    console.log("Service Worker not supported");
+    return;
+  }
+  if (!("Notification" in window)) {
+    console.log("Notifications not supported");
+    return;
+  }
+
+  try {
+    // Register SW (GitHub Pages correct path)
+    const sw = await navigator.serviceWorker.register(
+      "/SH-thehungerpoint/firebase-messaging-sw.js"
+    );
+
+    console.log("SW registered:", sw);
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      console.warn("Notification permission denied");
+      return;
+    }
+
+    const messaging = firebase.messaging();
+
+    const token = await messaging.getToken({
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: sw,
+    });
+
+    if (!token) {
+      console.warn("FCM token not generated");
+      return;
+    }
+
+    console.log("Admin FCM Token:", token);
+
+    // Save token for alerts
+    await firebase.firestore()
+      .collection("adminTokens")
+      .doc(token)
+      .set({
+        token,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+    // Foreground notifications (when admin panel is open)
+    messaging.onMessage((payload) => {
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: "/SH-thehungerpoint/home/assets-img/icon-192.png"
+      });
+    });
+
+  } catch (e) {
+    console.error("Push Notification Error:", e);
+  }
+})();
+
 // LOGIN PROTECTION
 if (!localStorage.getItem("adminLoggedIn")) {
     window.location.href = "login.html";
