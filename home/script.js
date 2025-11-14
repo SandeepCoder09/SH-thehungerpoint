@@ -1,196 +1,156 @@
-// Replace alerts with beautiful toast messages
-function showToast(message, type = "info") {
-  const container = document.getElementById("toast-container");
-  if (!container) return alert(message);
-
-  const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3500);
-}
-
-/* script.js
-   Frontend logic for SH The Hunger Point
-   - Sends create-order and verify-payment requests to backend
-   - Opens Razorpay checkout
-   - Shows simple success/failure UI updates
+/* script.js - final frontend logic for SH The Hunger Point
+   Update SERVER_URL if your backend URL changes
 */
 
-// CHANGE THIS to your server URL if different
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; // <-- set your Render URL
+const PRICE = 10;
 
-const PRICE = 10; // price per unit (INR)
+// small DOM helpers
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-// helper: show alert-style message (using alert for simplicity)
-function showMessage(message) {
-  alert(message);
+// Toast helper
+function showToast(message, type = "info", duration = 3500) {
+  const container = document.getElementById("toast-container");
+  if (!container) return alert(message);
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.textContent = message;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.remove();
+  }, duration);
 }
 
-// helper: small DOM helpers
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
-
-// init quantity controls
-function initControls() {
-  $$(".menu-item").forEach(item => {
+// quantity controls + order flow
+function init() {
+  $$(".menu-item").forEach((item) => {
     const qtyDisplay = item.querySelector(".qty");
-    const decBtn = item.querySelector('[data-action="dec"]');
-    const incBtn = item.querySelector('[data-action="inc"]');
+    const dec = item.querySelector('[data-action="dec"]');
+    const inc = item.querySelector('[data-action="inc"]');
     const orderBtn = item.querySelector(".order-btn");
-
     let qty = Number(qtyDisplay.textContent || 1);
     qty = isNaN(qty) ? 1 : Math.max(1, qty);
     qtyDisplay.textContent = qty;
 
-    const setQty = (newQty) => {
-      qty = Math.max(1, Math.floor(newQty));
+    const setQty = (v) => {
+      qty = Math.max(1, Math.floor(v));
       qtyDisplay.textContent = qty;
     };
 
-    decBtn.addEventListener("click", () => setQty(qty - 1));
-    incBtn.addEventListener("click", () => setQty(qty + 1));
+    dec.addEventListener("click", () => setQty(qty - 1));
+    inc.addEventListener("click", () => setQty(qty + 1));
 
-    orderBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
+    orderBtn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
       await handleOrder(item, qty, orderBtn);
     });
   });
+
+  // optional quick ping
+  fetch(`${SERVER_URL}/ping`).catch(() => console.log("Ping failed (ok)"));
 }
 
-// disable/enable all order buttons (prevents duplicates)
 function setOrderButtonsDisabled(disabled) {
-  $$(".order-btn").forEach(b => b.disabled = disabled);
+  $$(".order-btn").forEach(b => { b.disabled = disabled; if(!disabled) b.classList.remove("processing"); });
 }
 
-// main order flow
 async function handleOrder(itemEl, qty, orderBtn) {
   const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
   const total = qty * PRICE;
 
-  // UI: disable order buttons while in progress
+  // UI
   setOrderButtonsDisabled(true);
+  orderBtn.classList.add("processing");
+  const prevText = orderBtn.textContent;
   orderBtn.textContent = "Processing...";
 
   try {
-    // 1) create order on server
-    const createResp = await fetch(`${SERVER_URL}/create-order`, {
+    const resp = await fetch(`${SERVER_URL}/create-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: total })
+      body: JSON.stringify({ amount: total, items: [{ name, qty, price: PRICE }] })
     });
 
-    if (!createResp.ok) {
-      throw new Error("Network response was not ok");
+    if (!resp.ok) throw new Error("Network error");
+    const data = await resp.json();
+    if (!data || !data.ok || !data.order) {
+      console.error("create-order failed:", data);
+      throw new Error(data?.error || "Order creation failed");
     }
 
-    const createData = await createResp.json();
-    if (!createData || !createData.ok || !createData.order) {
-      // server returned JSON but order creation failed
-      console.error("create-order failed:", createData);
-      throw new Error(createData.error || "Order creation failed");
-    }
-
-    // 2) open Razorpay checkout
-    openRazorpay(createData, name, qty, total);
-
+    openRazorpay(data, name, qty, total);
   } catch (err) {
-    console.error("Order flow error:", err);
-    showMessage("Server offline or error. Try again.");
+    console.error(err);
+    showToast("Server offline or error. Try again.", "error");
     setOrderButtonsDisabled(false);
-    orderBtn.textContent = "Order Now";
+    orderBtn.classList.remove("processing");
+    orderBtn.textContent = prevText;
   }
 }
 
-// opens Razorpay checkout with the order returned from backend
 function openRazorpay(data, name, qty, total) {
   if (!window.Razorpay) {
-    showMessage("Razorpay checkout script not loaded.");
+    showToast("Razorpay script not loaded.", "error");
     setOrderButtonsDisabled(false);
     return;
   }
 
   const options = {
-    key: data.key_id || "",                // supplied by backend
-    amount: data.order.amount,            // amount in paise (server already sets this)
+    key: data.key_id || data.key || "", // use backend-sent public key
+    amount: data.order.amount,
     currency: "INR",
-    name: "SH The Hunger Point",
+    name: "SH — The Hunger Point",
     description: `${name} × ${qty}`,
     order_id: data.order.id,
-    handler: async function (response) {
-      // called when payment is completed in checkout
+    handler: async function (resp) {
+      // verify payment with backend
       try {
-        // verify payment with backend
         const verify = await fetch(`${SERVER_URL}/verify-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
+            razorpay_order_id: resp.razorpay_order_id,
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_signature: resp.razorpay_signature,
             items: [{ name, qty, price: PRICE }]
           })
         });
 
         if (!verify.ok) throw new Error("Verify network error");
-        const verified = await verify.json();
+        const result = await verify.json();
 
-        if (verified.ok) {
-          // success: show confirmation UI
+        if (result.ok) {
+          // show success UI
           document.querySelector(".menu").style.display = "none";
           const status = document.getElementById("order-status");
-          if (status) {
-            status.classList.remove("hidden");
-            const etaText = document.getElementById("eta-text");
-            if (etaText) etaText.textContent = `Order #${verified.orderId} confirmed! ETA: 15 mins 🍴`;
-          } else {
-            showMessage("Order confirmed! ETA ~15 mins.");
-          }
+          status.classList.remove("hidden");
+          $("#eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
+          showToast("Order confirmed! Enjoy your meal 🍽️", "success");
         } else {
-          console.error("Payment verification failed:", verified);
-          showMessage("Payment verification failed. Contact support.");
+          console.error("Verification failed:", result);
+          showToast("Payment verification failed.", "error");
           setOrderButtonsDisabled(false);
         }
       } catch (err) {
-        console.error("Verify error:", err);
-        showMessage("Verification failed or server offline.");
+        console.error(err);
+        showToast("Verification failed. Try later.", "error");
         setOrderButtonsDisabled(false);
       } finally {
-        // restore state of buttons (if not hidden)
-        $$(".order-btn").forEach(b => b.textContent = "Order Now");
+        $$(".order-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Order Now"; });
       }
     },
     modal: {
-      ondismiss: function() {
-        // user closed the checkout window
+      ondismiss: function () {
+        // user closed checkout
         setOrderButtonsDisabled(false);
-        $$(".order-btn").forEach(b => b.textContent = "Order Now");
+        $$(".order-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Order Now"; });
       }
     }
   };
 
-  // open checkout
   const rzp = new Razorpay(options);
   rzp.open();
 }
 
-// on DOM ready
-document.addEventListener("DOMContentLoaded", () => {
-  initControls();
-
-  // quick offline check: ping server /ping (not required but friendlier)
-  fetch(`${SERVER_URL}/ping`, { method: "GET" })
-    .then(r => {
-      if (!r.ok) throw new Error("ping failed");
-      return r.text();
-    })
-    .then(txt => console.log("Server ping:", txt))
-    .catch(err => {
-      console.warn("Server ping failed:", err);
-      // don't block UI — show only when user tries to order
-    });
-});
+document.addEventListener("DOMContentLoaded", init);
