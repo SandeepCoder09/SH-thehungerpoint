@@ -66,6 +66,13 @@ app.get("/ping", (req, res) => {
 // -----------------------------
 // 2) ADMIN LOGIN (PLAIN TEXT)
 // -----------------------------
+
+console.log("DEBUG_ADMIN:",
+  "ADMIN_EMAIL =", ADMIN_EMAIL,
+  "ADMIN_PASSWORD =", ADMIN_PASSWORD,
+  "ADMIN_JWT_SECRET =", ADMIN_JWT_SECRET
+);
+
 app.post("/admin/login", (req, res) => {
   const { email, password } = req.body;
 
