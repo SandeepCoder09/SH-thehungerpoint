@@ -1,50 +1,60 @@
-const db = firebase.firestore();
-const table = document.getElementById("orderTable");
-const ding = document.getElementById("ding");
-let soundEnabled = false;
+// Fetch orders in real time
+const ordersContainer = document.getElementById("orders");
 
-document.getElementById("enableSound").addEventListener("click", () => {
-  soundEnabled = true;
-  alert("Sound notifications enabled!");
-});
+function renderOrders(snapshot) {
+  ordersContainer.innerHTML = "";
 
-function playSound() {
-  if (soundEnabled) ding.play();
-}
+  snapshot.forEach(doc => {
+    const data = doc.data();
 
-function renderOrder(id, data) {
-  const items = data.items.map(i => `${i.name} × ${i.qty}`).join("<br>");
-  const row = `
-    <tr>
-      <td>${id}</td>
-      <td>${items}</td>
-      <td>₹${data.total}</td>
-      <td><span class="status">${data.status}</span></td>
-      <td>
-        <button class="update" onclick="updateStatus('${id}', 'Preparing')">Prep</button>
-        <button class="update" onclick="updateStatus('${id}', 'Out for Delivery')">Out</button>
-        <button class="update" onclick="updateStatus('${id}', 'Delivered')">Done</button>
-      </td>
-    </tr>
-  `;
-  return row;
-}
+    const card = document.createElement("div");
+    card.className = "order-card";
 
-async function updateStatus(id, status) {
-  await db.collection("orders").doc(id).update({ status });
-}
+    // Convert timestamp
+    const time = new Date(data.timestamp).toLocaleString();
 
-function loadOrders() {
-  db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-    let html = "";
-    snapshot.docChanges().forEach(change => {
-      if (change.type === "added" && soundEnabled) playSound();
+    card.innerHTML = `
+      <h3>Order ID: ${doc.id}</h3>
+
+      <div><strong>Payment ID:</strong> ${data.payment_id}</div>
+
+      <div class="items-list">
+        <strong>Items:</strong>
+        <ul>
+          ${data.items.map(item => `
+            <li>${item.name} — Qty: ${item.qty} — ₹${item.price}</li>
+          `).join("")}
+        </ul>
+      </div>
+
+      <div class="timestamp">Placed on: ${time}</div>
+
+      <label><strong>Status:</strong></label>
+      <select class="status-select" data-id="${doc.id}">
+        <option ${data.status === "paid" ? "selected" : ""}>paid</option>
+        <option ${data.status === "preparing" ? "selected" : ""}>preparing</option>
+        <option ${data.status === "on the way" ? "selected" : ""}>on the way</option>
+        <option ${data.status === "completed" ? "selected" : ""}>completed</option>
+      </select>
+    `;
+
+    ordersContainer.appendChild(card);
+  });
+
+  // Attach status change listeners
+  document.querySelectorAll(".status-select").forEach(select => {
+    select.addEventListener("change", async (e) => {
+      const id = e.target.dataset.id;
+      const newStatus = e.target.value;
+
+      await db.collection("orders").doc(id).update({ status: newStatus });
+
+      alert(`Status updated to ${newStatus}`);
     });
-    snapshot.forEach(doc => {
-      html += renderOrder(doc.id, doc.data());
-    });
-    table.innerHTML = html;
   });
 }
 
-loadOrders();
+// Real-time Firebase listener
+db.collection("orders")
+  .orderBy("timestamp", "desc")
+  .onSnapshot(renderOrders);
