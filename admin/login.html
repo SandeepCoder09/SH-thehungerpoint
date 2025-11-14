@@ -1,28 +1,34 @@
-<!-- admin/login.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Login — SH The Hunger Point</title>
+
   <link rel="stylesheet" href="login.css" />
-  <!-- Firebase (compat) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-  <!-- make sure this file exists and contains your Firebase web config -->
+  <!-- Load Firebase config (from home folder) -->
   <script src="../home/firebase-config.js"></script>
 </head>
+
 <body>
-  <main class="login-wrap">
-    <div class="login-card">
-      <h1>Admin login</h1>
-      <input id="email" type="email" placeholder="Email" autocomplete="username" />
-      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
-      <button id="loginBtn" class="btn">Sign in</button>
+  <div class="login-container">
+    <h1 class="title">Admin Login</h1>
+    <p class="subtitle">SH — The Hunger Point</p>
+
+    <div class="login-box">
+      <input id="email" type="email" placeholder="Admin email" />
+      <input id="password" type="password" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+
       <p id="error" class="error"></p>
     </div>
-  </main>
+  </div>
 
   <script src="login.js"></script>
 </body>
