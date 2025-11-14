@@ -1,3 +1,13 @@
+if (localStorage.getItem("sh_admin_auth") !== "1") {
+  window.location.href = "login.html";
+}
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("sh_admin_auth");
+  firebase.auth().signOut();
+  window.location.href = "login.html";
+});
+
 // admin.js
 // Ensure firebase-config.js exists and initializes `firebase`
 
