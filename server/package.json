@@ -1,17 +1,16 @@
 {
-  "name": "sh-hunger-server",
+  "name": "sh-backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "razorpay-server.js",
   "scripts": {
     "start": "node razorpay-server.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dotenv": "^16.4.0",
     "express": "^4.18.2",
-    "firebase-admin": "^12.0.0",
-    "razorpay": "^2.9.1"
+    "cors": "^2.8.5",
+    "firebase-admin": "^11.10.1",
+    "razorpay": "^2.8.5",
+    "jsonwebtoken": "^9.0.2"
   }
 }
