@@ -1,0 +1,66 @@
+/* admin/login.css */
+:root {
+  --bg: #f5f5f7;
+  --card: #fff;
+  --accent: #d84444;
+  --muted: #888;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Segoe UI, Roboto, "Helvetica Neue", Arial
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center
+}
+
+.login-wrap {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px
+}
+
+.login-card {
+  background: var(--card);
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08)
+}
+
+.login-card h1 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  color: #222
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #e6e6e9
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer
+}
+
+.error {
+  color: #b62828;
+  margin-top: 8px;
+  font-size: 13px
+}
