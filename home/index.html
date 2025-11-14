@@ -1,82 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SH The Hunger Point</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SH — The Hunger Point</title>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (Firestore only) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-  <!-- Your Firebase Config -->
+  <!-- Your firebase config (local file) -->
   <script src="firebase-config.js"></script>
 </head>
-
 <body>
-  <header class="navbar">
-    <h1 class="logo">SH The Hunger Point</h1>
+  <header class="nav">
+    <div class="brand">
+      <div class="logo-mark">SH</div>
+      <div class="brand-text">
+        <div class="name">SH — The Hunger Point</div>
+        <div class="tag">Family style • Premium • Fast food</div>
+      </div>
+    </div>
   </header>
 
-  <main class="content">
+  <main class="container">
     <section class="hero">
-      <h2>Delicious. Fast. Fresh.</h2>
-      <p>Order your favorite Momo, Finger, or Tea now!</p>
+      <h1>Delicious. Fast. Fresh.</h1>
+      <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
     </section>
 
-    <section class="menu">
-      <div class="menu-item" data-item="Momo">
-        <h3>Momo</h3>
-        <p>₹10 / 5 pieces</p>
+    <section class="menu" aria-label="menu">
+      <article class="menu-item" data-item="Momo">
+        <div class="mi-left">
+          <h3>Momo</h3>
+          <div class="price">₹10 <small>/ 5 pieces</small></div>
+        </div>
         <div class="controls">
-          <button class="qty-btn" data-action="dec">−</button>
-          <span class="qty">1</span>
-          <button class="qty-btn" data-action="inc">+</button>
+          <div class="qty-wrap">
+            <button class="qty-btn" data-action="dec">−</button>
+            <span class="qty">1</span>
+            <button class="qty-btn" data-action="inc">+</button>
+          </div>
           <button class="order-btn">Order Now</button>
         </div>
-      </div>
+      </article>
 
-      <div class="menu-item" data-item="Finger">
-        <h3>Finger</h3>
-        <p>₹10 / plate</p>
+      <article class="menu-item" data-item="Finger">
+        <div class="mi-left">
+          <h3>Finger</h3>
+          <div class="price">₹10 <small>/ plate</small></div>
+        </div>
         <div class="controls">
-          <button class="qty-btn" data-action="dec">−</button>
-          <span class="qty">1</span>
-          <button class="qty-btn" data-action="inc">+</button>
+          <div class="qty-wrap">
+            <button class="qty-btn" data-action="dec">−</button>
+            <span class="qty">1</span>
+            <button class="qty-btn" data-action="inc">+</button>
+          </div>
           <button class="order-btn">Order Now</button>
         </div>
-      </div>
+      </article>
 
-      <div class="menu-item" data-item="Tea">
-        <h3>Tea</h3>
-        <p>₹10 / cup</p>
+      <article class="menu-item" data-item="Tea">
+        <div class="mi-left">
+          <h3>Tea</h3>
+          <div class="price">₹10 <small>/ cup</small></div>
+        </div>
         <div class="controls">
-          <button class="qty-btn" data-action="dec">−</button>
-          <span class="qty">1</span>
-          <button class="qty-btn" data-action="inc">+</button>
+          <div class="qty-wrap">
+            <button class="qty-btn" data-action="dec">−</button>
+            <span class="qty">1</span>
+            <button class="qty-btn" data-action="inc">+</button>
+          </div>
           <button class="order-btn">Order Now</button>
         </div>
-      </div>
+      </article>
     </section>
 
-    <section id="order-status" class="hidden">
+    <section id="order-status" class="order-status hidden">
       <h3>Order Confirmed 🎉</h3>
       <p id="eta-text"></p>
     </section>
   </main>
 
   <footer class="footer">
-    <p>© 2025 | SH - The Hunger Point</p>
+    <p>© 2025 SH — The Hunger Point</p>
   </footer>
 
   <!-- Razorpay Checkout -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Main Script -->
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
+
+  <!-- Main script -->
   <script src="script.js"></script>
-<div class="toast-container" id="toast-container"></div>
 </body>
 </html>
-
