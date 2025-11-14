@@ -1,103 +1,97 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin — SH The Hunger Point</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — SH The Hunger Point</title>
 
-  <!-- Google font -->
+  <link rel="stylesheet" href="admin.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="admin.css">
-
-  <!-- Firebase (compat) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Firebase Config (from home folder) -->
+  <script src="../home/firebase-config.js"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-  <header class="adm-header">
-    <div class="left">
-      <h1>SH — Admin</h1>
-      <div class="sub">Orders & Analytics</div>
+
+<!-- LOGIN PROTECTION -->
+<script>
+  if (!localStorage.getItem("adminLoggedIn")) {
+      window.location.href = "login.html";
+  }
+</script>
+
+<header class="adm-header">
+  <h1>SH — Admin Dashboard</h1>
+  <button id="logoutBtn" class="logout-btn">Logout</button>
+</header>
+
+<main class="adm-main">
+
+  <!-- TOP STATS -->
+  <section class="stats">
+    <div class="stat-box">
+      <h3>Total Orders</h3>
+      <div id="totalOrders">0</div>
     </div>
 
-    <div class="right">
-      <div class="toggle-wrap">
-        <label class="switch">
-          <input id="darkToggle" type="checkbox" />
-          <span class="slider"></span>
-        </label>
-        <small class="toggle-label">Dark</small>
-      </div>
-
-      <button id="refreshBtn" class="btn small">Refresh</button>
-      <button id="logoutBtn" class="btn ghost">Logout</button>
+    <div class="stat-box">
+      <h3>Total Sales</h3>
+      <div id="totalSales">₹0</div>
     </div>
-  </header>
 
-  <main class="adm-main">
-    <section class="top-grid">
-      <div class="stat card">
-        <div class="stat-title">Total Orders</div>
-        <div id="statOrders" class="stat-value">0</div>
-      </div>
+    <div class="stat-box">
+      <h3>Last 1 Hour</h3>
+      <div id="recentOrders">0</div>
+    </div>
+  </section>
 
-      <div class="stat card">
-        <div class="stat-title">Total Sales (₹)</div>
-        <div id="statSales" class="stat-value">₹0</div>
-      </div>
+  <!-- CHARTS -->
+  <section class="charts">
+    <div class="chart-card">
+      <h3>Orders (Last 24 Hours)</h3>
+      <canvas id="hourChart"></canvas>
+    </div>
 
-      <div class="stat card">
-        <div class="stat-title">New (Last 1h)</div>
-        <div id="statRecent" class="stat-value">0</div>
-      </div>
-    </section>
+    <div class="chart-card">
+      <h3>Sales (Last 7 Days)</h3>
+      <canvas id="weekChart"></canvas>
+    </div>
+  </section>
 
-    <section class="charts-grid">
-      <div class="card chart-card">
-        <h3>Orders (Last 24 hours)</h3>
-        <canvas id="ordersChart" height="120"></canvas>
-      </div>
+  <!-- ORDERS LIST -->
+  <section class="orders-section">
+    <h2>Live Orders</h2>
 
-      <div class="card chart-card">
-        <h3>Sales (Last 7 days)</h3>
-        <canvas id="salesChart" height="120"></canvas>
-      </div>
-    </section>
+    <div class="controls">
+      <input id="searchInput" placeholder="Search orders…" />
+      <select id="statusFilter">
+        <option value="">All</option>
+        <option value="paid">Paid</option>
+        <option value="preparing">Preparing</option>
+        <option value="on the way">On the way</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
 
-    <section class="orders-wrap card">
-      <div class="orders-head">
-        <h2>Orders</h2>
-        <div class="orders-controls">
-          <input id="searchInput" placeholder="Search order id / item" />
-          <select id="statusFilter">
-            <option value="">All statuses</option>
-            <option value="paid">paid</option>
-            <option value="preparing">preparing</option>
-            <option value="on the way">on the way</option>
-            <option value="completed">completed</option>
-          </select>
-        </div>
-      </div>
+    <div id="ordersList">Loading orders…</div>
+  </section>
 
-      <div id="ordersList" class="ordersList">
-        <div class="emptyMsg">No orders yet.</div>
-      </div>
-    </section>
-  </main>
+</main>
 
-  <!-- Hidden audio for new order -->
-  <audio id="pingAudio" preload="auto">
-    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
-  </audio>
+<!-- Notification sound -->
+<audio id="newOrderSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
 
-  <script src="../home/firebase-config.js"></script>
-  <script src="admin.js"></script>
+<script src="admin.js"></script>
+
 </body>
 </html>
