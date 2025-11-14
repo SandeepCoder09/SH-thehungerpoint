@@ -1,12 +1,18 @@
+// Firebase v10 Modular SDK (auto-loaded from CDN in index.html)
+
 const firebaseConfig = {
-    apiKey: "REPLACE_API_KEY",
-    authDomain: "REPLACE_PROJECT.firebaseapp.com",
-    projectId: "sh-the-hunger-point",
-    storageBucket: "REPLACE_PROJECT.appspot.com",
-    messagingSenderId: "REPLACE_SENDER_ID",
-    appId: "REPLACE_APP_ID"
-  };
-  
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  
+  apiKey: "AIzaSyBAR2bTveqOertBkpt95YId9hDPrg6S9_E",
+  authDomain: "sh-the-hunger-point.firebaseapp.com",
+  projectId: "sh-the-hunger-point",
+  storageBucket: "sh-the-hunger-point.appspot.com",
+  messagingSenderId: "312843485011",
+  appId: "1:312843485011:web:347c18ee0ad022a1beaba6"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Firestore reference
+const db = firebase.firestore();
+
+console.log("🔥 Firebase Connected — Firestore Ready");
