@@ -1,33 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Login — SH The Hunger Point</title>
-
   <link rel="stylesheet" href="login.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
-
 <body>
-  <div class="login-container">
-    <h1 class="title">Admin Login</h1>
-    <p class="subtitle">SH — The Hunger Point</p>
+  <div class="login-wrap">
+    <h1>Admin Login</h1>
 
-    <div class="login-box">
-      <input id="email" type="email" placeholder="Admin email" />
-      <input id="password" type="password" placeholder="Password" />
-      <button id="loginBtn">Login</button>
-
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
       <p id="error" class="error"></p>
-    </div>
+    </form>
   </div>
-  
-  <script src="../home/firebase-config.js"></script>
+
   <script src="login.js"></script>
 </body>
 </html>
