@@ -1,42 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — SH The Hunger Point</title>
 
-  <!-- Google Fonts -->
+  <!-- Google font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Stylesheet -->
+  <!-- Styles -->
   <link rel="stylesheet" href="admin.css">
 
-  <!-- Firebase Compat (v10) -->
+  <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-  <!-- Firebase config (from home folder) -->
-  <script src="../home/firebase-config.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Your firebase client config: place admin/firebase-config.js or ../home/firebase-config.js -->
+  <script src="firebase-config.js"></script>
 </head>
 
 <body>
-
-  <!-- Header -->
   <header class="adm-header">
-    <h1>SH Admin Panel</h1>
-    <button id="logoutBtn" class="btn-ghost">Logout</button>
+    <div class="left">
+      <h1>SH — Admin</h1>
+      <div class="sub">Orders & Analytics</div>
+    </div>
+
+    <div class="right">
+      <div class="toggle-wrap">
+        <label class="switch">
+          <input id="darkToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+        <small class="toggle-label">Dark</small>
+      </div>
+
+      <button id="refreshBtn" class="btn small">Refresh</button>
+      <button id="logoutBtn" class="btn ghost">Logout</button>
+    </div>
   </header>
 
-  <!-- Main -->
   <main class="adm-main">
-    <section class="orders-wrap">
-      <h2>Recent Orders</h2>
-      <div id="ordersList" class="ordersList">Loading orders…</div>
+    <section class="top-grid">
+      <div class="stat card">
+        <div class="stat-title">Total Orders</div>
+        <div id="statOrders" class="stat-value">0</div>
+      </div>
+
+      <div class="stat card">
+        <div class="stat-title">Total Sales (₹)</div>
+        <div id="statSales" class="stat-value">₹0</div>
+      </div>
+
+      <div class="stat card">
+        <div class="stat-title">New (Last 1h)</div>
+        <div id="statRecent" class="stat-value">0</div>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="card chart-card">
+        <h3>Orders (Last 24 hours)</h3>
+        <canvas id="ordersChart" height="120"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <h3>Sales (Last 7 days)</h3>
+        <canvas id="salesChart" height="120"></canvas>
+      </div>
+    </section>
+
+    <section class="orders-wrap card">
+      <div class="orders-head">
+        <h2>Orders</h2>
+        <div class="orders-controls">
+          <input id="searchInput" placeholder="Search order id / item" />
+          <select id="statusFilter">
+            <option value="">All statuses</option>
+            <option value="paid">paid</option>
+            <option value="preparing">preparing</option>
+            <option value="on the way">on the way</option>
+            <option value="completed">completed</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="ordersList" class="ordersList">
+        <div class="emptyMsg">No orders yet.</div>
+      </div>
     </section>
   </main>
 
-  <!-- JS -->
-  <script src="admin.js"></script>
+  <!-- Hidden audio for new order -->
+  <audio id="pingAudio" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
+  </audio>
 
+  <script src="admin.js"></script>
 </body>
 </html>
