@@ -1,3 +1,19 @@
+// Replace alerts with beautiful toast messages
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return alert(message);
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
+}
+
 /* script.js
    Frontend logic for SH The Hunger Point
    - Sends create-order and verify-payment requests to backend
