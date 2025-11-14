@@ -1,5 +1,5 @@
 const PRICE = 10;
-const SERVER_URL = "https://sh-hunger-server.onrender.com"; // Render backend URL
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; // Render backend URL
 
 document.querySelectorAll(".menu-item").forEach(item => {
   const qtyDisplay = item.querySelector(".qty");
