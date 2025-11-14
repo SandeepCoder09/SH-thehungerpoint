@@ -1,26 +1,39 @@
+// admin/login.js
+// Admin email (as requested)
+const ADMIN_EMAIL = "sr07572107@gmail.com";
+
 const auth = firebase.auth();
 
-// 👉 Replace with your admin email
-const ADMIN_EMAIL = "YOUR_ADMIN_EMAIL@gmail.com";
+const emailEl = document.getElementById("email");
+const passEl  = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const errEl = document.getElementById("error");
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
+loginBtn.addEventListener("click", async () => {
+  errEl.textContent = "";
+  const email = emailEl.value.trim();
+  const password = passEl.value;
+
+  if (!email || !password) {
+    errEl.textContent = "Enter email and password.";
+    return;
+  }
 
   try {
-    const user = await auth.signInWithEmailAndPassword(email, pass);
-
-    if (email !== ADMIN_EMAIL) {
-      alert("Unauthorized user!");
-      auth.signOut();
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      errEl.textContent = "Unauthorized user.";
+      await auth.signOut();
       return;
     }
 
-    // Save login
-    localStorage.setItem("adminAuth", "true");
+    // mark logged-in locally; admin pages will check this
+    localStorage.setItem("sh_admin_auth", "1");
 
+    // redirect to admin dashboard
     window.location.href = "index.html";
-  } catch (err) {
-    document.getElementById("errorMsg").innerText = err.message;
+  } catch (e) {
+    // friendly error message
+    errEl.textContent = e.message || "Failed to sign in.";
   }
 });
