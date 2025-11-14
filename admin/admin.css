@@ -1,65 +1,131 @@
-/* admin/admin.css */
+/* ================================
+   Zomato-Themed Admin Panel
+   SH The Hunger Point
+================================ */
+
+/* Global Reset */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  font-family: Inter, system-ui, Segoe UI, Roboto, Arial
+  font-family: "Poppins", sans-serif;
 }
 
 body {
-  margin: 0;
-  background: #fafafa;
-  color: #111
+  background-color: #fafafa;
+  color: #333;
 }
 
+/* HEADER */
 .adm-header {
+  background: #e23744; /* Zomato Red */
+  padding: 16px 24px;
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background: #fff;
-  border-bottom: 1px solid #eee
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
 .adm-header h1 {
-  margin: 0;
-  font-size: 18px
+  font-size: 22px;
+  font-weight: 600;
 }
 
 .btn-ghost {
+  border: 2px solid white;
   background: transparent;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
+  padding: 8px 14px;
+  color: white;
   border-radius: 8px;
-  cursor: pointer
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* MAIN WRAPPER */
 .adm-main {
-  padding: 20px
+  padding: 25px;
+  max-width: 900px;
+  margin: auto;
+}
+
+/* ORDERS SECTION */
+.orders-wrap {
+  background: #fff;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 .orders-wrap h2 {
-  margin: 0 0 12px
+  font-size: 26px;
+  color: #e23744;
+  font-weight: 600;
+  margin-bottom: 18px;
 }
 
+/* LIST AND ORDER CARDS */
 .ordersList {
   display: flex;
   flex-direction: column;
-  gap: 12px
+  gap: 18px;
 }
 
-.orderBox {
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.03)
+.orderCard {
+  background: #fff7f7;
+  border-left: 5px solid #e23744;
+  padding: 18px 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 7px rgba(0,0,0,0.1);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-.orderRow {
+.orderCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.orderCard p {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.order-meta {
+  font-size: 13px;
+  color: #777;
+  margin-top: 8px;
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap
+  justify-content: space-between;
 }
 
-small.muted {
-  color: #666
+/* EMPTY MESSAGE */
+.emptyMsg {
+  text-align: center;
+  padding: 32px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .orders-wrap {
+    padding: 16px;
+  }
+  .orderCard {
+    padding: 14px;
+  }
 }
