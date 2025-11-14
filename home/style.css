@@ -210,6 +210,8 @@ body {
   padding: 16px 0;
   margin-top: auto;
   font-size: 13px
+  background: linear-gradient(90deg, var(--accent), #b71c1c);
+  box-shadow: 0 6px 18px rgba(214, 34, 34, 0.12);
 }
 
 /* Toast styles (from earlier) */
