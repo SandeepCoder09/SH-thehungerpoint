@@ -25,7 +25,14 @@ if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !ADMIN_JWT_SECRET) {
 }
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://sandeepcoder09.github.io",
+    "http://localhost:5500"
+  ],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use(express.json());
 
 // -----------------------------
