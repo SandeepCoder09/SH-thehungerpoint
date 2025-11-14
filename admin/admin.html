@@ -1,66 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SH Admin Panel</title>
-  <link rel="stylesheet" href="admin.css" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#E23744" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — SH The Hunger Point</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+  <script src="firebase-config.js"></script>
+
 </head>
 <body>
-  <header class="topbar">
-    <h1>SH Admin Panel</h1>
-    <div class="actions">
-      <button id="enableSound">Enable Alerts 🔔</button>
-      <button id="refresh">Refresh</button>
-    </div>
-  </header>
 
-  <main>
-    <section id="stats">
-      <div class="stat"><h2 id="total">0</h2><p>Total</p></div>
-      <div class="stat"><h2 id="preparing">0</h2><p>Preparing</p></div>
-      <div class="stat"><h2 id="out">0</h2><p>Out</p></div>
-      <div class="stat"><h2 id="delivered">0</h2><p>Delivered</p></div>
-    </section>
+<header class="header">
+  <h2>Admin Panel — SH The Hunger Point</h2>
+  <p>View and manage orders in real-time</p>
+</header>
 
-    <section id="orders">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="orderTable"></tbody>
-      </table>
-    </section>
-  </main>
+<main class="container">
+  <div id="orders" class="orders"></div>
+</main>
 
-  <audio id="ding" src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3" preload="auto"></audio>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <!-- Import Firebase Config from /home/ -->
-
-  <footer class="footer">
-    <p>© 2025 | SH - The Hunger Point</p>
-  </footer>
-
-  <script src="../home/firebase-config.js"></script>
-
-  <script src="admin.js"></script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js');
-    }
-  </script>
+<script src="script.js"></script>
 </body>
 </html>
