@@ -7,37 +7,31 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const admin = require("firebase-admin");
-const serviceAccount = require("../admin/serviceAccountKey.json");
+const serviceAccount = require("./admin/serviceAccountKey.json");
 
 const app = express();
 
-// ---------------------
-// 1. CORS FIX (IMPORTANT)
-// ---------------------
+// 1️⃣ CORS FIX
 app.use(cors({
-  origin: "*",   // allow all for now (we will restrict later)
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(bodyParser.json());
 
-// ---------------------
-// 2. Firebase Admin SDK
-// ---------------------
+// 2️⃣ Firebase Admin Initialization
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
 
-// ---------------------
-// 3. Razorpay Credentials
-// ---------------------
+// 3️⃣ Razorpay Credentials
 const RZP_KEY_ID = process.env.RZP_KEY_ID;
 const RZP_KEY_SECRET = process.env.RZP_KEY_SECRET;
 
 if (!RZP_KEY_ID || !RZP_KEY_SECRET) {
-  console.error("❌ Missing Razorpay keys in .env!");
+  console.log("❌ ERROR: Razorpay keys missing in .env");
   process.exit(1);
 }
 
@@ -46,26 +40,25 @@ const razorpay = new Razorpay({
   key_secret: RZP_KEY_SECRET
 });
 
-// ---------------------
-// 4. API: Create Order
-// ---------------------
+// 4️⃣ CREATE PAYMENT ORDER
 app.post("/create-order", async (req, res) => {
   try {
     const { amount, items } = req.body;
 
     if (!amount || !items) {
-      return res.status(400).json({ error: "Missing amount or items" });
+      return res.status(400).json({ error: "Amount or items missing" });
     }
 
     const options = {
-      amount: amount * 100,        // in paisa
+      amount: amount * 100,
       currency: "INR",
       receipt: "receipt_" + Date.now()
     };
 
+    // Create order in Razorpay
     const order = await razorpay.orders.create(options);
 
-    // Save order into Firestore
+    // Save to Firestore
     await db.collection("orders").add({
       items: items,
       total: amount,
@@ -82,14 +75,13 @@ app.post("/create-order", async (req, res) => {
 
   } catch (error) {
     console.error("❌ Error creating order:", error);
-    res.status(500).json({ error: "Failed to create order" });
+    res.status(500).json({ error: "Order creation failed" });
   }
 });
 
-// ---------------------
-// 5. Server Listen
-// ---------------------
+
+// 5️⃣ SERVER LISTENER
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Razorpay server running on port ${PORT}`);
+  console.log(`🚀 SH Hunger Backend running on port ${PORT}`);
 });
