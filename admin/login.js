@@ -1,37 +1,30 @@
-const emailEl = document.getElementById("email");
-const passEl = document.getElementById("password");
-const errorEl = document.getElementById("error");
-const loginBtn = document.getElementById("loginBtn");
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 
-// Admin email (Lock login to only your admin account)
-const ADMIN_EMAIL = "sr07572107@gmail.com";
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-loginBtn.addEventListener("click", async () => {
-  errorEl.textContent = "";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const errorBox = document.getElementById("error");
 
-  const email = emailEl.value.trim();
-  const password = passEl.value.trim();
-
-  if (!email || !password) {
-    errorEl.textContent = "Please enter email & password";
-    return;
-  }
-
-  if (email !== ADMIN_EMAIL) {
-    errorEl.textContent = "Access denied: Not an admin";
-    return;
-  }
+  errorBox.textContent = "";
 
   try {
-    await firebase.auth().signInWithEmailAndPassword(email, password);
+    const res = await fetch(`${SERVER_URL}/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-    // Save session
-    localStorage.setItem("sh_admin_auth", "1");
+    const data = await res.json();
+    if (!data.ok) {
+      errorBox.textContent = data.error;
+      return;
+    }
 
-    // Redirect
+    localStorage.setItem("admin_jwt", data.token);
     window.location.href = "index.html";
-
   } catch (err) {
-    errorEl.textContent = err.message;
+    errorBox.textContent = "Network error, try again.";
   }
 });
