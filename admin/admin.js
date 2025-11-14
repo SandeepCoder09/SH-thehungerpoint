@@ -40,6 +40,11 @@
 
     console.log("Admin FCM Token:", token);
 
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("admin_jwt");
+  window.location.href = "login.html";
+});
+
     // Save token for alerts
     await firebase.firestore()
       .collection("adminTokens")
@@ -144,7 +149,7 @@ function renderOrders() {
     sel.onchange = async (e) => {
       let id = e.target.dataset.id;
       let newStatus = e.target.value;
-      await db.collection("orders").doc(id).update({ status: newStatus });
+      await updateOrderStatus(order.id, "completed") // or whatever status
     };
   });
 }
@@ -251,3 +256,22 @@ function updateCharts() {
 // SEARCH + FILTER
 searchInput.oninput = renderOrders;
 statusFilter.onchange = renderOrders;
+
+async function updateOrderStatus(orderId, newStatus) {
+  const token = localStorage.getItem("admin_jwt");
+
+  const res = await fetch("https://sh-thehungerpoint.onrender.com/admin/update-status", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ orderId, status: newStatus })
+  });
+
+  const data = await res.json();
+  if (!data.ok) {
+    alert("Failed to update");
+  }
+}
+
