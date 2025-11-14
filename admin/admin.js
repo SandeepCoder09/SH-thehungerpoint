@@ -1,5 +1,6 @@
-if (localStorage.getItem("sh_admin_auth") !== "1") {
-  window.location.href = "login.html";
+// Block access if admin not logged in
+if (!localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "login.html";
 }
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
