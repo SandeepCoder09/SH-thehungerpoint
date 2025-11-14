@@ -1,29 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin — SH The Hunger Point</title>
-
-  <link rel="stylesheet" href="admin.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
+  <meta charset="UTF-8" />
+  <title>Admin Panel | SH Hunger Point</title>
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-
 </head>
 <body>
 
-<header class="header">
-  <h2>Admin Panel — SH The Hunger Point</h2>
-  <p>View and manage orders in real-time</p>
-</header>
+<h1>Admin Dashboard</h1>
+<button id="logoutBtn">Logout</button>
 
-<main class="container">
-  <div id="orders" class="orders"></div>
-</main>
+<h2>Orders</h2>
+<div id="orders"></div>
 
 <script src="admin.js"></script>
 </body>
