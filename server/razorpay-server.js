@@ -1,32 +1,27 @@
-// server/razorpay-server.js
-
+// razorpay-server.js
 require("dotenv").config();
 const express = require("express");
 const Razorpay = require("razorpay");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const crypto = require("crypto");
 const admin = require("firebase-admin");
 
 const app = express();
 
-/* --------------------------------------
-   CORS FIX (works on Render + GitHub Pages)
---------------------------------------- */
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// ------------------------------------------------------------
+// 1️⃣ CORS — Allow GitHub Pages + anywhere (safe for now)
+// ------------------------------------------------------------
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(bodyParser.json());
 
-/* --------------------------------------
-   FIREBASE ADMIN INIT USING ENV VARIABLES
---------------------------------------- */
-// FIREBASE ADMIN CONFIG USING ENV VARIABLES
+// ------------------------------------------------------------
+// 2️⃣ Firebase Admin SDK Setup (using Render ENV variables)
+// ------------------------------------------------------------
 const serviceAccount = {
   type: process.env.FIREBASE_TYPE,
   project_id: process.env.FIREBASE_PROJECT_ID,
@@ -42,80 +37,91 @@ const serviceAccount = {
 };
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
 
-/* --------------------------------------
-   RAZORPAY INITIALIZATION
---------------------------------------- */
+// ------------------------------------------------------------
+// 3️⃣ Razorpay Credentials (from ENV variables)
+// ------------------------------------------------------------
 const razorpay = new Razorpay({
   key_id: process.env.RZP_KEY_ID,
-  key_secret: process.env.RZP_KEY_SECRET,
+  key_secret: process.env.RZP_KEY_SECRET
 });
 
-/* --------------------------------------
-   CREATE ORDER API
---------------------------------------- */
+// ------------------------------------------------------------
+// 4️⃣ Create Razorpay Order Route
+// ------------------------------------------------------------
 app.post("/create-order", async (req, res) => {
   try {
-    const amount = req.body.amount * 100; // convert to paise
+    const { amount } = req.body;
 
     const order = await razorpay.orders.create({
-      amount,
+      amount: amount * 100,
       currency: "INR",
-      receipt: "receipt_" + new Date().getTime(),
+      receipt: "receipt_" + Date.now()
     });
 
-    res.send({
+    res.json({
       ok: true,
-      key_id: process.env.RZP_KEY_ID,
       order,
+      key_id: process.env.RZP_KEY_ID
     });
   } catch (err) {
-    console.log("Order error:", err);
-    res.status(500).send({ ok: false, error: err });
+    console.error("Create Order Error:", err);
+    res.json({ ok: false, error: err });
   }
 });
 
-/* --------------------------------------
-   VERIFY PAYMENT API
---------------------------------------- */
+// ------------------------------------------------------------
+// 5️⃣ Verify Payment Route
+// ------------------------------------------------------------
+const crypto = require("crypto");
+
 app.post("/verify-payment", async (req, res) => {
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-    items,
-  } = req.body;
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      items
+    } = req.body;
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RZP_KEY_SECRET)
-    .update(body.toString())
-    .digest("hex");
+    const hmac = crypto.createHmac("sha256", process.env.RZP_KEY_SECRET);
+    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+    const expectedSignature = hmac.digest("hex");
 
-  if (expectedSignature !== razorpay_signature) {
-    return res.status(400).send({ ok: false, message: "Invalid signature" });
+    if (expectedSignature !== razorpay_signature) {
+      return res.json({ ok: false, message: "Payment verification failed" });
+    }
+
+    // Save order to Firebase
+    const ref = await db.collection("orders").add({
+      razorpay_order_id,
+      razorpay_payment_id,
+      items,
+      timestamp: Date.now()
+    });
+
+    res.json({ ok: true, orderId: ref.id });
+  } catch (err) {
+    console.error("Verify Payment Error:", err);
+    res.json({ ok: false });
   }
-
-  // Save order to Firebase
-  const orderRef = await db.collection("orders").add({
-    orderId: razorpay_order_id,
-    paymentId: razorpay_payment_id,
-    items,
-    timestamp: Date.now(),
-    status: "paid",
-  });
-
-  res.send({ ok: true, orderId: orderRef.id });
 });
 
-/* --------------------------------------
-   START SERVER
---------------------------------------- */
+// ------------------------------------------------------------
+// 6️⃣ /ping Route — Used by Cron Job to keep server awake
+// ------------------------------------------------------------
+app.get("/ping", (req, res) => {
+  res.send("Server Active ✔");
+});
+
+// ------------------------------------------------------------
+// 7️⃣ Start Server
+// ------------------------------------------------------------
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log("🚀 Razorpay Server Running on PORT:", PORT);
+  console.log(`🚀 Razorpay Server Running on PORT: ${PORT}`);
 });
