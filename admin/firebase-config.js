@@ -9,3 +9,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+localStorage.setItem("sh_admin_auth", "1");
+
+localStorage.removeItem("sh_admin_auth");
