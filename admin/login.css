@@ -1,66 +1,67 @@
-/* admin/login.css */
-:root {
-  --bg: #f5f5f7;
-  --card: #fff;
-  --accent: #d84444;
-  --muted: #888;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, Segoe UI, Roboto, "Helvetica Neue", Arial
-}
-
 body {
   margin: 0;
-  background: var(--bg);
+  padding: 0;
+  background: #fafafa;
+  font-family: "Poppins", sans-serif;
   display: flex;
-  min-height: 100vh;
+  justify-content: center;
   align-items: center;
-  justify-content: center
+  height: 100vh;
 }
 
-.login-wrap {
-  width: 100%;
-  max-width: 420px;
-  padding: 24px
+.login-container {
+  text-align: center;
 }
 
-.login-card {
-  background: var(--card);
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08)
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #e23744;
 }
 
-.login-card h1 {
-  margin: 0 0 18px;
-  font-size: 20px;
-  color: #222
+.subtitle {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 25px;
 }
 
-.login-card input {
-  width: 100%;
-  padding: 12px 14px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid #e6e6e9
+.login-box {
+  width: 320px;
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
 }
 
-.btn {
+.login-box input {
   width: 100%;
   padding: 12px;
-  border-radius: 8px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  background: #e23744;
   border: none;
-  background: var(--accent);
-  color: #fff;
+  color: white;
+  font-size: 15px;
   font-weight: 600;
-  margin-top: 10px;
-  cursor: pointer
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #c72938;
 }
 
 .error {
-  color: #b62828;
-  margin-top: 8px;
-  font-size: 13px
+  margin-top: 12px;
+  color: #e23744;
+  font-size: 13px;
+  height: 18px;
 }
