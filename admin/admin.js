@@ -1,234 +1,189 @@
-// Block access if admin not logged in
+// LOGIN PROTECTION
 if (!localStorage.getItem("adminLoggedIn")) {
     window.location.href = "login.html";
 }
 
+const db = firebase.firestore();
+
+const ordersList = document.getElementById("ordersList");
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+
+const totalOrdersEl = document.getElementById("totalOrders");
+const totalSalesEl = document.getElementById("totalSales");
+const recentOrdersEl = document.getElementById("recentOrders");
+
+const sound = document.getElementById("newOrderSound");
+
+// CHART CONTEXTS
+let hourChart, weekChart;
+const hourCtx = document.getElementById("hourChart").getContext("2d");
+const weekCtx = document.getElementById("weekChart").getContext("2d");
+
+// LOGOUT
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.removeItem("sh_admin_auth");
-  firebase.auth().signOut();
+  localStorage.removeItem("adminLoggedIn");
   window.location.href = "login.html";
 });
 
-// admin.js
-// Ensure firebase-config.js exists and initializes `firebase`
-
-// Protect: redirect to login if not authenticated locally
-if (localStorage.getItem("sh_admin_auth") !== "1") {
-  window.location.href = "login.html";
+// Helper: Currency
+function ₹(number) {
+  return "₹" + Number(number).toFixed(0);
 }
 
-// Firestore
-const db = firebase.firestore();
-
-// DOM
-const ordersListEl = document.getElementById("ordersList");
-const statOrdersEl = document.getElementById("statOrders");
-const statSalesEl = document.getElementById("statSales");
-const statRecentEl = document.getElementById("statRecent");
-const ordersChartCtx = document.getElementById("ordersChart").getContext("2d");
-const salesChartCtx = document.getElementById("salesChart").getContext("2d");
-const pingAudio = document.getElementById("pingAudio");
-const searchInput = document.getElementById("searchInput");
-const statusFilter = document.getElementById("statusFilter");
-const refreshBtn = document.getElementById("refreshBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const darkToggle = document.getElementById("darkToggle");
-
-let ordersCache = new Map();
-let ordersChart, salesChart;
-let lastSnapshotIds = new Set();
-
-// Helpers
-function formatCurrency(x){ return "₹" + (Number(x)||0); }
-function timeAgo(ts){ return ts ? new Date(ts).toLocaleString() : "-" }
-
-// Render single order card
-function renderOrderCard(id, data){
-  const itemsHtml = (data.items || []).map(i => `<li>${i.name} — x${i.qty} — ₹${i.price}</li>`).join("");
-  const total = data.amount ?? ((data.items||[]).reduce((s,it)=>s + (it.qty*it.price),0));
-  return `
-    <div class="orderItem" data-id="${id}">
-      <div class="order-left">
-        <div class="order-item-title">Order #${id}</div>
-        <div class="order-meta">Payment: ${data.razorpay_payment_id||'—'} • ${timeAgo(data.createdAt)}</div>
-        <ul class="items-list">${itemsHtml}</ul>
-        <div class="order-meta"><strong>Total:</strong> ${formatCurrency(total)}</div>
-      </div>
-
-      <div class="order-right">
-        <div><strong>${formatCurrency(total)}</strong></div>
-        <div style="margin-top:8px">
-          <select class="status-select" data-id="${id}">
-            <option value="paid"${data.status==="paid"?" selected":""}>paid</option>
-            <option value="preparing"${data.status==="preparing"?" selected":""}>preparing</option>
-            <option value="on the way"${data.status==="on the way"?" selected":""}>on the way</option>
-            <option value="completed"${data.status==="completed"?" selected":""}>completed</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  `;
+// Helper: time ago
+function formatTime(ts) {
+  return new Date(ts).toLocaleString();
 }
 
-// Render list (apply filters/search)
-function renderOrdersList(){
-  const q = (searchInput.value || "").trim().toLowerCase();
+let ordersCache = [];
+
+// RENDER ORDERS LIST
+function renderOrders() {
+  const keyword = searchInput.value.toLowerCase();
   const statusF = statusFilter.value;
-  const arr = Array.from(ordersCache.entries())
-    .map(([id,data]) => ({id, ...data}))
-    .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
 
-  const filtered = arr.filter(o=>{
-    if (statusF && o.status !== statusF) return false;
-    if (!q) return true;
-    return (o.id && o.id.toLowerCase().includes(q)) ||
-           (o.items && o.items.some(it=> (it.name||"").toLowerCase().includes(q)));
-  });
+  let filtered = ordersCache.filter(o => 
+    (!statusF || o.status === statusF) &&
+    (o.id.toLowerCase().includes(keyword) || 
+     o.items.some(i => i.name.toLowerCase().includes(keyword)))
+  );
 
-  if (!filtered.length){
-    ordersListEl.innerHTML = `<div class="emptyMsg">No orders found.</div>`;
+  if (filtered.length === 0) {
+    ordersList.innerHTML = `<p>No orders found...</p>`;
     return;
   }
 
-  ordersListEl.innerHTML = filtered.map(o => renderOrderCard(o.id,o)).join("");
-  // attach status listeners
-  document.querySelectorAll(".status-select").forEach(sel=>{
-    sel.addEventListener("change", async (e)=>{
-      const id = e.target.dataset.id;
-      const newStatus = e.target.value;
-      try {
-        await db.collection("orders").doc(id).update({ status: newStatus });
-      } catch(err){ console.error("Status update:", err); alert("Failed to update status") }
-    });
+  ordersList.innerHTML = filtered.map(o => `
+    <div class="order-card">
+      <div class="left">
+        <h3>Order #${o.id}</h3>
+        <p>${formatTime(o.createdAt)}</p>
+        <ul>
+          ${o.items.map(i => `<li>${i.name} × ${i.qty} — ₹${i.price}</li>`).join("")}
+        </ul>
+        <strong>Total: ${₹(o.total)}</strong>
+      </div>
+
+      <div class="right">
+        <select class="status" data-id="${o.id}">
+          <option value="paid" ${o.status=="paid"?"selected":""}>Paid</option>
+          <option value="preparing" ${o.status=="preparing"?"selected":""}>Preparing</option>
+          <option value="on the way" ${o.status=="on the way"?"selected":""}>On the way</option>
+          <option value="completed" ${o.status=="completed"?"selected":""}>Completed</option>
+        </select>
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll(".status").forEach(sel => {
+    sel.onchange = async (e) => {
+      let id = e.target.dataset.id;
+      let newStatus = e.target.value;
+      await db.collection("orders").doc(id).update({ status: newStatus });
+    };
   });
 }
 
-// Compute analytics and update stats + charts
-function computeAnalytics(){
-  const arr = Array.from(ordersCache.values());
-  const totalOrders = arr.length;
-  const totalSales = arr.reduce((s,o)=> s + (o.amount || (o.items||[]).reduce((ss,it)=> ss + (it.qty*it.price),0)), 0);
-  const oneHour = Date.now() - (1000*60*60);
-  const recentCount = arr.filter(o => (o.createdAt || 0) >= oneHour).length;
+// FIREBASE REAL-TIME LISTENER
+db.collection("orders")
+  .orderBy("createdAt", "desc")
+  .onSnapshot(snapshot => {
+    
+    let newOrders = [];
 
-  statOrdersEl.textContent = totalOrders;
-  statSalesEl.textContent = formatCurrency(totalSales);
-  statRecentEl.textContent = recentCount;
+    ordersCache = snapshot.docs.map(doc => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toMillis ? data.createdAt.toMillis() : Date.now();
+      const items = data.items || [];
+      const total = data.amount || items.reduce((s, it) => s + it.qty * it.price, 0);
 
-  // Orders per hour (last 24 hours)
-  const hours = new Array(24).fill(0);
-  const salesPerDay = {};
-  for (const o of arr){
-    const d = new Date(o.createdAt || Date.now());
-    const hr = d.getHours();
-    hours[hr] += 1;
-    const dayKey = d.toISOString().slice(0,10);
-    salesPerDay[dayKey] = (salesPerDay[dayKey] || 0) + (o.amount || (o.items||[]).reduce((ss,it)=> ss + (it.qty*it.price),0));
-  }
-
-  // update charts
-  const labels = Array.from({length:24}, (_,i)=> `${i}:00`);
-  const ordersData = hours;
-  updateOrdersChart(labels, ordersData);
-
-  const last7days = Object.keys(salesPerDay).sort().slice(-7);
-  const salesData = last7days.map(k=> salesPerDay[k] || 0);
-  updateSalesChart(last7days, salesData);
-}
-
-// Chart initializations
-function initCharts(){
-  ordersChart = new Chart(ordersChartCtx, {
-    type: 'bar',
-    data: { labels: [], datasets: [{ label:'Orders', data:[], backgroundColor: 'rgba(226,55,68,0.9)'}] },
-    options: { responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}}
-  });
-  salesChart = new Chart(salesChartCtx, {
-    type:'line',
-    data:{ labels:[], datasets:[{ label:'Sales (₹)', data:[], borderColor:'#e23744', backgroundColor:'rgba(226,55,68,0.08)', tension:0.3 }] },
-    options:{ responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}} }
-  });
-}
-
-function updateOrdersChart(labels,data){
-  if (!ordersChart) return;
-  ordersChart.data.labels = labels;
-  ordersChart.data.datasets[0].data = data;
-  ordersChart.update();
-}
-function updateSalesChart(labels,data){
-  if (!salesChart) return;
-  salesChart.data.labels = labels;
-  salesChart.data.datasets[0].data = data;
-  salesChart.update();
-}
-
-// Real-time listener for orders collection
-function subscribeOrders(){
-  db.collection("orders").orderBy("createdAt","desc").onSnapshot(snapshot=>{
-    let newIdFound = false;
-    snapshot.docChanges().forEach(change=>{
-      const id = change.doc.id;
-      const data = change.doc.data();
-      // ensure numeric timestamp (if Firestore Timestamp)
-      if (data.createdAt && data.createdAt.toMillis) data.createdAt = data.createdAt.toMillis();
-      if (change.type === "added"){
-        if (!ordersCache.has(id)) newIdFound = true;
+      if (!ordersCache.find(o => o.id === doc.id)) {
+        sound.play().catch(()=>{});
       }
-      if (change.type === "removed"){
-        ordersCache.delete(id);
-      } else {
-        ordersCache.set(id, {...data});
-      }
+
+      return {
+        id: doc.id,
+        items,
+        total,
+        status: data.status || "paid",
+        createdAt
+      };
     });
 
-    // Play sound only when a truly new id appears
-    const incomingIds = snapshot.docs.map(d=>d.id);
-    const newly = incomingIds.filter(i => !lastSnapshotIds.has(i));
-    if (newly.length) {
-      // mark new ids
-      newly.forEach(i=> lastSnapshotIds.add(i));
-      // play sound & highlight last one
-      pingAudio.play().catch(()=>{});
-    }
-
-    renderOrdersList();
-    computeAnalytics();
-  }, err=>{
-    console.error("Orders subscription error:", err);
-    ordersListEl.innerHTML = `<div class="emptyMsg">Error loading orders: ${err.message}</div>`;
-  });
-}
-
-// UI events
-searchInput.addEventListener("input", () => renderOrdersList());
-statusFilter.addEventListener("change", () => renderOrdersList());
-refreshBtn.addEventListener("click", () => { computeAnalytics(); renderOrdersList(); });
-
-// Logout
-logoutBtn.addEventListener("click", ()=> {
-  localStorage.removeItem("sh_admin_auth");
-  window.location.href = "login.html";
+    renderOrders();
+    updateStats();
+    updateCharts();
 });
 
-// Dark mode toggle
-darkToggle.addEventListener("change", (e)=>{
-  if (e.target.checked) {
-    document.body.classList.add("dark");
-    localStorage.setItem("sh_admin_dark","1");
+// UPDATE TOP STATS
+function updateStats() {
+  totalOrdersEl.textContent = ordersCache.length;
+
+  const totalSales = ordersCache.reduce((s, o) => s + o.total, 0);
+  totalSalesEl.textContent = ₹(totalSales);
+
+  const oneHourAgo = Date.now() - 3600000;
+  const recent = ordersCache.filter(o => o.createdAt >= oneHourAgo).length;
+  recentOrdersEl.textContent = recent;
+}
+
+// CHARTS
+function updateCharts() {
+  // Hours (24)
+  let hours = Array(24).fill(0);
+  ordersCache.forEach(o => {
+    let h = new Date(o.createdAt).getHours();
+    hours[h]++;
+  });
+
+  if (!hourChart) {
+    hourChart = new Chart(hourCtx, {
+      type: "bar",
+      data: {
+        labels: Array.from({length:24}, (_,i)=>i+":00"),
+        datasets: [{
+          label: "Orders",
+          backgroundColor: "#e23744",
+          data: hours
+        }]
+      }
+    });
   } else {
-    document.body.classList.remove("dark");
-    localStorage.removeItem("sh_admin_dark");
+    hourChart.data.datasets[0].data = hours;
+    hourChart.update();
   }
-});
 
-// restore dark
-if (localStorage.getItem("sh_admin_dark")==="1"){
-  darkToggle.checked = true;
-  document.body.classList.add("dark");
+  // 7-day sales
+  let days = {};
+  ordersCache.forEach(o => {
+    let key = new Date(o.createdAt).toISOString().slice(0,10);
+    days[key] = (days[key] || 0) + o.total;
+  });
+
+  let keys = Object.keys(days).slice(-7);
+  let values = keys.map(k => days[k]);
+
+  if (!weekChart) {
+    weekChart = new Chart(weekCtx, {
+      type: "line",
+      data: {
+        labels: keys,
+        datasets: [{
+          label: "Sales (₹)",
+          borderColor: "#e23744",
+          data: values,
+          tension: 0.4
+        }]
+      }
+    });
+  } else {
+    weekChart.data.labels = keys;
+    weekChart.data.datasets[0].data = values;
+    weekChart.update();
+  }
 }
 
-// Init
-initCharts();
-subscribeOrders();
-computeAnalytics();
+// SEARCH + FILTER
+searchInput.oninput = renderOrders;
+statusFilter.onchange = renderOrders;
