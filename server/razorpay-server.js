@@ -7,81 +7,114 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const admin = require("firebase-admin");
-const serviceAccount = require("./admin/serviceAccountKey.json");
 
 const app = express();
 
-// 1️⃣ CORS FIX
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+/* --------------------------------------
+   CORS FIX (works on Render + GitHub Pages)
+--------------------------------------- */
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(bodyParser.json());
 
-// 2️⃣ Firebase Admin Initialization
+/* --------------------------------------
+   FIREBASE ADMIN INIT USING ENV VARIABLES
+--------------------------------------- */
+const serviceAccount = {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
+  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+};
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
+
 const db = admin.firestore();
 
-// 3️⃣ Razorpay Credentials
-const RZP_KEY_ID = process.env.RZP_KEY_ID;
-const RZP_KEY_SECRET = process.env.RZP_KEY_SECRET;
-
-if (!RZP_KEY_ID || !RZP_KEY_SECRET) {
-  console.log("❌ ERROR: Razorpay keys missing in .env");
-  process.exit(1);
-}
-
+/* --------------------------------------
+   RAZORPAY INITIALIZATION
+--------------------------------------- */
 const razorpay = new Razorpay({
-  key_id: RZP_KEY_ID,
-  key_secret: RZP_KEY_SECRET
+  key_id: process.env.RZP_KEY_ID,
+  key_secret: process.env.RZP_KEY_SECRET,
 });
 
-// 4️⃣ CREATE PAYMENT ORDER
+/* --------------------------------------
+   CREATE ORDER API
+--------------------------------------- */
 app.post("/create-order", async (req, res) => {
   try {
-    const { amount, items } = req.body;
+    const amount = req.body.amount * 100; // convert to paise
 
-    if (!amount || !items) {
-      return res.status(400).json({ error: "Amount or items missing" });
-    }
-
-    const options = {
-      amount: amount * 100,
+    const order = await razorpay.orders.create({
+      amount,
       currency: "INR",
-      receipt: "receipt_" + Date.now()
-    };
-
-    // Create order in Razorpay
-    const order = await razorpay.orders.create(options);
-
-    // Save to Firestore
-    await db.collection("orders").add({
-      items: items,
-      total: amount,
-      status: "Pending",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      razorpayOrderId: order.id
+      receipt: "receipt_" + new Date().getTime(),
     });
 
-    res.json({
-      id: order.id,
-      amount: order.amount,
-      currency: order.currency
+    res.send({
+      ok: true,
+      key_id: process.env.RZP_KEY_ID,
+      order,
     });
-
-  } catch (error) {
-    console.error("❌ Error creating order:", error);
-    res.status(500).json({ error: "Order creation failed" });
+  } catch (err) {
+    console.log("Order error:", err);
+    res.status(500).send({ ok: false, error: err });
   }
 });
 
+/* --------------------------------------
+   VERIFY PAYMENT API
+--------------------------------------- */
+app.post("/verify-payment", async (req, res) => {
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    items,
+  } = req.body;
 
-// 5️⃣ SERVER LISTENER
-const PORT = process.env.PORT || 5000;
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RZP_KEY_SECRET)
+    .update(body.toString())
+    .digest("hex");
+
+  if (expectedSignature !== razorpay_signature) {
+    return res.status(400).send({ ok: false, message: "Invalid signature" });
+  }
+
+  // Save order to Firebase
+  const orderRef = await db.collection("orders").add({
+    orderId: razorpay_order_id,
+    paymentId: razorpay_payment_id,
+    items,
+    timestamp: Date.now(),
+    status: "paid",
+  });
+
+  res.send({ ok: true, orderId: orderRef.id });
+});
+
+/* --------------------------------------
+   START SERVER
+--------------------------------------- */
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 SH Hunger Backend running on port ${PORT}`);
+  console.log("🚀 Razorpay Server Running on PORT:", PORT);
 });
