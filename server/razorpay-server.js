@@ -64,27 +64,19 @@ app.get("/ping", (req, res) => {
 });
 
 // -----------------------------
-// 2) ADMIN LOGIN (PLAIN TEXT)
-// -----------------------------
-
-console.log("DEBUG_ADMIN:",
-  "ADMIN_EMAIL =", ADMIN_EMAIL,
-  "ADMIN_PASSWORD =", ADMIN_PASSWORD,
-  "ADMIN_JWT_SECRET =", ADMIN_JWT_SECRET
-);
-
+// Admin Login System 
 app.post("/admin/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (email !== ADMIN_EMAIL) {
-    return res.json({ ok: false, error: "Invalid email" });
+  if (
+    email !== process.env.ADMIN_EMAIL ||
+    password !== process.env.ADMIN_PASSWORD
+  ) {
+    return res.json({ ok: false, error: "Invalid email or password" });
   }
 
-  if (password !== ADMIN_PASSWORD) {
-    return res.json({ ok: false, error: "Invalid password" });
-  }
-
-  const token = jwt.sign({ email }, ADMIN_JWT_SECRET, { expiresIn: "12h" });
+  const jwt = require("jsonwebtoken");
+  const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "2h" });
 
   res.json({ ok: true, token });
 });
