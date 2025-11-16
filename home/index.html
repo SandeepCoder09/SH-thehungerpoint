@@ -7,14 +7,14 @@
 
   <link rel="stylesheet" href="/home/style.css" />
 
-  <!-- Firebase SDKs (Firestore only) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-  <!-- Your firebase config (local file) -->
   <script src="firebase-config.js"></script>
 </head>
 <body>
+  <!-- HEADER -->
   <header class="nav">
     <div class="brand">
       <div class="logo-mark">SH</div>
@@ -25,39 +25,42 @@
     </div>
 
     <div class="header-actions">
-      <button id="cartToggle" class="icon-btn" aria-label="Toggle cart">
-        🛒 <span id="cartCount">0</span>
+      <button id="cartToggle" class="icon-btn">
+        🛒<span id="cartCount">0</span>
       </button>
     </div>
   </header>
 
   <main class="container">
+    <!-- Hero -->
     <section class="hero">
       <h1>Delicious. Fast. Fresh.</h1>
       <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
     </section>
 
-    <!-- Tabs (Home / Orders / Profile / Offers) -->
-    <nav class="top-tabs" aria-label="Main navigation">
+    <!-- TABS -->
+    <nav class="top-tabs">
       <button class="tab active" data-tab="home">Home</button>
       <button class="tab" data-tab="orders">My Orders</button>
       <button class="tab" data-tab="profile">Profile</button>
       <button class="tab" data-tab="offers">Offers</button>
     </nav>
 
+    <!-- HOME MENU -->
     <section id="home" class="page page-home">
-      <section class="menu" aria-label="menu">
-        <!-- Items: momo, finger, tea, hot tea -->
+      <section class="menu">
+        
         <article class="menu-item" data-item="Momo" data-price="10">
           <div class="mi-left">
             <h3>Momo</h3>
             <div class="price">₹10 <small>/ 5 pieces</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
-              <button class="qty-btn" data-action="dec">−</button>
+              <button class="qty-btn">−</button>
               <span class="qty">1</span>
-              <button class="qty-btn" data-action="inc">+</button>
+              <button class="qty-btn">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -68,11 +71,12 @@
             <h3>Finger</h3>
             <div class="price">₹10 <small>/ plate</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
-              <button class="qty-btn" data-action="dec">−</button>
+              <button class="qty-btn">−</button>
               <span class="qty">1</span>
-              <button class="qty-btn" data-action="inc">+</button>
+              <button class="qty-btn">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -83,11 +87,12 @@
             <h3>Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
-              <button class="qty-btn" data-action="dec">−</button>
+              <button class="qty-btn">−</button>
               <span class="qty">1</span>
-              <button class="qty-btn" data-action="inc">+</button>
+              <button class="qty-btn">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -98,32 +103,36 @@
             <h3>Hot Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
-              <button class="qty-btn" data-action="dec">−</button>
+              <button class="qty-btn">−</button>
               <span class="qty">1</span>
-              <button class="qty-btn" data-action="inc">+</button>
+              <button class="qty-btn">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
         </article>
+
       </section>
     </section>
 
-    <!-- Orders / Profile / Offers placeholders -->
+    <!-- ORDERS -->
     <section id="orders" class="page hidden">
       <h2>Your Orders</h2>
       <p id="pastOrders">No orders yet.</p>
     </section>
 
+    <!-- PROFILE -->
     <section id="profile" class="page hidden">
       <h2>Profile</h2>
-      <p>— Admin / user profile info will be here.</p>
+      <p>Profile details will appear here.</p>
     </section>
 
+    <!-- OFFERS -->
     <section id="offers" class="page hidden">
       <h2>Offers</h2>
-      <p>— Any active offers will be shown here.</p>
+      <p>No active offers.</p>
     </section>
 
     <section id="order-status" class="order-status hidden">
@@ -132,8 +141,8 @@
     </section>
   </main>
 
-  <!-- Cart drawer -->
-  <aside id="cartDrawer" class="cart-drawer hidden" aria-hidden="true">
+  <!-- CART MODAL -->
+  <aside id="cartDrawer" class="cart-drawer hidden">
     <header>
       <h3>Your Cart</h3>
       <button id="closeCart" class="icon-btn">✕</button>
@@ -152,17 +161,13 @@
     </footer>
   </aside>
 
+  <!-- FOOTER -->
   <footer class="footer">
-    <p>© 2025 SH — The Hunger Point</p>
+    © 2025 SH — The Hunger Point
   </footer>
 
-  <!-- Razorpay Checkout -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-  <!-- Toast container -->
-  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
-
-  <!-- Main script -->
+  <div id="toast-container" class="toast-container"></div>
   <script src="/home/script.js"></script>
 </body>
 </html>
