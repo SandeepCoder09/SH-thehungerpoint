@@ -15,7 +15,7 @@
 
 <body>
 
-  <!-- DESKTOP TOP TABS -->
+  <!-- DESKTOP TOP NAVIGATION -->
   <div class="top-tabs">
     <div class="tab active" data-tab="home">Home</div>
     <div class="tab" data-tab="orders">My Orders</div>
@@ -33,12 +33,17 @@
         <div class="tag">Family style • Premium • Fast food</div>
       </div>
     </div>
+
+    <!-- CART ICON -->
+    <div class="cart-icon" id="openCart">
+      🛒 <span id="cartCount">0</span>
+    </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="container">
 
-    <!-- HOME PAGE SECTION -->
+    <!-- PAGE: HOME -->
     <section class="page home-page">
       <section class="hero">
         <h1>Delicious. Fast. Fresh.</h1>
@@ -46,6 +51,7 @@
       </section>
 
       <section class="menu">
+        
         <!-- MOMO -->
         <article class="menu-item" data-item="Momo">
           <div class="mi-left">
@@ -58,7 +64,7 @@
               <span class="qty">1</span>
               <button class="qty-btn" data-action="inc">+</button>
             </div>
-            <button class="order-btn">Order Now</button>
+            <button class="add-cart-btn">Add</button>
           </div>
         </article>
 
@@ -74,7 +80,7 @@
               <span class="qty">1</span>
               <button class="qty-btn" data-action="inc">+</button>
             </div>
-            <button class="order-btn">Order Now</button>
+            <button class="add-cart-btn">Add</button>
           </div>
         </article>
 
@@ -90,15 +96,15 @@
               <span class="qty">1</span>
               <button class="qty-btn" data-action="inc">+</button>
             </div>
-            <button class="order-btn">Order Now</button>
+            <button class="add-cart-btn">Add</button>
           </div>
         </article>
 
-        <!-- NEW ITEM: HOT TEA -->
+        <!-- HOT TEA -->
         <article class="menu-item" data-item="Hot Tea">
           <div class="mi-left">
-            <h3>Bread Pakoda</h3>
-            <div class="price">₹10 <small>/ 1 Bread Pakoda</small></div>
+            <h3>Hot Tea</h3>
+            <div class="price">₹10 <small>/ cup</small></div>
           </div>
           <div class="controls">
             <div class="qty-wrap">
@@ -106,33 +112,39 @@
               <span class="qty">1</span>
               <button class="qty-btn" data-action="inc">+</button>
             </div>
-            <button class="order-btn">Order Now</button>
+            <button class="add-cart-btn">Add</button>
           </div>
         </article>
+
       </section>
 
+      <!-- ORDER CONFIRMATION MESSAGE -->
       <section id="order-status" class="order-status hidden">
         <h3>Order Confirmed 🎉</h3>
         <p id="eta-text"></p>
       </section>
+
     </section>
 
-    <!-- OTHER TABS: Blank for now -->
-    <section class="page orders-page" style="display:none;">
+    <!-- PAGE: MY ORDERS -->
+    <section class="page orders-page" style="display: none;">
       <h2>My Orders</h2>
-      <p>Order history will appear here.</p>
+      <p>Your order history will show here.</p>
     </section>
 
+    <!-- PAGE: PROFILE -->
     <section class="page profile-page" style="display:none;">
       <h2>My Profile</h2>
-      <p>User profile details here.</p>
+      <p>Profile details coming soon.</p>
     </section>
 
+    <!-- PAGE: OFFERS -->
     <section class="page offers-page" style="display:none;">
       <h2>Offers</h2>
       <p>No offers available right now.</p>
     </section>
 
+    <!-- PAGE: HELP -->
     <section class="page help-page" style="display:none;">
       <h2>Help & Support</h2>
       <p>Contact support for help.</p>
@@ -140,8 +152,8 @@
 
   </main>
 
-  <!-- ADMIN PAGE LINK -->
-  <a href="https://sh-thehungerpoint.vercel.app/admin/login.html" target="_block">Admin Panel</a>
+  <!-- ADMIN PANEL LINK -->
+  <a href="https://sh-thehungerpoint.vercel.app/admin/login.html" target="_blank">Admin Panel</a>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -156,10 +168,26 @@
     <div class="bn-item" data-tab="offers">🎉<span>Offers</span></div>
   </div>
 
+  <!-- CART POPUP -->
+  <div class="cart-popup hidden" id="cartPopup">
+    <div class="cart-box">
+      <h3>Your Cart</h3>
+
+      <div id="cartItems"></div>
+
+      <div class="cart-total">
+        Total: <span id="cartTotal">₹0</span>
+      </div>
+
+      <button id="checkoutBtn" class="checkout-btn">Checkout</button>
+      <button id="closeCart" class="close-cart">Close</button>
+    </div>
+  </div>
+
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Toast -->
+  <!-- Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- MAIN SCRIPT -->
