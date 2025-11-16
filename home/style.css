@@ -1,18 +1,20 @@
 /* ---------------------------------------------------
    SH — The Hunger Point
-   STYLE.CSS (Option A: Wide Boxes + Zomato Glow)
-   Fully Responsive — Final Version
+   FULL STYLE.CSS (Fixed UI)
+   - Hero as navbar
+   - Even spaced tabs
+   - Bigger item boxes
+   - Equal + / − buttons
 --------------------------------------------------- */
 
 :root {
   --primary: #E23744;
-  --primary-dark: #b71c1c;
+  --primary-strong: #b71c1c;
   --bg: #F5F6FA;
   --card: #ffffff;
   --muted: #6b6b6b;
-  --radius: 20px;
+  --radius: 22px;
   --shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
-  --glow: 0 6px 28px rgba(226, 55, 68, 0.18);
   --maxWidth: 980px;
 }
 
@@ -22,61 +24,53 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 html, body {
   height: 100%;
 }
-
 body {
   font-family: "Poppins", sans-serif;
-  background: var(--bg);
-  color: #222;
   display: flex;
   flex-direction: column;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: #222;
 }
 
 /* ---------------------------------------------------
-   HEADER
+   HEADER (Top Navigation)
 --------------------------------------------------- */
 .nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 22px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   color: #fff;
   position: sticky;
   top: 0;
-  z-index: 60;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  z-index: 80;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
-
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
-
 .logo-mark {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 14px;
   background: linear-gradient(135deg, #f6b042, #ffd27a);
-  color: #8b1b1b;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #8b1b1b;
   font-weight: 900;
   font-size: 18px;
 }
-
 .brand-text .name {
   font-size: 20px;
   font-weight: 700;
 }
-
 .brand-text .tag {
   font-size: 12px;
   opacity: 0.9;
@@ -84,305 +78,262 @@ body {
 
 .header-actions .icon-btn {
   background: transparent;
-  border: 0;
-  cursor: pointer;
+  border: none;
   color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 800;
+  gap: 6px;
 }
-
-.cart-emoji {
-  font-size: 22px;
-}
-
-#cartCount {
-  font-weight: 800;
-}
+.cart-emoji { font-size: 22px; }
 
 /* ---------------------------------------------------
    MAIN CONTAINER
 --------------------------------------------------- */
 .container {
   max-width: var(--maxWidth);
-  margin: 18px auto;
+  margin: 14px auto;
   padding: 14px;
   flex: 1;
 }
 
 /* ---------------------------------------------------
-   HERO
+   HERO (Now looks like a NAVBAR section)
 --------------------------------------------------- */
 .hero {
-  background: linear-gradient(180deg, rgba(246, 176, 66, 0.08), rgba(226, 50, 50, 0.03));
-  padding: 24px;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(246,176,66,0.08), rgba(226,50,50,0.03));
+  padding: 26px 22px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  text-align: left;
 }
-
 .hero h1 {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 6px;
 }
-
 .hero p {
   font-size: 14px;
+  margin-top: 6px;
   color: var(--muted);
 }
 
 /* ---------------------------------------------------
-   TABS
+   TABS (Even Spaced)
 --------------------------------------------------- */
 .top-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 22px;
-  flex-wrap: wrap;
 }
-
 .tab {
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+  border-radius: 14px;
   background: var(--card);
-  border: 1px solid #eee;
-  cursor: pointer;
+  border: 1px solid #ddd;
   font-weight: 600;
+  cursor: pointer;
   font-size: 14px;
+  transition: 0.15s ease;
 }
-
 .tab.active {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 6px 18px rgba(226, 55, 68, 0.18);
+  box-shadow: 0 6px 16px rgba(226,55,68,0.32);
 }
 
 /* ---------------------------------------------------
-   MENU — Big Zomato Style Boxes
+   MENU ITEMS
 --------------------------------------------------- */
 .menu {
   display: grid;
-  gap: 22px;
+  gap: 26px;
 }
 
 .menu-item {
-  width: 90%;
-  margin: 0 auto;
   background: var(--card);
-  padding: 28px;
-  border-radius: 24px;
+  padding: 26px;
+  width: 96%;
+  margin: 0 auto;
+  border-radius: 26px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 28px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-  transition: 0.18s ease;
+  gap: 22px;
+  box-shadow: var(--shadow);
+  transition: 0.2s ease;
 }
-
 .menu-item:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.14);
 }
 
 .mi-left h3 {
   font-size: 22px;
   font-weight: 700;
 }
-
 .price {
   margin-top: 6px;
-  font-size: 18px;
   color: var(--primary);
+  font-size: 18px;
   font-weight: 700;
 }
-
 .price small {
   color: var(--muted);
-  font-size: 13px;
-  margin-left: 8px;
+  margin-left: 4px;
+  font-size: 12px;
 }
 
 /* ---------------------------------------------------
-   QTY CONTROLS
+   CONTROLS (Equal - and + Button Sizes)
 --------------------------------------------------- */
 .controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .qty-wrap {
   display: flex;
   align-items: center;
+  border-radius: 40px;
   overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.08);
   background: #fff;
 }
 
 .qty-btn {
-  padding: 12px 22px;
+  width: 56px;
+  height: 48px;
+  border: none;
   background: var(--primary);
   color: #fff;
-  border: none;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
-
 .qty {
-  padding: 8px 12px;
-  font-size: 18px;
-  font-weight: 800;
-  min-width: 44px;
+  width: 50px;
   text-align: center;
+  font-size: 18px;
+  font-weight: 700;
 }
 
-/* ---------------------------------------------------
-   ADD BUTTON (Zomato Glow)
---------------------------------------------------- */
+/* Add button */
 .add-cart-btn {
-  background: var(--card);
-  border: 2px solid var(--primary);
-  padding: 12px 18px;
+  padding: 12px 20px;
   border-radius: 14px;
-  font-weight: 800;
+  border: 2px solid var(--primary);
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.18s ease-in-out;
-  box-shadow: var(--glow);
+  transition: 0.2s ease;
+  box-shadow: 0 8px 20px rgba(226,55,68,0.26);
 }
-
 .add-cart-btn:hover {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 12px 40px rgba(226, 55, 68, 0.28);
+  box-shadow: 0 12px 32px rgba(226,55,68,0.38);
 }
 
 /* ---------------------------------------------------
-   ORDER STATUS
---------------------------------------------------- */
-.order-status {
-  margin-top: 20px;
-  padding: 18px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #fff8e6, #fff4f2);
-  text-align: center;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* ---------------------------------------------------
-   CART MODAL — Center Popup
+   CART MODAL (same as previous)
 --------------------------------------------------- */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.35);
-  z-index: 120;
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.2s ease;
+  z-index: 200;
 }
-
-.overlay:not(.hidden) {
-  opacity: 1;
-  visibility: visible;
+.hidden {
+  display: none !important;
 }
 
 .cart-modal {
   position: fixed;
   left: 50%;
   top: 50%;
-  width: 90%;
-  max-width: 650px;
-  transform: translate(-50%, -50%) scale(0.92);
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 680px;
   background: var(--card);
-  border-radius: 20px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.25);
-  z-index: 130;
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.25s ease;
-}
-
-.cart-modal:not(.hidden) {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  visibility: visible;
+  border-radius: 18px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.25);
+  z-index: 210;
 }
 
 .cart-modal-head,
 .cart-modal-foot {
+  display: flex;
+  justify-content: space-between;
   padding: 16px;
   border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
-
 .cart-items {
   padding: 16px;
-  max-height: 55vh;
+  max-height: 52vh;
   overflow-y: auto;
 }
-
 .cart-item {
-  background: #fafafa;
-  padding: 12px;
-  border-radius: 12px;
   display: flex;
   justify-content: space-between;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 10px;
   margin-bottom: 12px;
 }
 
-/* FOOTER */
+/* ---------------------------------------------------
+   FOOTER
+--------------------------------------------------- */
 .footer {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  padding: 18px;
-  text-align: center;
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   color: #fff;
   font-weight: 600;
+  text-align: center;
+  padding: 18px;
+  margin-top: auto;
 }
 
-/* TOAST */
+/* Toasts */
 .toast-container {
   position: fixed;
-  bottom: 24px;
+  bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2000;
+  z-index: 9999;
 }
-
 .toast {
   background: #222;
-  color: #fff;
   padding: 10px 14px;
-  border-radius: 12px;
-  margin-top: 8px;
+  border-radius: 10px;
+  color: #fff;
+  margin-top: 6px;
 }
 
 /* ---------------------------------------------------
-   RESPONSIVE
+   Responsive Fixes
 --------------------------------------------------- */
 @media (max-width: 520px) {
   .menu-item {
+    width: 98%;
     padding: 20px;
-    width: 95%;
   }
   .qty-btn {
-    padding: 10px 16px;
-    font-size: 18px;
+    width: 50px;
+    height: 44px;
   }
   .qty {
     font-size: 16px;
-  }
-  .add-cart-btn {
-    padding: 10px 14px;
   }
 }
