@@ -1,76 +1,72 @@
-/* /home/style.css
-   Clean, responsive styles for index.html (bottom-drawer cart)
-   Primary color: #E23744
-*/
+/* ---------------------------------------------------
+   SH — The Hunger Point
+   Fully Responsive + Zomato Glow + Clean UI
+   Primary Color: #E23744
+--------------------------------------------------- */
 
-/* Root variables */
 :root {
   --primary: #E23744;
   --primary-dark: #b71c1c;
   --bg: #F5F6FA;
   --card: #fff;
   --muted: #6b6b6b;
-  --radius: 12px;
-  --shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-/* Reset */
+/* RESET */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Poppins", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
-html,
-body {
+html, body {
   height: 100%;
 }
 
 body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
   background: var(--bg);
   color: #222;
+  display: flex;
+  flex-direction: column;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* -----------------------------------------
+/* ---------------------------------------------------
    HEADER
------------------------------------------ */
+--------------------------------------------------- */
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
+  padding: 18px 20px;
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
   position: sticky;
   top: 0;
-  z-index: 60;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  z-index: 99;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .logo-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #f6b042, #ffd27a);
-  color: #8b1b1b;
+  color: #902020;
+  font-weight: 800;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 18px;
 }
 
 .brand-text .name {
@@ -80,211 +76,251 @@ body {
 
 .brand-text .tag {
   font-size: 12px;
-  opacity: 0.95;
+  opacity: 0.8;
 }
 
-.header-actions .icon-btn {
+/* Header Cart Button */
+.icon-btn {
   background: transparent;
   border: none;
   color: #fff;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .cart-emoji {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 #cartCount {
   font-weight: 800;
-  margin-left: 6px;
 }
 
-/* -----------------------------------------
-   LAYOUT CONTAINER
------------------------------------------ */
+/* ---------------------------------------------------
+   CONTAINER + HERO
+--------------------------------------------------- */
 .container {
-  max-width: 980px;
+  flex: 1;
+  max-width: 1050px;
   margin: 18px auto;
   padding: 16px;
-  flex: 1;
 }
 
-/* -----------------------------------------
-   HERO
------------------------------------------ */
 .hero {
-  background: linear-gradient(180deg, rgba(246, 176, 66, 0.06), rgba(226, 50, 50, 0.02));
-  padding: 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(246, 176, 66, 0.1),
+    rgba(226, 55, 68, 0.05)
+  );
+  padding: 26px;
   border-radius: var(--radius);
-  margin-bottom: 16px;
   box-shadow: var(--shadow);
+  margin-bottom: 20px;
 }
 
 .hero h1 {
-  font-size: 22px;
+  font-size: 26px;
+  font-weight: 700;
   color: #2c0d0d;
 }
 
 .hero p {
-  color: var(--muted);
   margin-top: 8px;
-  font-size: 14px;
+  font-size: 15px;
+  color: var(--muted);
 }
 
-/* -----------------------------------------
+/* ---------------------------------------------------
    TABS
------------------------------------------ */
+--------------------------------------------------- */
 .top-tabs {
   display: flex;
   gap: 10px;
-  margin: 12px 0 18px;
+  margin-bottom: 18px;
 }
 
 .tab {
-  padding: 10px 14px;
-  border-radius: 10px;
   background: var(--card);
-  border: 1px solid #eee;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px 16px;
   cursor: pointer;
+  font-size: 15px;
   font-weight: 600;
-  font-size: 14px;
+  transition: 0.2s ease;
 }
 
 .tab.active {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
-  border: none;
+  border-color: transparent;
+  transform: translateY(-2px);
 }
 
-/* -----------------------------------------
-   MENU ITEMS
------------------------------------------ */
+/* ---------------------------------------------------
+   MENU ITEMS (BIGGER ZOMATO STYLE)
+--------------------------------------------------- */
 .menu {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 640px) {
   .menu {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   }
 }
 
 .menu-item {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 14px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  align-items: center;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  transition: 0.2s ease;
+}
+
+.menu-item:hover {
+  transform: translateY(-3px);
 }
 
 .mi-left h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .price {
+  margin-top: 4px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--primary);
-  font-size: 14px;
 }
 
 .price small {
-  font-weight: 500;
-  color: var(--muted);
-  margin-left: 6px;
   font-size: 12px;
+  color: var(--muted);
 }
 
-/* -----------------------------------------
-   MENU CONTROLS (qty, add button)
------------------------------------------ */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
+/* ---------------------------------------------------
+   QTY BUTTONS (+ / -)
+--------------------------------------------------- */
 .qty-wrap {
   display: flex;
   align-items: center;
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
   background: #fff;
+  border-radius: 40px;
+  border: 1px solid #ddd;
+  overflow: hidden;
 }
 
 .qty-btn {
-  border: none;
-  padding: 10px 14px;
-  font-size: 18px;
-  font-weight: 800;
-  cursor: pointer;
   background: var(--primary);
   color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .qty {
-  min-width: 36px;
+  font-size: 16px;
+  min-width: 38px;
   text-align: center;
-  padding: 8px 6px;
   font-weight: 700;
+}
+
+/* ---------------------------------------------------
+   ADD BUTTON — ZOMATO GLOW
+--------------------------------------------------- */
+.add-cart-btn {
+  background: #fff;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.add-cart-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 14px rgba(226, 55, 68, 0.6),
+              0 0 26px rgba(226, 55, 68, 0.4);
+  border-radius: inherit;
+  opacity: 0;
+  transition: 0.3s ease;
+}
+
+.add-cart-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.add-cart-btn:hover::before {
+  opacity: 1;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px rgba(226, 55, 68, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(226, 55, 68, 0.7); }
+  100% { box-shadow: 0 0 10px rgba(226, 55, 68, 0.4); }
 }
 
 .add-cart-btn {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
+  animation: glowPulse 2.5s infinite ease-in-out;
 }
 
-/* -----------------------------------------
+/* ---------------------------------------------------
    ORDER STATUS
------------------------------------------ */
+--------------------------------------------------- */
 .order-status {
-  margin-top: 20px;
-  padding: 18px;
-  background: linear-gradient(90deg, #fff8e6, #fff4f2);
-  border-radius: 12px;
+  background: #fff7e8;
+  padding: 20px;
+  border-radius: var(--radius);
   text-align: center;
+  margin-top: 20px;
+  box-shadow: var(--shadow);
 }
 
 .hidden {
   display: none !important;
 }
 
-/* -----------------------------------------
-   CART DRAWER (BOTTOM SHEET)
------------------------------------------ */
+/* ---------------------------------------------------
+   CART DRAWER (BOTTOM SLIDE)
+--------------------------------------------------- */
 .cart-drawer {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  margin: 0 auto;
-  width: 100%;
+  margin: auto;
   max-width: 980px;
   background: var(--card);
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  box-shadow: 0 -12px 40px rgba(0,0,0,0.18);
   transform: translateY(110%);
-  transition: transform 0.28s ease;
-  z-index: 80;
+  transition: transform 0.3s ease;
+  z-index: 200;
 }
 
 .cart-drawer:not(.hidden) {
@@ -292,42 +328,30 @@ body {
 }
 
 .cart-head {
+  padding: 16px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 12px;
   border-bottom: 1px solid #eee;
 }
 
 .cart-items {
-  padding: 12px;
-  max-height: 50vh;
-  overflow: auto;
+  padding: 16px;
+  max-height: 55vh;
+  overflow-y: auto;
 }
 
 .cart-item {
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 12px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  padding: 10px;
-  border-radius: 10px;
-  background: #fafafa;
-  margin-bottom: 10px;
-  align-items: center;
 }
 
-.cart-item .meta {
-  font-size: 14px;
-}
-
-.cart-item .qty-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* CART FOOTER */
 .cart-footer {
-  padding: 12px;
+  padding: 16px;
   border-top: 1px solid #eee;
   display: flex;
   justify-content: space-between;
@@ -335,21 +359,22 @@ body {
 }
 
 .cart-total {
+  font-size: 18px;
   font-weight: 700;
-  font-size: 16px;
+  color: var(--primary);
 }
 
 .cart-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .primary {
   background: var(--primary);
   color: #fff;
   border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 700;
 }
@@ -357,26 +382,26 @@ body {
 .muted {
   background: #f1f1f1;
   border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
-/* -----------------------------------------
+/* ---------------------------------------------------
    FOOTER
------------------------------------------ */
+--------------------------------------------------- */
 .footer {
-  text-align: center;
-  padding: 16px;
   margin-top: auto;
+  text-align: center;
+  padding: 18px;
+  font-weight: 600;
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
-  font-weight: 600;
 }
 
-/* -----------------------------------------
+/* ---------------------------------------------------
    TOAST
------------------------------------------ */
+--------------------------------------------------- */
 .toast-container {
   position: fixed;
   bottom: 22px;
@@ -386,37 +411,34 @@ body {
 }
 
 .toast {
+  padding: 12px 16px;
   background: #222;
   color: #fff;
-  padding: 10px 14px;
   border-radius: 10px;
   margin-top: 8px;
-  opacity: 0.97;
 }
 
-/* -----------------------------------------
-   SMALL DEVICES
------------------------------------------ */
+/* ---------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------- */
 @media (max-width: 520px) {
   .logo-mark {
     width: 44px;
     height: 44px;
-  }
-  .brand-text .name {
     font-size: 16px;
   }
+
   .hero h1 {
-    font-size: 18px;
+    font-size: 22px;
   }
-  .add-cart-btn {
-    padding: 8px 10px;
+
+  .menu-item {
+    padding: 16px;
   }
+
   .qty-btn {
-    padding: 8px 12px;
-  }
-  .cart-drawer {
-    max-width: calc(100% - 16px);
-    left: 8px;
-    right: 8px;
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
   }
 }
