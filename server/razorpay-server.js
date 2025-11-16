@@ -1,163 +1,66 @@
-// ---------------------------
-// SH - The Hunger Point Server
-// ---------------------------
+// server_fixed.js — Complete working backend (Firebase Admin + Razorpay + Admin Login)
 
-import express from "express";
-import cors from "cors";
-import Razorpay from "razorpay";
-import crypto from "crypto";
-import admin from "firebase-admin";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import express from "express"; import cors from "cors"; import Razorpay from "razorpay"; import crypto from "crypto"; import admin from "firebase-admin"; import jwt from "jsonwebtoken"; import bcrypt from "bcryptjs";
 
-// ---------------------------
-// SERVER SETUP
-// ---------------------------
+// ----------------------------- // INITIALIZE EXPRESS // ----------------------------- const app = express(); app.use(cors({ origin: "*" })); app.use(express.json());
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+// ----------------------------- // ENVIRONMENT VARIABLES // ----------------------------- const { FIREBASE_TYPE, FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_CLIENT_ID, FIREBASE_AUTH_URI, FIREBASE_TOKEN_URI, FIREBASE_AUTH_PROVIDER_X509_CERT_URL, FIREBASE_CLIENT_X509_CERT_URL, FIREBASE_UNIVERSE_DOMAIN, JWT_SECRET, RZP_KEY_ID, RZP_KEY_SECRET } = process.env;
 
-// ---------------------------
-// FIREBASE ADMIN (Render ENV)
-// ---------------------------
+// ----------------------------- // FIREBASE ADMIN INITIALIZATION // ----------------------------- try { const serviceAccount = { type: FIREBASE_TYPE, project_id: FIREBASE_PROJECT_ID, private_key_id: FIREBASE_PRIVATE_KEY_ID, private_key: FIREBASE_PRIVATE_KEY.replace(/\n/g, "\n"), client_email: FIREBASE_CLIENT_EMAIL, client_id: FIREBASE_CLIENT_ID, auth_uri: FIREBASE_AUTH_URI, token_uri: FIREBASE_TOKEN_URI, auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL, client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL, universe_domain: FIREBASE_UNIVERSE_DOMAIN, };
 
-admin.initializeApp({
-  credential: admin.credential.cert({
-    type: process.env.FIREBASE_TYPE,
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_AUTH_URI,
-    token_uri: process.env.FIREBASE_TOKEN_URI,
-    auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
-    client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
-    universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
-  }),
-});
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount), }); console.log("Firebase Admin initialized ✔"); } catch (err) { console.error("Firebase Admin Init Error ❌", err); }
 
 const db = admin.firestore();
 
-// ---------------------------
-// RAZORPAY SETUP
-// ---------------------------
+// ----------------------------- // RAZORPAY INIT // ----------------------------- const razorpay = new Razorpay({ key_id: RZP_KEY_ID, key_secret: RZP_KEY_SECRET });
 
-const razorpay = new Razorpay({
-  key_id: process.env.RZP_KEY_ID,
-  key_secret: process.env.RZP_KEY_SECRET,
-});
+// ----------------------------- // PING TEST // ----------------------------- app.get("/ping", (req, res) => { res.send("Server Awake ✔"); });
 
-// ---------------------------
-// API ROUTES
-// ---------------------------
+// ----------------------------- // ADMIN LOGIN // ----------------------------- app.post("/admin/login", async (req, res) => { try { const { email, password } = req.body;
 
-// HEALTH CHECK (for cron-job)
-app.get("/ping", (req, res) => {
-  res.send("Server Awake ✔");
-});
+const adminDoc = await db.collection("admins").doc(email).get();
+if (!adminDoc.exists)
+  return res.json({ ok: false, error: "Invalid email or password" });
 
-// ---------------------------
-// 1) CREATE ORDER
-// ---------------------------
+const data = adminDoc.data();
+const valid = await bcrypt.compare(password, data.passwordHash);
+if (!valid)
+  return res.json({ ok: false, error: "Invalid email or password" });
 
-app.post("/create-order", async (req, res) => {
-  try {
-    const { amount } = req.body;
+const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 
-    const order = await razorpay.orders.create({
-      amount: amount * 100,
-      currency: "INR",
-      receipt: "rcpt_" + Date.now(),
-    });
+res.json({ ok: true, token });
 
-    res.json({
-      ok: true,
-      order,
-      key_id: process.env.RZP_KEY_ID,
-    });
-  } catch (err) {
-    console.error("Order Error:", err);
-    res.json({ ok: false, error: "Failed to create order" });
-  }
-});
+} catch (err) { console.error("Admin Login Error ❌", err); res.json({ ok: false, error: "Server error" }); } });
 
-// ---------------------------
-// 2) VERIFY PAYMENT + SAVE ORDER
-// ---------------------------
+// ----------------------------- // ADMIN VERIFY TOKEN // ----------------------------- app.post("/admin/verify", (req, res) => { try { const { token } = req.body; const decoded = jwt.verify(token, JWT_SECRET); res.json({ ok: true, admin: decoded.email }); } catch (e) { res.json({ ok: false }); } });
 
-app.post("/verify-payment", async (req, res) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      items,
-    } = req.body;
+// ----------------------------- // UPDATE ORDER STATUS // ----------------------------- app.post("/admin/update-status", async (req, res) => { try { const { id, status } = req.body; await db.collection("orders").doc(id).update({ status }); res.json({ ok: true }); } catch (err) { console.error("Status Update Error ❌", err); res.json({ ok: false }); } });
 
-    const hmac = crypto.createHmac("sha256", process.env.RZP_KEY_SECRET);
-    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
-    const generatedSignature = hmac.digest("hex");
+// ----------------------------- // CREATE ORDER (RAZORPAY) // ----------------------------- app.post("/create-order", async (req, res) => { try { const { amount } = req.body;
 
-    if (generatedSignature !== razorpay_signature) {
-      return res.json({ ok: false, error: "Payment verification failed" });
-    }
+const options = {
+  amount: amount * 100,
+  currency: "INR",
+};
 
-    const orderId = "ORD" + Date.now();
+const order = await razorpay.orders.create(options);
+res.json(order);
 
-    await db.collection("orders").doc(orderId).set({
-      orderId,
-      items,
-      razorpay_order_id,
-      razorpay_payment_id,
-      timestamp: Date.now(),
-      status: "confirmed",
-    });
+} catch (err) { console.error("Razorpay Create Error ❌", err); res.status(500).json({ error: "Server Error" }); } });
 
-    res.json({ ok: true, orderId });
-  } catch (err) {
-    console.error("Verify Error:", err);
-    res.json({ ok: false, error: "Server error" });
-  }
-});
+// ----------------------------- // VERIFY PAYMENT // ----------------------------- app.post("/verify-payment", (req, res) => { try { const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-// ---------------------------
-// 3) ADMIN LOGIN (NEW)
-// ---------------------------
+const hash = crypto.createHmac("sha256", RZP_KEY_SECRET)
+  .update(razorpay_order_id + "|" + razorpay_payment_id)
+  .digest("hex");
 
-app.post("/admin/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+if (hash === razorpay_signature) {
+  res.json({ success: true });
+} else {
+  res.json({ success: false });
+}
 
-    const adminDoc = await db.collection("admins").doc(email).get();
-    if (!adminDoc.exists)
-      return res.json({ ok: false, error: "Invalid email or password" });
+} catch (err) { console.error("Verify Error ❌", err); res.json({ success: false }); } });
 
-    const adminData = adminDoc.data();
-
-    const match = await bcrypt.compare(password, adminData.passwordHash);
-    if (!match)
-      return res.json({ ok: false, error: "Invalid email or password" });
-
-    const token = jwt.sign(
-      { email: adminData.email, role: "admin" },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.json({ ok: true, token });
-  } catch (err) {
-    console.error("Admin Login Error:", err);
-    res.json({ ok: false, error: "Server error" });
-  }
-});
-
-// ---------------------------
-// START SERVER
-// ---------------------------
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 SH Hunger Server Running on PORT ${PORT}`);
-});
+// ----------------------------- // START SERVER // ----------------------------- const PORT = process.env.PORT || 10000; app.listen(PORT, () => console.log(🔥 SH Hunger Server Running on PORT ${PORT}));
