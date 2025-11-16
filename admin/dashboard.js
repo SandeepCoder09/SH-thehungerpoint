@@ -220,12 +220,26 @@ logoutBtn && (logoutBtn.onclick = () => { localStorage.removeItem("admin_jwt"); 
 // Start
 startRealtimeListener();
 
-// LOGOUT BUTTON
-const logoutBtn = document.getElementById("logoutBtn");
+// -----------------------------
+// LOGOUT (FINAL WORKING VERSION)
+// -----------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
 
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("admin_jwt");   // remove token
-    window.location.href = "login.html";     // go to admin/login.html
+  if (!logoutBtn) {
+    console.warn("Logout button not found!");
+    return;
+  }
+
+  logoutBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // remove both tokens (old and new)
+    localStorage.removeItem("admin_jwt");
+    localStorage.removeItem("adminLoggedIn");
+
+    // redirect to login page (inside admin folder)
+    window.location.href = "login.html";
   });
-}
+});
