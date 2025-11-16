@@ -1,14 +1,12 @@
 // server/razorpay-server.js
-// Production-style backend for SH — The Hunger Point
-// Features:
-//  - Robust Firebase Admin init (escaped private key support)
-//  - Environment validation + clear logs
-//  - Admin login (bcrypt + JWT)
-//  - Admin token verify endpoint
-//  - Protected admin endpoints (update order status)
-//  - Razorpay create order + verify payment
-//  - Health check /ping
-//  - Clear structured logging
+// Production-ready backend for SH — The Hunger Point
+// - Robust Firebase Admin init (handles escaped \n in private key)
+// - Env validation and clear logs
+// - Admin login (bcryptjs + JWT)
+// - Admin token verify endpoint
+// - Protected admin endpoints (update order status)
+// - Razorpay create order + verify payment
+// - Health check /ping
 
 import express from "express";
 import cors from "cors";
@@ -19,27 +17,57 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 // -----------------------------
-// Config / Env
+// Environment variables used by this server (set on Render / environment)
 // -----------------------------
-const REQUIRED_ENVS = [
-  "FIREBASE_TYPE",
-  "FIREBASE_PROJECT_ID",
-  "FIREBASE_PRIVATE_KEY_ID",
-  "FIREBASE_PRIVATE_KEY",
-  "FIREBASE_CLIENT_EMAIL",
-  "FIREBASE_CLIENT_ID",
-  "FIREBASE_AUTH_URI",
-  "FIREBASE_TOKEN_URI",
-  "FIREBASE_AUTH_PROVIDER_CERT_URL",
-  "FIREBASE_CLIENT_CERT_URL",
-  "FIREBASE_UNIVERSE_DOMAIN",
-  "JWT_SECRET",
-  "RZP_KEY_ID",
-  "RZP_KEY_SECRET",
-];
+/*
+Required:
+  FIREBASE_TYPE
+  FIREBASE_PROJECT_ID
+  FIREBASE_PRIVATE_KEY_ID
+  FIREBASE_PRIVATE_KEY     (escaped single-line or real multiline)
+  FIREBASE_CLIENT_EMAIL
+  FIREBASE_CLIENT_ID
+  FIREBASE_AUTH_URI
+  FIREBASE_TOKEN_URI
+  FIREBASE_AUTH_PROVIDER_CERT_URL
+  FIREBASE_CLIENT_CERT_URL
+  FIREBASE_UNIVERSE_DOMAIN
+  JWT_SECRET
+  RZP_KEY_ID
+  RZP_KEY_SECRET
+  PORT (optional)
+*/
 
-function checkEnvs() {
-  const missing = REQUIRED_ENVS.filter((k) => !process.env[k]);
+// -----------------------------
+// Helpers
+// -----------------------------
+const safeJson = (res, status, obj) => res.status(status).json(obj);
+
+function rebuildPrivateKey(rawKey) {
+  if (!rawKey) return null;
+  // If the key was pasted with literal "\n" escapes (common in Render), convert to actual newlines
+  return rawKey.includes("\\n") ? rawKey.replace(/\\n/g, "\n") : rawKey;
+}
+
+function checkRequiredEnvs() {
+  const required = [
+    "FIREBASE_TYPE",
+    "FIREBASE_PROJECT_ID",
+    "FIREBASE_PRIVATE_KEY_ID",
+    "FIREBASE_PRIVATE_KEY",
+    "FIREBASE_CLIENT_EMAIL",
+    "FIREBASE_CLIENT_ID",
+    "FIREBASE_AUTH_URI",
+    "FIREBASE_TOKEN_URI",
+    "FIREBASE_AUTH_PROVIDER_CERT_URL",
+    "FIREBASE_CLIENT_CERT_URL",
+    "FIREBASE_UNIVERSE_DOMAIN",
+    "JWT_SECRET",
+    "RZP_KEY_ID",
+    "RZP_KEY_SECRET",
+  ];
+
+  const missing = required.filter((k) => !process.env[k]);
   if (missing.length) {
     console.warn("⚠️ Missing environment variables:", missing.join(", "));
   } else {
@@ -47,25 +75,13 @@ function checkEnvs() {
   }
 }
 
-// Ensure we run the check early
-checkEnvs();
-
-// -----------------------------
-// Helpers
-// -----------------------------
-function rebuildPrivateKey(escapedKey) {
-  // If the private key contains literal '\n' sequences, convert them to real newlines
-  if (!escapedKey) return null;
-  return escapedKey.includes("\\n") ? escapedKey.replace(/\\n/g, "\n") : escapedKey;
-}
-
-function safeJson(res, status, payload) {
-  res.status(status).json(payload);
-}
+// Run check early
+checkRequiredEnvs();
 
 // -----------------------------
 // Firebase Admin initialization (robust)
 // -----------------------------
+let db = null;
 try {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
@@ -82,23 +98,22 @@ try {
   };
 
   if (!serviceAccount.private_key) {
-    throw new Error("FIREBASE_PRIVATE_KEY is missing or not formatted correctly.");
+    throw new Error("FIREBASE_PRIVATE_KEY is empty or incorrectly formatted.");
   }
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
 
-  console.log("✅ Firebase Admin initialized successfully.");
+  db = admin.firestore();
+  console.log("✅ Firebase Admin initialized.");
 } catch (err) {
   console.error("🔥 Firebase Admin initialization failed:", err && err.message ? err.message : err);
-  // continue running to show errors in logs; endpoints will fail if db is undefined
+  // db will be null — endpoints that use db will return errors gracefully
 }
 
-const db = admin.firestore && typeof admin.firestore === "function" ? admin.firestore() : null;
-
 // -----------------------------
-// Razorpay client
+// Razorpay init
 // -----------------------------
 const razorpay = new Razorpay({
   key_id: process.env.RZP_KEY_ID || "",
@@ -106,13 +121,13 @@ const razorpay = new Razorpay({
 });
 
 // -----------------------------
-// Express app
+// Express setup
 // -----------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Basic health check
+// Health check
 app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
 // -----------------------------
@@ -137,37 +152,28 @@ function requireAdminToken(req, res, next) {
 // -----------------------------
 // Route: Admin Login
 // POST /admin/login
-// Body: { email, password }
+// body: { email, password }
 // -----------------------------
 app.post("/admin/login", async (req, res) => {
   try {
     if (!db) {
-      console.error("DB not initialized in /admin/login");
+      console.error("/admin/login: Firestore not initialized.");
       return safeJson(res, 500, { ok: false, error: "Server error" });
     }
 
     const { email, password } = req.body || {};
-    if (!email || !password) {
-      return safeJson(res, 400, { ok: false, error: "Email and password required" });
-    }
+    if (!email || !password) return safeJson(res, 400, { ok: false, error: "Email and password required" });
 
     const doc = await db.collection("admins").doc(email).get();
-    if (!doc.exists) {
-      return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
-    }
+    if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
 
     const adminData = doc.data();
     const passwordHash = adminData.passwordHash || adminData.password || "";
 
     const match = await bcrypt.compare(password, passwordHash);
-    if (!match) {
-      return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
-    }
+    if (!match) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
 
-    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET || "", {
-      expiresIn: "7d",
-    });
-
+    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET || "", { expiresIn: "7d" });
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
     console.error("Admin Login Error:", err && err.message ? err.message : err);
@@ -176,23 +182,21 @@ app.post("/admin/login", async (req, res) => {
 });
 
 // -----------------------------
-// Route: Verify admin token (used by admin UI)
-// GET /admin/verify  (or POST if you prefer token in body)
-// Header: Authorization: Bearer <token>
+// Route: Admin verify (used by admin UI to check token validity)
+// GET /admin/verify (requires Authorization: Bearer <token>)
 // -----------------------------
 app.get("/admin/verify", requireAdminToken, (req, res) => {
   return safeJson(res, 200, { ok: true, email: req.admin.email, role: req.admin.role });
 });
 
 // -----------------------------
-// Route: Admin update order status (protected)
+// Route: Admin update status (protected)
 // POST /admin/update-status
-// Body: { orderId, status }
+// body: { orderId, status }
 // -----------------------------
 app.post("/admin/update-status", requireAdminToken, async (req, res) => {
   try {
     if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-
     const { orderId, status } = req.body || {};
     if (!orderId || !status) return safeJson(res, 400, { ok: false, error: "orderId and status required" });
 
@@ -205,9 +209,9 @@ app.post("/admin/update-status", requireAdminToken, async (req, res) => {
 });
 
 // -----------------------------
-// Route: Create Razorpay order (frontend)
+// Route: Create Razorpay order
 // POST /create-order
-// Body: { amount, items }
+// body: { amount, items }
 // -----------------------------
 app.post("/create-order", async (req, res) => {
   try {
@@ -215,7 +219,7 @@ app.post("/create-order", async (req, res) => {
     if (!amount || Number(amount) <= 0) return safeJson(res, 400, { ok: false, error: "amount required" });
 
     const rzpOrder = await razorpay.orders.create({
-      amount: Math.round(Number(amount) * 100), // ₹ -> paise
+      amount: Math.round(Number(amount) * 100), // rupees -> paise
       currency: "INR",
       receipt: "rcpt_" + Date.now(),
     });
@@ -230,7 +234,7 @@ app.post("/create-order", async (req, res) => {
 // -----------------------------
 // Route: Verify Razorpay payment
 // POST /verify-payment
-// Body: { razorpay_order_id, razorpay_payment_id, razorpay_signature, items }
+// body: { razorpay_order_id, razorpay_payment_id, razorpay_signature, items }
 // -----------------------------
 app.post("/verify-payment", async (req, res) => {
   try {
