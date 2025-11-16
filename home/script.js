@@ -1,222 +1,154 @@
-// home/script.js — FINAL (cleanly formatted)
-// Includes: cart UI, qty controls, tabs, Razorpay flow (create-order + verify-payment), toasts
-// Preserves your original endpoints and handlers. Drop this into home/script.js
+// /home/script.js
+// Cart + qty + tabs + Razorpay flow
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
-const PRICE_DEFAULT = 10; // fallback price
+const PRICE_DEFAULT = 10;
 
-// small DOM helpers
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-/* -------------------------
-   TOAST
-   ------------------------- */
-function showToast(message, type = "info", duration = 3000) {
+function showToast(message, duration = 2200) {
   const container = document.getElementById("toast-container");
-  if (!container) return console.log("TOAST:", message);
-
+  if (!container) return console.log("toast:", message);
   const t = document.createElement("div");
-  t.className = `toast ${type}`;
+  t.className = "toast";
   t.textContent = message;
   container.appendChild(t);
-
   setTimeout(() => t.remove(), duration);
 }
 
-/* -------------------------
-   CART STATE & HELPERS
-   ------------------------- */
-let cart = []; // { id, name, price, qty }
+let cart = [];
 
 function findCartIndex(id) {
   return cart.findIndex((c) => c.id === id);
 }
 
 function updateCartCount() {
-  const count = cart.reduce((s, i) => s + i.qty, 0);
-  const el = document.getElementById("cartCount");
-  if (el) el.textContent = count;
+  const el = $("#cartCount");
+  if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
-function formatINR(n) {
-  return `₹${n}`;
-}
-
-/* -------------------------
-   CART UI RENDER
-   ------------------------- */
-function updateCartUI() {
-  const container = document.getElementById("cartItems");
+function renderCart() {
+  const container = $("#cartItems");
   if (!container) return;
   container.innerHTML = "";
 
   if (cart.length === 0) {
     container.innerHTML = `<p class="empty">Cart is empty</p>`;
-    const t = document.getElementById("cartTotal");
-    if (t) t.textContent = formatINR(0);
+    $("#cartTotal").textContent = "₹0";
     updateCartCount();
     return;
   }
 
   let total = 0;
-
   cart.forEach((item) => {
-    total += item.price * item.qty;
-
-    const row = document.createElement("div");
-    row.className = "cart-item";
-    row.innerHTML = `
+    total += item.qty * item.price;
+    const node = document.createElement("div");
+    node.className = "cart-item";
+    node.innerHTML = `
       <div class="meta">
         <div><strong>${item.name}</strong></div>
         <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
       </div>
       <div class="qty-controls">
-        <button class="decrease" data-id="${item.id}">−</button>
-        <span class="cart-qty">${item.qty}</span>
-        <button class="increase" data-id="${item.id}">+</button>
-        <button class="remove" data-id="${item.id}" title="Remove">✕</button>
+        <button class="cart-dec" data-id="${item.id}">−</button>
+        <span>${item.qty}</span>
+        <button class="cart-inc" data-id="${item.id}">+</button>
+        <button class="cart-remove" data-id="${item.id}">✕</button>
       </div>
     `;
-    container.appendChild(row);
+    container.appendChild(node);
   });
 
-  const t = document.getElementById("cartTotal");
-  if (t) t.textContent = formatINR(total);
+  $("#cartTotal").textContent = "₹" + total;
   updateCartCount();
 
-  // attach handlers
-  container.querySelectorAll(".decrease").forEach((btn) => {
-    btn.onclick = (e) => {
+  container.querySelectorAll(".cart-dec").forEach((b) =>
+    b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
       const idx = findCartIndex(id);
       if (idx >= 0) {
-        if (cart[idx].qty > 1) cart[idx].qty -= 1;
-        else cart.splice(idx, 1);
-        updateCartUI();
+        cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+        renderCart();
       }
-    };
-  });
+    })
+  );
 
-  container.querySelectorAll(".increase").forEach((btn) => {
-    btn.onclick = (e) => {
+  container.querySelectorAll(".cart-inc").forEach((b) =>
+    b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
       const idx = findCartIndex(id);
       if (idx >= 0) {
         cart[idx].qty += 1;
-        updateCartUI();
+        renderCart();
       }
-    };
-  });
+    })
+  );
 
-  container.querySelectorAll(".remove").forEach((btn) => {
-    btn.onclick = (e) => {
+  container.querySelectorAll(".cart-remove").forEach((b) =>
+    b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
       cart = cart.filter((c) => c.id !== id);
-      updateCartUI();
-    };
-  });
+      renderCart();
+    })
+  );
 }
 
-/* -------------------------
-   OPEN / CLOSE CART (CENTERED)
-   ------------------------- */
 function openCart() {
-  const d = document.getElementById("cartDrawer");
+  const d = $("#cartDrawer");
   if (!d) return;
   d.classList.remove("hidden");
   d.setAttribute("aria-hidden", "false");
-  // reinforce centering (CSS should handle most)
-  d.style.left = "50%";
-  d.style.top = "50%";
-  d.style.transform = "translate(-50%, -50%) scale(1)";
-  updateCartUI();
+  renderCart();
 }
-
 function closeCart() {
-  const d = document.getElementById("cartDrawer");
+  const d = $("#cartDrawer");
   if (!d) return;
   d.classList.add("hidden");
   d.setAttribute("aria-hidden", "true");
 }
 
-/* -------------------------
-   ADD TO CART / MENU BINDINGS
-   ------------------------- */
-function addToCart(name, price, qty) {
-  const id = name.toLowerCase().replace(/\s+/g, "-");
-  const idx = findCartIndex(id);
-  if (idx >= 0) cart[idx].qty += qty;
-  else cart.push({ id, name, price, qty });
-  updateCartUI();
-}
+$$(".menu-item").forEach((itemEl) => {
+  const qtyEl = itemEl.querySelector(".qty");
+  const dec = itemEl.querySelector(".qty-btn.minus");
+  const inc = itemEl.querySelector(".qty-btn.plus");
+  const addBtn = itemEl.querySelector(".add-cart-btn");
 
-function initMenuBindings() {
-  $$(".menu-item").forEach((itemEl) => {
-    const qtyDisplay = itemEl.querySelector(".qty");
-    const dec = itemEl.querySelector('[data-action="dec"]');
-    const inc = itemEl.querySelector('[data-action="inc"]');
-    const addBtn = itemEl.querySelector(".add-cart-btn");
+  let qty = Number(qtyEl?.textContent) || 1;
+  qtyEl && (qtyEl.textContent = qty);
 
-    let qty = Number(qtyDisplay?.textContent) || 1;
-    if (qty < 1) qty = 1;
-    if (qtyDisplay) qtyDisplay.textContent = qty;
+  const setQty = (v) => {
+    qty = Math.max(1, Math.floor(v));
+    if (qtyEl) qtyEl.textContent = qty;
+  };
 
-    const setQty = (v) => {
-      qty = Math.max(1, Math.floor(v));
-      if (qtyDisplay) qtyDisplay.textContent = qty;
-    };
+  dec?.addEventListener("click", () => setQty(qty - 1));
+  inc?.addEventListener("click", () => setQty(qty + 1));
 
-    dec && dec.addEventListener("click", () => setQty(qty - 1));
-    inc && inc.addEventListener("click", () => setQty(qty + 1));
+  addBtn?.addEventListener("click", () => {
+    const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
+    const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
+    const id = (name || "").toLowerCase().replace(/\s+/g, "-");
 
-    addBtn &&
-      addBtn.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        const name =
-          itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
-        const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
-        addToCart(name, price, qty);
-        showToast(`${qty} × ${name} added to cart`, "success");
+    const idx = findCartIndex(id);
+    if (idx >= 0) cart[idx].qty += qty;
+    else cart.push({ id, name, price, qty });
 
-        // small UI pulse on cart icon
-        const ct = document.getElementById("cartToggle");
-        if (ct) {
-          ct.animate(
-            [{ transform: "scale(1)" }, { transform: "scale(1.06)" }, { transform: "scale(1)" }],
-            { duration: 180 }
-          );
-        }
-      });
+    showToast(`${qty} × ${name} added to cart`);
+    renderCart();
   });
-}
+});
 
-/* -------------------------
-   TABS
-   ------------------------- */
-function initTabs() {
-  $$(".tab").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      $$(".tab").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const tab = btn.dataset.tab;
-      $$(".page").forEach((p) => p.classList.add("hidden"));
-      const el = document.getElementById(tab);
-      if (el) el.classList.remove("hidden");
-    });
-  });
-}
-
-/* -------------------------
-   BACKEND / RAZORPAY FLOW
-   ------------------------- */
-function setOrderButtonsDisabled(disabled) {
-  $$(".add-cart-btn").forEach((b) => {
-    b.disabled = disabled;
-    if (!disabled) b.classList.remove("processing");
-  });
-}
+$$(".tab").forEach((btn) =>
+  btn.addEventListener("click", () => {
+    $$(".tab").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    $$(".page").forEach((p) => p.classList.add("hidden"));
+    const el = document.getElementById(tab);
+    if (el) el.classList.remove("hidden");
+  })
+);
 
 async function createOrderOnServer(items, amount) {
   const resp = await fetch(`${SERVER_URL}/create-order`, {
@@ -224,14 +156,13 @@ async function createOrderOnServer(items, amount) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount, items }),
   });
-
   if (!resp.ok) throw new Error("Network error");
   return resp.json();
 }
 
-function openRazorpay(data, items, amount) {
+function openRazorpay(data, items) {
   if (!window.Razorpay) {
-    showToast("Razorpay script not loaded.", "error");
+    showToast("Razorpay script not loaded");
     return;
   }
 
@@ -254,50 +185,31 @@ function openRazorpay(data, items, amount) {
             items,
           }),
         });
-
         if (!verify.ok) throw new Error("Verify network error");
         const result = await verify.json();
 
         if (result.ok) {
           cart = [];
-          updateCartUI();
+          renderCart();
           closeCart();
-
-          // hide menus (keeps your previous behavior)
-          document.querySelectorAll(".menu").forEach((el) => (el.style.display = "none"));
-
-          const status = document.getElementById("order-status");
-          if (status) {
-            status.classList.remove("hidden");
-            const eta = document.getElementById("eta-text");
-            if (eta) eta.textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
-          }
-
-          showToast("Order confirmed! Enjoy your meal 🍽️", "success");
+          document.querySelectorAll(".menu").forEach((m) => (m.style.display = "none"));
+          const status = $("#order-status");
+          status.classList.remove("hidden");
+          $("#eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
+          showToast("Order confirmed! Enjoy your meal 🍽️");
         } else {
-          console.error("Verification failed:", result);
-          showToast("Payment verification failed.", "error");
-          setOrderButtonsDisabled(false);
+          showToast("Payment verification failed");
         }
       } catch (err) {
         console.error(err);
-        showToast("Verification failed. Try later.", "error");
-        setOrderButtonsDisabled(false);
+        showToast("Verification failed. Try later");
       } finally {
-        $$(".add-cart-btn").forEach((b) => {
-          b.classList.remove("processing");
-          b.textContent = "Add";
-        });
+        $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
       }
     },
     modal: {
       ondismiss: function () {
-        // user closed checkout
-        setOrderButtonsDisabled(false);
-        $$(".add-cart-btn").forEach((b) => {
-          b.classList.remove("processing");
-          b.textContent = "Add";
-        });
+        $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
       },
     },
   };
@@ -306,19 +218,14 @@ function openRazorpay(data, items, amount) {
   rzp.open();
 }
 
-/* -------------------------
-   CHECKOUT BUTTON HANDLER
-   ------------------------- */
-async function handleCheckoutClick() {
+$("#checkoutBtn")?.addEventListener("click", async () => {
   if (cart.length === 0) {
-    showToast("Cart is empty", "info");
+    showToast("Cart is empty");
     return;
   }
-
   const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  setOrderButtonsDisabled(true);
   $$(".add-cart-btn").forEach((b) => {
     b.classList.add("processing");
     b.textContent = "Processing...";
@@ -326,65 +233,24 @@ async function handleCheckoutClick() {
 
   try {
     const data = await createOrderOnServer(items, total);
-    openRazorpay(data, items, total);
+    openRazorpay(data, items);
   } catch (err) {
     console.error(err);
-    showToast("Server offline or error. Try again.", "error");
-    setOrderButtonsDisabled(false);
-    $$(".add-cart-btn").forEach((b) => {
-      b.classList.remove("processing");
-      b.textContent = "Add";
-    });
+    showToast("Server offline or error. Try again.");
+    $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
   }
-}
-
-/* -------------------------
-   INIT
-   ------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  initMenuBindings();
-  initTabs();
-  updateCartCount();
-  updateCartUI();
-
-  // bind cart open/close
-  const ct = document.getElementById("cartToggle");
-  if (ct) ct.addEventListener("click", openCart);
-
-  const closeBtn = document.getElementById("closeCart");
-  if (closeBtn) closeBtn.addEventListener("click", closeCart);
-
-  const clearBtn = document.getElementById("clearCart");
-  if (clearBtn) clearBtn.addEventListener("click", () => {
-    cart = [];
-    updateCartUI();
-    closeCart();
-  });
-
-  // checkout
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  if (checkoutBtn) checkoutBtn.addEventListener("click", handleCheckoutClick);
-
-  // ESC to close
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeCart();
-  });
-
-  // quick ping
-  fetch(`${SERVER_URL}/ping`).catch(() => console.log("Ping failed (ok)"));
 });
 
-// backward compatible small helpers (kept intentionally)
-function openCheckout() {
-  const m = document.getElementById("checkoutModal");
-  if (m) m.classList.remove("hidden");
-}
+$("#cartToggle")?.addEventListener("click", openCart);
+$("#closeCart")?.addEventListener("click", closeCart);
+$("#clearCart")?.addEventListener("click", () => {
+  cart = [];
+  renderCart();
+  closeCart();
+});
 
-const closeModalBtn = document.getElementById("closeModalBtn");
-if (closeModalBtn)
-  closeModalBtn.onclick = () => {
-    const m = document.getElementById("checkoutModal");
-    if (m) m.classList.add("hidden");
-  };
-
-/* End of final script */
+document.addEventListener("DOMContentLoaded", () => {
+  renderCart();
+  updateCartCount();
+  fetch(`${SERVER_URL}/ping`).catch(() => console.log("Ping failed (ok)"));
+});
