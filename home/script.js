@@ -1,11 +1,6 @@
 /* /home/script.js
    Centered cart modal (Option B) JS
    Preserves Razorpay flow + server endpoints
-   - modal open/close + overlay
-   - menu qty increment/decrement
-   - add to cart
-   - cart render + in-cart qty controls
-   - checkout (create-order -> open Razorpay -> verify)
 */
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -17,10 +12,7 @@ const $$ = (s) => Array.from(document.querySelectorAll(s));
 
 function showToast(message, duration = 2200) {
   const container = document.getElementById("toast-container");
-  if (!container) {
-    console.log("toast:", message);
-    return;
-  }
+  if (!container) { console.log("toast:", message); return; }
   const t = document.createElement("div");
   t.className = "toast";
   t.textContent = message;
@@ -28,9 +20,7 @@ function showToast(message, duration = 2200) {
   setTimeout(() => t.remove(), duration);
 }
 
-/* -------------------------
-   CART STATE
-   ------------------------- */
+/* CART STATE */
 let cart = []; // items: { id, name, price, qty }
 
 function findCartIndex(id) {
@@ -42,9 +32,7 @@ function updateCartCount() {
   if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
-/* -------------------------
-   RENDER CART (modal)
-   ------------------------- */
+/* RENDER CART (modal) */
 function renderCart() {
   const container = $("#cartItems");
   if (!container) return;
@@ -112,9 +100,7 @@ function renderCart() {
   });
 }
 
-/* -------------------------
-   Modal open/close
-   ------------------------- */
+/* MODAL open/close */
 function openModal() {
   const overlay = $("#overlay");
   const modal = $("#cartModal");
@@ -148,9 +134,7 @@ $("#clearCart")?.addEventListener("click", () => {
   closeModal();
 });
 
-/* -------------------------
-   Menu: qty controls + add
-   ------------------------- */
+/* Menu: qty controls + add */
 $$(".menu-item").forEach(itemEl => {
   const qtyEl = itemEl.querySelector(".qty");
   const dec = itemEl.querySelector(".qty-btn.minus");
@@ -182,9 +166,7 @@ $$(".menu-item").forEach(itemEl => {
   });
 });
 
-/* -------------------------
-   Tabs switch
-   ------------------------- */
+/* Tabs switch */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     $$(".tab").forEach(b => b.classList.remove("active"));
@@ -196,15 +178,12 @@ $$(".tab").forEach(btn => {
   });
 });
 
-/* -------------------------
-   Checkout flow (Razorpay)
-   ------------------------- */
+/* Checkout flow (Razorpay) */
 function setOrderButtonsDisabled(disabled){
   $$(".add-cart-btn").forEach(b => { b.disabled = disabled; if(!disabled) b.classList.remove("processing"); });
 }
 
 async function createOrderOnServer(items, amount) {
-  // POST to your server - /create-order
   const resp = await fetch(`${SERVER_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -249,7 +228,7 @@ function openRazorpay(data, items) {
           cart = [];
           renderCart();
           closeModal();
-          // hide menu or show confirmation
+          // optionally hide menu and show confirmation
           $$(".menu").forEach(m => m.style.display = "none");
           const status = document.getElementById("order-status");
           if (status) {
@@ -307,7 +286,7 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
   }
 });
 
-/* Quick server ping */
+/* Quick server ping (optional) */
 fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 
 /* init */
