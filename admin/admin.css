@@ -305,3 +305,48 @@ body {
     width: 100%;
   }
 }
+
+
+.live-order-popup {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 99999;
+  background: #ffffff;
+  border-left: 6px solid #e23744;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 18px 20px;
+  width: 260px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.3s ease;
+}
+
+.live-order-popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.live-order-popup .popup-content h3 {
+  margin-bottom: 6px;
+  color: #e23744;
+  font-size: 18px;
+}
+
+.live-order-popup p {
+  font-size: 14px;
+  margin: 3px 0;
+  color: #333;
+}
+
+#popupClose {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: #e23744;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
