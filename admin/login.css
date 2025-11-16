@@ -1,113 +1,50 @@
-/* ---------------------------
-   SH — Admin Login (Redesigned)
----------------------------- */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", sans-serif;
-}
-
 body {
-  background: linear-gradient(135deg, #ffdad5, #ffb5a7);
-  height: 100vh;
+  background: #f3f3f3;
+  font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  height: 100vh;
 }
 
-/* Login Card */
-.login-wrap {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(12px);
-  padding: 32px;
-  width: 100%;
-  max-width: 360px;
-  border-radius: 18px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-h1 {
+.login-container {
+  background: #fff;
+  padding: 30px;
+  width: 350px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
   text-align: center;
-  font-size: 24px;
-  margin-bottom: 22px;
-  font-weight: 700;
-  color: #b82121;
 }
 
-/* Inputs */
-input {
+input, button {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  transition: 0.2s;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-input:focus {
-  border-color: #d62828;
-  box-shadow: 0 0 0 3px rgba(214, 40, 40, 0.2);
-  outline: none;
-}
-
-/* Password wrapper (eye icon handled in HTML) */
-.pwd-wrap input {
-  padding-right: 42px;
-}
-
-/* Login Button */
-button[type="submit"] {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(90deg, #d62828, #b71c1c);
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
+button {
+  background: #e23744;
+  color: white;
   cursor: pointer;
-  margin-top: 14px;
-  transition: 0.2s ease;
-  box-shadow: 0 6px 16px rgba(214, 40, 40, 0.25);
+  font-weight: 600;
 }
 
-button[type="submit"]:hover {
-  transform: translateY(-2px);
+.password-field {
+  position: relative;
 }
 
-button[type="submit"]:active {
-  transform: translateY(1px);
+.eye {
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  cursor: pointer;
+  font-size: 18px;
 }
 
-/* Error Message */
 .error {
+  color: red;
   margin-top: 10px;
-  color: #d62828;
-  font-size: 14px;
-  text-align: center;
-  min-height: 20px;
-}
-
-/* Mobile Responsive */
-@media (max-width: 480px) {
-  .login-wrap {
-    padding: 26px;
-  }
-  h1 {
-    font-size: 22px;
-  }
-  input {
-    font-size: 14px;
-  }
+  font-weight: 500;
 }
