@@ -1,343 +1,269 @@
-/* ---------------------------------------------------
-   SH — The Hunger Point (Premium Red Theme)
-   Full Responsive Frontend Stylesheet
-   Version: Zomato Glow + Big Item Boxes
---------------------------------------------------- */
+/* /home/style.css
+   Option A: Wide Boxes (90% width centered) + Zomato glow
+   Primary color preserved: #E23744
+*/
 
 :root {
   --primary: #E23744;
-  --primary-dark: #b71c1c;
+  --primary-strong: #b71c1c;
   --bg: #F5F6FA;
   --card: #ffffff;
   --muted: #6b6b6b;
   --radius: 20px;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+  --glow: 0 6px 28px rgba(226, 55, 68, 0.18);
+  --maxWidth: 980px;
 }
 
-/* Reset */
+/* Reset & Base */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
 }
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+}
 body {
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   background: var(--bg);
+  color: #222;
   display: flex;
   flex-direction: column;
-  color: #222;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---------------------------------------------------
-   HEADER
---------------------------------------------------- */
+/* HEADER */
 .nav {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 18px 22px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   color: #fff;
   position: sticky;
   top: 0;
-  z-index: 50;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  z-index: 60;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
-
 .brand {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-
 .logo-mark {
   width: 56px;
   height: 56px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #f6b042, #ffd27a);
   color: #8b1b1b;
-  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
   font-size: 18px;
 }
-
-.brand-text .name { font-size: 20px; font-weight: 700; }
+.brand-text .name {
+  font-size: 20px;
+  font-weight: 700;
+}
 .brand-text .tag {
   font-size: 12px;
   opacity: 0.9;
 }
-
 .header-actions .icon-btn {
   background: transparent;
-  border: none;
-  cursor: pointer;
+  border: 0;
   color: #fff;
-  font-size: 18px;
-  font-weight: 700;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 16px;
+}
+.cart-emoji {
+  font-size: 22px;
+}
+#cartCount {
+  font-weight: 800;
 }
 
-.cart-emoji { font-size: 22px; }
-
-/* ---------------------------------------------------
-   MAIN CONTAINER
---------------------------------------------------- */
+/* MAIN CONTAINER */
 .container {
-  padding: 18px;
-  max-width: 1000px;
-  margin: 10px auto;
+  max-width: var(--maxWidth);
+  margin: 18px auto;
+  padding: 14px;
   flex: 1;
 }
 
-/* ---------------------------------------------------
-   HERO BANNER
---------------------------------------------------- */
+/* HERO */
 .hero {
-  padding: 25px;
-  background: linear-gradient(to bottom,
-    rgba(246,176,66,0.1),
-    rgba(226,50,50,0.06)
-  );
+  background: linear-gradient(180deg, rgba(246, 176, 66, 0.08), rgba(226, 50, 50, 0.03));
+  padding: 24px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-bottom: 20px;
 }
-
 .hero h1 {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 6px;
 }
-
 .hero p {
-  font-size: 14px;
   color: var(--muted);
+  font-size: 14px;
 }
 
-/* ---------------------------------------------------
-   TABS (HOME • ORDERS • PROFILE • OFFERS)
---------------------------------------------------- */
+/* TABS */
 .top-tabs {
   display: flex;
   gap: 12px;
   margin-bottom: 22px;
+  flex-wrap: wrap;
 }
-
 .tab {
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   border: 1px solid #eee;
-  font-weight: 600;
   cursor: pointer;
+  font-weight: 600;
   font-size: 14px;
-  transition: 0.25s ease;
 }
-
 .tab.active {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(226,55,68,0.4);
+  box-shadow: 0 6px 18px rgba(226, 55, 68, 0.18);
 }
 
-/* ---------------------------------------------------
-   MENU ITEMS (BIG BOXES)
---------------------------------------------------- */
+/* MENU: Wide boxes */
 .menu {
   display: grid;
   gap: 22px;
 }
-
 .menu-item {
   background: var(--card);
-  padding: 28px 28px;
-  border-radius: 22px;
+  padding: 28px;
+  border-radius: 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 26px;
-  box-shadow: var(--shadow);
-  max-width: 92%;
+  justify-content: space-between;
+  gap: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  width: 90%;
   margin: 0 auto;
-  transition: 0.25s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-
 .menu-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
 }
 
 .mi-left h3 {
   font-size: 22px;
   font-weight: 700;
+  margin-bottom: 6px;
 }
 .price {
   font-size: 18px;
   color: var(--primary);
-  margin-top: 6px;
+  font-weight: 700;
 }
 .price small {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
+  margin-left: 8px;
 }
 
-/* ---------------------------------------------------
-   QTY CONTROL BUTTONS
---------------------------------------------------- */
+/* CONTROLS */
 .controls {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
 .qty-wrap {
   display: flex;
   align-items: center;
-  background: #fff;
-  border-radius: 50px;
+  border-radius: 999px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
 }
-
 .qty-btn {
-  padding: 12px 20px;
+  padding: 12px 22px;
+  border: 0;
   background: var(--primary);
   color: #fff;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
-  border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .qty {
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: 700;
-  min-width: 40px;
+  min-width: 44px;
   text-align: center;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 18px;
 }
 
-/* ---------------------------------------------------
-   ADD BUTTON (Zomato Glow)
---------------------------------------------------- */
+/* ADD BUTTON */
 .add-cart-btn {
-  background: #fff;
+  background: var(--card);
   border: 2px solid var(--primary);
-  padding: 12px 20px;
-  border-radius: 16px;
-  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 800;
   cursor: pointer;
-  transition: 0.25s ease;
-  box-shadow: 0 0 12px rgba(226,55,68,0.3);
+  box-shadow: 0 8px 30px rgba(226, 55, 68, 0.18);
+  transition: all 0.18s ease;
 }
-
 .add-cart-btn:hover {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 0 18px rgba(226,55,68,0.6);
+  box-shadow: 0 12px 40px rgba(226, 55, 68, 0.28);
 }
 
-/* ---------------------------------------------------
-   CART DRAWER (BOTTOM SLIDE-UP)
---------------------------------------------------- */
-.cart-drawer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  background: #fff;
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
-  box-shadow: 0 -12px 40px rgba(0,0,0,0.18);
-  transform: translateY(110%);
-  transition: 0.3s ease;
-  z-index: 100;
-}
-
-.cart-drawer:not(.hidden) {
-  transform: translateY(0);
-}
-
-.cart-head,
-.cart-footer {
-  padding: 16px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.cart-items {
-  padding: 16px;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.cart-item {
-  background: #fafafa;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* ---------------------------------------------------
-   FOOTER
---------------------------------------------------- */
-.footer {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  text-align: center;
+/* ORDER STATUS */
+.order-status {
+  margin-top: 20px;
   padding: 18px;
-  color: #fff;
-  font-weight: 600;
-}
-
-/* ---------------------------------------------------
-   TOAST
---------------------------------------------------- */
-.toast-container {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-}
-.toast {
-  padding: 10px 14px;
-  background: #222;
-  color: #fff;
+  background: linear-gradient(90deg, #fff8e6, #fff4f2);
   border-radius: 12px;
-  margin-top: 6px;
+  text-align: center;
+}
+.hidden {
+  display: none !important;
 }
 
-/* ---------------------------------------------------
-   RESPONSIVE FIXES
---------------------------------------------------- */
-@media (max-width: 540px) {
-  .menu-item {
-    padding: 22px;
-    max-width: 96%;
-  }
-  .qty-btn {
-    padding: 10px 16px;
-    font-size: 20px;
-  }
-  .qty {
-    font-size: 16px;
-  }
-  .add-cart-btn {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
+/* CART MODAL */
+.overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 120;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
 }
+.overlay:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+.cart-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  width: 92%;
+  max-width: 680px;
+  background: var(--card);
+  border-radius: 16px;
