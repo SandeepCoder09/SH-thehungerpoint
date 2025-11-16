@@ -1,366 +1,413 @@
-/* ---------------------------------------------------
-   SH — The Hunger Point
-   FULL STYLE.CSS (Fixed UI)
-   - Hero as navbar
-   - Even spaced tabs
-   - Bigger item boxes
-   - Equal + / − buttons
---------------------------------------------------- */
+/* ============================
+   The Hunger Point — UI Styles
+   Centered Cart Modal (Option B)
+   Primary Color: #E23744
+   ============================ */
 
 :root {
-  --primary: #E23744;
-  --primary-strong: #b71c1c;
-  --bg: #F5F6FA;
-  --card: #ffffff;
-  --muted: #6b6b6b;
-  --radius: 22px;
-  --shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
-  --maxWidth: 980px;
+    --primary: #E23744;
+    --primary-dark: #b71c1c;
+    --bg: #F5F6FA;
+    --card: #ffffff;
+    --muted: #6b6b6b;
+    --radius: 20px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    --glow: 0 10px 40px rgba(226, 55, 68, 0.2);
+    --maxWidth: 980px;
 }
 
 /* RESET */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
-html, body {
-  height: 100%;
+
+html,
+body {
+    height: 100%;
 }
 
 body {
-  font-family: "Poppins", sans-serif;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg);
-  color: #222;
+    font-family: "Poppins", sans-serif;
+    background: var(--bg);
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Top browser + navbar background (no overflow into hero) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 90px; /* PERFECT height for your screenshot */
-  background: linear-gradient(90deg, #E23744, #b71c1c);
-  z-index: -1;
-  pointer-events: none;
-}
+/* ============================
+   HEADER
+   ============================ */
 
-/* ---------------------------------------------------
-   HEADER (Top Navigation)
---------------------------------------------------- */
 .nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 22px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
-  color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 80;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
+
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
+
 .logo-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f6b042, #ffd27a);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #8b1b1b;
-  font-weight: 900;
-  font-size: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f6b042, #ffd27a);
+    color: #8b1b1b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 18px;
 }
+
 .brand-text .name {
-  font-size: 20px;
-  font-weight: 700;
+    font-size: 20px;
+    font-weight: 700;
 }
+
 .brand-text .tag {
-  font-size: 12px;
-  opacity: 0.9;
+    font-size: 12px;
+    opacity: 0.9;
 }
 
-.header-actions .icon-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 800;
 }
-.cart-emoji { font-size: 22px; }
 
-/* ---------------------------------------------------
+.cart-emoji {
+    font-size: 22px;
+}
+
+/* ============================
    MAIN CONTAINER
---------------------------------------------------- */
+   ============================ */
+
 .container {
-  max-width: var(--maxWidth);
-  margin: 14px auto;
-  padding: 14px;
-  flex: 1;
+    max-width: var(--maxWidth);
+    margin: 18px auto;
+    padding: 14px;
+    flex: 1;
 }
 
-/* ---------------------------------------------------
-   HERO (Now looks like a NAVBAR section)
---------------------------------------------------- */
+/* ============================
+   HERO SECTION
+   ============================ */
+
 .hero {
-  width: 100%;
-  background: linear-gradient(180deg, rgba(246,176,66,0.08), rgba(226,50,50,0.03));
-  padding: 26px 22px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin-bottom: 18px;
-  text-align: left;
+    padding: 24px;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg,
+            rgba(246, 176, 66, 0.08),
+            rgba(226, 50, 50, 0.03));
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
 }
+
 .hero h1 {
-  font-size: 24px;
-  font-weight: 700;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
+
 .hero p {
-  font-size: 14px;
-  margin-top: 6px;
-  color: var(--muted);
+    color: var(--muted);
+    font-size: 14px;
 }
 
-/* ---------------------------------------------------
-   TABS (Even Spaced)
---------------------------------------------------- */
+/* ============================
+   TABS
+   ============================ */
+
 .top-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 22px;
-}
-.tab {
-  padding: 10px 14px;
-  text-align: center;
-  border-radius: 14px;
-  background: var(--card);
-  border: 1px solid #ddd;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.15s ease;
-}
-.tab.active {
-  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 6px 16px rgba(226,55,68,0.32);
+    display: flex;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
 }
 
-/* ---------------------------------------------------
+.tab {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid #eee;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 86px;
+    text-align: center;
+}
+
+.tab.active {
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(226, 55, 68, 0.18);
+}
+
+/* ============================
    MENU ITEMS
---------------------------------------------------- */
+   ============================ */
+
 .menu {
-  display: grid;
-  gap: 26px;
+    display: grid;
+    gap: 22px;
 }
 
 .menu-item {
-  background: var(--card);
-  padding: 26px;
-  width: 96%;
-  margin: 0 auto;
-  border-radius: 26px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 22px;
-  box-shadow: var(--shadow);
-  transition: 0.2s ease;
+    background: var(--card);
+    padding: 28px;
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+    transition: 0.2s ease;
+    gap: 28px;
 }
+
 .menu-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 42px rgba(0,0,0,0.14);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
 }
 
 .mi-left h3 {
-  font-size: 22px;
-  font-weight: 700;
-}
-.price {
-  margin-top: 6px;
-  color: var(--primary);
-  font-size: 18px;
-  font-weight: 700;
-}
-.price small {
-  color: var(--muted);
-  margin-left: 4px;
-  font-size: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
-/* ---------------------------------------------------
-   CONTROLS (Equal - and + Button Sizes)
---------------------------------------------------- */
+.price {
+    font-size: 18px;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.price small {
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: 8px;
+}
+
+/* ============================
+   QTY CONTROL
+   ============================ */
+
 .controls {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .qty-wrap {
-  display: flex;
-  align-items: center;
-  border-radius: 40px;
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.08);
-  background: #fff;
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .qty-btn {
-  width: 56px;
-  height: 48px;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  font-size: 22px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+    padding: 12px 22px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    min-width: 54px;
 }
+
 .qty {
-  width: 50px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
+    padding: 10px 18px;
+    min-width: 44px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 18px;
 }
 
-/* Add button */
+/* ============================
+   ADD BUTTON
+   ============================ */
+
 .add-cart-btn {
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: 2px solid var(--primary);
-  background: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-  box-shadow: 0 8px 20px rgba(226,55,68,0.26);
+    background: #fff;
+    border: 2px solid var(--primary);
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: var(--glow);
+    transition: 0.2s;
 }
+
 .add-cart-btn:hover {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 12px 32px rgba(226,55,68,0.38);
+    background: var(--primary);
+    color: #fff;
 }
 
-/* Modal Code Goes Here */
-===========================
+/* ============================
+   CART MODAL (CENTERED)
+   ============================ */
 
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 120;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s ease;
+}
 
-/* FOOTER */
+.overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cart-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 92%;
+    max-width: 680px;
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    padding-bottom: 18px;
+
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 130;
+    transition: 0.2s ease;
+}
+
+.cart-modal:not(.hidden) {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* modal head */
+.cart-modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+.cart-items {
+    padding: 16px;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.cart-item {
+    background: #fafafa;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* modal footer */
 .cart-modal-foot {
-  padding: 18px;
-  border-top: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .cart-total {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
 }
 
+/* modal footer buttons */
 .cart-modal-actions {
-  display: flex;
-  gap: 12px;
+    display: flex;
+    gap: 12px;
 }
 
-/* Buttons */
 .primary {
-  background: var(--primary);
-  color: #fff;
-  border: 0;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.primary:hover {
-  box-shadow: 0 6px 14px rgba(226,55,68,0.35);
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 800;
 }
 
 .muted {
-  background: #eee;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 0;
-}
-.muted:hover {
-  background: #e1e1e1;
+    background: #f1f1f1;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-/* Scrollbar clean */
-.cart-items::-webkit-scrollbar {
-  width: 6px;
-}
-.cart-items::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
-  border-radius: 6px;
-}
-
-/* ---------------------------------------------------
+/* ============================
    FOOTER
---------------------------------------------------- */
+   ============================ */
+
 .footer {
-  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
-  color: #fff;
-  font-weight: 600;
-  text-align: center;
-  padding: 18px;
-  margin-top: auto;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    text-align: center;
+    padding: 18px;
+    color: #fff;
+    font-weight: 700;
 }
 
-/* Toasts */
-.toast-container {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-}
-.toast {
-  background: #222;
-  padding: 10px 14px;
-  border-radius: 10px;
-  color: #fff;
-  margin-top: 6px;
-}
+/* ============================
+   RESPONSIVE
+   ============================ */
 
-/* ---------------------------------------------------
-   Responsive Fixes
---------------------------------------------------- */
 @media (max-width: 520px) {
-  .menu-item {
-    width: 98%;
-    padding: 20px;
-  }
-  .qty-btn {
-    width: 50px;
-    height: 44px;
-  }
-  .qty {
-    font-size: 16px;
-  }
+    .menu-item {
+        padding: 20px;
+        width: 96%;
+    }
+
+    .qty-btn {
+        padding: 12px 16px;
+        min-width: 44px;
+    }
+
+    .qty {
+        min-width: 40px;
+    }
+
+    .cart-modal {
+        width: 94%;
+    }
 }
