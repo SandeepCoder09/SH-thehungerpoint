@@ -282,3 +282,19 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCartCount();
   updateCartUI();
 });
+
+// Open modal
+function openCheckout() {
+  document.getElementById("checkoutModal").classList.remove("hidden");
+}
+
+// Close modal
+document.getElementById("closeModalBtn").onclick = () => {
+  document.getElementById("checkoutModal").classList.add("hidden");
+};
+
+// Checkout
+document.getElementById("checkoutBtn").onclick = () => {
+  // your existing checkout flow
+  handleFinalCheckout();
+};
