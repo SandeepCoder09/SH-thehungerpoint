@@ -6,6 +6,32 @@
   <title>Admin Login — SH The Hunger Point</title>
 
   <link rel="stylesheet" href="login.css" />
+
+  <!-- Eye Icon Styling -->
+  <style>
+    .pwd-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .toggle-pwd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .toggle-pwd img {
+      width: 20px;
+      height: 20px;
+      opacity: 0.8;
+    }
+    .toggle-pwd img:hover {
+      opacity: 1;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,12 +40,39 @@
 
     <form id="loginForm">
       <input id="email" type="email" placeholder="Admin Email" required />
-      <input id="password" type="password" placeholder="Password" required />
+
+      <div class="pwd-wrap">
+        <input id="password" type="password" placeholder="Password" required />
+        <button type="button" id="togglePwd" class="toggle-pwd">
+          <img id="pwdIcon" src="https://cdn-icons-png.flaticon.com/512/159/159604.png" alt="show"/>
+        </button>
+      </div>
+
       <button type="submit">Login</button>
       <p id="error" class="error"></p>
     </form>
   </div>
 
   <script src="login.js"></script>
+
+  <!-- Password Toggle Script -->
+  <script>
+    const toggleBtn = document.getElementById("togglePwd");
+    const pwdField = document.getElementById("password");
+    const pwdIcon = document.getElementById("pwdIcon");
+
+    const eyeOpen = "https://cdn-icons-png.flaticon.com/512/159/159604.png";
+    const eyeClosed = "https://cdn-icons-png.flaticon.com/512/565/565655.png";
+
+    toggleBtn.addEventListener("click", () => {
+      if (pwdField.type === "password") {
+        pwdField.type = "text";
+        pwdIcon.src = eyeClosed;
+      } else {
+        pwdField.type = "password";
+        pwdIcon.src = eyeOpen;
+      }
+    });
+  </script>
 </body>
 </html>
