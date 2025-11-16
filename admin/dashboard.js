@@ -219,3 +219,13 @@ logoutBtn && (logoutBtn.onclick = () => { localStorage.removeItem("admin_jwt"); 
 
 // Start
 startRealtimeListener();
+
+// LOGOUT BUTTON
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("admin_jwt");   // remove token
+    window.location.href = "login.html";     // go to admin/login.html
+  });
+}
