@@ -36,14 +36,14 @@ body {
   color: #222;
 }
 
-/* Full-top background using your exact navbar gradient */
+/* FIXED: Prevent gradient overflow into content */
 body::before {
   content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 170px; /* covers entire top area including Chrome UI */
+  height: 110px; /* perfect height for mobile chrome */
   background: linear-gradient(90deg, #E23744, #b71c1c);
   z-index: -1;
   pointer-events: none;
