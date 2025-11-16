@@ -1,171 +1,177 @@
-/* /home/script.js
-   Option A (wide boxes). Preserves existing server + Razorpay flow.
-   - Cart modal centered
-   - Qty buttons fixed and identical style
-   - Tabs, add-to-cart, checkout preserved
-*/
+/* ---------------------------------------------------
+   SH — The Hunger Point
+   script.js (Final Version — Option A Center Modal)
+   Cart + Qty + Tabs + Razorpay Integrated
+--------------------------------------------------- */
 
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; // keep your backend
-const PRICE_DEFAULT = 10; // fallback price
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
+const PRICE_DEFAULT = 10;
 
-// DOM helpers
+// Shortcuts
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-// Toast helper
-function showToast(message, duration = 2500) {
-  const container = document.getElementById("toast-container");
-  if (!container) {
-    console.log("toast:", message);
-    return;
-  }
+/* ---------------------------------------------------
+   TOAST
+--------------------------------------------------- */
+function showToast(msg, duration = 2200) {
+  const box = $("#toast-container");
+  if (!box) return console.log("Toast:", msg);
+
   const t = document.createElement("div");
   t.className = "toast";
-  t.textContent = message;
-  container.appendChild(t);
+  t.textContent = msg;
+  box.appendChild(t);
   setTimeout(() => t.remove(), duration);
 }
 
-/* ---------------------------
-   CART state & helpers
-   --------------------------- */
-let cart = []; // { id, name, price, qty }
+/* ---------------------------------------------------
+   CART STATE
+--------------------------------------------------- */
+let cart = [];
 
 function findCartIndex(id) {
-  return cart.findIndex(c => c.id === id);
+  return cart.findIndex((c) => c.id === id);
 }
 
 function updateCartCount() {
-  const el = $("#cartCount");
-  if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
+  $("#cartCount").textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
+/* ---------------------------------------------------
+   RENDER CART MODAL
+--------------------------------------------------- */
 function renderCart() {
-  const container = $("#cartItems");
-  if (!container) return;
-  container.innerHTML = "";
+  const box = $("#cartItems");
+  box.innerHTML = "";
 
   if (cart.length === 0) {
-    container.innerHTML = `<p class="empty">Cart is empty</p>`;
+    box.innerHTML = `<p class="empty">Cart is empty</p>`;
     $("#cartTotal").textContent = "₹0";
     updateCartCount();
     return;
   }
 
   let total = 0;
-  cart.forEach(item => {
-    total += item.price * item.qty;
-    const node = document.createElement("div");
-    node.className = "cart-item";
-    node.innerHTML = `
+
+  cart.forEach((item) => {
+    total += item.qty * item.price;
+
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.innerHTML = `
       <div class="meta">
-        <div><strong>${item.name}</strong></div>
-        <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
+        <strong>${item.name}</strong>
+        <div>₹${item.price} × ${item.qty} = ₹${item.qty * item.price}</div>
       </div>
+
       <div class="qty-controls">
         <button class="cart-dec" data-id="${item.id}">−</button>
         <span>${item.qty}</span>
         <button class="cart-inc" data-id="${item.id}">+</button>
-        <button class="cart-remove" data-id="${item.id}" title="Remove">✕</button>
+        <button class="cart-remove" data-id="${item.id}">✕</button>
       </div>
     `;
-    container.appendChild(node);
+    box.appendChild(row);
   });
 
-  $("#cartTotal").textContent = "₹" + total;
+  $("#cartTotal").textContent = `₹${total}`;
   updateCartCount();
 
-  // attach handlers
-  container.querySelectorAll(".cart-dec").forEach(b => b.addEventListener("click", e => {
-    const id = e.currentTarget.dataset.id;
-    const idx = findCartIndex(id);
-    if (idx >= 0) {
-      cart[idx].qty = Math.max(1, cart[idx].qty - 1);
-      renderCart();
-    }
-  }));
+  // CART DEC
+  box.querySelectorAll(".cart-dec").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      const idx = findCartIndex(id);
+      if (idx >= 0) {
+        cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+        renderCart();
+      }
+    })
+  );
 
-  container.querySelectorAll(".cart-inc").forEach(b => b.addEventListener("click", e => {
-    const id = e.currentTarget.dataset.id;
-    const idx = findCartIndex(id);
-    if (idx >= 0) {
-      cart[idx].qty += 1;
-      renderCart();
-    }
-  }));
+  // CART INC
+  box.querySelectorAll(".cart-inc").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      const idx = findCartIndex(id);
+      if (idx >= 0) {
+        cart[idx].qty++;
+        renderCart();
+      }
+    })
+  );
 
-  container.querySelectorAll(".cart-remove").forEach(b => b.addEventListener("click", e => {
-    const id = e.currentTarget.dataset.id;
-    cart = cart.filter(c => c.id !== id);
-    renderCart();
-  }));
+  // REMOVE ITEM
+  box.querySelectorAll(".cart-remove").forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      cart = cart.filter((c) => c.id !== id);
+      renderCart();
+    })
+  );
 }
 
-/* ---------------------------
-   Cart modal open/close
-   --------------------------- */
-const overlay = $("#cartOverlay");
-const modal = $("#cartModal");
-
-function openCart() {
-  if (overlay) overlay.classList.remove("hidden");
-  if (modal) modal.classList.remove("hidden");
+/* ---------------------------------------------------
+   CART MODAL OPEN / CLOSE
+--------------------------------------------------- */
+function openCartModal() {
+  $("#overlay").classList.remove("hidden");
+  $("#cartModal").classList.remove("hidden");
   renderCart();
 }
-function closeCart() {
-  if (overlay) overlay.classList.add("hidden");
-  if (modal) modal.classList.add("hidden");
+
+function closeCartModal() {
+  $("#overlay").classList.add("hidden");
+  $("#cartModal").classList.add("hidden");
 }
 
-$("#cartToggle")?.addEventListener("click", openCart);
-$("#closeCart")?.addEventListener("click", closeCart);
-overlay?.addEventListener("click", closeCart);
-
-// Clear cart
-$("#clearCart")?.addEventListener("click", () => {
+$("#cartToggle").addEventListener("click", openCartModal);
+$("#closeCart").addEventListener("click", closeCartModal);
+$("#overlay")?.addEventListener("click", closeCartModal);
+$("#clearCart").addEventListener("click", () => {
   cart = [];
   renderCart();
-  closeCart();
+  closeCartModal();
 });
 
-/* ---------------------------
-   Tabs
-   --------------------------- */
-$$(".tab").forEach(btn => {
+/* ---------------------------------------------------
+   TABS (HOME / ORDERS / PROFILE / OFFERS)
+--------------------------------------------------- */
+$$(".tab").forEach((btn) => {
   btn.addEventListener("click", () => {
-    $$(".tab").forEach(b => b.classList.remove("active"));
+    $$(".tab").forEach((t) => t.classList.remove("active"));
     btn.classList.add("active");
+
     const tab = btn.dataset.tab;
-    $$(".page").forEach(p => p.classList.add("hidden"));
-    const el = document.getElementById(tab);
-    if (el) el.classList.remove("hidden");
+    $$(".page").forEach((p) => p.classList.add("hidden"));
+    $("#" + tab).classList.remove("hidden");
   });
 });
 
-/* ---------------------------
-   Menu qty & add button (preserve your old code)
-   --------------------------- */
-$$(".menu-item").forEach(itemEl => {
-  const qtyEl = itemEl.querySelector(".qty");
-  const dec = itemEl.querySelector(".qty-btn.minus");
-  const inc = itemEl.querySelector(".qty-btn.plus");
-  const addBtn = itemEl.querySelector(".add-cart-btn");
+/* ---------------------------------------------------
+   MENU ITEMS (QTY + ADD)
+--------------------------------------------------- */
+$$(".menu-item").forEach((item) => {
+  const qtyEl = item.querySelector(".qty");
+  const dec = item.querySelector(".qty-btn.minus");
+  const inc = item.querySelector(".qty-btn.plus");
+  const addBtn = item.querySelector(".add-cart-btn");
 
-  let qty = Number(qtyEl?.textContent) || 1;
-  if (qtyEl) qtyEl.textContent = qty;
+  let qty = Number(qtyEl.textContent) || 1;
 
-  const setQty = v => {
-    qty = Math.max(1, Math.floor(v));
-    if (qtyEl) qtyEl.textContent = qty;
+  const setQty = (v) => {
+    qty = Math.max(1, v);
+    qtyEl.textContent = qty;
   };
 
-  dec?.addEventListener("click", () => setQty(qty - 1));
-  inc?.addEventListener("click", () => setQty(qty + 1));
+  dec.addEventListener("click", () => setQty(qty - 1));
+  inc.addEventListener("click", () => setQty(qty + 1));
 
-  addBtn?.addEventListener("click", () => {
-    const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
-    const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
-    const id = (name || "").toLowerCase().replace(/\s+/g, "-");
+  addBtn.addEventListener("click", () => {
+    const name = item.dataset.item;
+    const price = Number(item.dataset.price) || PRICE_DEFAULT;
+    const id = name.toLowerCase().replace(/\s+/g, "-");
 
     const idx = findCartIndex(id);
     if (idx >= 0) cart[idx].qty += qty;
@@ -176,123 +182,88 @@ $$(".menu-item").forEach(itemEl => {
   });
 });
 
-/* ---------------------------
-   Checkout flow (Razorpay) — preserved
-   --------------------------- */
-
-function setOrderButtonsDisabled(disabled) {
-  $$(".add-cart-btn").forEach(b => {
-    b.disabled = disabled;
-    if (!disabled) b.classList.remove("processing");
-  });
-}
-
-async function createOrderOnServer(items, amount) {
-  const resp = await fetch(`${SERVER_URL}/create-order`, {
+/* ---------------------------------------------------
+   RAZORPAY CHECKOUT FLOW
+--------------------------------------------------- */
+async function createOrderOnServer(items, total) {
+  const res = await fetch(`${SERVER_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, items })
+    body: JSON.stringify({ items, amount: total }),
   });
-  if (!resp.ok) throw new Error("Network error");
-  const data = await resp.json();
-  if (!data || !data.ok || !data.order) throw new Error(data?.error || "Order creation failed");
-  return data;
+
+  if (!res.ok) throw new Error("Network error");
+  return res.json();
 }
 
-function openRazorpay(data, items) {
-  if (!window.Razorpay) {
-    showToast("Razorpay script not loaded.", "error");
-    return;
-  }
-
+function openRazorpay(data, items, total) {
   const options = {
-    key: data.key_id || data.key || "",
+    key: data.key_id || "",
     amount: data.order.amount,
     currency: "INR",
     name: "SH — The Hunger Point",
-    description: items.map(i => `${i.name}×${i.qty}`).join(", "),
+    description: items.map((i) => `${i.name}×${i.qty}`).join(", "),
     order_id: data.order.id,
+
     handler: async function (resp) {
-      try {
-        const verify = await fetch(`${SERVER_URL}/verify-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: resp.razorpay_order_id,
-            razorpay_payment_id: resp.razorpay_payment_id,
-            razorpay_signature: resp.razorpay_signature,
-            items
-          })
-        });
+      const verifyRes = await fetch(`${SERVER_URL}/verify-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: resp.razorpay_order_id,
+          razorpay_payment_id: resp.razorpay_payment_id,
+          razorpay_signature: resp.razorpay_signature,
+          items,
+        }),
+      });
 
-        if (!verify.ok) throw new Error("Verify network error");
-        const result = await verify.json();
+      const result = await verifyRes.json();
 
-        if (result.ok) {
-          // success UI — preserve your behavior
-          cart = [];
-          renderCart();
-          closeCart();
-          document.querySelectorAll(".menu").forEach(m => m.style.display = "none");
-          const status = document.getElementById("order-status");
-          status.classList.remove("hidden");
-          document.getElementById("eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
-          showToast("Order confirmed! Enjoy your meal 🍽️");
-        } else {
-          console.error("Verification failed:", result);
-          showToast("Payment verification failed.");
-          setOrderButtonsDisabled(false);
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("Verification failed. Try later.");
-        setOrderButtonsDisabled(false);
-      } finally {
-        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
+      if (result.ok) {
+        cart = [];
+        renderCart();
+        closeCartModal();
+        $("#order-status").classList.remove("hidden");
+        $("#eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
+        showToast("Order confirmed 🍽️");
+      } else {
+        showToast("Payment verification failed");
       }
     },
+
     modal: {
-      ondismiss: function () {
-        setOrderButtonsDisabled(false);
-        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
-      }
-    }
+      ondismiss: () => {
+        showToast("Checkout cancelled");
+      },
+    },
   };
 
-  const rzp = new Razorpay(options);
-  rzp.open();
+  new Razorpay(options).open();
 }
 
-/* Checkout button */
-$("#checkoutBtn")?.addEventListener("click", async () => {
+$("#checkoutBtn").addEventListener("click", async () => {
   if (cart.length === 0) {
     showToast("Cart is empty");
     return;
   }
 
-  const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
+  const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  // UI lock
-  setOrderButtonsDisabled(true);
-  $$(".add-cart-btn").forEach(b => { b.classList.add("processing"); b.textContent = "Processing..."; });
-
   try {
-    const data = await createOrderOnServer(items, total);
-    openRazorpay(data, items);
+    const orderData = await createOrderOnServer(items, total);
+    openRazorpay(orderData, items, total);
   } catch (err) {
     console.error(err);
-    showToast("Server offline or error. Try again.");
-    setOrderButtonsDisabled(false);
-    $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
+    showToast("Server error — try again later");
   }
 });
 
-/* Quick ping to keep backend awake (optional) */
-fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
-
-/* Init */
+/* ---------------------------------------------------
+   INIT
+--------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  renderCart();
   updateCartCount();
-}); 
+  renderCart();
+  fetch(`${SERVER_URL}/ping`).catch(() => {});
+});
