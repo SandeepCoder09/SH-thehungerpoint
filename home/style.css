@@ -1,48 +1,48 @@
-/* -----------------------------------------
-   home/style.css
-   Clean, responsive stylesheet for SH — The Hunger Point
-   Keeps admin color: --primary: #E23744
-   ----------------------------------------- */
+/* -------------------------------------------------
+   SH — The Hunger Point
+   CLEAN & RESPONSIVE FRONTEND STYLESHEET
+   ------------------------------------------------- */
 
 :root {
-  --primary: #E23744; /* same as admin */
+  --primary: #E23744;
+  --primary-dark: #B71C1C;
   --bg: #F5F6FA;
-  --muted: #6b6b6b;
-  --card: #ffffff;
-  --radius: 12px;
-  --shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  --card: #FFFFFF;
+  --radius: 14px;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* Reset / base */
+/* RESET */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Poppins", Inter, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
   background: var(--bg);
   color: #222;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ---------- Header ---------- */
+/* -------------------------------------------------
+   HEADER
+   ------------------------------------------------- */
+
 .nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px;
-  background: linear-gradient(90deg, var(--primary), #b71c1c);
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
+  box-shadow: var(--shadow);
 }
 
 .brand {
@@ -54,142 +54,140 @@ body {
 .logo-mark {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #f6b042, #ffd27a);
-  color: #8b1b1b;
-  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #7c0f0f;
 }
 
 .brand-text .name {
-  font-weight: 700;
   font-size: 18px;
-  line-height: 1;
+  font-weight: 700;
 }
 
 .brand-text .tag {
   font-size: 12px;
-  opacity: 0.95;
+  opacity: 0.9;
   margin-top: 2px;
 }
 
-/* header actions */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+/* Cart icon */
 .icon-btn {
-  background: transparent;
+  background: none;
   border: none;
   color: #fff;
-  font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
 }
 
 #cartCount {
-  margin-left: 8px;
-  font-weight: 800;
+  margin-left: 6px;
+  font-weight: 700;
+  font-size: 15px;
 }
 
-/* ---------- Container ---------- */
+/* -------------------------------------------------
+   MAIN CONTAINER
+   ------------------------------------------------- */
+
 .container {
-  max-width: 980px;
-  margin: 20px auto;
-  padding: 16px;
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+  margin: auto;
 }
 
-/* ---------- Hero ---------- */
+/* -------------------------------------------------
+   HERO SECTION
+   ------------------------------------------------- */
+
 .hero {
-  background: linear-gradient(
-    180deg,
-    rgba(246, 176, 66, 0.06),
-    rgba(226, 50, 50, 0.02)
-  );
-  border-radius: var(--radius);
+  background: var(--card);
   padding: 20px;
-  margin-bottom: 18px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
+  margin-bottom: 20px;
 }
 
 .hero h1 {
   font-size: 22px;
-  color: #2c0d0d;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .hero p {
-  color: var(--muted);
-  margin-top: 8px;
   font-size: 14px;
+  color: #555;
 }
 
-/* ---------- Tabs ---------- */
+/* -------------------------------------------------
+   TABS
+   ------------------------------------------------- */
+
 .top-tabs {
   display: flex;
-  gap: 8px;
-  margin: 12px 0 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .top-tabs .tab {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 8px 12px;
+  padding: 10px 18px;
+  background: #fff;
   border: 1px solid #eee;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
   font-size: 14px;
 }
 
 .top-tabs .tab.active {
-  background: linear-gradient(90deg, var(--primary), #b71c1c);
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
-  border-color: transparent;
 }
 
-/* ---------- Menu grid & items ---------- */
+/* -------------------------------------------------
+   MENU (Food Items)
+   ------------------------------------------------- */
+
 .menu {
-  display: grid;
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .menu-item {
   background: var(--card);
-  border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-}
-
-.mi-left h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #111;
+  align-items: center;
 }
 
 .price {
-  font-weight: 700;
   color: var(--primary);
+  font-weight: 700;
   font-size: 14px;
 }
 
 .price small {
-  font-weight: 500;
-  color: var(--muted);
-  margin-left: 6px;
+  color: #777;
   font-size: 12px;
+  margin-left: 4px;
 }
 
-/* Controls */
+/* Quantity Controls */
 .controls {
   display: flex;
   align-items: center;
@@ -199,100 +197,82 @@ body {
 .qty-wrap {
   display: flex;
   align-items: center;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: #fff;
 }
 
 .qty-btn {
-  background: transparent;
-  padding: 10px 14px;
+  padding: 10px 16px;
+  font-size: 20px;
+  background: var(--primary);
+  color: #fff;
   border: none;
-  font-size: 18px;
   cursor: pointer;
-  user-select: none;
 }
 
 .qty {
-  min-width: 36px;
+  padding: 10px 14px;
+  min-width: 32px;
   text-align: center;
-  display: inline-block;
-  padding: 8px 6px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .add-cart-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 2px solid var(--primary);
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 8px 10px;
-  border-radius: 8px;
+  color: var(--primary);
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 700;
 }
 
-.add-cart-btn:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
-}
+/* -------------------------------------------------
+   CART MODAL (Centered)
+   ------------------------------------------------- */
 
-/* ---------- Order status (hidden by default) ---------- */
-.order-status {
-  margin-top: 20px;
-  padding: 18px;
-  background: linear-gradient(90deg, #fff8e6, #fff4f2);
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 700;
-  color: #222;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* ---------- Cart drawer ---------- */
 .cart-drawer {
   position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 320px;
-  max-width: 92vw;
+  top: 50%;
+  left: 50%;
+  width: min(460px, 92vw);
+  max-height: 85vh;
+  transform: translate(-50%, -50%);
   background: var(--card);
-  border-radius: 12px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
-  z-index: 80;
+  border-radius: var(--radius);
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 200;
+}
+
+.cart-drawer.hidden {
+  display: none !important;
 }
 
 .cart-drawer header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid #eee;
 }
 
 .cart-items {
-  padding: 12px;
+  padding: 16px;
   max-height: 50vh;
-  overflow: auto;
-}
-
-.cart-items .empty {
-  color: var(--muted);
-  padding: 8px 0;
+  overflow-y: auto;
 }
 
 .cart-item {
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 10px 8px;
-  border-radius: 8px;
-  background: #fafafa;
-  margin-bottom: 10px;
   align-items: center;
 }
 
@@ -300,204 +280,99 @@ body {
   font-size: 14px;
 }
 
-.cart-item .qty-controls {
+.qty-controls {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.cart-item button {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* cart footer */
-.cart-drawer footer {
-  padding: 12px;
-  border-top: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .cart-total {
-  font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 10px;
 }
 
 .cart-actions {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.primary,
+.muted {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .primary {
   background: var(--primary);
   color: #fff;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
 }
 
 .muted {
-  background: #f1f1f1;
+  background: #eee;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
-/* ----- FIX FOOTER TO BOTTOM ----- */
+/* -------------------------------------------------
+   ORDER STATUS
+   ------------------------------------------------- */
 
-html, body {
-  height: 100%;
+.order-status {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fff8e6;
+  border-radius: var(--radius);
+  text-align: center;
+  font-weight: 700;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
+.hidden {
+  display: none !important;
 }
 
-/* container should expand, footer stays at bottom */
-.container {
-  flex: 1;
-}
+/* -------------------------------------------------
+   FOOTER
+   ------------------------------------------------- */
 
-/* footer stays at bottom, no overflow on mobile */
 .footer {
-  margin-top: auto;
+  background: var(--primary);
+  color: #fff;
   text-align: center;
   padding: 18px;
-  background: linear-gradient(90deg, var(--primary), #b71c1c);
-  color: #fff;
-  font-weight: 600;
-  width: 100%;
-  position: relative;
+  margin-top: auto;
 }
 
-/* ---------- Responsive ---------- */
-@media (min-width: 700px) {
-  .menu {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  }
-}
+/* -------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------- */
 
 @media (max-width: 700px) {
   .container {
-    padding: 12px;
+    padding: 14px;
   }
 
-  .menu {
-    grid-template-columns: 1fr;
+  .menu-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
   }
 
-  .cart-drawer {
-    right: 10px;
-    left: 10px;
-    width: auto;
-    max-width: calc(100% - 20px);
+  .controls {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
-/* small helpers (toasts etc) */
-.toast-container {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-}
-
-.toast {
-  background: #222;
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 10px;
-  margin-top: 8px;
-  opacity: 0.98;
-  font-size: 14px;
-}
-
-/* ------------------------------
-   CHECKOUT MODAL — CENTERED FIXED
------------------------------- */
-.checkout-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 5000;
-  padding: 16px;
-}
-
-.checkout-modal.hidden {
-  display: none;
-}
-
-.checkout-box {
-  width: 100%;
-  max-width: 420px;
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 18px;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
-  animation: scaleIn 0.25s ease-out;
-}
-
-.checkout-box h2 {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: #e23744;
-  margin-bottom: 18px;
-}
-
-.cart-items {
-  max-height: 240px;
-  overflow-y: auto;
-  padding-right: 4px;
-  margin-bottom: 16px;
-}
-
-.cart-total {
-  font-size: 18px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  text-align: right;
-}
-
-.checkout-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.btn {
-  flex: 1;
-  padding: 14px 0;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-}
-
-.btn.checkout {
-  background: #e23744;
-  color: #fff;
-}
-
-.btn.cancel {
-  background: #dedede;
-  color: #333;
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+@media (max-width: 480px) {
+  .top-tabs .tab {
+    flex: 1;
+    text-align: center;
+  }
 }
