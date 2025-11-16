@@ -17,6 +17,7 @@ body {
   overflow-x: hidden;
 }
 
+
 /* -----------------------------------------
    SIDEBAR
    ----------------------------------------- */
@@ -32,6 +33,8 @@ body {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(255,255,255,0.1);
+  transition: 0.3s ease-in-out;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -58,6 +61,25 @@ body {
   color: #fff;
 }
 
+
+/* -----------------------------------------
+   TOGGLE BUTTON FOR MOBILE
+   ----------------------------------------- */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  left: 15px;
+  top: 15px;
+  background: #141414;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 2000;
+  font-size: 16px;
+}
+
+
 /* -----------------------------------------
    MAIN CONTENT
    ----------------------------------------- */
@@ -66,6 +88,7 @@ body {
   padding: 30px;
   width: calc(100% - 260px);
   min-height: 100vh;
+  transition: 0.3s;
 }
 
 .topbar {
@@ -81,6 +104,7 @@ body {
   font-size: 26px;
   font-weight: 600;
 }
+
 
 /* -----------------------------------------
    STATS GRID
@@ -118,6 +142,7 @@ body {
   color: #111;
 }
 
+
 /* -----------------------------------------
    CHART SECTION
    ----------------------------------------- */
@@ -141,8 +166,9 @@ body {
   color: #333;
 }
 
+
 /* -----------------------------------------
-   ORDERS CONTAINER
+   ORDERS SECTION
    ----------------------------------------- */
 .orders-container {
   margin-top: 40px;
@@ -156,6 +182,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .orders-header h2 {
@@ -166,6 +194,7 @@ body {
 .order-controls {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .order-controls input,
@@ -175,6 +204,7 @@ body {
   border-radius: 8px;
   font-size: 15px;
 }
+
 
 /* -----------------------------------------
    ORDER CARDS
@@ -211,33 +241,67 @@ body {
   background: white;
 }
 
+
 /* -----------------------------------------
-   RESPONSIVE
+   RESPONSIVE FIXES
    ----------------------------------------- */
-@media (max-width: 900px) {
+
+/* TABLET */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+  }
+}
+
+/* MOBILE MENU */
+@media (max-width: 850px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    left: -260px;
+    height: 100vh;
+    position: fixed;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+
   .chart-section {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 700px) {
-  .sidebar {
-    width: 200px;
-  }
-  .main-content {
-    margin-left: 220px;
-  }
-}
-
+/* SMALL MOBILE */
 @media (max-width: 540px) {
-  .sidebar {
-    position: absolute;
-    height: auto;
-    width: 100%;
-    display: none;
+  .stat-card p {
+    font-size: 22px;
   }
-  .main-content {
-    margin-left: 0;
+
+  .orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .order-controls input {
+    width: 100%;
+  }
+
+  .order-controls select {
     width: 100%;
   }
 }
