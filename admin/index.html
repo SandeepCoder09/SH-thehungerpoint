@@ -1,111 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — SH The Hunger Point</title>
-
-  <link rel="stylesheet" href="admin.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-<script src="../home/firebase-config.js"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-
-<body>
-  <script>
-(async ()=>{
-  const token = localStorage.getItem("admin_jwt");
-  if (!token) return location.href = "login.html";
-
-  const res = await fetch("https://sh-thehungerpoint.onrender.com/admin/verify", {
-    headers: { Authorization: "Bearer " + token }
-  });
-
-  const data = await res.json();
-  if (!data.ok) {
-    localStorage.removeItem("admin_jwt");
-    location.href = "login.html";
-  }
-})();
-</script>
-
-<!-- LOGIN PROTECTION -->
+  <title>Admin Dashboard — SH The Hunger Point</title>  <link rel="stylesheet" href="admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />  <!-- Firebase (Compat for Messaging) -->  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>  <script src="../home/firebase-config.js"></script>  <!-- Chart.js -->  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head><body>
+<!-- Correct & Final JWT Login Protection -->
 <script>
-  if (!localStorage.getItem("adminLoggedIn")) {
-      window.location.href = "login.html";
-  }
-</script>
+(async () => {
+  const token = localStorage.getItem("admin_jwt");
+  if (!token) return location.href = "login.html";try { const res = await fetch("https://sh-thehungerpoint.onrender.com/admin/verify", { headers: { Authorization: "Bearer " + token } });
+
+const data = await res.json();
+if (!data.ok) {
+  localStorage.removeItem("admin_jwt");
+  return location.href = "login.html";
+}
+
+} catch (err) { console.error("Verification error", err); localStorage.removeItem("admin_jwt"); return location.href = "login.html"; } })(); </script>
 
 <header class="adm-header">
   <h1>SH — Admin Dashboard</h1>
   <button id="logoutBtn" class="logout-btn">Logout</button>
-</header>
-
-<main class="adm-main">
-
-  <!-- TOP STATS -->
-  <section class="stats">
+</header><main class="adm-main">  <!-- TOP STATS -->  <section class="stats">
     <div class="stat-box">
       <h3>Total Orders</h3>
       <div id="totalOrders">0</div>
-    </div>
+    </div><div class="stat-box">
+  <h3>Total Sales</h3>
+  <div id="totalSales">₹0</div>
+</div>
 
-    <div class="stat-box">
-      <h3>Total Sales</h3>
-      <div id="totalSales">₹0</div>
-    </div>
+<div class="stat-box">
+  <h3>Last 1 Hour</h3>
+  <div id="recentOrders">0</div>
+</div>
 
-    <div class="stat-box">
-      <h3>Last 1 Hour</h3>
-      <div id="recentOrders">0</div>
-    </div>
-  </section>
-
-  <!-- CHARTS -->
-  <section class="charts">
+  </section>  <!-- CHARTS -->  <section class="charts">
     <div class="chart-card">
       <h3>Orders (Last 24 Hours)</h3>
       <canvas id="hourChart"></canvas>
-    </div>
+    </div><div class="chart-card">
+  <h3>Sales (Last 7 Days)</h3>
+  <canvas id="weekChart"></canvas>
+</div>
 
-    <div class="chart-card">
-      <h3>Sales (Last 7 Days)</h3>
-      <canvas id="weekChart"></canvas>
-    </div>
-  </section>
+  </section>  <!-- ORDERS LIST -->  <section class="orders-section">
+    <h2>Live Orders</h2><div class="controls">
+  <input id="searchInput" placeholder="Search orders…" />
+  <select id="statusFilter">
+    <option value="">All</option>
+    <option value="paid">Paid</option>
+    <option value="preparing">Preparing</option>
+    <option value="on the way">On the way</option>
+    <option value="completed">Completed</option>
+  </select>
+</div>
 
-  <!-- ORDERS LIST -->
-  <section class="orders-section">
-    <h2>Live Orders</h2>
+<div id="ordersList">Loading orders…</div>
 
-    <div class="controls">
-      <input id="searchInput" placeholder="Search orders…" />
-      <select id="statusFilter">
-        <option value="">All</option>
-        <option value="paid">Paid</option>
-        <option value="preparing">Preparing</option>
-        <option value="on the way">On the way</option>
-        <option value="completed">Completed</option>
-      </select>
-    </div>
-
-    <div id="ordersList">Loading orders…</div>
-  </section>
-
-</main>
-
-<!-- Notification sound -->
-<audio id="newOrderSound">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
-
-<script src="admin.js" defer></script>
-
-</body>
+  </section></main><!-- Notification Sound --><audio id="newOrderSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
+</audio><script src="admin.js" defer></script><script>
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("admin_jwt");
+  location.href = "login.html";
+});
+</script></body>
 </html>
