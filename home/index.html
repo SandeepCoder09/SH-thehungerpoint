@@ -1,30 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SH — The Hunger Point</title>
 
-  <link rel="stylesheet" href="/home/style.css">
+  <link rel="stylesheet" href="/home/style.css" />
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs (Firestore only) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+  <!-- Your firebase config (local file) -->
   <script src="firebase-config.js"></script>
 </head>
-
 <body>
-
-  <!-- DESKTOP TOP NAVIGATION -->
-  <div class="top-tabs">
-    <div class="tab active" data-tab="home">Home</div>
-    <div class="tab" data-tab="orders">My Orders</div>
-    <div class="tab" data-tab="profile">My Profile</div>
-    <div class="tab" data-tab="offers">Offers</div>
-    <div class="tab" data-tab="help">Help</div>
-  </div>
-
-  <!-- HEADER -->
   <header class="nav">
     <div class="brand">
       <div class="logo-mark">SH</div>
@@ -34,26 +24,31 @@
       </div>
     </div>
 
-    <!-- CART ICON -->
-    <div class="cart-icon" id="openCart">
-      🛒 <span id="cartCount">0</span>
+    <div class="header-actions">
+      <button id="cartToggle" class="icon-btn" aria-label="Toggle cart">
+        🛒 <span id="cartCount">0</span>
+      </button>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main class="container">
+    <section class="hero">
+      <h1>Delicious. Fast. Fresh.</h1>
+      <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
+    </section>
 
-    <!-- PAGE: HOME -->
-    <section class="page home-page">
-      <section class="hero">
-        <h1>Delicious. Fast. Fresh.</h1>
-        <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
-      </section>
+    <!-- Tabs (Home / Orders / Profile / Offers) -->
+    <nav class="top-tabs" aria-label="Main navigation">
+      <button class="tab active" data-tab="home">Home</button>
+      <button class="tab" data-tab="orders">My Orders</button>
+      <button class="tab" data-tab="profile">Profile</button>
+      <button class="tab" data-tab="offers">Offers</button>
+    </nav>
 
-      <section class="menu">
-        
-        <!-- MOMO -->
-        <article class="menu-item" data-item="Momo">
+    <section id="home" class="page page-home">
+      <section class="menu" aria-label="menu">
+        <!-- Items: momo, finger, tea, hot tea -->
+        <article class="menu-item" data-item="Momo" data-price="10">
           <div class="mi-left">
             <h3>Momo</h3>
             <div class="price">₹10 <small>/ 5 pieces</small></div>
@@ -68,8 +63,7 @@
           </div>
         </article>
 
-        <!-- FINGER -->
-        <article class="menu-item" data-item="Finger">
+        <article class="menu-item" data-item="Finger" data-price="10">
           <div class="mi-left">
             <h3>Finger</h3>
             <div class="price">₹10 <small>/ plate</small></div>
@@ -84,8 +78,7 @@
           </div>
         </article>
 
-        <!-- TEA -->
-        <article class="menu-item" data-item="Tea">
+        <article class="menu-item" data-item="Tea" data-price="10">
           <div class="mi-left">
             <h3>Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
@@ -100,8 +93,7 @@
           </div>
         </article>
 
-        <!-- HOT TEA -->
-        <article class="menu-item" data-item="Hot Tea">
+        <article class="menu-item" data-item="Hot Tea" data-price="10">
           <div class="mi-left">
             <h3>Hot Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
@@ -115,82 +107,62 @@
             <button class="add-cart-btn">Add</button>
           </div>
         </article>
-
       </section>
-
-      <!-- ORDER CONFIRMATION MESSAGE -->
-      <section id="order-status" class="order-status hidden">
-        <h3>Order Confirmed 🎉</h3>
-        <p id="eta-text"></p>
-      </section>
-
     </section>
 
-    <!-- PAGE: MY ORDERS -->
-    <section class="page orders-page" style="display: none;">
-      <h2>My Orders</h2>
-      <p>Your order history will show here.</p>
+    <!-- Orders / Profile / Offers placeholders -->
+    <section id="orders" class="page hidden">
+      <h2>Your Orders</h2>
+      <p id="pastOrders">No orders yet.</p>
     </section>
 
-    <!-- PAGE: PROFILE -->
-    <section class="page profile-page" style="display:none;">
-      <h2>My Profile</h2>
-      <p>Profile details coming soon.</p>
+    <section id="profile" class="page hidden">
+      <h2>Profile</h2>
+      <p>— Admin / user profile info will be here.</p>
     </section>
 
-    <!-- PAGE: OFFERS -->
-    <section class="page offers-page" style="display:none;">
+    <section id="offers" class="page hidden">
       <h2>Offers</h2>
-      <p>No offers available right now.</p>
+      <p>— Any active offers will be shown here.</p>
     </section>
 
-    <!-- PAGE: HELP -->
-    <section class="page help-page" style="display:none;">
-      <h2>Help & Support</h2>
-      <p>Contact support for help.</p>
+    <section id="order-status" class="order-status hidden">
+      <h3>Order Confirmed 🎉</h3>
+      <p id="eta-text"></p>
     </section>
-
   </main>
 
-  <!-- ADMIN PANEL LINK -->
-  <a href="https://sh-thehungerpoint.vercel.app/admin/login.html" target="_blank">Admin Panel</a>
+  <!-- Cart drawer -->
+  <aside id="cartDrawer" class="cart-drawer hidden" aria-hidden="true">
+    <header>
+      <h3>Your Cart</h3>
+      <button id="closeCart" class="icon-btn">✕</button>
+    </header>
 
-  <!-- FOOTER -->
+    <div id="cartItems" class="cart-items">
+      <p class="empty">Cart is empty</p>
+    </div>
+
+    <footer>
+      <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
+      <div class="cart-actions">
+        <button id="checkoutBtn" class="primary">Checkout</button>
+        <button id="clearCart" class="muted">Close</button>
+      </div>
+    </footer>
+  </aside>
+
   <footer class="footer">
     <p>© 2025 SH — The Hunger Point</p>
   </footer>
 
-  <!-- MOBILE BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="bn-item active" data-tab="home">🏠<span>Home</span></div>
-    <div class="bn-item" data-tab="orders">🧾<span>Orders</span></div>
-    <div class="bn-item" data-tab="profile">👤<span>Profile</span></div>
-    <div class="bn-item" data-tab="offers">🎉<span>Offers</span></div>
-  </div>
-
-  <!-- CART POPUP -->
-  <div class="cart-popup hidden" id="cartPopup">
-    <div class="cart-box">
-      <h3>Your Cart</h3>
-
-      <div id="cartItems"></div>
-
-      <div class="cart-total">
-        Total: <span id="cartTotal">₹0</span>
-      </div>
-
-      <button id="checkoutBtn" class="checkout-btn">Checkout</button>
-      <button id="closeCart" class="close-cart">Close</button>
-    </div>
-  </div>
-
-  <!-- Razorpay -->
+  <!-- Razorpay Checkout -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="toast-container"></div>
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
 
-  <!-- MAIN SCRIPT -->
+  <!-- Main script -->
   <script src="/home/script.js"></script>
 </body>
 </html>
