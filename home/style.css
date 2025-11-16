@@ -198,6 +198,48 @@ body {
   color: var(--muted);
 }
 
+/* Food Image */
+.menu-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 18px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Middle content */
+.mi-center {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.mi-center h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.mi-center .price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.mi-center .price small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* For mobile */
+@media(max-width: 520px) {
+  .menu-img {
+    width: 70px;
+    height: 70px;
+  }
+  .mi-center h3 {
+    font-size: 18px;
+  }
+}
+
 /* ============================
    QTY (Compact Style)
 ============================ */
