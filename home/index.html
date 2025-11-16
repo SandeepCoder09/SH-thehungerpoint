@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SH — The Hunger Point</title>
 
-  <!-- Link to stylesheet (relative path) -->
   <link rel="stylesheet" href="/home/style.css" />
 
-  <!-- Firebase (firestore used by admin/cart/etc) -->
+  <!-- Firebase SDKs (Firestore only) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-  <!-- Your local firebase-config -->
+  <!-- Your firebase config (local file) -->
   <script src="firebase-config.js"></script>
 </head>
 <body>
@@ -26,7 +25,7 @@
     </div>
 
     <div class="header-actions">
-      <button id="cartToggle" class="icon-btn" aria-label="Open cart">
+      <button id="cartToggle" class="icon-btn" aria-label="Toggle cart">
         <span class="cart-emoji">🛒</span>
         <span id="cartCount">0</span>
       </button>
@@ -39,7 +38,7 @@
       <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
     </section>
 
-    <!-- Tabs -->
+    <!-- Tabs (Home / Orders / Profile / Offers) -->
     <nav class="top-tabs" aria-label="Main navigation">
       <button class="tab active" data-tab="home">Home</button>
       <button class="tab" data-tab="orders">My Orders</button>
@@ -47,7 +46,6 @@
       <button class="tab" data-tab="offers">Offers</button>
     </nav>
 
-    <!-- HOME PAGE -->
     <section id="home" class="page page-home">
       <section class="menu" aria-label="menu">
 
@@ -56,7 +54,6 @@
             <h3>Momo</h3>
             <div class="price">₹10 <small>/ 5 pieces</small></div>
           </div>
-
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus" data-action="dec">−</button>
@@ -72,7 +69,6 @@
             <h3>Finger</h3>
             <div class="price">₹10 <small>/ plate</small></div>
           </div>
-
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus" data-action="dec">−</button>
@@ -88,7 +84,6 @@
             <h3>Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
-
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus" data-action="dec">−</button>
@@ -104,7 +99,6 @@
             <h3>Hot Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
-
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus" data-action="dec">−</button>
@@ -118,7 +112,6 @@
       </section>
     </section>
 
-    <!-- ORDERS / PROFILE / OFFERS -->
     <section id="orders" class="page hidden">
       <h2>Your Orders</h2>
       <p id="pastOrders">No orders yet.</p>
@@ -126,50 +119,48 @@
 
     <section id="profile" class="page hidden">
       <h2>Profile</h2>
-      <p>User profile info will appear.</p>
+      <p>— Admin / user profile info will be here.</p>
     </section>
 
     <section id="offers" class="page hidden">
       <h2>Offers</h2>
-      <p>No active offers.</p>
+      <p>— Any active offers will be shown here.</p>
     </section>
 
-    <!-- Order success -->
     <section id="order-status" class="order-status hidden">
       <h3>Order Confirmed 🎉</h3>
       <p id="eta-text"></p>
     </section>
   </main>
 
-  <!-- CART MODAL (centered) -->
-  <div id="cartOverlay" class="overlay hidden" aria-hidden="true"></div>
-  <div id="cartModal" class="cart-modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
-    <header class="cart-modal-head">
+  <!-- Bottom Cart Drawer (Option A) -->
+  <aside id="cartDrawer" class="cart-drawer hidden" aria-hidden="true">
+    <header class="cart-head">
       <h3>Your Cart</h3>
-      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
+      <button id="closeCart" class="icon-btn">✕</button>
     </header>
 
     <div id="cartItems" class="cart-items">
       <p class="empty">Cart is empty</p>
     </div>
 
-    <footer class="cart-modal-foot">
+    <footer class="cart-footer">
       <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
-      <div class="cart-modal-actions">
+      <div class="cart-actions">
         <button id="checkoutBtn" class="primary">Checkout</button>
         <button id="clearCart" class="muted">Close</button>
       </div>
     </footer>
-  </div>
+  </aside>
 
   <footer class="footer">
     <p>© 2025 SH — The Hunger Point</p>
   </footer>
 
-  <!-- Razorpay -->
+  <!-- Razorpay Checkout -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Toasts -->
+  <!-- Toast container -->
   <div id="toast-container" class="toast-container" aria-hidden="true"></div>
 
   <!-- Main script -->
