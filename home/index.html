@@ -1,16 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- Full top red effect using your exact gradient -->
-<meta name="theme-color" content="#E23744">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
+  <!-- Full top red for mobile browser -->
+  <meta name="theme-color" content="#E23744">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Hunger Point</title>
 
-  <link rel="stylesheet" href="/home/style.css" />
+  <link rel="stylesheet" href="style.css" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
@@ -19,6 +20,7 @@
 </head>
 
 <body>
+
   <!-- HEADER -->
   <header class="nav">
     <div class="brand">
@@ -39,6 +41,7 @@
 
   <!-- MAIN -->
   <main class="container">
+
     <section class="hero">
       <h1>Delicious. Fast. Fresh.</h1>
       <p>Family-style fast food — momo, finger, tea & more.</p>
@@ -52,8 +55,9 @@
       <button class="tab" data-tab="offers">Offers</button>
     </nav>
 
-    <!-- MENU -->
+    <!-- HOME PAGE -->
     <section id="home" class="page">
+
       <section class="menu">
 
         <article class="menu-item" data-item="Momo" data-price="10">
@@ -61,6 +65,7 @@
             <h3>Momo</h3>
             <div class="price">₹10 <small>/ 5 pieces</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus">−</button>
@@ -76,6 +81,7 @@
             <h3>Finger</h3>
             <div class="price">₹10 <small>/ plate</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus">−</button>
@@ -91,6 +97,7 @@
             <h3>Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus">−</button>
@@ -106,6 +113,7 @@
             <h3>Hot Tea</h3>
             <div class="price">₹10 <small>/ cup</small></div>
           </div>
+
           <div class="controls">
             <div class="qty-wrap">
               <button class="qty-btn minus">−</button>
@@ -117,17 +125,30 @@
         </article>
 
       </section>
+
     </section>
 
     <!-- OTHER PAGES -->
-    <section id="orders" class="page hidden"><h2>Your Orders</h2><p id="pastOrders">No orders yet.</p></section>
-    <section id="profile" class="page hidden"><h2>Profile</h2><p>User profile info will appear.</p></section>
-    <section id="offers" class="page hidden"><h2>Offers</h2><p>No active offers.</p></section>
+    <section id="orders" class="page hidden">
+      <h2>Your Orders</h2>
+      <p id="pastOrders">No orders yet</p>
+    </section>
+
+    <section id="profile" class="page hidden">
+      <h2>Profile</h2>
+      <p>User profile info will appear</p>
+    </section>
+
+    <section id="offers" class="page hidden">
+      <h2>Offers</h2>
+      <p>No active offers</p>
+    </section>
 
     <section id="order-status" class="order-status hidden">
       <h3>Order Confirmed 🎉</h3>
       <p id="eta-text"></p>
     </section>
+
   </main>
 
   <!-- CART MODAL -->
@@ -160,6 +181,6 @@
 
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="/home/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
