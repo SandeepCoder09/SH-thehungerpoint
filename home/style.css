@@ -260,51 +260,182 @@ body::before {
   box-shadow: 0 12px 32px rgba(226,55,68,0.38);
 }
 
-/* ---------------------------------------------------
-   CART MODAL (same as previous)
---------------------------------------------------- */
+/* ==========================
+   CART MODAL — NEW CLEAN UI
+   ========================== */
+
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
   z-index: 200;
-}
-.hidden {
-  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s ease;
 }
 
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal Body */
 .cart-modal {
   position: fixed;
-  left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.97);
   width: 92%;
   max-width: 680px;
-  background: var(--card);
-  border-radius: 18px;
-  box-shadow: 0 30px 70px rgba(0,0,0,0.25);
+  background: #fff;
+  border-radius: 22px;
+  padding: 0;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
   z-index: 210;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s ease;
 }
 
-.cart-modal-head,
-.cart-modal-foot {
+.cart-modal.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Modal Header */
+.cart-modal-head {
+  padding: 18px 22px;
+  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid #eee;
+  align-items: center;
 }
+
+.cart-modal-head h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cart-modal-head button {
+  background: #fff;
+  border: 2px solid #bbb;
+  border-radius: 10px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+.cart-modal-head button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Cart Items */
 .cart-items {
-  padding: 16px;
+  padding: 16px 20px;
   max-height: 52vh;
   overflow-y: auto;
 }
+
 .cart-item {
+  background: #fafafa;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 14px;
   display: flex;
   justify-content: space-between;
-  padding: 12px;
-  background: #fafafa;
+  align-items: center;
+}
+
+.cart-item .meta {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Qty Controls */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-controls button {
+  background: #fff;
+  border: 2px solid #ddd;
+  padding: 6px 10px;
   border-radius: 10px;
-  margin-bottom: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.qty-controls button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.qty-controls span {
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* FOOTER */
+.cart-modal-foot {
+  padding: 18px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cart-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Buttons */
+.primary {
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.primary:hover {
+  box-shadow: 0 6px 14px rgba(226,55,68,0.35);
+}
+
+.muted {
+  background: #eee;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+}
+.muted:hover {
+  background: #e1e1e1;
+}
+
+/* Scrollbar clean */
+.cart-items::-webkit-scrollbar {
+  width: 6px;
+}
+.cart-items::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 6px;
 }
 
 /* ---------------------------------------------------
