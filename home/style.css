@@ -396,6 +396,70 @@ body {
 }
 
 /* ============================
+   CART QTY CONTROLS (MATCH HOME STYLE)
+   ============================ */
+
+.cart-item {
+    background: #ffffff;
+    padding: 18px;
+    margin-bottom: 14px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Outer pill like home page */
+.qty-controls {
+    background: #fff;
+    border-radius: 999px;
+    padding: 0;
+}
+
+/* Same style as home .qty-btn */
+.cart-inc,
+.cart-dec {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    font-weight: 900;
+    width: 48px;
+    height: 48px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Middle quantity number — same as home */
+.qty-controls span {
+    min-width: 50px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 10px 8px;
+    background: #fff;
+    border-left: 2px solid rgba(0,0,0,0.06);
+    border-right: 2px solid rgba(0,0,0,0.06);
+}
+
+/* Remove button stays small but cleaner */
+.cart-remove {
+    background: transparent;
+    border: 2px solid #aaa;
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* ============================
    FOOTER
 ============================ */
 
