@@ -113,9 +113,17 @@
 
     <div id="ordersList" class="orders-list">Loading orders…</div>
   </section>
-
 </section>
 
+  <div id="liveOrderPopup" class="live-order-popup hidden">
+  <div class="popup-content">
+    <h3>🔥 New Order Received</h3>
+    <p id="popupOrderId"></p>
+    <p id="popupOrderItems"></p>
+    <button id="popupClose">OK</button>
+  </div>
+</div>
+  
 <!-- SOUND -->
 <audio id="newOrderSound">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
