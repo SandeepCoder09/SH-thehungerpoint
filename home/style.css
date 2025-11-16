@@ -36,14 +36,14 @@ body {
   color: #222;
 }
 
-/* FIXED: Prevent gradient overflow into content */
+/* Top browser + navbar background (no overflow into hero) */
 body::before {
   content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 110px; /* perfect height for mobile chrome */
+  height: 90px; /* PERFECT height for your screenshot */
   background: linear-gradient(90deg, #E23744, #b71c1c);
   z-index: -1;
   pointer-events: none;
