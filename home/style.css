@@ -1,205 +1,386 @@
-/* VARIABLES */
+/* ============================
+   The Hunger Point — UI Styles
+   Layout: Compact Item Cards (Option 2)
+   Primary Color: #E23744
+============================ */
+
 :root {
   --primary: #E23744;
   --primary-dark: #b71c1c;
   --bg: #F5F6FA;
   --card: #ffffff;
   --muted: #6b6b6b;
-  --radius: 20px;
-  --shadow: 0 12px 36px rgba(0,0,0,0.08);
+  --radius: 16px;
+  --shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
   --maxWidth: 980px;
 }
 
-/* GLOBAL RESET */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+html, body {
+  height: 100%;
+}
 body {
-  background: var(--bg);
   font-family: "Poppins", sans-serif;
+  background: var(--bg);
   color: #222;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
-/* HEADER */
+/* ============================
+   HEADER
+============================ */
+
 .nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px;
+  padding: 18px 22px;
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 80;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .logo-mark {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
   background: linear-gradient(135deg, #f6b042, #ffd27a);
-  font-weight: 900;
-  font-size: 18px;
+  border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-weight: 900;
+  color: #8b1b1b;
+  font-size: 18px;
+}
+
+.brand-text .name {
+  font-weight: 700;
+  font-size: 18px;
+}
+.brand-text .tag {
+  font-size: 12px;
+  opacity: 0.9;
 }
 
 .icon-btn {
   background: transparent;
   border: none;
-  color: #fff;
+  color: white;
+  font-weight: 800;
   cursor: pointer;
+  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 18px;
+  gap: 8px;
 }
 
-/* MAIN */
+.cart-emoji {
+  font-size: 22px;
+}
+
+/* ============================
+   MAIN CONTAINER
+============================ */
+
 .container {
   max-width: var(--maxWidth);
-  margin: 0 auto;
-  padding: 18px;
+  margin: 16px auto;
+  padding: 14px;
+  flex: 1;
 }
 
-/* HERO */
+/* ============================
+   HERO SECTION
+============================ */
+
 .hero {
-  background: rgba(255,255,255,0.6);
-  padding: 24px;
+  background: linear-gradient(180deg,
+    rgba(246, 176, 66, 0.10),
+    rgba(226, 50, 50, 0.05)
+  );
+  padding: 22px;
   border-radius: var(--radius);
+  margin-bottom: 18px;
   box-shadow: var(--shadow);
-  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.hero p {
+  font-size: 14px;
+  color: var(--muted);
 }
 
-/* TABS */
+/* ============================
+   TABS
+============================ */
+
 .top-tabs {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 22px;
-  flex-wrap: nowrap;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }
-
 .tab {
-  flex: 1;
-  padding: 12px 18px;
-  text-align: center;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  background: #fff;
-  font-weight: 600;
+  padding: 8px 14px;
+  background: var(--card);
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+  text-align: center;
 }
-
 .tab.active {
-  background: var(--primary);
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(226,55,68,0.4);
+  box-shadow: 0 6px 14px rgba(226, 55, 68, 0.25);
 }
 
-/* PAGE SWITCHING FIX */
-.page {
-  display: none;
-}
-.page:not(.hidden) {
-  display: block;
-}
+/* ============================
+   MENU ITEMS (Compact Layout)
+============================ */
 
-/* MENU ITEMS */
 .menu {
   display: grid;
-  gap: 22px;
-}
-.menu-item {
-  background: var(--card);
-  padding: 28px;
-  border-radius: 22px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  box-shadow: var(--shadow);
+  gap: 18px;
 }
 
-/* Qty controls */
+.menu-item {
+  background: var(--card);
+  padding: 18px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  width: 94%;
+  margin: 0 auto;
+  transition: 0.2s ease;
+}
+
+.menu-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
+}
+
+.mi-left h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+.price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.price small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ============================
+   QTY (Compact Style)
+============================ */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .qty-wrap {
   display: flex;
   border-radius: 50px;
   overflow: hidden;
+  border: 1px solid #ddd;
+  background: white;
 }
+
 .qty-btn {
   background: var(--primary);
-  color: #fff;
-  padding: 12px 24px;
-  font-size: 20px;
   border: none;
-}
-.qty {
-  padding: 10px 20px;
+  padding: 10px 16px;
   font-size: 18px;
-  font-weight: bold;
-}
-
-/* ADD BUTTON */
-.add-cart-btn {
-  border: 2px solid var(--primary);
-  padding: 12px 20px;
-  border-radius: 16px;
-  font-weight: bold;
-  background: #fff;
+  font-weight: 900;
+  color: white;
+  min-width: 40px;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(226,55,68,0.3);
 }
 
-/* CART MODAL */
+.qty {
+  padding: 8px 14px;
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: center;
+}
+
+/* ============================
+   ADD BUTTON
+============================ */
+
+.add-cart-btn {
+  background: white;
+  border: 2px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.add-cart-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ============================
+   ORDER STATUS
+============================ */
+
+.order-status {
+  padding: 16px;
+  text-align: center;
+  border-radius: 14px;
+  background: #fff4f2;
+  margin-top: 20px;
+}
+.hidden {
+  display: none !important;
+}
+
+/* ============================
+   CART MODAL (CENTERED)
+============================ */
+
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
+  background: rgba(0,0,0,0.35);
+  z-index: 120;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s;
 }
-
-.overlay:not(.hidden),
-.cart-modal:not(.hidden) {
-  display: block;
+.overlay:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
 }
 
 .cart-modal {
   position: fixed;
   left: 50%;
-  top: 52%;
-  transform: translate(-50%, -50%);
+  top: 50%;
   width: 92%;
   max-width: 600px;
-  background: #fff;
+  background: var(--card);
   border-radius: 16px;
-  padding-bottom: 16px;
-  display: none;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.25);
+  transform: translate(-50%, -50%) scale(0.95);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 130;
+  transition: 0.2s ease;
+}
+.cart-modal:not(.hidden) {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  visibility: visible;
 }
 
-/* FOOTER */
+.cart-modal-head,
+.cart-modal-foot {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-items {
+  padding: 16px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.cart-item {
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.muted {
+  background: #f1f1f1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* ============================
+   FOOTER
+============================ */
+
 .footer {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  color: #fff;
-  text-align: center;
   padding: 18px;
+  text-align: center;
+  color: white;
+  font-weight: 700;
 }
 
-/* RESPONSIVE */
-@media(max-width:500px){
+/* ============================
+   SMALL SCREENS
+============================ */
+
+@media (max-width: 520px) {
   .menu-item {
-    flex-direction: column;
-    align-items: flex-start;
+    width: 96%;
+    padding: 16px;
+  }
+  .qty-btn {
+    padding: 8px 14px;
+  }
+  .add-cart-btn {
+    padding: 8px 12px;
+  }
+  .cart-modal {
+    width: 94%;
   }
 }
