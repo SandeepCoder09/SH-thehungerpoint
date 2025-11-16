@@ -1,15 +1,24 @@
-// /home/script.js
-// Cart + qty + tabs + Razorpay flow
+/* /home/script.js
+   Option A (wide boxes). Preserves existing server + Razorpay flow.
+   - Cart modal centered
+   - Qty buttons fixed and identical style
+   - Tabs, add-to-cart, checkout preserved
+*/
 
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
-const PRICE_DEFAULT = 10;
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; // keep your backend
+const PRICE_DEFAULT = 10; // fallback price
 
+// DOM helpers
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-function showToast(message, duration = 2200) {
+// Toast helper
+function showToast(message, duration = 2500) {
   const container = document.getElementById("toast-container");
-  if (!container) return console.log("toast:", message);
+  if (!container) {
+    console.log("toast:", message);
+    return;
+  }
   const t = document.createElement("div");
   t.className = "toast";
   t.textContent = message;
@@ -17,10 +26,13 @@ function showToast(message, duration = 2200) {
   setTimeout(() => t.remove(), duration);
 }
 
-let cart = [];
+/* ---------------------------
+   CART state & helpers
+   --------------------------- */
+let cart = []; // { id, name, price, qty }
 
 function findCartIndex(id) {
-  return cart.findIndex((c) => c.id === id);
+  return cart.findIndex(c => c.id === id);
 }
 
 function updateCartCount() {
@@ -41,8 +53,8 @@ function renderCart() {
   }
 
   let total = 0;
-  cart.forEach((item) => {
-    total += item.qty * item.price;
+  cart.forEach(item => {
+    total += item.price * item.qty;
     const node = document.createElement("div");
     node.className = "cart-item";
     node.innerHTML = `
@@ -54,7 +66,7 @@ function renderCart() {
         <button class="cart-dec" data-id="${item.id}">−</button>
         <span>${item.qty}</span>
         <button class="cart-inc" data-id="${item.id}">+</button>
-        <button class="cart-remove" data-id="${item.id}">✕</button>
+        <button class="cart-remove" data-id="${item.id}" title="Remove">✕</button>
       </div>
     `;
     container.appendChild(node);
@@ -63,61 +75,86 @@ function renderCart() {
   $("#cartTotal").textContent = "₹" + total;
   updateCartCount();
 
-  container.querySelectorAll(".cart-dec").forEach((b) =>
-    b.addEventListener("click", (e) => {
-      const id = e.currentTarget.dataset.id;
-      const idx = findCartIndex(id);
-      if (idx >= 0) {
-        cart[idx].qty = Math.max(1, cart[idx].qty - 1);
-        renderCart();
-      }
-    })
-  );
-
-  container.querySelectorAll(".cart-inc").forEach((b) =>
-    b.addEventListener("click", (e) => {
-      const id = e.currentTarget.dataset.id;
-      const idx = findCartIndex(id);
-      if (idx >= 0) {
-        cart[idx].qty += 1;
-        renderCart();
-      }
-    })
-  );
-
-  container.querySelectorAll(".cart-remove").forEach((b) =>
-    b.addEventListener("click", (e) => {
-      const id = e.currentTarget.dataset.id;
-      cart = cart.filter((c) => c.id !== id);
+  // attach handlers
+  container.querySelectorAll(".cart-dec").forEach(b => b.addEventListener("click", e => {
+    const id = e.currentTarget.dataset.id;
+    const idx = findCartIndex(id);
+    if (idx >= 0) {
+      cart[idx].qty = Math.max(1, cart[idx].qty - 1);
       renderCart();
-    })
-  );
+    }
+  }));
+
+  container.querySelectorAll(".cart-inc").forEach(b => b.addEventListener("click", e => {
+    const id = e.currentTarget.dataset.id;
+    const idx = findCartIndex(id);
+    if (idx >= 0) {
+      cart[idx].qty += 1;
+      renderCart();
+    }
+  }));
+
+  container.querySelectorAll(".cart-remove").forEach(b => b.addEventListener("click", e => {
+    const id = e.currentTarget.dataset.id;
+    cart = cart.filter(c => c.id !== id);
+    renderCart();
+  }));
 }
 
+/* ---------------------------
+   Cart modal open/close
+   --------------------------- */
+const overlay = $("#cartOverlay");
+const modal = $("#cartModal");
+
 function openCart() {
-  const d = $("#cartDrawer");
-  if (!d) return;
-  d.classList.remove("hidden");
-  d.setAttribute("aria-hidden", "false");
+  if (overlay) overlay.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
   renderCart();
 }
 function closeCart() {
-  const d = $("#cartDrawer");
-  if (!d) return;
-  d.classList.add("hidden");
-  d.setAttribute("aria-hidden", "true");
+  if (overlay) overlay.classList.add("hidden");
+  if (modal) modal.classList.add("hidden");
 }
 
-$$(".menu-item").forEach((itemEl) => {
+$("#cartToggle")?.addEventListener("click", openCart);
+$("#closeCart")?.addEventListener("click", closeCart);
+overlay?.addEventListener("click", closeCart);
+
+// Clear cart
+$("#clearCart")?.addEventListener("click", () => {
+  cart = [];
+  renderCart();
+  closeCart();
+});
+
+/* ---------------------------
+   Tabs
+   --------------------------- */
+$$(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    $$(".tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    $$(".page").forEach(p => p.classList.add("hidden"));
+    const el = document.getElementById(tab);
+    if (el) el.classList.remove("hidden");
+  });
+});
+
+/* ---------------------------
+   Menu qty & add button (preserve your old code)
+   --------------------------- */
+$$(".menu-item").forEach(itemEl => {
   const qtyEl = itemEl.querySelector(".qty");
   const dec = itemEl.querySelector(".qty-btn.minus");
   const inc = itemEl.querySelector(".qty-btn.plus");
   const addBtn = itemEl.querySelector(".add-cart-btn");
 
   let qty = Number(qtyEl?.textContent) || 1;
-  qtyEl && (qtyEl.textContent = qty);
+  if (qtyEl) qtyEl.textContent = qty;
 
-  const setQty = (v) => {
+  const setQty = v => {
     qty = Math.max(1, Math.floor(v));
     if (qtyEl) qtyEl.textContent = qty;
   };
@@ -139,30 +176,32 @@ $$(".menu-item").forEach((itemEl) => {
   });
 });
 
-$$(".tab").forEach((btn) =>
-  btn.addEventListener("click", () => {
-    $$(".tab").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    const tab = btn.dataset.tab;
-    $$(".page").forEach((p) => p.classList.add("hidden"));
-    const el = document.getElementById(tab);
-    if (el) el.classList.remove("hidden");
-  })
-);
+/* ---------------------------
+   Checkout flow (Razorpay) — preserved
+   --------------------------- */
+
+function setOrderButtonsDisabled(disabled) {
+  $$(".add-cart-btn").forEach(b => {
+    b.disabled = disabled;
+    if (!disabled) b.classList.remove("processing");
+  });
+}
 
 async function createOrderOnServer(items, amount) {
   const resp = await fetch(`${SERVER_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, items }),
+    body: JSON.stringify({ amount, items })
   });
   if (!resp.ok) throw new Error("Network error");
-  return resp.json();
+  const data = await resp.json();
+  if (!data || !data.ok || !data.order) throw new Error(data?.error || "Order creation failed");
+  return data;
 }
 
 function openRazorpay(data, items) {
   if (!window.Razorpay) {
-    showToast("Razorpay script not loaded");
+    showToast("Razorpay script not loaded.", "error");
     return;
   }
 
@@ -171,7 +210,7 @@ function openRazorpay(data, items) {
     amount: data.order.amount,
     currency: "INR",
     name: "SH — The Hunger Point",
-    description: items.map((i) => `${i.name}×${i.qty}`).join(", "),
+    description: items.map(i => `${i.name}×${i.qty}`).join(", "),
     order_id: data.order.id,
     handler: async function (resp) {
       try {
@@ -182,54 +221,61 @@ function openRazorpay(data, items) {
             razorpay_order_id: resp.razorpay_order_id,
             razorpay_payment_id: resp.razorpay_payment_id,
             razorpay_signature: resp.razorpay_signature,
-            items,
-          }),
+            items
+          })
         });
+
         if (!verify.ok) throw new Error("Verify network error");
         const result = await verify.json();
 
         if (result.ok) {
+          // success UI — preserve your behavior
           cart = [];
           renderCart();
           closeCart();
-          document.querySelectorAll(".menu").forEach((m) => (m.style.display = "none"));
-          const status = $("#order-status");
+          document.querySelectorAll(".menu").forEach(m => m.style.display = "none");
+          const status = document.getElementById("order-status");
           status.classList.remove("hidden");
-          $("#eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
+          document.getElementById("eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
           showToast("Order confirmed! Enjoy your meal 🍽️");
         } else {
-          showToast("Payment verification failed");
+          console.error("Verification failed:", result);
+          showToast("Payment verification failed.");
+          setOrderButtonsDisabled(false);
         }
       } catch (err) {
         console.error(err);
-        showToast("Verification failed. Try later");
+        showToast("Verification failed. Try later.");
+        setOrderButtonsDisabled(false);
       } finally {
-        $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
+        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
       }
     },
     modal: {
       ondismiss: function () {
-        $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
-      },
-    },
+        setOrderButtonsDisabled(false);
+        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
+      }
+    }
   };
 
   const rzp = new Razorpay(options);
   rzp.open();
 }
 
+/* Checkout button */
 $("#checkoutBtn")?.addEventListener("click", async () => {
   if (cart.length === 0) {
     showToast("Cart is empty");
     return;
   }
-  const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
+
+  const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  $$(".add-cart-btn").forEach((b) => {
-    b.classList.add("processing");
-    b.textContent = "Processing...";
-  });
+  // UI lock
+  setOrderButtonsDisabled(true);
+  $$(".add-cart-btn").forEach(b => { b.classList.add("processing"); b.textContent = "Processing..."; });
 
   try {
     const data = await createOrderOnServer(items, total);
@@ -237,20 +283,16 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
   } catch (err) {
     console.error(err);
     showToast("Server offline or error. Try again.");
-    $$(".add-cart-btn").forEach((b) => (b.classList.remove("processing"), (b.textContent = "Add")));
+    setOrderButtonsDisabled(false);
+    $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
   }
 });
 
-$("#cartToggle")?.addEventListener("click", openCart);
-$("#closeCart")?.addEventListener("click", closeCart);
-$("#clearCart")?.addEventListener("click", () => {
-  cart = [];
-  renderCart();
-  closeCart();
-});
+/* Quick ping to keep backend awake (optional) */
+fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 
+/* Init */
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
-  fetch(`${SERVER_URL}/ping`).catch(() => console.log("Ping failed (ok)"));
 });
