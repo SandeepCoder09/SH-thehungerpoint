@@ -52,17 +52,19 @@ function renderCart() {
     const node = document.createElement("div");
     node.className = "cart-item";
     node.innerHTML = `
-      <div class="meta">
-        <div style="font-weight:700">${item.name}</div>
-        <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
-      </div>
-      <div class="qty-controls">
-        <button class="cart-dec" data-id="${item.id}" aria-label="decrease">−</button>
-        <span style="min-width:26px; text-align:center; display:inline-block;">${item.qty}</span>
-        <button class="cart-inc" data-id="${item.id}" aria-label="increase">+</button>
-        <button class="cart-remove" data-id="${item.id}" title="Remove">✕</button>
-      </div>
-    `;
+  <div class="meta">
+    <div class="cart-item-name">${item.name}</div>
+    <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
+  </div>
+
+  <div class="cart-qty-wrap">
+    <button class="cart-dec" data-id="${item.id}">−</button>
+    <span class="cart-qty">${item.qty}</span>
+    <button class="cart-inc" data-id="${item.id}">+</button>
+  </div>
+
+  <button class="cart-remove" data-id="${item.id}">✕</button>
+`;
     container.appendChild(node);
   });
 
