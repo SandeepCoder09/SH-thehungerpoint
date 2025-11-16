@@ -2,12 +2,9 @@
   "version": 2,
   "routes": [
     { "src": "/", "dest": "home/index.html" },
-    { "src": "/home/(.*)", "dest": "home/$1" },
+    { "src": "/home/?", "dest": "home/index.html" },
 
     { "src": "/admin", "dest": "admin/index.html" },
     { "src": "/admin/(.*)", "dest": "admin/$1" }
-  ],
-  "static": {
-    "public": "."
-  }
+  ]
 }
