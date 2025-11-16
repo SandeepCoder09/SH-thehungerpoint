@@ -1,8 +1,5 @@
-/* -----------------------------------------
-   ADMIN PANEL — CLEAN MODERN UI STYLESHEET
-   ----------------------------------------- */
+/* admin.css — Fully responsive, modern admin panel styles */
 
-/* BASE */
 * {
   margin: 0;
   padding: 0;
@@ -17,10 +14,7 @@ body {
   overflow-x: hidden;
 }
 
-
-/* -----------------------------------------
-   SIDEBAR
-   ----------------------------------------- */
+/* ---------------- SIDEBAR ---------------- */
 .sidebar {
   width: 240px;
   background: #141414;
@@ -61,10 +55,7 @@ body {
   color: #fff;
 }
 
-
-/* -----------------------------------------
-   TOGGLE BUTTON FOR MOBILE
-   ----------------------------------------- */
+/* ---------------- MENU TOGGLE (MOBILE) ---------------- */
 .menu-toggle {
   display: none;
   position: fixed;
@@ -79,10 +70,7 @@ body {
   font-size: 16px;
 }
 
-
-/* -----------------------------------------
-   MAIN CONTENT
-   ----------------------------------------- */
+/* ---------------- MAIN CONTENT ---------------- */
 .main-content {
   margin-left: 260px;
   padding: 30px;
@@ -105,10 +93,7 @@ body {
   font-weight: 600;
 }
 
-
-/* -----------------------------------------
-   STATS GRID
-   ----------------------------------------- */
+/* ---------------- STATS GRID ---------------- */
 .stats-grid {
   margin-top: 20px;
   display: grid;
@@ -142,10 +127,7 @@ body {
   color: #111;
 }
 
-
-/* -----------------------------------------
-   CHART SECTION
-   ----------------------------------------- */
+/* ---------------- CHART SECTION ---------------- */
 .chart-section {
   margin-top: 35px;
   display: grid;
@@ -166,10 +148,7 @@ body {
   color: #333;
 }
 
-
-/* -----------------------------------------
-   ORDERS SECTION
-   ----------------------------------------- */
+/* ---------------- ORDERS SECTION ---------------- */
 .orders-container {
   margin-top: 40px;
   padding: 20px;
@@ -205,10 +184,6 @@ body {
   font-size: 15px;
 }
 
-
-/* -----------------------------------------
-   ORDER CARDS
-   ----------------------------------------- */
 .orders-list {
   margin-top: 25px;
 }
@@ -241,72 +216,7 @@ body {
   background: white;
 }
 
-
-/* -----------------------------------------
-   RESPONSIVE FIXES
-   ----------------------------------------- */
-
-/* TABLET */
-@media (max-width: 1024px) {
-  .main-content {
-    margin-left: 230px;
-    width: calc(100% - 230px);
-  }
-}
-
-/* MOBILE MENU */
-@media (max-width: 850px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  .sidebar {
-    left: -260px;
-    height: 100vh;
-    position: fixed;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-    padding: 20px;
-  }
-
-  .chart-section {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* SMALL MOBILE */
-@media (max-width: 540px) {
-  .stat-card p {
-    font-size: 22px;
-  }
-
-  .orders-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .order-controls {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .order-controls input {
-    width: 100%;
-  }
-
-  .order-controls select {
-    width: 100%;
-  }
-}
-
-
+/* ---------------- LIVE ORDER POPUP ---------------- */
 .live-order-popup {
   position: fixed;
   bottom: 25px;
@@ -328,10 +238,10 @@ body {
   transform: translateY(0);
 }
 
-.live-order-popup .popup-content h3 {
-  margin-bottom: 6px;
+.live-order-popup h3 {
   color: #e23744;
   font-size: 18px;
+  margin-bottom: 8px;
 }
 
 .live-order-popup p {
@@ -349,4 +259,45 @@ body {
   color: #fff;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* ---------------- RESPONSIVE DESIGN ---------------- */
+@media (max-width: 850px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    left: -260px;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .chart-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .stat-card p {
+    font-size: 22px;
+  }
+
+  .orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-controls input,
+  .order-controls select {
+    width: 100%;
+  }
 }
