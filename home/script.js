@@ -295,4 +295,4 @@ fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
-});
+}); 
