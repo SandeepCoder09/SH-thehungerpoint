@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Full top red for mobile browser -->
+  <!-- Full top red effect using your exact gradient -->
   <meta name="theme-color" content="#E23744">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,14 +13,13 @@
 
   <link rel="stylesheet" href="/home/style.css" />
 
-  <!-- Firebase -->
+  <!-- Firebase (if used) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <script src="firebase-config.js"></script>
 </head>
 
 <body>
-
   <!-- HEADER -->
   <header class="nav">
     <div class="brand">
@@ -32,7 +31,7 @@
     </div>
 
     <div class="header-actions">
-      <button id="cartToggle" class="icon-btn">
+      <button id="cartToggle" class="icon-btn" aria-label="Open cart">
         <span class="cart-emoji">🛒</span>
         <span id="cartCount">0</span>
       </button>
@@ -41,24 +40,22 @@
 
   <!-- MAIN -->
   <main class="container">
-
-    <section class="hero">
+    <section class="hero" role="banner">
       <h1>Delicious. Fast. Fresh.</h1>
-      <p>Family-style fast food — momo, finger, tea & more.</p>
+      <p>Family-style fast food — momo, finger, tea &amp; more.</p>
     </section>
 
     <!-- TABS -->
-    <nav class="top-tabs">
+    <nav class="top-tabs" role="navigation" aria-label="Main tabs">
       <button class="tab active" data-tab="home">Home</button>
       <button class="tab" data-tab="orders">My Orders</button>
       <button class="tab" data-tab="profile">Profile</button>
       <button class="tab" data-tab="offers">Offers</button>
     </nav>
 
-    <!-- HOME PAGE -->
+    <!-- MENU -->
     <section id="home" class="page">
-
-      <section class="menu">
+      <section class="menu" aria-label="Menu items">
 
         <article class="menu-item" data-item="Momo" data-price="10">
           <div class="mi-left">
@@ -67,10 +64,10 @@
           </div>
 
           <div class="controls">
-            <div class="qty-wrap">
-              <button class="qty-btn minus">−</button>
-              <span class="qty">1</span>
-              <button class="qty-btn plus">+</button>
+            <div class="qty-wrap" role="group" aria-label="Quantity selector">
+              <button class="qty-btn minus" aria-label="Decrease">−</button>
+              <span class="qty" aria-live="polite">1</span>
+              <button class="qty-btn plus" aria-label="Increase">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -83,10 +80,10 @@
           </div>
 
           <div class="controls">
-            <div class="qty-wrap">
-              <button class="qty-btn minus">−</button>
-              <span class="qty">1</span>
-              <button class="qty-btn plus">+</button>
+            <div class="qty-wrap" role="group" aria-label="Quantity selector">
+              <button class="qty-btn minus" aria-label="Decrease">−</button>
+              <span class="qty" aria-live="polite">1</span>
+              <button class="qty-btn plus" aria-label="Increase">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -99,10 +96,10 @@
           </div>
 
           <div class="controls">
-            <div class="qty-wrap">
-              <button class="qty-btn minus">−</button>
-              <span class="qty">1</span>
-              <button class="qty-btn plus">+</button>
+            <div class="qty-wrap" role="group" aria-label="Quantity selector">
+              <button class="qty-btn minus" aria-label="Decrease">−</button>
+              <span class="qty" aria-live="polite">1</span>
+              <button class="qty-btn plus" aria-label="Increase">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -115,49 +112,36 @@
           </div>
 
           <div class="controls">
-            <div class="qty-wrap">
-              <button class="qty-btn minus">−</button>
-              <span class="qty">1</span>
-              <button class="qty-btn plus">+</button>
+            <div class="qty-wrap" role="group" aria-label="Quantity selector">
+              <button class="qty-btn minus" aria-label="Decrease">−</button>
+              <span class="qty" aria-live="polite">1</span>
+              <button class="qty-btn plus" aria-label="Increase">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
         </article>
 
       </section>
-
     </section>
 
     <!-- OTHER PAGES -->
-    <section id="orders" class="page hidden">
-      <h2>Your Orders</h2>
-      <p id="pastOrders">No orders yet</p>
-    </section>
-
-    <section id="profile" class="page hidden">
-      <h2>Profile</h2>
-      <p>User profile info will appear</p>
-    </section>
-
-    <section id="offers" class="page hidden">
-      <h2>Offers</h2>
-      <p>No active offers</p>
-    </section>
+    <section id="orders" class="page hidden"><h2>Your Orders</h2><p id="pastOrders">No orders yet.</p></section>
+    <section id="profile" class="page hidden"><h2>Profile</h2><p>User profile info will appear.</p></section>
+    <section id="offers" class="page hidden"><h2>Offers</h2><p>No active offers.</p></section>
 
     <section id="order-status" class="order-status hidden">
       <h3>Order Confirmed 🎉</h3>
       <p id="eta-text"></p>
     </section>
-
   </main>
 
   <!-- CART MODAL -->
-  <div id="overlay" class="overlay hidden"></div>
+  <div id="overlay" class="overlay hidden" aria-hidden="true"></div>
 
-  <div id="cartModal" class="cart-modal hidden">
+  <div id="cartModal" class="cart-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
     <header class="cart-modal-head">
-      <h3>Your Cart</h3>
-      <button id="closeCart" class="icon-btn">✕</button>
+      <h3 id="cartTitle">Your Cart</h3>
+      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
     </header>
 
     <div id="cartItems" class="cart-items">
@@ -179,8 +163,8 @@
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
 
   <script src="/home/script.js"></script>
 </body>
-</html> 
+</html>
