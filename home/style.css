@@ -1,413 +1,205 @@
-/* ============================
-   The Hunger Point — UI Styles
-   Centered Cart Modal (Option B)
-   Primary Color: #E23744
-   ============================ */
-
+/* VARIABLES */
 :root {
-    --primary: #E23744;
-    --primary-dark: #b71c1c;
-    --bg: #F5F6FA;
-    --card: #ffffff;
-    --muted: #6b6b6b;
-    --radius: 20px;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    --glow: 0 10px 40px rgba(226, 55, 68, 0.2);
-    --maxWidth: 980px;
+  --primary: #E23744;
+  --primary-dark: #b71c1c;
+  --bg: #F5F6FA;
+  --card: #ffffff;
+  --muted: #6b6b6b;
+  --radius: 20px;
+  --shadow: 0 12px 36px rgba(0,0,0,0.08);
+  --maxWidth: 980px;
 }
 
-/* RESET */
+/* GLOBAL RESET */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-html,
 body {
-    height: 100%;
+  background: var(--bg);
+  font-family: "Poppins", sans-serif;
+  color: #222;
+  display: flex;
+  flex-direction: column;
 }
 
-body {
-    font-family: "Poppins", sans-serif;
-    background: var(--bg);
-    color: #222;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* ============================
-   HEADER
-   ============================ */
-
+/* HEADER */
 .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 22px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    color: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 80;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .logo-mark {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #f6b042, #ffd27a);
-    color: #8b1b1b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    font-size: 18px;
-}
-
-.brand-text .name {
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.brand-text .tag {
-    font-size: 12px;
-    opacity: 0.9;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f6b042, #ffd27a);
+  font-weight: 900;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .icon-btn {
-    background: transparent;
-    border: none;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 800;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
 }
 
-.cart-emoji {
-    font-size: 22px;
-}
-
-/* ============================
-   MAIN CONTAINER
-   ============================ */
-
+/* MAIN */
 .container {
-    max-width: var(--maxWidth);
-    margin: 18px auto;
-    padding: 14px;
-    flex: 1;
+  max-width: var(--maxWidth);
+  margin: 0 auto;
+  padding: 18px;
 }
 
-/* ============================
-   HERO SECTION
-   ============================ */
-
+/* HERO */
 .hero {
-    padding: 24px;
-    border-radius: var(--radius);
-    background: linear-gradient(180deg,
-            rgba(246, 176, 66, 0.08),
-            rgba(226, 50, 50, 0.03));
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
+  background: rgba(255,255,255,0.6);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
 }
 
-.hero h1 {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-
-.hero p {
-    color: var(--muted);
-    font-size: 14px;
-}
-
-/* ============================
-   TABS
-   ============================ */
-
+/* TABS */
 .top-tabs {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+  flex-wrap: nowrap;
 }
 
 .tab {
-    padding: 10px 16px;
-    border-radius: 12px;
-    background: var(--card);
-    border: 1px solid #eee;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    min-width: 86px;
-    text-align: center;
+  flex: 1;
+  padding: 12px 18px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .tab.active {
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 6px 18px rgba(226, 55, 68, 0.18);
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(226,55,68,0.4);
 }
 
-/* ============================
-   MENU ITEMS
-   ============================ */
+/* PAGE SWITCHING FIX */
+.page {
+  display: none;
+}
+.page:not(.hidden) {
+  display: block;
+}
 
+/* MENU ITEMS */
 .menu {
-    display: grid;
-    gap: 22px;
+  display: grid;
+  gap: 22px;
 }
-
 .menu-item {
-    background: var(--card);
-    padding: 28px;
-    border-radius: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
-    margin: 0 auto;
-    box-shadow: var(--shadow);
-    transition: 0.2s ease;
-    gap: 28px;
+  background: var(--card);
+  padding: 28px;
+  border-radius: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: var(--shadow);
 }
 
-.menu-item:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-}
-
-.mi-left h3 {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-
-.price {
-    font-size: 18px;
-    color: var(--primary);
-    font-weight: 700;
-}
-
-.price small {
-    font-size: 13px;
-    color: var(--muted);
-    margin-left: 8px;
-}
-
-/* ============================
-   QTY CONTROL
-   ============================ */
-
-.controls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
+/* Qty controls */
 .qty-wrap {
-    display: flex;
-    align-items: center;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  border-radius: 50px;
+  overflow: hidden;
 }
-
 .qty-btn {
-    padding: 12px 22px;
-    border: none;
-    background: var(--primary);
-    color: #fff;
-    font-size: 22px;
-    font-weight: 900;
-    cursor: pointer;
-    min-width: 54px;
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 20px;
+  border: none;
 }
-
 .qty {
-    padding: 10px 18px;
-    min-width: 44px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 18px;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-/* ============================
-   ADD BUTTON
-   ============================ */
-
+/* ADD BUTTON */
 .add-cart-btn {
-    background: #fff;
-    border: 2px solid var(--primary);
-    padding: 12px 18px;
-    border-radius: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: var(--glow);
-    transition: 0.2s;
+  border: 2px solid var(--primary);
+  padding: 12px 20px;
+  border-radius: 16px;
+  font-weight: bold;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(226,55,68,0.3);
 }
 
-.add-cart-btn:hover {
-    background: var(--primary);
-    color: #fff;
-}
-
-/* ============================
-   CART MODAL (CENTERED)
-   ============================ */
-
+/* CART MODAL */
 .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 120;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.2s ease;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
 }
 
-.overlay:not(.hidden) {
-    opacity: 1;
-    visibility: visible;
+.overlay:not(.hidden),
+.cart-modal:not(.hidden) {
+  display: block;
 }
 
 .cart-modal {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    width: 92%;
-    max-width: 680px;
-    background: var(--card);
-    border-radius: 16px;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-    padding-bottom: 18px;
-
-    transform: translate(-50%, -50%) scale(0.95);
-    opacity: 0;
-    visibility: hidden;
-    z-index: 130;
-    transition: 0.2s ease;
+  position: fixed;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 16px;
+  padding-bottom: 16px;
+  display: none;
 }
 
-.cart-modal:not(.hidden) {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-    visibility: visible;
-}
-
-/* modal head */
-.cart-modal-head {
-    padding: 16px 20px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    font-weight: 700;
-}
-
-.cart-items {
-    padding: 16px;
-    max-height: 55vh;
-    overflow-y: auto;
-}
-
-.cart-item {
-    background: #fafafa;
-    padding: 14px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* modal footer */
-.cart-modal-foot {
-    padding: 16px 20px;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.cart-total {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--primary);
-}
-
-/* modal footer buttons */
-.cart-modal-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.primary {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    padding: 12px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 800;
-}
-
-.muted {
-    background: #f1f1f1;
-    border: none;
-    padding: 12px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-/* ============================
-   FOOTER
-   ============================ */
-
+/* FOOTER */
 .footer {
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    text-align: center;
-    padding: 18px;
-    color: #fff;
-    font-weight: 700;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  text-align: center;
+  padding: 18px;
 }
 
-/* ============================
-   RESPONSIVE
-   ============================ */
-
-@media (max-width: 520px) {
-    .menu-item {
-        padding: 20px;
-        width: 96%;
-    }
-
-    .qty-btn {
-        padding: 12px 16px;
-        min-width: 44px;
-    }
-
-    .qty {
-        min-width: 40px;
-    }
-
-    .cart-modal {
-        width: 94%;
-    }
+/* RESPONSIVE */
+@media(max-width:500px){
+  .menu-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
