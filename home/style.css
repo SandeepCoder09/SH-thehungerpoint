@@ -350,14 +350,32 @@ body {
   cursor: pointer;
 }
 
-/* ---------- Footer ---------- */
+/* ----- FIX FOOTER TO BOTTOM ----- */
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* container should expand, footer stays at bottom */
+.container {
+  flex: 1;
+}
+
+/* footer stays at bottom, no overflow on mobile */
 .footer {
+  margin-top: auto;
   text-align: center;
   padding: 18px;
   background: linear-gradient(90deg, var(--primary), #b71c1c);
   color: #fff;
-  margin-top: 32px;
   font-weight: 600;
+  width: 100%;
+  position: relative;
 }
 
 /* ---------- Responsive ---------- */
