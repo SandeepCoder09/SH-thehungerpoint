@@ -7,14 +7,24 @@
 
   <link rel="stylesheet" href="/home/style.css">
 
-  <!-- Firebase SDKs (Firestore only) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-  <!-- Your firebase config (local file) -->
   <script src="firebase-config.js"></script>
 </head>
+
 <body>
+
+  <!-- DESKTOP TOP TABS -->
+  <div class="top-tabs">
+    <div class="tab active" data-tab="home">Home</div>
+    <div class="tab" data-tab="orders">My Orders</div>
+    <div class="tab" data-tab="profile">My Profile</div>
+    <div class="tab" data-tab="offers">Offers</div>
+    <div class="tab" data-tab="help">Help</div>
+  </div>
+
+  <!-- HEADER -->
   <header class="nav">
     <div class="brand">
       <div class="logo-mark">SH</div>
@@ -25,80 +35,134 @@
     </div>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="container">
-    <section class="hero">
-      <h1>Delicious. Fast. Fresh.</h1>
-      <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
+
+    <!-- HOME PAGE SECTION -->
+    <section class="page home-page">
+      <section class="hero">
+        <h1>Delicious. Fast. Fresh.</h1>
+        <p>Family-style fast food — momo, finger, tea & more. Premium taste, pocket-friendly.</p>
+      </section>
+
+      <section class="menu">
+        <!-- MOMO -->
+        <article class="menu-item" data-item="Momo">
+          <div class="mi-left">
+            <h3>Momo</h3>
+            <div class="price">₹10 <small>/ 5 pieces</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn" data-action="dec">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn" data-action="inc">+</button>
+            </div>
+            <button class="order-btn">Order Now</button>
+          </div>
+        </article>
+
+        <!-- FINGER -->
+        <article class="menu-item" data-item="Finger">
+          <div class="mi-left">
+            <h3>Finger</h3>
+            <div class="price">₹10 <small>/ plate</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn" data-action="dec">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn" data-action="inc">+</button>
+            </div>
+            <button class="order-btn">Order Now</button>
+          </div>
+        </article>
+
+        <!-- TEA -->
+        <article class="menu-item" data-item="Tea">
+          <div class="mi-left">
+            <h3>Tea</h3>
+            <div class="price">₹10 <small>/ cup</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn" data-action="dec">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn" data-action="inc">+</button>
+            </div>
+            <button class="order-btn">Order Now</button>
+          </div>
+        </article>
+
+        <!-- NEW ITEM: HOT TEA -->
+        <article class="menu-item" data-item="Hot Tea">
+          <div class="mi-left">
+            <h3>Hot Tea</h3>
+            <div class="price">₹10 <small>/ cup</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn" data-action="dec">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn" data-action="inc">+</button>
+            </div>
+            <button class="order-btn">Order Now</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="order-status" class="order-status hidden">
+        <h3>Order Confirmed 🎉</h3>
+        <p id="eta-text"></p>
+      </section>
     </section>
 
-    <section class="menu" aria-label="menu">
-      <article class="menu-item" data-item="Momo">
-        <div class="mi-left">
-          <h3>Momo</h3>
-          <div class="price">₹10 <small>/ 5 pieces</small></div>
-        </div>
-        <div class="controls">
-          <div class="qty-wrap">
-            <button class="qty-btn" data-action="dec">−</button>
-            <span class="qty">1</span>
-            <button class="qty-btn" data-action="inc">+</button>
-          </div>
-          <button class="order-btn">Order Now</button>
-        </div>
-      </article>
-
-      <article class="menu-item" data-item="Finger">
-        <div class="mi-left">
-          <h3>Finger</h3>
-          <div class="price">₹10 <small>/ plate</small></div>
-        </div>
-        <div class="controls">
-          <div class="qty-wrap">
-            <button class="qty-btn" data-action="dec">−</button>
-            <span class="qty">1</span>
-            <button class="qty-btn" data-action="inc">+</button>
-          </div>
-          <button class="order-btn">Order Now</button>
-        </div>
-      </article>
-
-      <article class="menu-item" data-item="Tea">
-        <div class="mi-left">
-          <h3>Tea</h3>
-          <div class="price">₹10 <small>/ cup</small></div>
-        </div>
-        <div class="controls">
-          <div class="qty-wrap">
-            <button class="qty-btn" data-action="dec">−</button>
-            <span class="qty">1</span>
-            <button class="qty-btn" data-action="inc">+</button>
-          </div>
-          <button class="order-btn">Order Now</button>
-        </div>
-      </article>
+    <!-- OTHER TABS: Blank for now -->
+    <section class="page orders-page" style="display:none;">
+      <h2>My Orders</h2>
+      <p>Order history will appear here.</p>
     </section>
 
-    <section id="order-status" class="order-status hidden">
-      <h3>Order Confirmed 🎉</h3>
-      <p id="eta-text"></p>
+    <section class="page profile-page" style="display:none;">
+      <h2>My Profile</h2>
+      <p>User profile details here.</p>
     </section>
+
+    <section class="page offers-page" style="display:none;">
+      <h2>Offers</h2>
+      <p>No offers available right now.</p>
+    </section>
+
+    <section class="page help-page" style="display:none;">
+      <h2>Help & Support</h2>
+      <p>Contact support for help.</p>
+    </section>
+
   </main>
 
-<a href="https://sh-thehungerpoint.vercel.app/admin/login.html" target="_block">Admin Panel</a>
-  
+  <!-- ADMIN LINK -->
+  <a href="https://sh-thehungerpoint.vercel.app/admin/login.html" target="_block">Admin Panel</a>
+
+  <!-- FOOTER -->
   <footer class="footer">
     <p>© 2025 SH — The Hunger Point</p>
   </footer>
 
-  <!-- Razorpay Checkout -->
+  <!-- MOBILE BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bn-item active" data-tab="home">🏠<span>Home</span></div>
+    <div class="bn-item" data-tab="orders">🧾<span>Orders</span></div>
+    <div class="bn-item" data-tab="profile">👤<span>Profile</span></div>
+    <div class="bn-item" data-tab="offers">🎉<span>Offers</span></div>
+  </div>
+
+  <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Toast container -->
-  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
+  <!-- Toast -->
+  <div id="toast-container" class="toast-container"></div>
 
-  <!-- Main script -->
+  <!-- MAIN SCRIPT -->
   <script src="/home/script.js"></script>
 </body>
 </html>
-
-<!-- force vercel redeploy -->
