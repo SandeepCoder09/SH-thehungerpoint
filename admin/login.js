@@ -1,4 +1,3 @@
-// Your backend URL
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -6,37 +5,38 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorBox = document.getElementById("error");
+  const errorEl = document.getElementById("error");
 
-  errorBox.textContent = "";
-
-  if (!email || !password) {
-    errorBox.textContent = "Both fields are required.";
-    return;
-  }
+  errorEl.textContent = "";
 
   try {
     const res = await fetch(`${SERVER_URL}/admin/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
 
     if (!data.ok) {
-      errorBox.textContent = data.error || "Invalid email or password";
+      errorEl.textContent = data.error || "Invalid email or password";
       return;
     }
 
-    // Save admin token
+    // Save JWT
     localStorage.setItem("admin_jwt", data.token);
 
-    // Redirect to admin dashboard
-    window.location.href = "index.html";
+    // Redirect correctly on Vercel
+    window.location.href = "/admin/index.html";
 
   } catch (err) {
     console.error(err);
-    errorBox.textContent = "Network error, try again.";
+    errorEl.textContent = "Server error. Try again.";
   }
+});
+
+// Password show/hide toggle
+document.getElementById("toggleEye").addEventListener("click", () => {
+  const pass = document.getElementById("password");
+  pass.type = pass.type === "password" ? "text" : "password";
 });
