@@ -5,26 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard — SH The Hunger Point</title>
 
-  <!-- Correct CSS Path -->
-  <link rel="stylesheet" href="./style.css" />
+  <!-- Clean Modern Admin UI -->
+  <link rel="stylesheet" href="./admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Firebase compat libraries -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-
-  <!-- Firebase config -->
   <script src="../home/firebase-config.js"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
-<!-- JWT LOGIN PROTECTION -->
+<!-- JWT AUTH CHECK -->
 <script>
 (async () => {
   const token = localStorage.getItem("admin_jwt");
@@ -36,91 +32,95 @@
     });
 
     const data = await res.json();
-
     if (!data.ok) {
       localStorage.removeItem("admin_jwt");
-      return location.href = "login.html";
+      location.href = "login.html";
     }
   } catch (err) {
-    console.error("Verification error:", err);
+    console.error(err);
     localStorage.removeItem("admin_jwt");
-    return location.href = "login.html";
+    location.href = "login.html";
   }
 })();
 </script>
 
-<header class="adm-header">
-  <h1>SH — Admin Dashboard</h1>
-  <button id="logoutBtn" class="logout-btn">Logout</button>
-</header>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">SH Admin</div>
+  <nav>
+    <a class="active">Dashboard</a>
+    <a>Orders</a>
+    <a>Sales</a>
+    <a>Notifications</a>
+    <a id="logoutBtn">Logout</a>
+  </nav>
+</aside>
 
-<main class="adm-main">
+<!-- MAIN CONTENT -->
+<section class="main-content">
 
-  <!-- TOP STATS -->
-  <section class="stats">
-    <div class="stat-box">
+  <!-- HEADER -->
+  <header class="topbar">
+    <h1>Dashboard</h1>
+  </header>
+
+  <!-- STATS GRID -->
+  <section class="stats-grid">
+    <div class="stat-card">
       <h3>Total Orders</h3>
-      <div id="totalOrders">0</div>
+      <p id="totalOrders">0</p>
     </div>
-
-    <div class="stat-box">
+    <div class="stat-card">
       <h3>Total Sales</h3>
-      <div id="totalSales">₹0</div>
+      <p id="totalSales">₹0</p>
     </div>
-
-    <div class="stat-box">
+    <div class="stat-card">
       <h3>Last 1 Hour</h3>
-      <div id="recentOrders">0</div>
+      <p id="recentOrders">0</p>
     </div>
   </section>
 
   <!-- CHARTS -->
-  <section class="charts">
-    <div class="chart-card">
-      <h3>Orders (Last 24 Hours)</h3>
+  <section class="chart-section">
+    <div class="chart-box">
+      <h3>Orders — 24 Hours</h3>
       <canvas id="hourChart"></canvas>
     </div>
 
-    <div class="chart-card">
-      <h3>Sales (Last 7 Days)</h3>
+    <div class="chart-box">
+      <h3>Sales — 7 Days</h3>
       <canvas id="weekChart"></canvas>
     </div>
   </section>
 
-  <!-- LIVE ORDERS -->
-  <section class="orders-section">
-    <h2>Live Orders</h2>
-
-    <div class="controls">
-      <input id="searchInput" placeholder="Search orders…" />
-      <select id="statusFilter">
-        <option value="">All</option>
-        <option value="paid">Paid</option>
-        <option value="preparing">Preparing</option>
-        <option value="on the way">On the way</option>
-        <option value="completed">Completed</option>
-      </select>
+  <!-- ORDERS LIST -->
+  <section class="orders-container">
+    <div class="orders-header">
+      <h2>Live Orders</h2>
+      <div class="order-controls">
+        <input id="searchInput" placeholder="Search orders…" />
+        <select id="statusFilter">
+          <option value="">All</option>
+          <option value="paid">Paid</option>
+          <option value="preparing">Preparing</option>
+          <option value="on the way">On the way</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
     </div>
 
-    <div id="ordersList">Loading orders…</div>
+    <div id="ordersList" class="orders-list">Loading orders…</div>
   </section>
 
-</main>
+</section>
 
-<!-- Notification sound -->
+<!-- SOUND -->
 <audio id="newOrderSound">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg"/>
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
 </audio>
 
-<!-- FIXED JS PATH -->
-<script src="./admin.js" defer></script>
-
-<script>
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.removeItem("admin_jwt");
-  location.href = "login.html";
-});
-</script>
+<!-- DASHBOARD LOGIC -->
+<script src="./dashboard.js" defer></script>
 
 </body>
 </html>
