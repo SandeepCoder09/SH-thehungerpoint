@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile — The Hunger Point</title>
+
+  <link rel="stylesheet" href="/home/profile.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <script src="/home/firebase-config.js"></script>
+</head>
+
+<body>
+
+<header class="profile-header">
+  <button class="back-btn" onclick="history.back()">← Back</button>
+  <h2>My Profile</h2>
+</header>
+
+<main class="profile-container">
+  
+  <div class="input-group">
+    <label>Full Name</label>
+    <input type="text" id="fullName" placeholder="Enter your name">
+  </div>
+
+  <div class="input-group">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter username">
+  </div>
+
+  <div class="input-group">
+    <label>Phone Number</label>
+    <input type="tel" id="phone" maxlength="10" placeholder="Enter phone number">
+  </div>
+
+  <div class="input-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter new password">
+  </div>
+
+  <button class="save-btn" id="saveProfile">Save Changes</button>
+
+</main>
+
+<script src="/home/profile.js"></script>
+</body>
+</html>
