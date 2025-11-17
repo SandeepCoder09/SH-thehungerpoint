@@ -1,28 +1,21 @@
-// auth/protect.js — reuse on any page that must be protected
-(function () {
-  const safeRedirect = () => location.replace('/auth/login.html');
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  if (!window.firebase || !firebase.auth) {
-    console.warn('Firebase missing — redirecting to login.');
-    return safeRedirect();
-  }
+const auth = getAuth();
 
-  firebase.auth().onAuthStateChanged(user => {
+onAuthStateChanged(auth, (user) => {
     if (!user) {
-      try { 
-        localStorage.setItem('redirect_after_login', location.pathname + location.search); 
-      } catch(e){}
-      safeRedirect();
-    }
-  });
+        // User NOT logged in
+        if (!window.location.pathname.includes("/auth/login.html") &&
+            !window.location.pathname.includes("/auth/signup.html")) {
 
-  // fallback safety
-  setTimeout(() => {
-    if (!firebase.auth().currentUser) {
-      try { 
-        localStorage.setItem('redirect_after_login', location.pathname + location.search); 
-      } catch(e){}
-      safeRedirect();
+            window.location.href = "/auth/login.html";
+        }
+    } else {
+        // User logged in → prevent going back to login screen
+        if (window.location.pathname.includes("/auth/login.html") ||
+            window.location.pathname.includes("/auth/signup.html")) {
+
+            window.location.href = "/home/index.html";
+        }
     }
-  }, 2000);
-})();
+});
