@@ -1,0 +1,74 @@
+:root {
+  --primary: #E23744;
+  --primary-dark: #b71c1c;
+  --card: #fff;
+  --bg: #F5F6FA;
+  --radius: 18px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+}
+
+.profile-header {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  padding: 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.profile-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.input-group {
+  margin-bottom: 18px;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid #ddd;
+  font-size: 15px;
+  background: #fff;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.save-btn:hover {
+  background: var(--primary-dark);
+}
