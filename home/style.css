@@ -491,6 +491,19 @@ body {
     background: #fff;
 }
 
+.close-only-btn {
+    background: #f1f1f1;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.close-only-btn:hover {
+    background: #e5e5e5;
+}
+
 /* ============================
    FOOTER
 ============================ */
