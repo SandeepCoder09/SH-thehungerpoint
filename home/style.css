@@ -459,6 +459,38 @@ body {
     font-size: 16px;
 }
 
+/* Cart quantity — same as home */
+.cart-qty-wrap {
+    display: flex;
+    align-items: center;
+    border-radius: 40px;
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid rgba(226, 55, 68, .35);
+}
+
+.cart-dec,
+.cart-inc {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;   /* same as home */
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 0;     /* remove round */
+    min-width: 48px;
+}
+
+.cart-qty {
+    padding: 10px 18px;
+    min-width: 40px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    background: #fff;
+}
+
 /* ============================
    FOOTER
 ============================ */
@@ -490,3 +522,35 @@ body {
     width: 94%;
   }
 }
+
+/* Toast container at safe visible height */
+.toast-container {
+    position: fixed;
+    bottom: 80px;     /* lifted above footer */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Toast Card */
+.toast {
+    background: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(226, 55, 68, .3);
+    font-size: 15px;
+    animation: fadeSlide 0.25s ease;
+}
+
+/* Entrance Animation */
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
