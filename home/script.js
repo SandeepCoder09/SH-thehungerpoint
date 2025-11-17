@@ -117,6 +117,11 @@ function closeModal() {
   if (modal) modal.classList.add("hidden");
 }
 
+// Close-only button (does NOT clear cart)
+document.getElementById("closeOnlyBtn")?.addEventListener("click", () => {
+    closeModal();  // uses your existing modal close function
+});
+
 /* hook cart icon */
 $("#cartToggle")?.addEventListener("click", (e) => {
   e.preventDefault();
