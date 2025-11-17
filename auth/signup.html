@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create Account — The Hunger Point</title>
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#E23744">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/auth/auth.css" />
+</head>
+
+<body class="auth-body">
+
+  <!-- HEADER -->
+  <header class="auth-header">
+    Create Your Account
+  </header>
+
+  <!-- MAIN CARD -->
+  <section class="auth-card">
+
+    <h2 class="auth-title">Welcome!</h2>
+    <p class="auth-sub">Create your account to continue.</p>
+
+    <!-- Username -->
+    <label for="username">Full Name</label>
+    <input type="text" id="username" placeholder="Enter your name">
+
+    <!-- Phone -->
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" placeholder="9999999999">
+
+    <!-- Email -->
+    <label for="email">Email Address (optional)</label>
+    <input type="email" id="email" placeholder="example@gmail.com">
+
+    <!-- Password -->
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter password">
+
+    <!-- Confirm Password -->
+    <label for="cpassword">Confirm Password</label>
+    <input type="password" id="cpassword" placeholder="Confirm password">
+
+    <!-- Create Account -->
+    <button id="signupBtn" class="auth-btn primary">
+      Create Account
+    </button>
+
+    <div class="auth-or">OR</div>
+
+    <!-- OTP Sign-in -->
+    <button id="phoneSignUpBtn" class="auth-btn muted">
+      Sign up with OTP
+    </button>
+
+    <!-- Already have account -->
+    <p class="auth-link">
+      Already have an account?
+      <a href="/auth/login.html">Login here</a>
+    </p>
+
+  </section>
+
+  <!-- Firebase + Auth Script -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <script src="/firebase-config.js"></script>
+
+  <script src="/auth/auth.js"></script>
+
+</body>
+</html>
