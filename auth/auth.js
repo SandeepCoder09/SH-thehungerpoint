@@ -1,178 +1,103 @@
-/* ===========================================================
-   The Hunger Point — Firebase Auth System
-   Features:
-   - Signup (Email + Password + Phone)
-   - Login (Email/Password)
-   - OTP Login (Firebase PhoneAuth)
-   - Firestore User Profile Sync
-   - Redirect to /home/index.html after login
-=========================================================== */
+// signup.js — creates Firebase user and a Firestore user doc
+// expects firebase compat SDKs loaded and /home/firebase-config.js to initialize firebase
 
-// Firestore references
-const db = firebase.firestore();
+// small helpers
+const $ = (s) => document.querySelector(s);
+const toastContainer = document.getElementById('toast-container');
 
-/* ---------------------------
-   PAGE DETECTION
----------------------------- */
-const page = document.body.dataset.page; 
-// login, signup, otp
-
-/* ---------------------------
-   HELPERS
----------------------------- */
-function $(s) { return document.querySelector(s); }
-function showError(msg) {
-    alert(msg);
-}
-function redirectHome() {
-    window.location.href = "/home/index.html";
+function showToast(msg, ms = 2400) {
+  if (!toastContainer) {
+    console.log('toast:', msg);
+    return;
+  }
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  toastContainer.appendChild(t);
+  setTimeout(() => t.remove(), ms);
 }
 
-/* ===========================================================
-   1️⃣ SIGNUP PAGE HANDLER
-=========================================================== */
-if (page === "signup") {
-    
-    $("#signupForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const name = $("#name").value.trim();
-        const email = $("#email").value.trim();
-        const phone = $("#phone").value.trim();
-        const pass = $("#password").value.trim();
-
-        if (name === "" || email === "" || phone === "" || pass === "") {
-            return showError("All fields are required");
-        }
-
-        try {
-            // Create user
-            const userCred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-            const uid = userCred.user.uid;
-
-            // Store user profile
-            await db.collection("users").doc(uid).set({
-                name,
-                email,
-                phone,
-                createdAt: new Date(),
-            });
-
-            alert("Account created successfully!");
-            redirectHome();
-
-        } catch (err) {
-            showError(err.message);
-        }
-    });
+function setError(msg) {
+  const el = $('#error');
+  if (el) el.textContent = msg || '';
 }
 
-/* ===========================================================
-   2️⃣ LOGIN PAGE HANDLER
-=========================================================== */
-if (page === "login") {
-
-    $("#loginForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = $("#email").value.trim();
-        const pass = $("#password").value.trim();
-
-        if (email === "" || pass === "") {
-            return showError("Enter email and password");
-        }
-
-        try {
-            await firebase.auth().signInWithEmailAndPassword(email, pass);
-            redirectHome();
-        } catch (err) {
-            showError(err.message);
-        }
-    });
-
-    // OTP Login → redirect to OTP page
-    $("#otpLoginBtn")?.addEventListener("click", () => {
-        window.location.href = "/auth/otp.html";
-    });
+function validPhone(p) {
+  // accept 10 digit indian phone (simple)
+  return /^\d{10}$/.test(p);
 }
 
-/* ===========================================================
-   3️⃣ OTP LOGIN PAGE HANDLER
-=========================================================== */
+// DOM
+const form = $('#signupForm');
+const submitBtn = $('#submitBtn');
+const togglePw = $('#togglePw');
 
-if (page === "otp") {
+togglePw?.addEventListener('click', () => {
+  const pw = $('#password');
+  if (!pw) return;
+  if (pw.type === 'password') {
+    pw.type = 'text';
+    togglePw.textContent = '🙈';
+  } else {
+    pw.type = 'password';
+    togglePw.textContent = '👁️';
+  }
+});
 
-    // Firebase Recaptcha
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("otp-btn", {
-        size: "invisible",
-    });
+// Signup flow
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  setError('');
+  submitBtn.disabled = true;
 
-    let confirmationResult = null;
+  const name = ($('#fullName')?.value || '').trim();
+  const phone = ($('#phone')?.value || '').trim();
+  const email = ($('#email')?.value || '').trim();
+  const password = ($('#password')?.value || '');
+  const confirm = ($('#confirmPassword')?.value || '');
 
-    // STEP 1 — Send OTP
-    $("#otpForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  // basic validation
+  if (!name) { setError('Enter your name'); submitBtn.disabled = false; return; }
+  if (!validPhone(phone)) { setError('Enter a valid 10-digit phone'); submitBtn.disabled = false; return; }
+  if (!email) { setError('Enter email'); submitBtn.disabled = false; return; }
+  if (password.length < 6) { setError('Password must be at least 6 characters'); submitBtn.disabled = false; return; }
+  if (password !== confirm) { setError('Passwords do not match'); submitBtn.disabled = false; return; }
 
-        const phone = $("#phone").value.trim();
+  try {
+    // Create user with Firebase Auth (compat)
+    const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const user = userCred.user;
+    if (!user) throw new Error('Signup failed');
 
-        if (phone.length < 10) {
-            return showError("Enter valid phone number");
-        }
+    // Update displayName (optional)
+    await user.updateProfile({ displayName: name }).catch(()=>{});
 
-        try {
-            confirmationResult = await firebase.auth()
-                .signInWithPhoneNumber("+91" + phone, window.recaptchaVerifier);
+    // Save user profile in Firestore
+    const db = firebase.firestore();
+    await db.collection('users').doc(user.uid).set({
+      name,
+      phone,
+      email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
 
-            $(".otp-box").classList.remove("hidden");
-            $("#phone").disabled = true;
+    showToast('Account created — redirecting…', 1800);
 
-            alert("OTP sent!");
+    // redirect to home after short delay
+    setTimeout(() => {
+      // ensure user is signed in and go to home
+      window.location.href = '/home/index.html';
+    }, 1200);
 
-        } catch (error) {
-            console.error(error);
-            showError("OTP sending failed");
-        }
-    });
-
-    // STEP 2 — Verify OTP
-    $("#verifyOtpBtn")?.addEventListener("click", async () => {
-        const code = $("#otp").value.trim();
-
-        if (code.length < 6) return showError("Enter valid OTP");
-
-        try {
-            const result = await confirmationResult.confirm(code);
-            const user = result.user;
-
-            // Sync user profile in Firestore if not exists
-            const ref = db.collection("users").doc(user.uid);
-            const doc = await ref.get();
-
-            if (!doc.exists) {
-                await ref.set({
-                    phone: user.phoneNumber,
-                    createdAt: new Date(),
-                });
-            }
-
-            alert("Login successful!");
-            redirectHome();
-
-        } catch (err) {
-            showError("Invalid OTP");
-        }
-    });
-
-}
-
-/* ===========================================================
-   AUTO REDIRECT IF ALREADY LOGGED IN
-=========================================================== */
-
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        if (["login", "signup", "otp"].includes(page)) {
-            redirectHome();
-        }
-    }
+  } catch (err) {
+    console.error('Signup error', err);
+    // friendly messages
+    let msg = err?.message || 'Signup failed';
+    if (msg.includes('auth/email-already-in-use')) msg = 'Email already in use. Try login';
+    if (msg.includes('auth/invalid-email')) msg = 'Invalid email address';
+    if (msg.includes('auth/weak-password')) msg = 'Password is too weak';
+    setError(msg);
+    showToast(msg, 3000);
+    submitBtn.disabled = false;
+  }
 });
