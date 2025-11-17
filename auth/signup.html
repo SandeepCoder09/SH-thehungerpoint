@@ -2,76 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Create Account — The Hunger Point</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign up — SH The Hunger Point</title>
 
-  <!-- Theme Color -->
-  <meta name="theme-color" content="#E23744">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="/auth/auth.css" />
+
+  <!-- Firebase (compat to match existing site) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- your firebase-config (must exist, same as other pages) -->
+  <script src="/home/firebase-config.js"></script>
 </head>
+<body>
+  <main class="auth-wrap">
+    <div class="card">
+      <header class="card-head">
+        <div class="brand">
+          <div class="logo-mark">SH</div>
+          <div class="brand-text">
+            <div class="name">SH — The Hunger Point</div>
+            <div class="tag">Create your account</div>
+          </div>
+        </div>
+      </header>
 
-<body class="auth-body">
+      <form id="signupForm" class="form">
+        <div class="field">
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" placeholder="Your name" required />
+        </div>
 
-  <!-- HEADER -->
-  <header class="auth-header">
-    Create Your Account
-  </header>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="10-digit mobile number" required />
+        </div>
 
-  <!-- MAIN CARD -->
-  <section class="auth-card">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required />
+        </div>
 
-    <h2 class="auth-title">Welcome!</h2>
-    <p class="auth-sub">Create your account to continue.</p>
+        <div class="field password-row">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input id="password" name="password" type="password" placeholder="Min 6 characters" required />
+            <button id="togglePw" type="button" class="eye" aria-label="Show password">👁️</button>
+          </div>
+        </div>
 
-    <!-- Username -->
-    <label for="username">Full Name</label>
-    <input type="text" id="username" placeholder="Enter your name">
+        <div class="field">
+          <label for="confirmPassword">Confirm password</label>
+          <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repeat password" required />
+        </div>
 
-    <!-- Phone -->
-    <label for="phone">Phone Number</label>
-    <input type="tel" id="phone" placeholder="9999999999">
+        <div id="error" class="error" role="alert" aria-live="assertive"></div>
 
-    <!-- Email -->
-    <label for="email">Email Address (optional)</label>
-    <input type="email" id="email" placeholder="example@gmail.com">
+        <div class="actions">
+          <button id="submitBtn" type="submit" class="primary">Create account</button>
+          <a class="link" href="/auth/login.html">Already have an account? Login</a>
+        </div>
+      </form>
 
-    <!-- Password -->
-    <label for="password">Password</label>
-    <input type="password" id="password" placeholder="Enter password">
+      <footer class="card-foot">
+        <small>By creating account you agree to our terms.</small>
+      </footer>
+    </div>
+  </main>
 
-    <!-- Confirm Password -->
-    <label for="cpassword">Confirm Password</label>
-    <input type="password" id="cpassword" placeholder="Confirm password">
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
 
-    <!-- Create Account -->
-    <button id="signupBtn" class="auth-btn primary">
-      Create Account
-    </button>
-
-    <div class="auth-or">OR</div>
-
-    <!-- OTP Sign-in -->
-    <button id="phoneSignUpBtn" class="auth-btn muted">
-      Sign up with OTP
-    </button>
-
-    <!-- Already have account -->
-    <p class="auth-link">
-      Already have an account?
-      <a href="/auth/login.html">Login here</a>
-    </p>
-
-  </section>
-
-  <!-- Firebase + Auth Script -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="/firebase-config.js"></script>
-
-  <script src="/auth/auth.js"></script>
-
+  <script src="/auth/signup.js" defer></script>
 </body>
 </html>
