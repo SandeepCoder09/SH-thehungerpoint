@@ -1,51 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>My Profile — The Hunger Point</title>
 
-  <link rel="stylesheet" href="/home/profile.css">
+  <link rel="stylesheet" href="/profile/style.css" />
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="/home/firebase-config.js"></script>
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- your firebase-config.js must initialize firebase (firebase.initializeApp(...)) -->
+  <script src="/firebase-config.js"></script>
 </head>
-
 <body>
+  <header class="prof-header">
+    <div class="prof-brand">
+      <div class="logo-mark">SH</div>
+      <div class="brand-text">
+        <div class="name">The Hunger Point</div>
+        <div class="tag">My Profile</div>
+      </div>
+    </div>
+    <nav class="prof-nav">
+      <a href="/home/index.html">Home</a>
+      <a href="/home/index.html#orders">My Orders</a>
+      <a href="/admin/login.html">Admin</a>
+    </nav>
+  </header>
 
-<header class="profile-header">
-  <button class="back-btn" onclick="history.back()">← Back</button>
-  <h2>My Profile</h2>
-</header>
+  <main class="prof-main">
+    <section class="prof-card">
+      <h2>Profile</h2>
+      <p class="muted">Update your profile details. Profile data is stored in Firestore.</p>
 
-<main class="profile-container">
-  
-  <div class="input-group">
-    <label>Full Name</label>
-    <input type="text" id="fullName" placeholder="Enter your name">
-  </div>
+      <form id="profileForm" autocomplete="off">
+        <label>
+          Full name
+          <input id="fullName" name="fullName" type="text" placeholder="e.g. Sandeep Coder" required>
+        </label>
 
-  <div class="input-group">
-    <label>Username</label>
-    <input type="text" id="username" placeholder="Enter username">
-  </div>
+        <label>
+          Email
+          <input id="email" name="email" type="email" placeholder="youremailid@gamil.com" required>
+        </label>
 
-  <div class="input-group">
-    <label>Phone Number</label>
-    <input type="tel" id="phone" maxlength="10" placeholder="Enter phone number">
-  </div>
+        <label>
+          Phone
+          <input id="phone" name="phone" type="tel" placeholder="+91 98xxxx..." pattern="[\d+\-\s]+" required>
+        </label>
 
-  <div class="input-group">
-    <label>Password</label>
-    <input type="password" id="password" placeholder="Enter new password">
-  </div>
+        <div class="pw-row">
+          <label class="pw-field">
+            New Password
+            <input id="password" name="password" type="password" placeholder="Leave blank to keep current" disabled>
+          </label>
 
-  <button class="save-btn" id="saveProfile">Save Changes</button>
+          <div class="pw-hints">
+            <p id="pwHint" class="muted">Password change requires Firebase Authentication enabled.</p>
+            <button id="changePwBtn" class="muted small" type="button" disabled>Change Password</button>
+          </div>
+        </div>
 
-</main>
+        <div class="actions">
+          <button id="saveBtn" type="submit" class="primary">Save Changes</button>
+          <button id="signoutBtn" type="button" class="muted">Sign out (if using Auth)</button>
+        </div>
 
-<script src="/home/profile.js"></script>
+        <p id="status" class="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="prof-footer">
+    © 2025 SH — The Hunger Point
+  </footer>
+
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
+
+  <script src="/profile/script.js" defer></script>
 </body>
 </html>
