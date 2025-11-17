@@ -174,7 +174,7 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--shadow);
-  width: 94%;
+  width: 97%;
   margin: 0 auto;
   transition: 0.2s ease;
 }
