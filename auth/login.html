@@ -1,55 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
-  <title>Login | The Hunger Point</title>
-
-  <link rel="stylesheet" href="/home/style.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="/firebase-config.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login — SH The Hunger Point</title>
 
   <link rel="stylesheet" href="/auth/auth.css">
+
+  <!-- Firebase compat (same as signup) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Your Firebase config -->
+  <script src="/home/firebase-config.js"></script>
 </head>
 
-<body class="auth-body">
+<body>
+  <main class="auth-wrap">
+    <div class="card">
+      <header class="card-head">
+        <div class="brand">
+          <div class="logo-mark">SH</div>
+          <div class="brand-text">
+            <div class="name">SH — The Hunger Point</div>
+            <div class="tag">Welcome back</div>
+          </div>
+        </div>
+      </header>
 
-  <!-- Top Bar (same as your theme) -->
-  <header class="auth-header">
-    <h2>The Hunger Point</h2>
-  </header>
+      <form id="loginForm" class="form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" required>
+        </div>
 
-  <!-- AUTH CARD -->
-  <div class="auth-card">
-    <h3 class="auth-title">Welcome Back</h3>
-    <p class="auth-sub">Login to continue</p>
+        <div class="field password-row">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input id="password" type="password" placeholder="Your password" required>
+            <button id="togglePw" type="button" class="eye">👁️</button>
+          </div>
+        </div>
 
-    <form id="loginForm">
+        <div id="error" class="error"></div>
 
-      <label>Phone Number</label>
-      <input type="tel" id="loginPhone" placeholder="Enter phone number" required>
+        <div class="actions">
+          <button id="loginBtn" type="submit" class="primary">Login</button>
+          <a class="link" href="/auth/signup.html">Create account</a>
+        </div>
+      </form>
 
-      <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="Enter password" required>
+      <footer class="card-foot">
+        <small>Forgot password? <a href="#" id="forgotLink" class="link">Reset</a></small>
+      </footer>
+    </div>
+  </main>
 
-      <button type="submit" class="primary auth-btn">Login</button>
-
-      <div class="auth-or">OR</div>
-
-      <button type="button" id="otpLoginBtn" class="muted auth-btn">
-        Continue with OTP
-      </button>
-
-      <p class="auth-link">
-        New here? <a href="/auth/signup.html">Create Account</a>
-      </p>
-    </form>
-  </div>
+  <div id="toast-container" class="toast-container"></div>
 
   <script src="/auth/login.js"></script>
 </body>
