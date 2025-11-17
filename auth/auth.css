@@ -1,0 +1,149 @@
+/* ==========================================
+   AUTH PAGES — The Hunger Point
+   Matches your main site theme exactly
+   ========================================== */
+
+:root {
+  --primary: #E23744;
+  --primary-dark: #b71c1c;
+  --bg: #F5F6FA;
+  --card: #ffffff;
+  --muted: #6b6b6b;
+  --radius: 20px;
+  --shadow: 0 8px 26px rgba(0,0,0,0.10);
+}
+
+/* Full page bg */
+.auth-body {
+  background: var(--bg);
+  font-family: "Poppins", sans-serif;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Top red bar */
+.auth-header {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  padding: 22px 20px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Main card */
+.auth-card {
+  background: var(--card);
+  width: 92%;
+  max-width: 420px;
+  margin: 30px auto;
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.auth-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* Form Fields */
+.auth-card label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 6px;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  outline: none;
+  font-size: 15px;
+}
+
+.auth-card input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 8px rgba(226,55,68,0.25);
+}
+
+/* Buttons */
+.auth-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.primary {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(226,55,68,0.26);
+}
+
+.primary:hover {
+  opacity: 0.92;
+}
+
+.muted {
+  background: #f1f1f1;
+  color: #333;
+}
+
+.muted:hover {
+  opacity: 0.9;
+}
+
+/* OR separator */
+.auth-or {
+  text-align: center;
+  margin: 16px 0 10px;
+  font-weight: 600;
+  color: #777;
+}
+
+/* Small link */
+.auth-link {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .auth-card {
+    width: 94%;
+    padding: 24px 18px;
+  }
+  .auth-header {
+    font-size: 20px;
+  }
+}
