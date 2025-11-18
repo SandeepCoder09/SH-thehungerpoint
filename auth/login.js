@@ -1,85 +1,131 @@
-// login.js — Firebase email/password login
-const $ = (s) => document.querySelector(s);
+// login.js - Phone OTP (Firebase compat)
+// Requires firebase-app-compat, firebase-auth-compat, firebase-firestore-compat loaded
+// and auth/firebase-config.js to initialize firebase.
 
-function showToast(msg, ms = 2400) {
-  const container = document.getElementById("toast-container");
-  const t = document.createElement("div");
-  t.className = "toast";
-  t.textContent = msg;
-  container.appendChild(t);
-  setTimeout(() => t.remove(), ms);
-}
+(function(){
+  const $ = (s)=> document.querySelector(s);
+  const toastEl = $('#toast');
 
-function setError(msg) {
-  $("#error").textContent = msg || "";
-}
-
-// toggle password
-$("#togglePw")?.addEventListener("click", () => {
-  const pw = $("#password");
-  if (pw.type === "password") {
-    pw.type = "text";
-    $("#togglePw").textContent = "🙈";
-  } else {
-    pw.type = "password";
-    $("#togglePw").textContent = "👁️";
+  function showToast(msg, ms=2200){
+    if(!toastEl) { console.log(msg); return; }
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>{ toastEl.hidden = true; }, ms);
   }
-});
 
-// login flow
-$("#loginForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  setError("");
-
-  const email = $("#email").value.trim();
-  const password = $("#password").value;
-
-  if (!email || !password) {
-    setError("Enter email & password");
+  // Ensure firebase exists
+  if(!window.firebase || !firebase.auth){
+    showToast("Firebase not initialized. Check firebase-config.js");
+    console.error("Firebase not initialized.");
     return;
   }
 
-  $("#loginBtn").disabled = true;
+  // Elements
+  const loginForm = $('#loginForm');
+  const phoneInput = $('#phone');
+  const sendOtpBtn = $('#sendOtpBtn');
+  const sendStatus = $('#sendStatus');
 
-  try {
-    const auth = firebase.auth();
-    await auth.signInWithEmailAndPassword(email, password);
+  const otpForm = $('#otpForm');
+  const otpInput = $('#otp');
+  const verifyBtn = $('#verifyBtn');
+  const otpStatus = $('#otpStatus');
 
-    showToast("Logging in…");
+  // Recaptcha verifier (invisible)
+  let recaptchaVerifier;
+  let confirmationResult;
 
-    setTimeout(() => {
-      window.location.href = "/home/index.html";
-    }, 900);
-
-  } catch (err) {
-    console.error(err);
-    let msg = "Login failed";
-
-    if (err.code === "auth/user-not-found") msg = "No account found.";
-    if (err.code === "auth/wrong-password") msg = "Incorrect password.";
-    if (err.code === "auth/invalid-email") msg = "Invalid email.";
-
-    setError(msg);
-    showToast(msg, 3000);
-    $("#loginBtn").disabled = false;
-  }
-});
-
-// password reset
-$("#forgotLink")?.addEventListener("click", async (e) => {
-  e.preventDefault();
-
-  const email = $("#email").value.trim();
-  if (!email) {
-    setError("Enter email to reset password");
-    return;
+  function initRecaptcha(){
+    // render once
+    if(recaptchaVerifier) return;
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'invisible',
+      callback: function(response){
+        // reCAPTCHA solved, allow send
+      }
+    });
+    recaptchaVerifier.render().catch(e=>console.warn("recaptcha render:",e));
   }
 
-  try {
-    await firebase.auth().sendPasswordResetEmail(email);
-    showToast("Reset email sent!");
-  } catch (err) {
-    console.error(err);
-    showToast("Reset failed");
+  initRecaptcha();
+
+  function normalizePhone(phone){
+    // remove non digits, expect 10 digits
+    const digits = (phone || '').replace(/\D/g,'');
+    if(digits.length === 10) return '+91' + digits;
+    // if already in +91... or longer, return as is
+    if(phone.startsWith('+')) return phone;
+    return null;
   }
-});
+
+  loginForm?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    sendStatus.textContent = '';
+    const raw = phoneInput.value.trim();
+    const phone = normalizePhone(raw);
+    if(!phone){ sendStatus.textContent = 'Enter a valid 10-digit phone.'; return; }
+
+    try{
+      sendOtpBtn.disabled = true;
+      sendStatus.textContent = 'Sending OTP...';
+      initRecaptcha();
+
+      confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier);
+      // show otp form
+      otpForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      sendStatus.textContent = `OTP sent to ${phone}.`;
+      showToast('OTP sent');
+    }catch(err){
+      console.error('sendOtp error', err);
+      // reset recaptcha on error
+      if(recaptchaVerifier && recaptchaVerifier.clear) try{ recaptchaVerifier.clear(); recaptchaVerifier = null; }catch(e){}
+      sendStatus.textContent = (err && err.message) || 'Failed to send OTP. Try again.';
+      showToast(sendStatus.textContent, 4000);
+    } finally {
+      sendOtpBtn.disabled = false;
+    }
+  });
+
+  otpForm?.addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
+    otpStatus.textContent = '';
+    const code = otpInput.value.trim();
+    if(!code || code.length < 4) { otpStatus.textContent = 'Enter the 6-digit OTP'; return; }
+
+    try{
+      verifyBtn.disabled = true;
+      otpStatus.textContent = 'Verifying...';
+      const result = await confirmationResult.confirm(code);
+      const user = result.user;
+      // create minimal user doc in firestore if not present
+      try{
+        const db = firebase.firestore();
+        const userRef = db.collection('users').doc(user.uid);
+        const doc = await userRef.get();
+        if(!doc.exists){
+          await userRef.set({
+            phone: user.phoneNumber || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        } else {
+          // optionally update last login
+          await userRef.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        }
+      }catch(dbErr){
+        console.warn('firestore save error', dbErr);
+      }
+
+      showToast('Signed in — redirecting...');
+      // redirect to home
+      setTimeout(()=> window.location.href = '/home/index.html', 900);
+    }catch(err){
+      console.error('verify error', err);
+      otpStatus.textContent = err?.message || 'Invalid OTP';
+      showToast(otpStatus.textContent, 3000);
+      verifyBtn.disabled = false;
+    }
+  });
+
+})();
