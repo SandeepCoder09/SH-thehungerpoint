@@ -1,103 +1,101 @@
-// signup.js — creates Firebase user and a Firestore user doc
-// expects firebase compat SDKs loaded and /home/firebase-config.js to initialize firebase
+// auth.js - signup flow with phone OTP (Firebase compat)
+// It will create a Firestore user doc including displayName.
+(function(){
+  const $ = (s)=> document.querySelector(s);
+  const toast = $('#toast');
 
-// small helpers
-const $ = (s) => document.querySelector(s);
-const toastContainer = document.getElementById('toast-container');
+  function showToast(msg, ms=2400){
+    if(!toast){ console.log(msg); return; }
+    toast.textContent = msg; toast.hidden = false;
+    clearTimeout(showToast._t); showToast._t = setTimeout(()=> toast.hidden = true, ms);
+  }
 
-function showToast(msg, ms = 2400) {
-  if (!toastContainer) {
-    console.log('toast:', msg);
+  if(!window.firebase || !firebase.auth){
+    showToast("Firebase not initialized. Check firebase-config.js");
+    console.error("Firebase not initialized.");
     return;
   }
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  toastContainer.appendChild(t);
-  setTimeout(() => t.remove(), ms);
-}
 
-function setError(msg) {
-  const el = $('#error');
-  if (el) el.textContent = msg || '';
-}
+  const signupForm = $('#signupForm');
+  const fullName = $('#fullName');
+  const phone = $('#phone');
+  const sendOtpBtn = $('#sendOtpSign');
 
-function validPhone(p) {
-  // accept 10 digit indian phone (simple)
-  return /^\d{10}$/.test(p);
-}
+  const verifyForm = $('#verifySignupForm');
+  const otpInput = $('#otpSignup');
+  const confirmBtn = $('#confirmSignup');
 
-// DOM
-const form = $('#signupForm');
-const submitBtn = $('#submitBtn');
-const togglePw = $('#togglePw');
+  let recaptchaVerifier;
+  let confirmationResult;
 
-togglePw?.addEventListener('click', () => {
-  const pw = $('#password');
-  if (!pw) return;
-  if (pw.type === 'password') {
-    pw.type = 'text';
-    togglePw.textContent = '🙈';
-  } else {
-    pw.type = 'password';
-    togglePw.textContent = '👁️';
+  function initRecaptcha(id){
+    if(recaptchaVerifier) return;
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier(id, {
+      size: 'invisible'
+    });
+    recaptchaVerifier.render().catch(e=>console.warn('recap render', e));
   }
-});
 
-// Signup flow
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  setError('');
-  submitBtn.disabled = true;
+  initRecaptcha('recaptcha-signup');
 
-  const name = ($('#fullName')?.value || '').trim();
-  const phone = ($('#phone')?.value || '').trim();
-  const email = ($('#email')?.value || '').trim();
-  const password = ($('#password')?.value || '');
-  const confirm = ($('#confirmPassword')?.value || '');
-
-  // basic validation
-  if (!name) { setError('Enter your name'); submitBtn.disabled = false; return; }
-  if (!validPhone(phone)) { setError('Enter a valid 10-digit phone'); submitBtn.disabled = false; return; }
-  if (!email) { setError('Enter email'); submitBtn.disabled = false; return; }
-  if (password.length < 6) { setError('Password must be at least 6 characters'); submitBtn.disabled = false; return; }
-  if (password !== confirm) { setError('Passwords do not match'); submitBtn.disabled = false; return; }
-
-  try {
-    // Create user with Firebase Auth (compat)
-    const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const user = userCred.user;
-    if (!user) throw new Error('Signup failed');
-
-    // Update displayName (optional)
-    await user.updateProfile({ displayName: name }).catch(()=>{});
-
-    // Save user profile in Firestore
-    const db = firebase.firestore();
-    await db.collection('users').doc(user.uid).set({
-      name,
-      phone,
-      email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    showToast('Account created — redirecting…', 1800);
-
-    // redirect to home after short delay
-    setTimeout(() => {
-      // ensure user is signed in and go to home
-      window.location.href = '/home/index.html';
-    }, 1200);
-
-  } catch (err) {
-    console.error('Signup error', err);
-    // friendly messages
-    let msg = err?.message || 'Signup failed';
-    if (msg.includes('auth/email-already-in-use')) msg = 'Email already in use. Try login';
-    if (msg.includes('auth/invalid-email')) msg = 'Invalid email address';
-    if (msg.includes('auth/weak-password')) msg = 'Password is too weak';
-    setError(msg);
-    showToast(msg, 3000);
-    submitBtn.disabled = false;
+  function normalizePhone(v){
+    const d = (v||'').replace(/\D/g,'');
+    if(d.length===10) return '+91'+d;
+    if(v.startsWith('+')) return v;
+    return null;
   }
-});
+
+  signupForm?.addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
+    const name = (fullName.value || '').trim();
+    const p = (phone.value || '').trim();
+    if(!name){ showToast('Enter your name'); return; }
+    const phoneNorm = normalizePhone(p);
+    if(!phoneNorm){ showToast('Enter valid 10-digit phone'); return; }
+    sendOtpBtn.disabled = true;
+    try{
+      initRecaptcha('recaptcha-signup');
+      confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNorm, recaptchaVerifier);
+      // show verify form
+      signupForm.classList.add('hidden');
+      verifyForm.classList.remove('hidden');
+      showToast('OTP sent');
+    }catch(err){
+      console.error('send otp', err);
+      showToast(err.message || 'Failed to send OTP');
+      if(recaptchaVerifier && recaptchaVerifier.clear) { try{ recaptchaVerifier.clear(); recaptchaVerifier = null; }catch(_){} }
+    } finally { sendOtpBtn.disabled = false; }
+  });
+
+  verifyForm?.addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
+    const code = (otpInput.value||'').trim();
+    if(code.length < 4) { showToast('Enter OTP'); return; }
+    confirmBtn.disabled = true;
+    try{
+      const res = await confirmationResult.confirm(code);
+      const user = res.user;
+      // Save displayName (full name) into firebase user and firestore
+      try{
+        await user.updateProfile({ displayName: (fullName.value||'').trim() });
+      }catch(e){ /* ignore */ }
+      try{
+        const db = firebase.firestore();
+        await db.collection('users').doc(user.uid).set({
+          name: (fullName.value||'').trim(),
+          phone: user.phoneNumber || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      }catch(e){
+        console.warn('save user doc', e);
+      }
+
+      showToast('Account created — redirecting...');
+      setTimeout(()=> window.location.href = '/home/index.html', 900);
+    }catch(err){
+      console.error('verify signup', err);
+      showToast(err.message || 'OTP invalid');
+      confirmBtn.disabled = false;
+    }
+  });
+})();
