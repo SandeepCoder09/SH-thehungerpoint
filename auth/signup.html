@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase SDKs (must load first) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -26,6 +26,7 @@
 
       <section class="card-body">
         <form id="signupForm">
+
           <label>Name</label>
           <input id="name" type="text" required placeholder="Your name">
 
@@ -38,6 +39,15 @@
           <label>Confirm Password</label>
           <input id="confirm" type="password" minlength="6" required placeholder="Re-enter password">
 
+          <!-- Legal Agreements -->
+          <label class="legal-check">
+            <input type="checkbox" id="legalAgree">
+            I agree to the 
+            <a href="/legal/terms.html" target="_blank">Terms & Conditions</a>,
+            <a href="/legal/privacy.html" target="_blank">Privacy Policy</a> and 
+            <a href="/legal/refund.html" target="_blank">Refund Policy</a>.
+          </label>
+
           <button type="submit" class="btn primary">Create Account</button>
 
           <div class="divider">or</div>
@@ -48,6 +58,7 @@
             Already have an account?
             <a href="/auth/login.html">Sign in</a>
           </p>
+
         </form>
       </section>
     </div>
@@ -55,8 +66,9 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase config must load BEFORE signup.js -->
+  <!-- Firebase Config Loader -->
   <script src="/auth/firebase-config.js"></script>
+  <!-- Signup Logic -->
   <script src="/auth/signup.js"></script>
 </body>
 </html>
