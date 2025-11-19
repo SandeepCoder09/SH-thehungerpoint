@@ -1,175 +1,87 @@
-/* Premium Signup Page — SH Theme */
+/* signup.css — Style A (red gradient / premium) */
 
-:root {
+:root{
   --primary: #E23744;
   --primary-dark: #b71c1c;
-  --yellow: #FBD24D;
+  --accent: #FBD24D;
   --bg: #f7f7f7;
   --muted: #666;
-  --radius: 18px;
+  --card-radius: 18px;
+  --input-radius: 14px;
   --shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
-body {
-  margin: 0;
-  padding: 30px;
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
   background: var(--bg);
-  font-family: Poppins, sans-serif;
-  display: flex;
-  justify-content: center;
+  padding:32px;
+  display:flex;
+  justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-.auth-page {
-  width: 100%;
-  max-width: 480px;
+.auth-page{width:100%;max-width:480px}
+.card{
+  background:#fff;border-radius:var(--card-radius);box-shadow:var(--shadow);overflow:hidden;
 }
 
-.card {
-  background: #fff;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
+/* header */
+.card-head{
+  background: linear-gradient(90deg,var(--primary),var(--primary-dark));
+  padding:18px 20px;display:flex;align-items:center;gap:14px;color:#fff;
+}
+.logo-box{
+  width:56px;height:56px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #8b1b1b;
+}
+.logo-box img{width:100%;height:100%;object-fit:cover}
+.brand-title{display:flex;flex-direction:column}
+.sh-title{font-weight:900;font-size:20px;line-height:1}
+.full-title{font-size:13px;opacity:0.95;margin-top:2px}
+
+/* body */
+.card-body{padding:22px}
+label{display:block;font-weight:600;margin-top:12px;color:#222;font-size:14px}
+input[type="text"],input[type="email"],input[type="password"],input{
+  width:100%;padding:12px 14px;border-radius:var(--input-radius);border:1px solid #e8e8e8;margin-top:8px;font-size:15px;background:#fff;transition:box-shadow .12s ease,border-color .12s ease;
+}
+input:focus{outline:none;border-color:rgba(226,55,68,0.18);box-shadow:0 8px 20px rgba(226,55,68,0.06)}
+
+/* password row */
+.password-row{position:relative}
+.toggle-pass{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  border:0;background:transparent;padding:6px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.toggle-pass svg{display:block}
+.toggle-pass:active{transform:translateY(-50%) scale(.98)}
+
+/* legal centered */
+.legal-wrapper{display:flex;justify-content:center;margin-top:16px}
+.legal-check{font-size:13px;color:var(--muted);text-align:center;line-height:1.4}
+.legal-check a{color:var(--primary);font-weight:600;margin:0 2px}
+
+/* buttons */
+.btn{width:100%;padding:12px;border-radius:14px;border:0;cursor:pointer;font-weight:700;margin-top:16px}
+.btn.primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 10px 28px rgba(226,55,68,0.18)}
+.btn.google{background:#fff;border:1px solid #e6e6e6;color:#2b2b2b}
+
+/* divider, small text */
+.divider{text-align:center;margin:14px;color:#9b9b9b}
+.muted.small{font-size:13px;color:#666;margin-top:14px;text-align:center}
+
+/* premium toast */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+  background:#111;color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.25);
+  font-weight:600;font-size:14px;z-index:9999;
 }
 
-/* HEADER */
-.card-head {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  color: #fff;
-}
-
-.logo-box {
-  width: 55px;
-  height: 55px;
-  background: var(--yellow);
-  border-radius: 12px;
-  border: 3px solid #8b1b1b;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.logo-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.brand-title {
-  display: flex;
-  flex-direction: column;
-}
-
-.sh-title {
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 20px;
-}
-
-.full-title {
-  margin-top: 2px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* BODY */
-.card-body {
-  padding: 22px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 12px;
-}
-
-input {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid #ddd;
-  font-size: 15px;
-  margin-top: 6px;
-}
-
-.password-row {
-  position: relative;
-}
-
-.togglePass {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-.eye-icon {
-  width: 22px;
-  height: 22px;
-}
-
-.legal-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 18px;
-}
-
-.legal-check {
-  font-size: 13px;
-  color: var(--muted);
-  text-align: center;
-  line-height: 1.4;
-}
-
-.legal-check a {
-  color: var(--primary);
-  font-weight: 600;
-}
-
-/* Buttons */
-.btn {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: none;
-  margin-top: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn.primary {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  color: #fff;
-  box-shadow: 0 8px 22px rgba(226,55,68,0.22);
-}
-
-.btn.google {
-  background: #fff;
-  border: 1px solid #ddd;
-  color: #444;
-}
-
-.divider {
-  text-align: center;
-  margin: 14px;
-  color: #999;
-}
-
-/* Premium Toast */
-.toast {
-  position: fixed;
-  bottom: 26px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: #222;
-  color: #fff;
-  font-size: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+/* small responsive tweaks */
+@media (max-width:420px){
+  .auth-page{padding:18px}
+  .card-head{padding:14px}
+  .brand-title .full-title{display:none}
 }
