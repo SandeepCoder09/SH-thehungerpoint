@@ -1,28 +1,21 @@
-/* signup.css — SH Theme (Style A) */
+/* Premium Signup Page — SH Theme */
 
 :root {
   --primary: #E23744;
   --primary-dark: #b71c1c;
   --yellow: #FBD24D;
   --bg: #f7f7f7;
-  --card-radius: 18px;
-  --input-radius: 14px;
-  --shadow: 0 12px 30px rgba(0,0,0,0.08);
   --muted: #666;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --radius: 18px;
+  --shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
 body {
-  font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background: var(--bg);
+  margin: 0;
   padding: 30px;
+  background: var(--bg);
+  font-family: Poppins, sans-serif;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
@@ -33,31 +26,31 @@ body {
 
 .card {
   background: #fff;
-  border-radius: var(--card-radius);
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
 
-/* Header */
+/* HEADER */
 .card-head {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  padding: 18px 22px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 18px 20px;
+  gap: 15px;
   color: #fff;
 }
 
 .logo-box {
-  width: 48px;
-  height: 48px;
+  width: 55px;
+  height: 55px;
   background: var(--yellow);
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
   border: 3px solid #8b1b1b;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .logo-box img {
@@ -66,11 +59,24 @@ body {
   object-fit: cover;
 }
 
-.title {
-  font-size: 20px;
-  font-weight: 700;
+.brand-title {
+  display: flex;
+  flex-direction: column;
 }
 
+.sh-title {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 20px;
+}
+
+.full-title {
+  margin-top: 2px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* BODY */
 .card-body {
   padding: 22px;
 }
@@ -78,34 +84,45 @@ body {
 label {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
   margin-top: 12px;
-  display: block;
 }
 
 input {
   width: 100%;
   padding: 12px 14px;
-  border-radius: var(--input-radius);
-  border: 1px solid #e2e2e2;
-  margin-top: 6px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
   font-size: 15px;
-  transition: 0.2s;
+  margin-top: 6px;
 }
 
-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(226,55,68,0.15);
+.password-row {
+  position: relative;
 }
 
-/* Legal Checkbox */
+.togglePass {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.eye-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.legal-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
 .legal-check {
   font-size: 13px;
-  margin-top: 16px;
   color: var(--muted);
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
+  text-align: center;
   line-height: 1.4;
 }
 
@@ -117,18 +134,18 @@ input:focus {
 /* Buttons */
 .btn {
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: none;
   margin-top: 16px;
   font-weight: 700;
-  border-radius: var(--input-radius);
-  border: none;
   cursor: pointer;
 }
 
 .btn.primary {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   color: #fff;
-  box-shadow: 0 8px 22px rgba(226,55,68,0.18);
+  box-shadow: 0 8px 22px rgba(226,55,68,0.22);
 }
 
 .btn.google {
@@ -139,20 +156,20 @@ input:focus {
 
 .divider {
   text-align: center;
-  margin: 14px 0;
+  margin: 14px;
   color: #999;
-  font-size: 14px;
 }
 
-/* Toast */
+/* Premium Toast */
 .toast {
   position: fixed;
-  bottom: 28px;
+  bottom: 26px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 12px 16px;
+  border-radius: 14px;
   background: #222;
   color: #fff;
-  padding: 10px 16px;
-  border-radius: 12px;
+  font-size: 14px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
