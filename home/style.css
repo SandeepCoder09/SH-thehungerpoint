@@ -67,8 +67,6 @@ body {
   /* background: #FBD24D;     /* your yellow color */ */
   border-radius: 12px;     /* rounded corners */
   overflow: hidden;
-  border: 2px solid white;
-  border-radius: 16px;
 }
 
 .logo-mark .logo-img {
