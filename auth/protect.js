@@ -1,21 +1,24 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+// protect.js — SH The Hunger Point
+// Protects pages from unauthenticated access
 
-const auth = getAuth();
+async function waitForFirebase() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (window.auth) resolve();
+      else setTimeout(check, 50);
+    };
+    check();
+  });
+}
 
-onAuthStateChanged(auth, (user) => {
+(async () => {
+  await waitForFirebase();
+
+  auth.onAuthStateChanged((user) => {
     if (!user) {
-        // User NOT logged in
-        if (!window.location.pathname.includes("/auth/login.html") &&
-            !window.location.pathname.includes("/auth/signup.html")) {
-
-            window.location.href = "/auth/login.html";
-        }
-    } else {
-        // User logged in → prevent going back to login screen
-        if (window.location.pathname.includes("/auth/login.html") ||
-            window.location.pathname.includes("/auth/signup.html")) {
-
-            window.location.href = "/home/index.html";
-        }
+      // Redirect to login if not logged in
+      const current = encodeURIComponent(window.location.pathname);
+      window.location.href = `/auth/login.html?next=${current}`;
     }
-});
+  });
+})();
