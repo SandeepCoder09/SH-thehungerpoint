@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -17,36 +17,57 @@
 <body>
   <main class="auth-page">
     <div class="card">
+
+      <!-- HEADER -->
       <header class="card-head">
         <div class="logo-box">
-          <img src="/home/sh-thehungerpoint.png" alt="logo" />
+          <img src="/home/sh-thehungerpoint.png" />
         </div>
-        <div class="title">Create Account</div>
+
+        <div class="brand-title">
+          <div class="sh-title">SH</div>
+          <div class="full-title">The Hunger Point</div>
+        </div>
       </header>
 
+      <!-- BODY -->
       <section class="card-body">
+
         <form id="signupForm">
 
           <label>Name</label>
-          <input id="name" type="text" required placeholder="Your name">
+          <input id="name" type="text" required placeholder="Your full name">
 
           <label>Email</label>
           <input id="email" type="email" required placeholder="you@example.com">
 
           <label>Password</label>
-          <input id="password" type="password" minlength="6" required placeholder="Create password">
+          <div class="password-row">
+            <input id="password" type="password" minlength="6" required placeholder="Create password">
+            <span class="togglePass" data-target="password">
+              <img src="/auth/icons/eye.svg" class="eye-icon">
+            </span>
+          </div>
 
           <label>Confirm Password</label>
-          <input id="confirm" type="password" minlength="6" required placeholder="Re-enter password">
+          <div class="password-row">
+            <input id="confirm" type="password" minlength="6" required placeholder="Re-enter password">
+            <span class="togglePass" data-target="confirm">
+              <img src="/auth/icons/eye.svg" class="eye-icon">
+            </span>
+          </div>
 
-          <!-- Legal Agreements -->
-          <label class="legal-check">
-            <input type="checkbox" id="legalAgree">
-            I agree to the 
-            <a href="/legal/terms.html" target="_blank">Terms & Conditions</a>,
-            <a href="/legal/privacy.html" target="_blank">Privacy Policy</a> and 
-            <a href="/legal/refund.html" target="_blank">Refund Policy</a>.
-          </label>
+          <!-- LEGAL AGREEMENT -->
+          <div class="legal-wrapper">
+            <label class="legal-check">
+              <input type="checkbox" id="legalAgree">
+              I accept the
+              <a href="/legal/terms.html" target="_blank">Terms</a>,
+              <a href="/legal/privacy.html" target="_blank">Privacy Policy</a>,
+              and
+              <a href="/legal/refund.html" target="_blank">Refund Policy</a>.
+            </label>
+          </div>
 
           <button type="submit" class="btn primary">Create Account</button>
 
@@ -60,15 +81,14 @@
           </p>
 
         </form>
+
       </section>
     </div>
 
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase Config Loader -->
   <script src="/auth/firebase-config.js"></script>
-  <!-- Signup Logic -->
   <script src="/auth/signup.js"></script>
 </body>
 </html>
