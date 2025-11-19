@@ -57,15 +57,28 @@ body {
 }
 
 .logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
+  position: relative;
   width: 55px;
   height: 55px;
-  border-radius: 15px;          /* smooth corners */
-  border: 3px solid #E23744;    /* same red as homepage */
+  border-radius: 15px;
+  padding: 0;
+  background: #FBD24D;
   overflow: hidden;
+}
+
+.logo-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  border-radius: 15px;
+  background: linear-gradient(90deg, #E23744, #C62831);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
 }
 
 .logo-mark img {
