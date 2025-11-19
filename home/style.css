@@ -56,17 +56,38 @@ body {
   gap: 12px;
 }
 
+/* LOGO FIX */
 .logo-mark {
-  width: 52px;
-  height: 52px;
-  background: linear-gradient(135deg, #f6b042, #ffd27a);
-  border-radius: 14px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-weight: 900;
-  color: #8b1b1b;
-  font-size: 18px;
+  justify-content: center;
+
+  width: 55px;      /* Adjust size of logo box */
+  height: 55px;
+  /* background: #FBD24D;     /* your yellow color */ */
+  border-radius: 12px;     /* rounded corners */
+  overflow: hidden;
+}
+
+.logo-mark .logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* makes image fit perfect */
+}
+
+/* Make header layout correct */
+.nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #E23744, #C62831);
 }
 
 .brand-text .name {
