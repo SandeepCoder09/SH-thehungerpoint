@@ -1,24 +1,11 @@
-// protect.js — SH The Hunger Point
-// Protects pages from unauthenticated access
+// protect.js - Prevent access if user is not logged in
 
-async function waitForFirebase() {
-  return new Promise(resolve => {
-    const check = () => {
-      if (window.auth) resolve();
-      else setTimeout(check, 50);
-    };
-    check();
-  });
-}
-
-(async () => {
-  await waitForFirebase();
-
-  auth.onAuthStateChanged((user) => {
+// Wait until Firebase is ready
+document.addEventListener("DOMContentLoaded", () => {
+  firebase.auth().onAuthStateChanged((user) => {
     if (!user) {
-      // Redirect to login if not logged in
-      const current = encodeURIComponent(window.location.pathname);
-      window.location.href = `/auth/login.html?next=${current}`;
+      // User NOT logged in → redirect to login
+      window.location.href = "/auth/login.html";
     }
   });
-})();
+});
