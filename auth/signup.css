@@ -38,7 +38,7 @@ body {
   overflow: hidden;
 }
 
-/* Header with gradient (same as homepage) */
+/* Header */
 .card-head {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   display: flex;
@@ -48,16 +48,15 @@ body {
   color: #fff;
 }
 
-/* Logo box */
 .logo-box {
   width: 48px;
   height: 48px;
   background: var(--yellow);
   border-radius: 12px;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   border: 3px solid #8b1b1b;
 }
 
@@ -91,14 +90,28 @@ input {
   border: 1px solid #e2e2e2;
   margin-top: 6px;
   font-size: 15px;
-  background: #fff;
   transition: 0.2s;
 }
 
 input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(226,55,68,0.15);
-  outline: none;
+}
+
+/* Legal Checkbox */
+.legal-check {
+  font-size: 13px;
+  margin-top: 16px;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+
+.legal-check a {
+  color: var(--primary);
+  font-weight: 600;
 }
 
 /* Buttons */
@@ -129,18 +142,6 @@ input:focus {
   margin: 14px 0;
   color: #999;
   font-size: 14px;
-}
-
-.muted.small {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-}
-
-.muted.small a {
-  color: var(--primary);
-  font-weight: 600;
 }
 
 /* Toast */
