@@ -1,38 +1,68 @@
-// login.js
+// login.js — SH The Hunger Point
 
-const $ = (s) => document.querySelector(s);
-const toast = $("#toast");
-
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.hidden = false;
-  setTimeout(() => (toast.hidden = true), 3000);
+// Wait until Firebase config loads
+async function waitForAuth() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (window.auth) resolve();
+      else setTimeout(check, 50);
+    };
+    check();
+  });
 }
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+(async () => {
+  await waitForAuth();
 
-  const email = $("#email").value.trim();
-  const password = $("#password").value;
+  const form = document.getElementById("loginForm");
+  const googleBtn = document.getElementById("googleLogin");
+  const toast = document.getElementById("toast");
 
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    showToast("Logged in! Redirecting...");
-    setTimeout(() => (window.location = "/"), 1200);
-  } catch (err) {
-    showToast(err.message);
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.hidden = false;
+    setTimeout(() => toast.hidden = true, 2500);
   }
-});
 
-// Google Login
-document.getElementById("googleLogin").addEventListener("click", async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
+  // Email + Password Login
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  try {
-    await auth.signInWithPopup(provider);
-    showToast("Welcome!");
-    setTimeout(() => (window.location = "/"), 1000);
-  } catch (err) {
-    showToast(err.message);
-  }
-});
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, pass);
+
+      showToast("Login successful!");
+
+      // If redirected from protected page
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "/home/index.html";
+
+      setTimeout(() => {
+        window.location.href = next;
+      }, 700);
+
+    } catch(err) {
+      showToast(err.message);
+    }
+  });
+
+  // Google Login
+  googleBtn.addEventListener("click", async () => {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      await auth.signInWithPopup(provider);
+
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "/home/index.html";
+
+      window.location.href = next;
+
+    } catch(err) {
+      showToast(err.message);
+    }
+  });
+
+})();
