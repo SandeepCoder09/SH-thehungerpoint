@@ -73,8 +73,12 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;       /* makes image fit perfect */
-  border: 1px solid white;
+  /* border: 1px solid white; */
   border-radius: 16px;
+  border-top-right: 2px;
+  border-top-left: 2px;
+  border-bottom-right: 2px;
+  border-bottom-left: 2px;
 }
 
 /* Make header layout correct */
