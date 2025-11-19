@@ -1,0 +1,157 @@
+/* signup.css — SH Theme (Style A) */
+
+:root {
+  --primary: #E23744;
+  --primary-dark: #b71c1c;
+  --yellow: #FBD24D;
+  --bg: #f7f7f7;
+  --card-radius: 18px;
+  --input-radius: 14px;
+  --shadow: 0 12px 30px rgba(0,0,0,0.08);
+  --muted: #666;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: var(--bg);
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-page {
+  width: 100%;
+  max-width: 480px;
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Header with gradient (same as homepage) */
+.card-head {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  color: #fff;
+}
+
+/* Logo box */
+.logo-box {
+  width: 48px;
+  height: 48px;
+  background: var(--yellow);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #8b1b1b;
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.card-body {
+  padding: 22px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 12px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--input-radius);
+  border: 1px solid #e2e2e2;
+  margin-top: 6px;
+  font-size: 15px;
+  background: #fff;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(226,55,68,0.15);
+  outline: none;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  font-weight: 700;
+  border-radius: var(--input-radius);
+  border: none;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(226,55,68,0.18);
+}
+
+.btn.google {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+.divider {
+  text-align: center;
+  margin: 14px 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.muted.small {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.muted.small a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
