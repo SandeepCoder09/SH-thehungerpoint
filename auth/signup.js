@@ -1,6 +1,6 @@
-// signup.js — SH The Hunger Point
+// SIGNUP JS — SH The Hunger Point Premium Version
 
-// Wait for Firebase auth/db to load
+// Wait for Firebase setup
 async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
@@ -15,9 +15,8 @@ async function waitForAuth() {
 
   await waitForAuth();
 
-  const form = document.getElementById("signupForm");
-  const googleBtn = document.getElementById("googleSignup");
   const toast = document.getElementById("toast");
+  const form = document.getElementById("signupForm");
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -25,7 +24,23 @@ async function waitForAuth() {
     setTimeout(() => toast.hidden = true, 2500);
   }
 
-  // Email + Password Signup
+  // Password Eye Toggle
+  document.querySelectorAll(".togglePass").forEach(icon => {
+    icon.addEventListener("click", () => {
+      const target = icon.getAttribute("data-target");
+      const input = document.getElementById(target);
+
+      if (input.type === "password") {
+        input.type = "text";
+        icon.innerHTML = `<img src="/auth/icons/eye-off.svg" class="eye-icon">`;
+      } else {
+        input.type = "password";
+        icon.innerHTML = `<img src="/auth/icons/eye.svg" class="eye-icon">`;
+      }
+    });
+  });
+
+  // Signup Handler
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -48,7 +63,6 @@ async function waitForAuth() {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, pass);
 
-      // Save user info in Firestore
       await db.collection("users").doc(result.user.uid).set({
         name,
         email,
@@ -56,11 +70,11 @@ async function waitForAuth() {
         createdAt: new Date()
       });
 
-      showToast("Account created!");
+      showToast("Account created successfully!");
 
       setTimeout(() => {
         window.location.href = "/home/index.html";
-      }, 700);
+      }, 900);
 
     } catch (err) {
       showToast(err.message);
@@ -68,12 +82,11 @@ async function waitForAuth() {
   });
 
   // Google Signup
-  googleBtn.addEventListener("click", async () => {
+  document.getElementById("googleSignup").addEventListener("click", async () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
       const result = await auth.signInWithPopup(provider);
 
-      // Save only if new user
       if (result.additionalUserInfo.isNewUser) {
         await db.collection("users").doc(result.user.uid).set({
           name: result.user.displayName,
