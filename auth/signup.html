@@ -1,80 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase (compat) -->
+  <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <link rel="stylesheet" href="/auth/signup.css" />
-  <link rel="icon" href="/home/sh-favicon.png" />
+  <link rel="icon" href="../home/sh-favicon.png" />
 </head>
+
 <body>
   <main class="auth-page">
     <div class="card">
 
-      <!-- header: logo + brand -->
+      <!-- HEADER -->
       <header class="card-head">
         <div class="logo-box">
-          <!-- using uploaded local file path as logo (your tooling will map this path) -->
-          <img src="/home/sh-thehungerpoint.png" alt="SH logo" />
-        </div>
-
-        <div class="brand-title">
-          <div class="sh-title">SH</div>
-          <div class="full-title">The Hunger Point</div>
+          <img src="../home/sh-thehungerpoint.png" alt="logo" />
+          <span class="brand-title">The Hunger Point</span>
         </div>
       </header>
 
       <section class="card-body">
-        <form id="signupForm" autocomplete="off" novalidate>
-          <label for="name">Name</label>
-          <input id="name" name="name" type="text" required placeholder="Your full name" />
+        <form id="signupForm">
+          
+          <label>Name</label>
+          <input id="name" type="text" required placeholder="Your full name">
 
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <label>Email</label>
+          <input id="email" type="email" required placeholder="you@example.com">
 
-          <label for="password">Password</label>
-          <div class="password-row">
-            <input id="password" name="password" type="password" minlength="6" required placeholder="Create password" />
-            <button type="button" class="toggle-pass" data-target="password" aria-label="Toggle password">
-              <!-- show-eye SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                   stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
+          <label>Password</label>
+          <div class="input-wrap">
+            <input id="password" type="password" minlength="6" required placeholder="Create password">
+            <button type="button" class="toggle-eye" data-target="password">
+              <img src="/icons/eye.svg" class="eye-icon" />
             </button>
           </div>
 
-          <label for="confirm">Confirm Password</label>
-          <div class="password-row">
-            <input id="confirm" name="confirm" type="password" minlength="6" required placeholder="Re-enter password" />
-            <button type="button" class="toggle-pass" data-target="confirm" aria-label="Toggle confirm password">
-              <!-- show-eye SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                   stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <input id="confirm" type="password" minlength="6" required placeholder="Re-enter password">
+            <button type="button" class="toggle-eye" data-target="confirm">
+              <img src="/icons/eye-off.svg" class="eye-icon" />
             </button>
           </div>
 
-          <!-- centered legal checkbox -->
-          <div class="legal-wrapper">
-            <label class="legal-check">
-              <input type="checkbox" id="legalAgree" />
-              I accept the
-              <a href="/legal/terms.html" target="_blank" rel="noopener">Terms</a>,
-              <a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
-              and
-              <a href="/legal/refund.html" target="_blank" rel="noopener">Refund Policy</a>.
-            </label>
-          </div>
+          <!-- LEGAL CHECKBOX -->
+          <label class="legal-box">
+            <input type="checkbox" id="legalCheck" />
+            <span>
+              I accept the 
+              <a href="/legal/terms.html">Terms</a>, 
+              <a href="/legal/privacy.html">Privacy Policy</a>, and 
+              <a href="/legal/refund.html">Refund Policy</a>.
+            </span>
+          </label>
 
           <button type="submit" class="btn primary">Create Account</button>
 
@@ -82,19 +68,18 @@
 
           <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
 
-          <p class="muted small">Already have an account? <a href="/auth/login.html">Sign in</a></p>
+          <p class="muted small">
+            Already have an account?
+            <a class="signin-link" href="login.html">Sign in</a>
+          </p>
         </form>
       </section>
     </div>
 
-    <!-- premium toast (single element toggled by JS) -->
-    <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+    <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- firebase config loader (your api config file) -->
   <script src="/auth/firebase-config.js"></script>
-
-  <!-- signup logic -->
   <script src="/auth/signup.js"></script>
 </body>
 </html>
