@@ -75,7 +75,7 @@ body {
   object-fit: cover;       /* makes image fit perfect */
   border: 2px solid white;
   border-radius: 16px;
-  border-top: 20px;
+  border-radius-top: 20px;
 }
 
 /* Make header layout correct */
