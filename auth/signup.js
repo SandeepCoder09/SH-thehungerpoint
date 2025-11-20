@@ -1,4 +1,5 @@
-// Wait for Firebase config to initialize
+// signup.js — SH The Hunger Point
+
 async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
@@ -19,32 +20,29 @@ async function waitForAuth() {
   function showToast(msg) {
     toast.textContent = msg;
     toast.hidden = false;
-    setTimeout(() => toast.hidden = true, 2600);
+    setTimeout(() => toast.hidden = true, 2500);
   }
 
-  // Eye toggle function
-  function togglePassword(inputId, openId, closeId) {
-    const input = document.getElementById(inputId);
-    const open = document.getElementById(openId);
-    const close = document.getElementById(closeId);
+  // Toggle password visibility
+  function togglePassword(fieldId, toggleId) {
+    const field = document.getElementById(fieldId);
+    const toggle = document.getElementById(toggleId);
 
-    open.addEventListener("click", () => {
-      input.type = "text";
-      open.classList.add("hide");
-      close.classList.remove("hide");
-    });
-
-    close.addEventListener("click", () => {
-      input.type = "password";
-      close.classList.add("hide");
-      open.classList.remove("hide");
+    toggle.addEventListener("click", () => {
+      if (field.type === "password") {
+        field.type = "text";
+        toggle.textContent = "🔒";
+      } else {
+        field.type = "password";
+        toggle.textContent = "🔓";
+      }
     });
   }
 
-  togglePassword("password", "eyeOpen", "eyeClose");
-  togglePassword("confirm", "eyeOpen2", "eyeClose2");
+  togglePassword("password", "togglePass");
+  togglePassword("confirm", "toggleConfirm");
 
-  // Submit Signup
+  // FORM SUBMIT
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -54,13 +52,13 @@ async function waitForAuth() {
     const confirm = document.getElementById("confirm").value;
     const legal = document.getElementById("legalCheck").checked;
 
-    if (!legal) return showToast("You must accept all policies.");
+    if (!legal) return showToast("Please accept all legal policies.");
     if (pass !== confirm) return showToast("Passwords do not match.");
 
     try {
-      const user = await auth.createUserWithEmailAndPassword(email, pass);
+      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
 
-      await db.collection("users").doc(user.user.uid).set({
+      await db.collection("users").doc(userCred.user.uid).set({
         name,
         email,
         createdAt: new Date()
@@ -70,23 +68,23 @@ async function waitForAuth() {
 
       setTimeout(() => {
         window.location.href = "/home/index.html";
-      }, 900);
+      }, 800);
 
     } catch (err) {
       showToast(err.message);
     }
   });
 
-  // GOOGLE Signup
+  // GOOGLE SIGNUP
   googleBtn.addEventListener("click", async () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      const result = await auth.signInWithPopup(provider);
+      const userCred = await auth.signInWithPopup(provider);
 
-      if (result.additionalUserInfo.isNewUser) {
-        await db.collection("users").doc(result.user.uid).set({
-          name: result.user.displayName,
-          email: result.user.email,
+      if (userCred.additionalUserInfo.isNewUser) {
+        await db.collection("users").doc(userCred.user.uid).set({
+          name: userCred.user.displayName,
+          email: userCred.user.email,
           createdAt: new Date()
         });
       }
