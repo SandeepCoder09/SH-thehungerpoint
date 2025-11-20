@@ -1,137 +1,136 @@
-// signup.js — SH System with correct config path + next=
-
-async function waitForAuth() {
-  return new Promise(resolve => {
-    const check = () => {
-      if (window.auth && window.db) resolve();
-      else setTimeout(check, 50);
-    };
-    check();
-  });
+:root{
+  --primary:#E23744;
+  --primary-dark:#b71c1c;
+  --bg:#f6f6f6;
+  --card:#fff;
+  --radius:18px;
+  --shadow:0 16px 40px rgba(0,0,0,0.12);
 }
 
-(async () => {
-  await waitForAuth();
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Poppins",system-ui;
+  background:var(--bg);
+  padding:36px;
+  display:flex;
+  justify-content:center;
+}
 
-  const form = document.getElementById("signupForm");
-  const toast = document.getElementById("toast");
-  const googleBtn = document.getElementById("googleSignup");
-  const createBtn = document.getElementById("createBtn");
+.auth-page{width:100%;max-width:520px}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-  function showToast(msg, ok=false) {
-    toast.textContent = msg;
-    toast.style.background = ok
-      ? "linear-gradient(90deg,#28cc72,#15a650)"
-      : "linear-gradient(90deg,#E23744,#b71c1c)";
-    toast.hidden = false;
-    setTimeout(()=> toast.hidden=true, 2500);
-  }
+/* HEADER */
+.card-head{
+  padding:18px 20px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
 
-  // show/hide password
-  document.querySelectorAll(".eye-btn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const id = btn.dataset.target;
-      const input = document.getElementById(id);
+.logo-box{display:flex;align-items:center;gap:12px}
+.logo-box img{
+  width:56px;height:56px;
+  border-radius:10px;
+  object-fit:cover;
+}
 
-      const show = input.type === "password";
-      input.type = show ? "text" : "password";
+.brand{color:#fff}
+.brand-sh{font-weight:900;font-size:20px}
+.brand-full{font-size:13px;opacity:0.9}
 
-      btn.innerHTML = show ? `
-        <!-- eye-off -->
-        <svg class="eye-svg" width="20" height="20" viewBox="0 0 24 24"
-          fill="none" stroke="#E23744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
-                   a21.83 21.83 0 0 1 5.06-7.94"/>
-          <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8
-                   a21.83 21.83 0 0 1-2.26 3.95"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>`
-      :
-      `
-        <!-- eye-open -->
-        <svg class="eye-svg" width="20" height="20" viewBox="0 0 24 24"
-          fill="none" stroke="#E23744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>`;
-    });
-  });
+/* BODY */
+.card-body{padding:24px}
+label{
+  font-weight:600;
+  margin-top:12px;
+  display:block;
+  color:#222;
+}
 
-  // prevent double submit
-  let sending = false;
+input{
+  width:100%;
+  padding:12px 14px;
+  margin-top:8px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:15px;
+}
 
-  form.addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    if (sending) return;
-    sending = true;
-    createBtn.disabled = true;
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 4px 18px rgba(226,55,68,0.12);
+}
 
-    const name = name.value.trim();
-    const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("password").value;
-    const confirm = document.getElementById("confirm").value;
-    const legal = document.getElementById("legalCheck").checked;
+/* EYE ICON INSIDE */
+.input-wrap{position:relative}
+.eye-btn{
+  position:absolute;
+  top:50%;
+  right:10px;
+  transform:translateY(-50%);
+  background:none;
+  border:0;
+  padding:5px;
+  cursor:pointer;
+}
+.eye-svg{stroke:#E23744}
 
-    if (!legal) {
-      showToast("Please accept all legal policies.");
-      sending = false;
-      createBtn.disabled = false;
-      return;
-    }
+/* LEGAL */
+.legal{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:16px;
+}
+.legal input{accent-color:var(--primary)}
+.legal a{color:var(--primary);font-weight:600}
 
-    if (pass !== confirm) {
-      showToast("Passwords do not match.");
-      sending = false;
-      createBtn.disabled = false;
-      return;
-    }
+/* BUTTONS */
+.btn{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  margin-top:20px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    try {
-      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
+.primary{
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  border:0; /* no border */
+}
 
-      await db.collection("users").doc(userCred.user.uid).set({
-        name,
-        email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+.google{
+  background:#fff;
+  border:1px solid #ddd;
+}
 
-      showToast("Account created!", true);
+.divider{
+  text-align:center;
+  margin:18px 0;
+  color:#666;
+}
 
-      const params = new URLSearchParams(location.search);
-      const next = params.get("next") || "/home/index.html";
+.signin-link{color:var(--primary);font-weight:700}
 
-      setTimeout(()=> location.href = next, 900);
-
-    } catch (err) {
-      showToast(err.message);
-      sending = false;
-      createBtn.disabled = false;
-    }
-  });
-
-  // GOOGLE SIGNUP
-  googleBtn.addEventListener("click", async ()=>{
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      const result = await auth.signInWithPopup(provider);
-
-      if (result.additionalUserInfo.isNewUser) {
-        await db.collection("users").doc(result.user.uid).set({
-          name: result.user.displayName,
-          email: result.user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
-      showToast("Google login success", true);
-
-      const params = new URLSearchParams(location.search);
-      const next = params.get("next") || "/home/index.html";
-      setTimeout(()=> location.href = next, 700);
-
-    } catch (err) {
-      showToast(err.message);
-    }
-  });
-
-})();
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 20px;
+  color:#fff;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  font-weight:600;
+  box-shadow:0 12px 25px rgba(0,0,0,0.25);
+}
