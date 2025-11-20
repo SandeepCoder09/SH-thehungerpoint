@@ -1,145 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — SH The Hunger Point</title>
-
+  <meta charset="utf-8" />
+  <title>Admin Dashboard — SH</title>
   <link rel="stylesheet" href="/admin/admin.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-  <script src="/home/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <header class="topbar">
+    <h1>SH — Admin</h1>
+    <div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
 
-  <!-- MOBILE MENU BUTTON -->
-  <div class="menu-toggle" id="menuToggle">☰</div>
+  <section class="dashboard-grid">
+    <aside class="controls">
+      <input id="searchInput" placeholder="Search orders or item..." />
+      <select id="statusFilter">
+        <option value="">All</option>
+        <option value="paid">Paid</option>
+        <option value="preparing">Preparing</option>
+        <option value="on the way">On the way</option>
+        <option value="completed">Completed</option>
+      </select>
 
-  <!-- JWT AUTH CHECK (Vercel Safe Absolute Paths) -->
-  <script>
-    (async () => {
-      const token = localStorage.getItem("admin_jwt");
-      if (!token) return (location.href = "/admin/login.html");
-
-      try {
-        const res = await fetch("https://sh-thehungerpoint.onrender.com/admin/verify", {
-          headers: { Authorization: "Bearer " + token }
-        });
-
-        const data = await res.json();
-        if (!data.ok) {
-          localStorage.removeItem("admin_jwt");
-          return (location.href = "/admin/login.html");
-        }
-      } catch (err) {
-        console.error(err);
-        localStorage.removeItem("admin_jwt");
-        return (location.href = "/admin/login.html");
-      }
-    })();
-  </script>
-
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">SH Admin</div>
-    <nav>
-      <a class="active" data-target="dashboard">Dashboard</a>
-      <a data-target="orders">Orders</a>
-      <a data-target="sales">Sales</a>
-      <a data-target="notifications">Notifications</a>
-      <a id="logoutBtn">Logout</a>
-    </nav>
-  </aside>
-
-
-  <!-- MAIN CONTENT -->
-  <section class="main-content">
-
-    <header class="topbar">
-      <h1 id="pageTitle">Dashboard</h1>
-    </header>
-
-    <section class="stats-grid">
-      <div class="stat-card"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
-      <div class="stat-card"><h3>Total Sales</h3><p id="totalSales">₹0</p></div>
-      <div class="stat-card"><h3>Last 1 Hour</h3><p id="recentOrders">0</p></div>
-    </section>
-
-    <section class="chart-section">
-      <div class="chart-box">
-        <h3>Orders — 24 Hours</h3>
-        <canvas id="hourChart"></canvas>
+      <div class="stats">
+        <div>Total Orders: <span id="totalOrders">0</span></div>
+        <div>Total Sales: <span id="totalSales">₹0</span></div>
+        <div>Recent (1h): <span id="recentOrders">0</span></div>
       </div>
 
-      <div class="chart-box">
-        <h3>Sales — 7 Days</h3>
+      <div class="charts">
+        <canvas id="hourChart"></canvas>
         <canvas id="weekChart"></canvas>
       </div>
-    </section>
+    </aside>
 
-    <section class="orders-container">
-      <div class="orders-header">
-        <h2>Live Orders</h2>
-        <div class="order-controls">
-          <input id="searchInput" placeholder="Search orders…" />
-          <select id="statusFilter">
-            <option value="">All</option>
-            <option value="paid">Paid</option>
-            <option value="preparing">Preparing</option>
-            <option value="on the way">On the way</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="ordersList" class="orders-list">Loading orders…</div>
-    </section>
+    <main class="orders-area">
+      <div id="ordersList"></div>
+    </main>
   </section>
 
+  <audio id="newOrderSound" src="/admin/new-order.mp3" preload="auto"></audio>
+  <div id="liveOrderPopup" class="popup"><div><div id="popupOrderId"></div><div id="popupOrderItems"></div><button id="popupClose">Close</button></div></div>
 
-  <!-- LIVE ORDER POPUP -->
-  <div id="liveOrderPopup" class="live-order-popup hidden">
-    <div class="popup-content">
-      <h3>🔥 New Order Received</h3>
-      <p id="popupOrderId"></p>
-      <p id="popupOrderItems"></p>
-      <button id="popupClose">OK</button>
-    </div>
-  </div>
-
-  <audio id="newOrderSound">
-    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg" />
-  </audio>
-
-  <script src="/admin/menu.js"></script>
-  <script src="/admin/dashboard.js" defer></script>
-
-  <script>
-    // Sidebar page switch
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll('.sidebar nav a[data-target]').forEach(a => {
-        a.addEventListener('click', () => {
-          document.querySelectorAll('.sidebar nav a').forEach(x => x.classList.remove('active'));
-          a.classList.add('active');
-          document.getElementById('pageTitle').textContent = a.dataset.target
-            .charAt(0).toUpperCase() + a.dataset.target.slice(1);
-
-          if (window.innerWidth <= 850) document.querySelector('.sidebar').classList.remove('active');
-        });
-      });
-
-      // Logout absolute for Vercel
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        localStorage.removeItem("admin_jwt");
-        location.href = "/admin/login.html";
-      });
-    });
-  </script>
+  <script type="module" src="/admin/dashboard.js"></script>
 </body>
 </html>
