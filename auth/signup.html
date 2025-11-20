@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Account — The Hunger Point</title>
+  <title>Create Account — SH The Hunger Point</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
   <link rel="stylesheet" href="/auth/signup.css" />
-  <link rel="icon" href="/home/sh-thehungerpoint.png" />
+  <link rel="icon" href="/home/sh-favicon.png" />
 </head>
 
 <body>
   <main class="auth-page">
     <div class="card">
-
-      <!-- Header -->
       <header class="card-head">
         <div class="logo-box">
-          <img src="../home/sh-thehungerpoint.png" />
+          <img src="/home/sh-thehungerpoint.png" />
           <span class="brand">The Hunger Point</span>
         </div>
         <div class="title">Create Account</div>
       </header>
 
-      <!-- FORM -->
       <section class="card-body">
         <form id="signupForm">
 
@@ -33,48 +36,28 @@
 
           <label>Password</label>
           <div class="pass-group">
-            <input id="password" type="password" minlength="6" placeholder="Create password" required>
+            <input id="password" type="password" placeholder="Create password" required minlength="6">
             <span class="toggle" id="togglePass">
-
-              <!-- Eye Open -->
-              <svg id="eyeOpen" class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-
-              <!-- Eye Close -->
-              <svg id="eyeClose" class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20 20 0 0 1 5.06-6.88M9.88 9.88A3 3 0 0 1 14.12 14.12" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-
+              <img src="/auth/icons/eye-open.svg" id="eyeOpen">
+              <img src="/auth/icons/eye-close.svg" id="eyeClose" class="hide">
             </span>
           </div>
 
           <label>Confirm Password</label>
           <div class="pass-group">
-            <input id="confirm" type="password" minlength="6" placeholder="Re-enter password" required>
+            <input id="confirm" type="password" placeholder="Re-enter password" required minlength="6">
             <span class="toggle" id="toggleConfirm">
-
-              <svg id="eyeOpen2" class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-
-              <svg id="eyeClose2" class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20 20 0 0 1 5.06-6.88M9.88 9.88A3 3 0 0 1 14.12 14.12" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-
+              <img src="/auth/icons/eye-open.svg" id="eyeOpen2">
+              <img src="/auth/icons/eye-close.svg" id="eyeClose2" class="hide">
             </span>
           </div>
 
-          <!-- Legal Checkbox -->
           <label class="legal">
             <input type="checkbox" id="legalCheck">
-            I accept the <a href="../legal/terms.html" class="link">Terms</a>,
-            <a href="../legal/privacy.html" class="link">Privacy Policy</a>,
-            <a href="../legal/refund.html" class="link">Refund Policy</a>
+            I accept the 
+            <a href="/legal/terms.html" class="link">Terms</a>, 
+            <a href="/legal/privacy.html" class="link">Privacy Policy</a>, 
+            and <a href="/legal/refund.html" class="link">Refund Policy</a>.
           </label>
 
           <button type="submit" class="btn primary">Create Account</button>
@@ -87,6 +70,7 @@
             Already have an account?
             <a href="/auth/login.html" class="signin-link">Sign in</a>
           </p>
+
         </form>
       </section>
     </div>
@@ -94,14 +78,8 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-  <!-- Correct config path -->
-  <script src="/api/firebase-config.js"></script>
-
+  <!-- CORRECT FIREBASE CONFIG PATH -->
+  <script src="/auth/firebase-config.js"></script>
   <script src="/auth/signup.js"></script>
 </body>
 </html>
