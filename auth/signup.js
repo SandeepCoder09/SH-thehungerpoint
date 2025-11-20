@@ -1,76 +1,72 @@
-// Initialize Firebase config already loaded above as firebase-config.js
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-function showToast(msg){
+async function showToast(msg) {
   const t = document.getElementById("toast");
   t.innerText = msg;
   t.hidden = false;
-  setTimeout(()=> t.hidden = true, 3000);
+  setTimeout(() => t.hidden = true, 3000);
 }
 
-// TOGGLE EYE ICONS
-document.querySelectorAll(".toggle-eye").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    const field = document.getElementById(btn.dataset.target);
+// Eye toggles
+function setupToggle(passId, openId, closeId) {
+  const pass = document.getElementById(passId);
+  const open = document.getElementById(openId);
+  const close = document.getElementById(closeId);
 
-    if(field.type === "password"){
-      field.type = "text";
-      btn.querySelector("img").src = "/icons/eye.svg";
-    } else {
-      field.type = "password";
-      btn.querySelector("img").src = "/icons/eye-off.svg";
-    }
-  });
-});
+  open.onclick = () => {
+    pass.type = "text";
+    open.classList.add("hide");
+    close.classList.remove("hide");
+  };
 
-// SIGNUP FORM
-document.getElementById("signupForm").addEventListener("submit", async (e)=>{
+  close.onclick = () => {
+    pass.type = "password";
+    close.classList.add("hide");
+    open.classList.remove("hide");
+  };
+}
+
+setupToggle("password", "eyeOpen", "eyeClose");
+setupToggle("confirm", "eyeOpen2", "eyeClose2");
+
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = name.value.trim();
+  const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const pass = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
   const legal = document.getElementById("legalCheck").checked;
 
-  if(!legal){
-    showToast("Please accept all legal policies.");
-    return;
-  }
+  if (pass !== confirm)
+    return showToast("Passwords do not match");
 
-  if(pass !== confirm){
-    showToast("Passwords do not match.");
-    return;
-  }
+  if (!legal)
+    return showToast("You must accept all legal conditions");
 
-  try{
-    const userCred = await auth.createUserWithEmailAndPassword(email, pass);
-
-    await db.collection("users").doc(userCred.user.uid).set({
+  try {
+    const userCred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+    await firebase.firestore().collection("users").doc(userCred.user.uid).set({
       name,
       email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt: Date.now()
     });
 
-    showToast("Account created successfully!");
+    showToast("Account created! Redirecting...");
+    setTimeout(() => {
+      window.location.href = "../home/index.html";
+    }, 1200);
 
-    setTimeout(()=> window.location.href="/home/index.html", 1500);
-
-  } catch(err){
+  } catch (err) {
     showToast(err.message);
   }
 });
 
-// GOOGLE SIGNUP
-document.getElementById("googleSignup").addEventListener("click", async ()=>{
-  try{
+// Google Signup
+document.getElementById("googleSignup").addEventListener("click", async () => {
+  try {
     const provider = new firebase.auth.GoogleAuthProvider();
-    await auth.signInWithPopup(provider);
-    showToast("Logged in with Google");
-    setTimeout(()=> location.href="/home/index.html", 1500);
-  }catch(e){
-    showToast(e.message);
+    await firebase.auth().signInWithPopup(provider);
+    window.location.href = "../home/index.html";
+  } catch (err) {
+    showToast(err.message);
   }
 });
