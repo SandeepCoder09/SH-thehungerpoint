@@ -11,49 +11,49 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Hunger Point</title>
 
-<!-- ======================= -->
-<!-- SH - The Hunger Point SEO -->
-<!-- ======================= -->
+  <!-- ======================= -->
+  <!-- SH - The Hunger Point SEO -->
+  <!-- ======================= -->
 
-<!-- Primary Meta Tags -->
-<title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
-<meta name="title" content="SH - The Hunger Point | Fresh & Fast Food in Fatehpur" />
-<meta name="description" content="SH - The Hunger Point serves fresh momos, fries, tea, and fast food in Fatehpur, Uttar Pradesh. Order fast, tasty and affordable food near you." />
-<meta name="keywords" content="SH The Hunger Point, fast food fatehpur, momos fatehpur, fries, tea, snacks, food delivery, hunger point" />
+  <!-- Primary Meta Tags -->
+  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
+  <meta name="title" content="SH - The Hunger Point | Fresh & Fast Food in Fatehpur" />
+  <meta name="description" content="SH - The Hunger Point serves fresh momos, fries, tea, and fast food in Fatehpur, Uttar Pradesh. Order fast, tasty and affordable food near you." />
+  <meta name="keywords" content="SH The Hunger Point, fast food fatehpur, momos fatehpur, fries, tea, snacks, food delivery, hunger point" />
 
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="/home/sh-favicon.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/home/sh-favicon.png" />
 
-<!-- Canonical URL -->
-<link rel="canonical" href="https://sh-thehungerpoint.vercel.app/" />
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://sh-thehungerpoint.vercel.app/" />
 
-<!-- Open Graph (Facebook / WhatsApp) -->
-<meta property="og:title" content="SH - The Hunger Point" />
-<meta property="og:description" content="Fresh & fast food in Fatehpur — Momos, Fries, Tea & more." />
-<meta property="og:image" content="https://sh-thehungerpoint.vercel.app/home/sh-favicon.png" />
-<meta property="og:url" content="https://sh-thehungerpoint.vercel.app" />
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="SH - The Hunger Point" />
+  <!-- Open Graph (Facebook / WhatsApp) -->
+  <meta property="og:title" content="SH - The Hunger Point" />
+  <meta property="og:description" content="Fresh & fast food in Fatehpur — Momos, Fries, Tea & more." />
+  <meta property="og:image" content="https://sh-thehungerpoint.vercel.app/home/sh-favicon.png" />
+  <meta property="og:url" content="https://sh-thehungerpoint.vercel.app" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SH - The Hunger Point" />
 
-<!-- Twitter Card -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:title" content="SH - The Hunger Point" />
-<meta property="twitter:description" content="Fresh & fast food in Fatehpur — Momos, Fries, Tea & more." />
-<meta property="twitter:image" content="https://sh-thehungerpoint.vercel.app/home/sh-favicon.png" />
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:title" content="SH - The Hunger Point" />
+  <meta property="twitter:description" content="Fresh & fast food in Fatehpur — Momos, Fries, Tea & more." />
+  <meta property="twitter:image" content="https://sh-thehungerpoint.vercel.app/home/sh-favicon.png" />
 
-<!-- Robots -->
-<meta name="robots" content="index, follow" />
-<meta name="googlebot" content="index,follow" />
+  <!-- Robots -->
+  <meta name="robots" content="index, follow" />
+  <meta name="googlebot" content="index,follow" />
 
-<link rel="stylesheet" href="/home/style.css" />
+  <link rel="stylesheet" href="/home/style.css" />
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="firebase-config.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
 
-<!-- All Pages Protection -->
-<script src="/auth/protect.js" defer></script>
+  <!-- All Pages Protection -->
+  <script src="/auth/protect.js" defer></script>
 </head>
 
 <body>
@@ -73,7 +73,7 @@
     </div>
 
     <div class="header-actions">
-      <button id="cartToggle" class="icon-btn">
+      <button id="cartToggle" class="icon-btn" aria-label="Open cart">
         <span class="cart-emoji">🛒</span>
         <span id="cartCount">0</span>
       </button>
@@ -83,13 +83,13 @@
   <!-- MAIN -->
   <main class="container">
 
-    <section class="hero">
+    <section class="hero" role="banner">
       <h1>Delicious. Fast. Fresh.</h1>
-      <p>Family-style fast food — momo, finger, tea & more.</p>
+      <p>Family-style fast food — momo, finger, tea &amp; more.</p>
     </section>
 
     <!-- TABS -->
-    <nav class="top-tabs">
+    <nav class="top-tabs" role="navigation" aria-label="Main tabs">
       <button class="tab active" data-tab="home">Home</button>
       <button class="tab" data-tab="orders">My Orders</button>
       <a href="/auth/signup.html" class="tab">Register</a>
@@ -98,36 +98,83 @@
 
     <!-- MENU -->
     <section id="home" class="page">
-    <section class="menu">
+      <section class="menu" aria-label="Menu items">
 
-      <!-- MENU ITEMS (unchanged) -->
-      <!-- MOMO -->
-      <article class="menu-item" data-item="Momo" data-price="10">
-        <img src="/home/sh-momo.png" class="menu-img">
-        <div class="mi-center">
-          <h3>Momo</h3>
-          <div class="price">₹10 <small>/ 5 piece</small></div>
-        </div>
-        <div class="controls">
-          <div class="qty-wrap">
-            <button class="qty-btn minus">−</button>
-            <span class="qty">1</span>
-            <button class="qty-btn plus">+</button>
+        <!-- MOMO -->
+        <article class="menu-item" data-item="Momo" data-price="10">
+          <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
+          <div class="mi-center">
+            <h3>Momo</h3>
+            <div class="price">₹10 <small>/ 4 piece</small></div>
           </div>
-          <button class="add-cart-btn">Add</button>
-        </div>
-      </article>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn minus" aria-label="Decrease qty">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn plus" aria-label="Increase qty">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </article>
 
-      <!-- YOU KEEP OTHER MENU ITEMS SAME -->
-      <!-- ... -->
+        <!-- FINGER -->
+        <article class="menu-item" data-item="Finger" data-price="10">
+          <img src="/home/sh-french-fries.png" class="menu-img" alt="Finger">
+          <div class="mi-center">
+            <h3>Finger</h3>
+            <div class="price">₹10 <small>/ plate</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn minus" aria-label="Decrease qty">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn plus" aria-label="Increase qty">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </article>
 
+        <!-- HOT TEA -->
+        <article class="menu-item" data-item="Tea" data-price="10">
+          <img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea">
+          <div class="mi-center">
+            <h3>Hot Tea</h3>
+            <div class="price">₹10 <small>/ cup</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn minus" aria-label="Decrease qty">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn plus" aria-label="Increase qty">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </article>
+
+        <!-- BREAD PAKODA -->
+        <article class="menu-item" data-item="Bread Pakoda" data-price="10">
+          <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda">
+          <div class="mi-center">
+            <h3>Bread Pakoda</h3>
+            <div class="price">₹10 <small>/ 1 piece</small></div>
+          </div>
+          <div class="controls">
+            <div class="qty-wrap">
+              <button class="qty-btn minus" aria-label="Decrease qty">−</button>
+              <span class="qty">1</span>
+              <button class="qty-btn plus" aria-label="Increase qty">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </article>
+
+      </section>
     </section>
-    </section>
 
-    <!-- Other Pages -->
-    <section id="orders" class="page hidden"><h2>Your Orders</h2><p id="pastOrders"></p></section>
-    <section id="profile" class="page hidden"><h2>Profile</h2></section>
-    <section id="offers" class="page hidden"><h2>Offers</h2></section>
+    <!-- OTHER PAGES -->
+    <section id="orders" class="page hidden"><h2>Your Orders</h2><p id="pastOrders">No orders yet.</p></section>
+    <section id="profile" class="page hidden"><h2>Profile</h2><p>User profile info will appear.</p></section>
+    <section id="offers" class="page hidden"><h2>Offers</h2><p>No active offers.</p></section>
 
     <section id="order-status" class="order-status hidden">
       <h3>Order Confirmed 🎉</h3>
@@ -137,12 +184,12 @@
   </main>
 
   <!-- CART MODAL -->
-  <div id="overlay" class="overlay hidden"></div>
+  <div id="overlay" class="overlay hidden" aria-hidden="true"></div>
 
-  <div id="cartModal" class="cart-modal hidden">
+  <div id="cartModal" class="cart-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
     <header class="cart-modal-head">
-      <h3>Your Cart</h3>
-      <button id="closeCart" class="icon-btn">✕</button>
+      <h3 id="cartTitle">Your Cart</h3>
+      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
     </header>
 
     <div id="cartItems" class="cart-items">
@@ -160,18 +207,16 @@
   </div>
 
   <!-- FOOTER -->
-  <footer class="footer">
-    <p>© 2025 SH — The Hunger Point</p>
-  </footer>
+  <footer class="footer"><p>© 2025 SH — The Hunger Point</p></footer>
 
   <!-- Cashfree SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
 
   <!-- Toast -->
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" aria-hidden="true"></div>
 
-  <!-- Main Script -->
-  <script src="/home/script.js?v=2"></script>
+  <!-- Main Script (cache-busted) -->
+  <script src="/home/script.js?v=3" defer></script>
 
 </body>
 </html>
