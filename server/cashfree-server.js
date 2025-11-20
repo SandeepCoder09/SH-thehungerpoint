@@ -1,38 +1,23 @@
 // server/cashfree-server.js
-// Production-ready backend for SH — The Hunger Point
-// - Firebase Admin initialization
-// - JWT admin authentication
-// - Admin login + verify + update status
+// SH — The Hunger Point (Cashfree Payment Gateway)
+// ------------------------------------------------
+// Features:
+// - Firebase Admin Init
+// - Admin login + JWT auth
+// - Admin order status update
 // - Cashfree create order + verify payment
-// - Health check
+// - Works with frontend Option-1 (Cashfree.checkout)
+// ------------------------------------------------
 
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import fetch from "node-fetch";   // required for Cashfree API calls
+import fetch from "node-fetch"; // Cashfree API calls
 
 // -----------------------------
-// Environment variables required:
-// -----------------------------
-/*
-  FIREBASE_TYPE
-  FIREBASE_PROJECT_ID
-  FIREBASE_PRIVATE_KEY_ID
-  FIREBASE_PRIVATE_KEY
-  FIREBASE_CLIENT_EMAIL
-  FIREBASE_CLIENT_ID
-  FIREBASE_AUTH_URI
-  FIREBASE_TOKEN_URI
-  FIREBASE_AUTH_PROVIDER_CERT_URL
-  FIREBASE_CLIENT_CERT_URL
-  FIREBASE_UNIVERSE_DOMAIN
-  JWT_SECRET
-  CF_APP_ID
-  CF_SECRET_KEY
-*/
-
+// Helpers
 // -----------------------------
 const safeJson = (res, status, obj) => res.status(status).json(obj);
 
@@ -42,9 +27,10 @@ function rebuildPrivateKey(rawKey) {
 }
 
 // -----------------------------
-// Firebase Admin Init
+// Firebase Admin Initialization
 // -----------------------------
 let db = null;
+
 try {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
@@ -71,22 +57,24 @@ try {
 }
 
 // -----------------------------
-// Express init
+// Express Init
 // -----------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check
 app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
 // -----------------------------
-// Middleware: Admin Auth
+// Admin Auth Middleware
 // -----------------------------
 function requireAdminToken(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth || !auth.startsWith("Bearer ")) {
     return safeJson(res, 401, { ok: false, error: "Unauthorized" });
   }
+
   try {
     const token = auth.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -105,14 +93,18 @@ app.post("/admin/login", async (req, res) => {
     const { email, password } = req.body;
 
     const doc = await db.collection("admins").doc(email).get();
-    if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
+    if (!doc.exists) {
+      return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
+    }
 
     const adminData = doc.data();
     const match = await bcrypt.compare(password, adminData.passwordHash);
 
     if (!match) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
 
-    const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
@@ -139,19 +131,21 @@ app.post("/admin/update-status", requireAdminToken, async (req, res) => {
 
     return safeJson(res, 200, { ok: true });
   } catch (err) {
+    console.error("Update status error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// CASHFREE: CREATE ORDER
-// /create-order
+// CASHFREE: CREATE ORDER (USED BY FRONTEND)
 // -----------------------------
-app.post("/create-order", async (req, res) => {
+app.post("/create-cashfree-order", async (req, res) => {
   try {
     const { amount, items, phone, email } = req.body;
 
-    if (!amount) return safeJson(res, 400, { ok: false, error: "amount required" });
+    if (!amount) {
+      return safeJson(res, 400, { ok: false, error: "amount required" });
+    }
 
     const body = {
       order_amount: Number(amount),
@@ -159,10 +153,7 @@ app.post("/create-order", async (req, res) => {
       customer_details: {
         customer_id: phone || "guest",
         customer_phone: phone || "9999999999",
-        customer_email: email || "guest@email.com",
-      },
-      order_meta: {
-        return_url: "https://sh-the-hunger-point.vercel.app/payment-success",
+        customer_email: email || "guest@example.com",
       },
     };
 
@@ -179,18 +170,30 @@ app.post("/create-order", async (req, res) => {
 
     const data = await cfRes.json();
 
-    return safeJson(res, 200, { ok: true, data });
+    if (!data.order_id || !data.payment_session_id) {
+      console.log("❌ Cashfree Order Error:", data);
+      return safeJson(res, 500, {
+        ok: false,
+        error: "Cashfree failed",
+        raw: data,
+      });
+    }
+
+    return safeJson(res, 200, {
+      ok: true,
+      orderId: data.order_id,
+      session: data.payment_session_id,
+    });
   } catch (err) {
     console.error("Cashfree create order error:", err);
-    return safeJson(res, 500, { ok: false, error: "Cashfree order failed" });
+    return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
 // CASHFREE: VERIFY PAYMENT
-// /verify-payment
 // -----------------------------
-app.post("/verify-payment", async (req, res) => {
+app.post("/verify-cashfree-payment", async (req, res) => {
   try {
     const { orderId, items } = req.body;
 
@@ -208,25 +211,22 @@ app.post("/verify-payment", async (req, res) => {
       return safeJson(res, 200, { ok: false, error: "Payment not completed" });
     }
 
-    const total =
-      items && Array.isArray(items)
-        ? items.reduce((s, it) => s + it.price * it.qty, 0)
-        : 0;
+    const total = items.reduce((s, it) => s + it.price * it.qty, 0);
 
     const newOrderId = "ORD" + Date.now();
 
     await db.collection("orders").doc(newOrderId).set({
       orderId: newOrderId,
+      cashfree_order_id: orderId,
       items,
       amount: total,
-      cashfree_order_id: orderId,
       timestamp: Date.now(),
       status: "paid",
     });
 
     return safeJson(res, 200, { ok: true, orderId: newOrderId });
   } catch (err) {
-    console.error("Cashfree verify payment error:", err);
+    console.error("Cashfree verify error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
@@ -235,6 +235,7 @@ app.post("/verify-payment", async (req, res) => {
 // START SERVER
 // -----------------------------
 const PORT = process.env.PORT || 10000;
+
 app.listen(PORT, () =>
   console.log(`🚀 SH Cashfree Server running on port ${PORT}`)
 );
