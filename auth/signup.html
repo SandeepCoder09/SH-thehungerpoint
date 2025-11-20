@@ -4,20 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Create Account — SH The Hunger Point</title>
-
-  <!-- Styles -->
   <link rel="stylesheet" href="/auth/signup.css" />
-
   <link rel="icon" href="/home/sh-favicon.png" />
 </head>
 <body>
   <main class="auth-page">
     <div class="card">
-
-      <!-- header -->
       <header class="card-head">
         <div class="logo-box">
-          <!-- local uploaded logo path (will be transformed by your deploy tooling) -->
           <img src="/home/sh-thehungerpoint.png" alt="SH logo" />
           <div class="brand">
             <div class="brand-sh">SH</div>
@@ -26,7 +20,6 @@
         </div>
       </header>
 
-      <!-- body -->
       <section class="card-body">
         <form id="signupForm" autocomplete="off" novalidate>
           <label for="name">Name</label>
@@ -39,7 +32,6 @@
           <div class="input-wrap">
             <input id="password" name="password" type="password" minlength="6" placeholder="Create password" required />
             <button type="button" class="eye-btn" aria-label="Toggle password" data-target="password">
-              <!-- inline SHOW eye (red) -->
               <svg class="eye-svg" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#E23744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -51,7 +43,6 @@
           <div class="input-wrap">
             <input id="confirm" name="confirm" type="password" minlength="6" placeholder="Re-enter password" required />
             <button type="button" class="eye-btn" aria-label="Toggle confirm password" data-target="confirm">
-              <!-- inline SHOW eye (red) -->
               <svg class="eye-svg" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#E23744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -59,14 +50,12 @@
             </button>
           </div>
 
-          <!-- legal checkbox (left aligned) -->
-          <label class="legal">
+          <label class="legal" for="legalCheck">
             <input type="checkbox" id="legalCheck" />
             <span>
               I accept the
               <a href="/legal/terms.html" target="_blank" rel="noopener">Terms</a>,
-              <a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
-              and
+              <a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and
               <a href="/legal/refund.html" target="_blank" rel="noopener">Refund Policy</a>.
             </span>
           </label>
@@ -85,19 +74,18 @@
       </section>
     </div>
 
-    <!-- toast -->
-    <div id="toast" class="toast" aria-live="polite" hidden></div>
+    <div id="toast" class="toast" hidden aria-live="polite"></div>
   </main>
 
-  <!-- Firebase SDKs (must load before firebase-config handler) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- Backend-provided config endpoint (Vercel serverless or your API) -->
+  <!-- serverless config endpoint (returns JSON used by client) -->
   <script src="/api/firebase-config"></script>
 
-  <!-- Signup logic -->
+  <!-- signup logic -->
   <script src="/auth/signup.js"></script>
 </body>
 </html>
