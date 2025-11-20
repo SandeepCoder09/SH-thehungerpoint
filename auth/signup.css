@@ -1,141 +1,169 @@
-:root{
-  --primary: #E23744;
-  --primary-dark: #b71c1c;
-  --bg: #F8F8F8;
-  --card: #fff;
-  --radius: 20px;
-  --shadow: 0 18px 40px rgba(0,0,0,0.12);
+/* General Layout */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  font-family: "Poppins", sans-serif;
 }
 
-body{
-  font-family: "Poppins", system-ui;
-  background: var(--bg);
-  display:flex;
-  justify-content:center;
-  padding:30px;
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
 }
 
-.auth-page{width:100%;max-width:520px;}
-
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
+.card {
+  width: 92%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-.card-head{
-  padding:18px 20px;
-  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-  display:flex;
-  align-items:center;
+/* Header */
+.card-head {
+  background: linear-gradient(90deg, #d10000, #ff4747);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: white;
 }
 
-.logo-box{
-  display:flex;
-  align-items:center;
-  gap:12px;
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.logo-box img{
-  width:52px;height:auto;
+.logo-box img {
+  width: 55px;
 }
 
-.brand-title{
-  color:#fff;
-  font-size:20px;
-  font-weight:700;
+.brand {
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.card-body{padding:25px;}
-
-label{font-weight:600;margin-top:12px;display:block;}
-
-input{
-  width:100%;
-  padding:12px 14px;
-  background:#fff;
-  border:1px solid #ddd;
-  border-radius:12px;
-  margin-top:6px;
-  font-size:15px;
+.title {
+  font-size: 22px;
+  margin-top: 10px;
+  font-weight: 600;
 }
 
-.input-wrap{
-  position:relative;
+/* Inputs */
+.card-body {
+  padding: 25px;
 }
 
-.toggle-eye{
-  position:absolute;
-  right:12px;
-  top:50%;
-  transform:translateY(-50%);
-  border:none;
-  background:none;
-  cursor:pointer;
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 14px;
+  color: #000;
 }
 
-.eye-icon{width:22px;height:22px;}
-
-.legal-box{
-  margin-top:22px;
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  font-size:14px;
+input {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-top: 6px;
+  outline: none;
+  font-size: 15px;
 }
 
-.legal-box input{
-  width:18px;
-  height:18px;
-  accent-color: var(--primary);
+input:focus {
+  border-color: #d10000;
 }
 
-.legal-box a{
-  color:var(--primary);
-  font-weight:600;
+/* Password Group */
+.pass-group {
+  position: relative;
 }
 
-.btn{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  margin-top:18px;
-  font-weight:700;
-  cursor:pointer;
+.pass-group .toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
-.btn.primary{
-  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-  color:white;
-  font-size:16px;
+.toggle img {
+  width: 22px;
 }
 
-.btn.google{
-  background:white;
-  border:1px solid #ddd;
+.hide {
+  display: none;
 }
 
-.divider{
-  text-align:center;
-  margin:16px 0;
-  color:#888;
+/* Legal checkbox */
+.legal {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 8px;
+  margin-top: 15px;
 }
 
-.signin-link{
-  color:var(--primary);
-  font-weight:700;
+.legal input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d10000;
 }
 
-.toast{
-  position:fixed;
-  bottom:28px;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-  color:#fff;
-  padding:14px 20px;
-  border-radius:14px;
-  font-size:15px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.18);
+.legal .link {
+  color: #d10000;
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border-radius: 13px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #d10000;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(209,0,0,0.3);
+}
+
+.google {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  color: #777;
+}
+
+.signin-link {
+  color: #d10000;
+  font-weight: 600;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #d10000;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 14px;
+  font-size: 15px;
+  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
+  z-index: 1000;
 }
