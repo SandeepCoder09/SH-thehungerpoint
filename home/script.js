@@ -1,19 +1,21 @@
 /* SH — The Hunger Point
-   Option-1 Cashfree Modal Checkout
-   Fully updated to replace Razorpay
+   Option A — Cashfree integration that talks to:
+     POST /create-order
+     POST /verify-payment
+
+   Robust parsing for multiple possible server response shapes.
 */
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
-// Helpers
+// helpers
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
 function showToast(message, duration = 2200) {
   const container = document.getElementById("toast-container");
-  if (!container) return console.log("toast:", message);
-
+  if (!container) { console.log("toast:", message); return; }
   const t = document.createElement("div");
   t.className = "toast";
   t.textContent = message;
@@ -22,25 +24,27 @@ function showToast(message, duration = 2200) {
 }
 
 /* CART STATE */
-let cart = []; // { id, name, price, qty }
+let cart = []; // items: { id, name, price, qty }
 
-/* Cart Helpers */
 function findCartIndex(id) {
   return cart.findIndex(c => c.id === id);
 }
 
 function updateCartCount() {
-  $("#cartCount").textContent = cart.reduce((s, i) => s + i.qty, 0);
+  const el = $("#cartCount");
+  if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
-/* Render Cart */
+/* RENDER CART (modal) */
 function renderCart() {
   const container = $("#cartItems");
+  if (!container) return;
   container.innerHTML = "";
 
   if (cart.length === 0) {
     container.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal").textContent = "₹0";
+    const totalEl = $("#cartTotal");
+    if (totalEl) totalEl.textContent = "₹0";
     updateCartCount();
     return;
   }
@@ -48,217 +52,288 @@ function renderCart() {
   let total = 0;
   cart.forEach(item => {
     total += item.qty * item.price;
+    const node = document.createElement("div");
+    node.className = "cart-item";
+    node.innerHTML = `
+  <div class="meta">
+    <div class="cart-item-name">${item.name}</div>
+    <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
+  </div>
 
-    const div = document.createElement("div");
-    div.className = "cart-item";
-    div.innerHTML = `
-      <div class="meta">
-        <div class="cart-item-name">${item.name}</div>
-        <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
-      </div>
+  <div class="cart-qty-wrap">
+    <button class="cart-dec" data-id="${item.id}">−</button>
+    <span class="cart-qty">${item.qty}</span>
+    <button class="cart-inc" data-id="${item.id}">+</button>
+  </div>
 
-      <div class="cart-qty-wrap">
-        <button class="cart-dec" data-id="${item.id}">−</button>
-        <span class="cart-qty">${item.qty}</span>
-        <button class="cart-inc" data-id="${item.id}">+</button>
-      </div>
-
-      <button class="cart-remove" data-id="${item.id}">✕</button>
-    `;
-    container.appendChild(div);
+  <button class="cart-remove" data-id="${item.id}">✕</button>
+`;
+    container.appendChild(node);
   });
 
-  $("#cartTotal").textContent = "₹" + total;
+  const totalEl = $("#cartTotal");
+  if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
 
-  // Cart button controls
-  container.querySelectorAll(".cart-dec").forEach(b =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.id;
+  // hook cart controls
+  container.querySelectorAll(".cart-dec").forEach(b => {
+    b.addEventListener("click", (e) => {
+      const id = e.currentTarget.dataset.id;
       const idx = findCartIndex(id);
       if (idx >= 0) {
         cart[idx].qty = Math.max(1, cart[idx].qty - 1);
         renderCart();
       }
-    })
-  );
-
-  container.querySelectorAll(".cart-inc").forEach(b =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.id;
+    }, { passive: true });
+  });
+  container.querySelectorAll(".cart-inc").forEach(b => {
+    b.addEventListener("click", (e) => {
+      const id = e.currentTarget.dataset.id;
       const idx = findCartIndex(id);
       if (idx >= 0) {
-        cart[idx].qty++;
+        cart[idx].qty += 1;
         renderCart();
       }
-    })
-  );
-
-  container.querySelectorAll(".cart-remove").forEach(b =>
-    b.addEventListener("click", () => {
-      cart = cart.filter(i => i.id !== b.dataset.id);
+    }, { passive: true });
+  });
+  container.querySelectorAll(".cart-remove").forEach(b => {
+    b.addEventListener("click", (e) => {
+      const id = e.currentTarget.dataset.id;
+      cart = cart.filter(c => c.id !== id);
       renderCart();
-    })
-  );
+    });
+  });
 }
 
-/* Modal */
+/* MODAL open/close */
 function openModal() {
-  $("#overlay").classList.remove("hidden");
-  $("#cartModal").classList.remove("hidden");
+  const overlay = $("#overlay");
+  const modal = $("#cartModal");
+  if (overlay) overlay.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
   renderCart();
 }
-
 function closeModal() {
-  $("#overlay").classList.add("hidden");
-  $("#cartModal").classList.add("hidden");
+  const overlay = $("#overlay");
+  const modal = $("#cartModal");
+  if (overlay) overlay.classList.add("hidden");
+  if (modal) modal.classList.add("hidden");
 }
 
-$("#closeOnlyBtn").addEventListener("click", closeModal);
-$("#cartToggle").addEventListener("click", openModal);
-$("#overlay").addEventListener("click", closeModal);
-$("#closeCart").addEventListener("click", closeModal);
+// Close-only button (does NOT clear cart)
+document.getElementById("closeOnlyBtn")?.addEventListener("click", () => {
+    closeModal();
+});
 
-$("#clearCart").addEventListener("click", () => {
+/* hook cart icon */
+$("#cartToggle")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  openModal();
+});
+
+/* overlay click closes modal */
+$("#overlay")?.addEventListener("click", closeModal);
+
+/* close button in modal */
+$("#closeCart")?.addEventListener("click", closeModal);
+
+/* clear cart button (also close) */
+$("#clearCart")?.addEventListener("click", () => {
   cart = [];
   renderCart();
   closeModal();
 });
 
-/* Menu Add-to-Cart Controls */
-$$(".menu-item").forEach(item => {
-  const qtyDisplay = item.querySelector(".qty");
-  const minus = item.querySelector(".qty-btn.minus");
-  const plus = item.querySelector(".qty-btn.plus");
-  const addBtn = item.querySelector(".add-cart-btn");
+/* Menu: qty controls + add */
+$$(".menu-item").forEach(itemEl => {
+  const qtyEl = itemEl.querySelector(".qty");
+  const dec = itemEl.querySelector(".qty-btn.minus");
+  const inc = itemEl.querySelector(".qty-btn.plus");
+  const addBtn = itemEl.querySelector(".add-cart-btn");
 
-  let qty = Number(qtyDisplay.textContent) || 1;
+  let qty = Number(qtyEl?.textContent) || 1;
+  if (qtyEl) qtyEl.textContent = qty;
 
   const setQty = (v) => {
-    qty = Math.max(1, v);
-    qtyDisplay.textContent = qty;
+    qty = Math.max(1, Math.floor(v));
+    if (qtyEl) qtyEl.textContent = qty;
   };
 
-  minus.addEventListener("click", () => setQty(qty - 1));
-  plus.addEventListener("click", () => setQty(qty + 1));
+  dec?.addEventListener("click", () => setQty(qty - 1));
+  inc?.addEventListener("click", () => setQty(qty + 1));
 
-  addBtn.addEventListener("click", () => {
-    const name = item.dataset.item;
-    const price = Number(item.dataset.price) || PRICE_DEFAULT;
-    const id = name.toLowerCase().replace(/\s+/g, "-");
+  addBtn?.addEventListener("click", () => {
+    const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
+    const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
+    const id = (""+name).toLowerCase().replace(/\s+/g,"-");
 
     const idx = findCartIndex(id);
-
     if (idx >= 0) cart[idx].qty += qty;
     else cart.push({ id, name, price, qty });
 
-    showToast(`${qty} × ${name} added`);
+    showToast(`${qty} × ${name} added to cart`);
     renderCart();
   });
 });
 
-/* Tabs */
+/* Tabs switch */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
-    $$(".tab").forEach(t => t.classList.remove("active"));
+    $$(".tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-
     const tab = btn.dataset.tab;
     $$(".page").forEach(p => p.classList.add("hidden"));
-
-    if (tab) $("#" + tab).classList.remove("hidden");
+    const el = document.getElementById(tab);
+    if (el) el.classList.remove("hidden");
   });
 });
 
-/* DISABLE ADD BUTTONS */
-function lockButtons(disabled) {
-  $$(".add-cart-btn").forEach(b => {
-    b.disabled = disabled;
-    b.textContent = disabled ? "Processing…" : "Add";
-  });
+/* Checkout helpers */
+function setOrderButtonsDisabled(disabled){
+  $$(".add-cart-btn").forEach(b => { b.disabled = disabled; if(!disabled) b.classList.remove("processing"); });
 }
 
-/* Create Order (BACKEND) */
-async function createCashfreeOrder(amount, items) {
-  const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
+async function createOrderOnServer(items, amount) {
+  const resp = await fetch(`${SERVER_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount,
-      items,
-      phone: "9999999999",
-      email: "guest@email.com",
-    }),
+    body: JSON.stringify({ amount, items })
   });
-
-  return res.json();
+  const data = await resp.json();
+  return data;
 }
 
-/* Verify Order */
-async function verifyCashfree(orderId, items) {
-  const res = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ orderId, items }),
-  });
+function parseCreateOrderResponse(data) {
+  // Support a few possible response shapes:
+  // 1) { ok: true, orderId: "...", session: "..." }
+  // 2) { ok: true, data: { order_id: "...", payment_session_id: "..." } }
+  // 3) { ok: true, data: { order_id: "...", session: "..." } }
+  // 4) { ok: true, order_id: "...", payment_session_id: "..." }
+  // 5) legacy: { ok: true, data: { ... } } where fields may be inside data
 
-  return res.json();
+  if (!data || !data.ok) return null;
+
+  // try top-level session/order
+  let session = data.session || data.payment_session_id || data.paymentSessionId || data.payment_session;
+  let orderId = data.orderId || data.order_id || data.orderId || data.order;
+
+  // try inside data
+  if ((!session || !orderId) && data.data) {
+    session = session || data.data.payment_session_id || data.data.session || data.data.paymentSessionId || data.data.payment_session;
+    orderId = orderId || data.data.order_id || data.data.orderId || data.data.order;
+  }
+
+  // try nested 'order' object (some APIs return order: { id, payment_session_id })
+  if ((!session || !orderId) && data.data && data.data.order) {
+    const od = data.data.order;
+    session = session || od.payment_session_id || od.session || od.paymentSessionId;
+    orderId = orderId || od.id || od.order_id;
+  }
+
+  if (session && orderId) return { session, orderId };
+  return null;
 }
 
-/* Checkout */
-$("#checkoutBtn").addEventListener("click", async () => {
-  if (cart.length === 0) return showToast("Cart is empty");
+function openCashfreeModal(sessionId) {
+  if (!window.Cashfree) {
+    showToast("Cashfree SDK not loaded");
+    return;
+  }
+  try {
+    Cashfree.checkout({
+      paymentSessionId: sessionId,
+      redirectTarget: "_modal"
+    });
+  } catch (err) {
+    console.error("Cashfree open error:", err);
+    showToast("Failed to open payment");
+  }
+}
+
+/* Checkout button in modal */
+$("#checkoutBtn")?.addEventListener("click", async () => {
+  if (cart.length === 0) {
+    showToast("Cart is empty");
+    return;
+  }
 
   const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  lockButtons(true);
+  // UI lock
+  setOrderButtonsDisabled(true);
+  $$(".add-cart-btn").forEach(b => { b.classList.add("processing"); b.textContent = "Processing..."; });
 
   try {
-    const cf = await createCashfreeOrder(total, items);
+    const data = await createOrderOnServer(items, total);
 
-    if (!cf.ok) {
-      showToast("Server error");
-      lockButtons(false);
+    const parsed = parseCreateOrderResponse(data);
+    if (!parsed) {
+      console.error("Create order unexpected response:", data);
+      showToast("Server error. Try again.");
+      setOrderButtonsDisabled(false);
       return;
     }
 
-    // OPEN CASHFREE MODAL
-    Cashfree.checkout({
-      paymentSessionId: cf.session,
-      redirectTarget: "_modal",
-    });
+    // open CF modal
+    openCashfreeModal(parsed.session);
 
-    // Listen for Cashfree events
-    window.addEventListener("message", async (ev) => {
-      if (ev.data?.paymentMessage === "SUCCESS") {
-        const v = await verifyCashfree(cf.orderId, items);
-
-        if (v.ok) {
-          cart = [];
-          renderCart();
-          closeModal();
-
-          $$(".menu").forEach(m => (m.style.display = "none"));
-          $("#order-status").classList.remove("hidden");
-          $("#eta-text").textContent = `Order #${v.orderId} confirmed! ETA 15 mins 🍽️`;
-
-          showToast("Order Confirmed!");
-        } else {
-          showToast("Verification failed");
+    // handle message — once only
+    const onMessage = async (ev) => {
+      try {
+        if (ev.data?.paymentMessage === "SUCCESS" || ev.data?.paymentStatus === "SUCCESS") {
+          // Try to determine orderId: prefer parsed.orderId, else check event payload
+          const cfOrderId = parsed.orderId || ev.data?.orderId || ev.data?.order_id || ev.data?.cashfree_order_id;
+          // call verify endpoint with whatever we have
+          const verifyResp = await fetch(`${SERVER_URL}/verify-payment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId: cfOrderId, items })
+          });
+          const verifyJson = await verifyResp.json();
+          if (verifyJson.ok) {
+            cart = [];
+            renderCart();
+            closeModal();
+            $$(".menu").forEach(m => m.style.display = "none");
+            const status = document.getElementById("order-status");
+            if (status) {
+              status.classList.remove("hidden");
+              $("#eta-text").textContent = `Order #${verifyJson.orderId || verifyJson.order_id || "N/A"} confirmed! ETA: 15 mins 🍴`;
+            }
+            showToast("Order confirmed! Enjoy your meal 🍽️", 3000);
+          } else {
+            console.error("Verify returned:", verifyJson);
+            showToast("Payment verification failed.");
+          }
+        } else if (ev.data?.paymentMessage === "FAILED" || ev.data?.paymentMessage === "CANCELLED") {
+          showToast("Payment cancelled.");
         }
+      } catch (err) {
+        console.error("Payment message handler error:", err);
+        showToast("Verification failed. Try later.");
+      } finally {
+        // cleanup UI and remove listener
+        setOrderButtonsDisabled(false);
+        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
+        window.removeEventListener("message", onMessage);
       }
-    });
+    };
+
+    window.addEventListener("message", onMessage, { once: true });
 
   } catch (err) {
     console.error(err);
-    showToast("Checkout failed");
-  } finally {
-    lockButtons(false);
+    showToast("Server error. Try again.");
+    setOrderButtonsDisabled(false);
+    $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
   }
 });
 
-/* Init */
+/* Quick server ping (optional) */
+fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
+
+/* init */
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
