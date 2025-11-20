@@ -1,218 +1,86 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Shipping Policy — SH · The Hunger Point</title>
-
-<!-- Example: change --primary-color to match your website -->
-<style>
-  :root{
-    --primary-color: #E63946;    /* ← REPLACE this with your website primary color */
-    --accent: #FFD166;           /* optional accent (auto-adjust if needed) */
-    --bg: #0f1724;               /* page background (dark) */
-    --card-bg: #0b1220;          /* card background */
-    --muted: #9aa4b2;
-    --text: #e6eef8;
-    --radius: 14px;
-    --max-width: 820px;
-    --shadow: 0 8px 30px rgba(2,6,23,0.6);
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-
-  /* Reset + base */
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    background:linear-gradient(180deg,var(--bg),#061021 140%);
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    padding:40px 20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    line-height:1.45;
-  }
-
-  /* Container */
-  .policy-wrap{
-    width:100%;
-    max-width:var(--max-width);
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    border: 1px solid rgba(255,255,255,0.03);
-    overflow:hidden;
-    display:grid;
-    grid-template-columns: 220px 1fr;
-  }
-
-  /* Left panel (brand) */
-  .brand{
-    padding:28px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-    text-align:center;
-  }
-  .logo{
-    width:72px;
-    height:72px;
-    border-radius:12px;
-    display:grid;
-    place-items:center;
-    background:linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 65%, black 20%));
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--primary-color) 40%, black 60%);
-    font-weight:700;
-    color:white;
-    font-size:26px;
-    letter-spacing:0.6px;
-  }
-  .brand h3{
-    margin:0;
-    font-size:16px;
-    font-weight:700;
-  }
-  .brand p{ margin:0; font-size:12px; color:var(--muted) }
-
-  /* Content */
-  .content{
-    padding:28px 30px;
-  }
-  .content header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    margin-bottom:14px;
-  }
-  .content header h1{
-    margin:0;
-    font-size:18px;
-    letter-spacing:0.2px;
-  }
-  .badge{
-    background:linear-gradient(90deg,var(--primary-color), color-mix(in srgb,var(--primary-color) 70%, black 18%));
-    color:white;
-    padding:8px 12px;
-    border-radius:999px;
-    font-weight:600;
-    font-size:13px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  }
-
-  /* Policy sections */
-  .section{
-    margin:16px 0;
-  }
-  .section h2{
-    margin:0 0 8px 0;
-    font-size:15px;
-    color:var(--text);
-  }
-  .section p, .section li{
-    margin:0 0 8px 0;
-    color:var(--muted);
-    font-size:14px;
-  }
-  .section ul{ padding-left:18px; margin:0 0 8px 0; }
-
-  /* Footer contact */
-  .contact{
-    margin-top:18px;
-    display:flex;
-    gap:12px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .contact a{
-    color:var(--primary-color);
-    text-decoration:none;
-    font-weight:600;
-    font-size:14px;
-  }
-
-  /* Responsive */
-  @media (max-width:720px){
-    .policy-wrap{ grid-template-columns: 1fr; padding:0; }
-    .brand{ padding:20px; flex-direction:row; gap:16px; justify-content:flex-start; }
-    .content{ padding:20px; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shipping Policy | SH - The Hunger Point</title>
+  <link rel="stylesheet" href="shipping.css" />
 </head>
 <body>
 
-<div class="policy-wrap" role="region" aria-label="Shipping policy for SH - The Hunger Point">
-  <div class="brand">
-    <div class="logo" aria-hidden="true">SH</div>
-    <div>
-      <h3>SH · The Hunger Point</h3>
-      <p>Fast. Fresh. Friendly.</p>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <img src="sh-logo.png" alt="SH Logo" class="logo">
+      <h1 class="title">Shipping Policy</h1>
     </div>
-  </div>
+  </header>
 
-  <main class="content">
-    <header>
-      <h1>Shipping & Delivery Policy</h1>
-      <div class="badge">Last updated: 20 Nov 2025</div>
-    </header>
+  <!-- Main Content -->
+  <section class="policy-card">
+    <h2 class="section-title">Shipping Policy</h2>
 
-    <section class="section">
-      <h2>1. Delivery Area</h2>
-      <p>We deliver within selected areas. Delivery availability is shown at checkout — if your address is outside our zone you'll be notified before payment.</p>
-    </section>
+    <p>
+      At SH – The Hunger Point, we work to ensure fast and reliable delivery 
+      for all your food orders. This Shipping Policy explains how we deliver, 
+      handle, and manage your orders.
+    </p>
 
-    <section class="section">
-      <h2>2. Estimated Delivery Time</h2>
-      <ul>
-        <li><strong>Normal orders:</strong> typically <em>25–45 minutes</em> depending on distance and kitchen load.</li>
-        <li><strong>Peak hours:</strong> times may increase due to high demand, traffic or weather.</li>
-        <li><strong>Pre-orders:</strong> scheduled deliveries arrive within 10–15 minutes of selected time slot.</li>
-      </ul>
-    </section>
+    <h3 class="section-heading">1. Delivery Area</h3>
+    <p>
+      We deliver within selected serviceable areas. If your address is outside 
+      our coverage zone, you will be notified during checkout.
+    </p>
 
-    <section class="section">
-      <h2>3. Delivery Charges</h2>
-      <p>Delivery fees are calculated by distance, order value and ongoing promotions. Final charges are displayed at checkout before you pay.</p>
-    </section>
+    <h3 class="section-heading">2. Estimated Delivery Time</h3>
+    <ul>
+      <li><strong>Normal Orders:</strong> 25–45 minutes</li>
+      <li><strong>Peak Hours:</strong> delivery time may increase</li>
+      <li><strong>Pre-Orders:</strong> delivered within 10–15 min of the chosen slot</li>
+    </ul>
 
-    <section class="section">
-      <h2>4. Order Processing</h2>
-      <p>Once your order is placed we confirm it, prepare it fresh, and assign a delivery partner. Real-time tracking updates are available if enabled.</p>
-    </section>
+    <h3 class="section-heading">3. Delivery Charges</h3>
+    <p>
+      Delivery fees vary based on distance, order amount, and current offers. 
+      Final delivery charges are shown before checkout.
+    </p>
 
-    <section class="section">
-      <h2>5. Delays & Exceptions</h2>
-      <p>Delays can occur due to extreme weather, traffic, high demand, or incorrect address/contact info. We'll notify you if an order is significantly delayed.</p>
-    </section>
+    <h3 class="section-heading">4. Order Processing</h3>
+    <p>
+      Once your order is placed, it is confirmed, prepared fresh, and assigned 
+      to a delivery partner for dispatch.
+    </p>
 
-    <section class="section">
-      <h2>6. Failed Delivery</h2>
-      <p>If we cannot reach you or your address is incorrect, the order may be returned to the outlet and marked undeliverable. No refunds are issued for prepared food in such cases.</p>
-    </section>
+    <h3 class="section-heading">5. Delays & Exceptions</h3>
+    <p>
+      Delays may occur due to traffic, weather, high demand, or incorrect 
+      address/contact details. You will be notified in such cases.
+    </p>
 
-    <section class="section">
-      <h2>7. Pickup Option</h2>
-      <p>You may choose to pick up your order from the outlet. Estimated pickup time appears at checkout.</p>
-    </section>
+    <h3 class="section-heading">6. Failed Delivery</h3>
+    <p>
+      Delivery may fail if the address is incorrect or if you are unreachable. 
+      Food items prepared for such orders are non-refundable.
+    </p>
 
-    <section class="section">
-      <h2>8. Packaging & Safety</h2>
-      <p>Orders are packed in food-grade, spill-resistant packaging. We follow hygiene best-practices while preparing and packing your food.</p>
-    </section>
+    <h3 class="section-heading">7. Pickup Orders</h3>
+    <p>
+      You may pick up your order directly from our outlet. Pickup time is shown 
+      at checkout.
+    </p>
 
-    <div class="contact">
-      <p style="margin:0;color:var(--muted)">For delivery queries:</p>
-      <a href="mailto:support@sh-hungerpoint.com">support@sh-hungerpoint.com</a>
-      <a href="tel:+91XXXXXXXXXX">+91-XXXXXXXXXX</a>
-    </div>
-  </main>
-</div>
+    <h3 class="section-heading">8. Packaging</h3>
+    <p>
+      All orders are securely packed using hygienic, food-grade materials.
+    </p>
+
+    <br>
+
+    <p><strong>For any delivery queries:</strong></p>
+    <p>Email: support@sh-hungerpoint.com</p>
+    <p>Phone: +91-XXXXXXXXXX</p>
+
+  </section>
 
 </body>
 </html>
