@@ -1,32 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login — SH The Hunger Point</title>
-
-  <link rel="stylesheet" href="./login.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <title>Admin Login — SH</title>
+  <link rel="stylesheet" href="/admin/login.css">
 </head>
-
 <body>
-
-  <div class="login-container">
+  <main class="login-main">
     <h1>Admin Login</h1>
-
     <form id="loginForm">
-      <input id="email" type="email" placeholder="Admin Email" required />
-
-      <div class="password-field">
-        <input id="password" type="password" placeholder="Password" required />
-        <span id="toggleEye" class="eye">👁️</span>
-      </div>
-
-      <button type="submit">Login</button>
-      <p id="error" class="error"></p>
+      <input id="email" type="email" placeholder="admin email" required />
+      <input id="password" type="password" placeholder="password" required />
+      <button type="submit">Sign in</button>
     </form>
-  </div>
-
-  <script src="./login.js"></script>
+    <div id="loginMsg" class="muted"></div>
+  </main>
+  <script src="/admin/login.js" type="module"></script>
 </body>
 </html>
