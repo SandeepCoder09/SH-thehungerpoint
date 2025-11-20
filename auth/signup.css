@@ -9,7 +9,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  font-family:"Poppins",system-ui;
   background:var(--bg);
   padding:36px;
   display:flex;
@@ -17,45 +17,120 @@ body{
 }
 
 .auth-page{width:100%;max-width:520px}
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-/* header */
-.card-head{padding:18px 20px;background:linear-gradient(90deg,var(--primary),var(--primary-dark));display:flex;align-items:center;gap:14px}
+/* HEADER */
+.card-head{
+  padding:18px 20px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
 .logo-box{display:flex;align-items:center;gap:12px}
-.logo-box img{width:56px;height:56px;object-fit:cover;border-radius:10px;border:3px solid rgba(0,0,0,0.06)}
-.brand{color:#fff;display:flex;flex-direction:column}
+.logo-box img{
+  width:56px;height:56px;
+  border-radius:10px;
+  object-fit:cover;
+}
+
+.brand{color:#fff}
 .brand-sh{font-weight:900;font-size:20px}
-.brand-full{font-size:13px;opacity:0.95;margin-top:2px}
+.brand-full{font-size:13px;opacity:0.9}
 
-/* body */
+/* BODY */
 .card-body{padding:24px}
-label{display:block;font-weight:600;margin-top:12px;color:#222}
-input[type="text"],input[type="email"],input[type="password"],input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #e6e6e6;margin-top:8px;font-size:15px;background:#fff}
-input:focus{outline:none;border-color:rgba(226,55,68,0.18);box-shadow:0 8px 24px rgba(226,55,68,0.04)}
+label{
+  font-weight:600;
+  margin-top:12px;
+  display:block;
+  color:#222;
+}
 
-/* eye inside input */
+input{
+  width:100%;
+  padding:12px 14px;
+  margin-top:8px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:15px;
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 4px 18px rgba(226,55,68,0.12);
+}
+
+/* EYE ICON INSIDE */
 .input-wrap{position:relative}
-.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;padding:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.eye-svg{width:20px;height:20px}
+.eye-btn{
+  position:absolute;
+  top:50%;
+  right:10px;
+  transform:translateY(-50%);
+  background:none;
+  border:0;
+  padding:5px;
+  cursor:pointer;
+}
+.eye-svg{stroke:#E23744}
 
-/* legal */
-.legal{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:14px;color:#333}
-.legal input[type="checkbox"]{width:18px;height:18px;accent-color:var(--primary);margin-top:3px}
+/* LEGAL */
+.legal{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:16px;
+}
+.legal input{accent-color:var(--primary)}
 .legal a{color:var(--primary);font-weight:600}
 
-/* buttons */
-.btn{width:100%;padding:13px;border-radius:12px;margin-top:18px;font-weight:700;cursor:pointer;font-size:15px}
-.btn.primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:#fff;border:0;box-shadow:0 10px 28px rgba(226,55,68,0.18)}
-.btn.google{background:#fff;border:1px solid #e6e6e6;color:#222}
-.btn:focus{outline:none}
+/* BUTTONS */
+.btn{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  margin-top:20px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-/* texts */
-.divider{text-align:center;margin:16px 0;color:#9b9b9b}
-.muted.small{text-align:center;margin-top:12px;color:#666}
+.primary{
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  border:0; /* no border */
+}
+
+.google{
+  background:#fff;
+  border:1px solid #ddd;
+}
+
+.divider{
+  text-align:center;
+  margin:18px 0;
+  color:#666;
+}
+
 .signin-link{color:var(--primary);font-weight:700}
 
-/* toast */
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.24);font-weight:700;z-index:9999}
-
-/* responsive */
-@media(max-width:420px){.auth-page{padding:12px}.card-body{padding:18px}.logo-box img{width:48px;height:48px}}
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 20px;
+  color:#fff;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+  font-weight:600;
+  box-shadow:0 12px 25px rgba(0,0,0,0.25);
+}
