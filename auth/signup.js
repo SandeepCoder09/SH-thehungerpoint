@@ -1,4 +1,4 @@
-// Wait until Firebase config loads
+// Wait for Firebase config to initialize
 async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
@@ -19,33 +19,33 @@ async function waitForAuth() {
   function showToast(msg) {
     toast.textContent = msg;
     toast.hidden = false;
-    setTimeout(() => (toast.hidden = true), 2500);
+    setTimeout(() => toast.hidden = true, 2600);
   }
 
-  // Eye Toggle Setup
-  function setupToggle(fieldId, openId, closeId) {
-    const field = document.getElementById(fieldId);
+  // Eye toggle function
+  function togglePassword(inputId, openId, closeId) {
+    const input = document.getElementById(inputId);
     const open = document.getElementById(openId);
     const close = document.getElementById(closeId);
 
-    open.onclick = () => {
-      field.type = "text";
+    open.addEventListener("click", () => {
+      input.type = "text";
       open.classList.add("hide");
       close.classList.remove("hide");
-    };
+    });
 
-    close.onclick = () => {
-      field.type = "password";
+    close.addEventListener("click", () => {
+      input.type = "password";
       close.classList.add("hide");
       open.classList.remove("hide");
-    };
+    });
   }
 
-  setupToggle("password", "eyeOpen", "eyeClose");
-  setupToggle("confirm", "eyeOpen2", "eyeClose2");
+  togglePassword("password", "eyeOpen", "eyeClose");
+  togglePassword("confirm", "eyeOpen2", "eyeClose2");
 
-  // SUBMIT FORM
-  form.addEventListener("submit", async e => {
+  // Submit Signup
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = document.getElementById("name").value.trim();
@@ -54,13 +54,13 @@ async function waitForAuth() {
     const confirm = document.getElementById("confirm").value;
     const legal = document.getElementById("legalCheck").checked;
 
-    if (!legal) return showToast("You must accept all legal policies.");
+    if (!legal) return showToast("You must accept all policies.");
     if (pass !== confirm) return showToast("Passwords do not match.");
 
     try {
-      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
+      const user = await auth.createUserWithEmailAndPassword(email, pass);
 
-      await db.collection("users").doc(userCred.user.uid).set({
+      await db.collection("users").doc(user.user.uid).set({
         name,
         email,
         createdAt: new Date()
@@ -68,37 +68,34 @@ async function waitForAuth() {
 
       showToast("Account created successfully!");
 
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/home/index.html";
-
-      setTimeout(() => (window.location.href = next), 700);
+      setTimeout(() => {
+        window.location.href = "/home/index.html";
+      }, 900);
 
     } catch (err) {
       showToast(err.message);
     }
   });
 
-  // GOOGLE SIGNUP
-  googleBtn.onclick = async () => {
+  // GOOGLE Signup
+  googleBtn.addEventListener("click", async () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      const userCred = await auth.signInWithPopup(provider);
+      const result = await auth.signInWithPopup(provider);
 
-      if (userCred.additionalUserInfo.isNewUser) {
-        await db.collection("users").doc(userCred.user.uid).set({
-          name: userCred.user.displayName,
-          email: userCred.user.email,
+      if (result.additionalUserInfo.isNewUser) {
+        await db.collection("users").doc(result.user.uid).set({
+          name: result.user.displayName,
+          email: result.user.email,
           createdAt: new Date()
         });
       }
 
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/home/index.html";
-
-      window.location.href = next;
+      window.location.href = "/home/index.html";
 
     } catch (err) {
       showToast(err.message);
     }
-  };
+  });
+
 })();
