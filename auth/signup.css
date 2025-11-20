@@ -1,36 +1,37 @@
 body {
   margin: 0;
   padding: 0;
-  background: #fafafa;
+  background: #f3f3f3;
   font-family: "Poppins", sans-serif;
 }
 
+/* Layout */
 .auth-page {
   display: flex;
   justify-content: center;
-  padding: 40px 0;
+  padding: 40px 12px;
 }
 
 .card {
-  width: 92%;
-  max-width: 420px;
+  width: 100%;
+  max-width: 430px;
   background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
   overflow: hidden;
 }
 
 /* Header */
 .card-head {
-  background: linear-gradient(90deg, #d10000, #ff4747);
+  background: linear-gradient(90deg, #d10000, #ff4d4d);
   padding: 25px;
-  color: white;
+  color: #fff;
 }
 
 .logo-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .logo-box img {
@@ -44,7 +45,7 @@ body {
 
 .title {
   font-size: 22px;
-  margin-top: 10px;
+  margin-top: 12px;
   font-weight: 600;
 }
 
@@ -55,50 +56,53 @@ body {
 
 label {
   display: block;
+  margin-top: 18px;
   font-weight: 600;
-  margin-top: 14px;
-  color: #111;
 }
 
 input {
+  margin-top: 6px;
   width: 100%;
   padding: 13px;
-  margin-top: 6px;
-  font-size: 16px;
   border-radius: 12px;
   border: 1px solid #ddd;
   outline: none;
-  transition: 0.2s;
+  font-size: 15px;
 }
 
 input:focus {
   border-color: #d10000;
 }
 
-/* Password group */
+/* Password Group */
 .pass-group {
   position: relative;
 }
 
-.eye-icon {
+.toggle img {
+  width: 24px;
+  cursor: pointer;
+}
+
+.toggle {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: pointer;
 }
 
 .hide {
   display: none;
 }
 
-/* Legal checkbox */
+/* Legal Checkbox */
 .legal {
   margin-top: 15px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
   font-size: 14px;
+  gap: 8px;
 }
 
 .legal input {
@@ -110,41 +114,41 @@ input:focus {
 .link {
   color: #d10000;
   font-weight: 600;
-  text-decoration: none;
 }
 
 /* Buttons */
 .btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
-  border-radius: 13px;
+  padding: 15px;
+  border-radius: 12px;
   font-weight: 600;
-  font-size: 17px;
+  font-size: 16px;
+  margin-top: 22px;
   cursor: pointer;
-  border: none;
 }
 
 .primary {
   background: #d10000;
   color: white;
+  border: none;
+  box-shadow: 0 5px 25px rgba(209,0,0,0.35);
 }
 
 .google {
-  border: 1px solid #ccc;
   background: #fff;
+  border: 1px solid #ddd;
 }
 
 .divider {
   text-align: center;
   margin: 18px 0;
-  color: #666;
+  color: #777;
 }
 
+/* Sign-in link */
 .signin-link {
   color: #d10000;
-  font-weight: 700;
-  text-decoration: none;
+  font-weight: 600;
 }
 
 /* Toast */
@@ -154,10 +158,10 @@ input:focus {
   left: 50%;
   transform: translateX(-50%);
   background: #d10000;
-  padding: 15px 20px;
-  border-radius: 14px;
   color: white;
+  padding: 14px 20px;
+  border-radius: 14px;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(209,0,0,0.4);
-  z-index: 999;
+  box-shadow: 0 6px 35px rgba(209,0,0,0.45);
+  z-index: 1000;
 }
