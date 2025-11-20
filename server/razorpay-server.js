@@ -1,30 +1,26 @@
-// server/razorpay-server.js
+// server/cashfree-server.js
 // Production-ready backend for SH — The Hunger Point
-// - Robust Firebase Admin init (handles escaped \n in private key)
-// - Env validation and clear logs
-// - Admin login (bcryptjs + JWT)
-// - Admin token verify endpoint
-// - Protected admin endpoints (update order status)
-// - Razorpay create order + verify payment
-// - Health check /ping
+// - Firebase Admin initialization
+// - JWT admin authentication
+// - Admin login + verify + update status
+// - Cashfree create order + verify payment
+// - Health check
 
 import express from "express";
 import cors from "cors";
-import Razorpay from "razorpay";
-import crypto from "crypto";
 import admin from "firebase-admin";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import fetch from "node-fetch";   // required for Cashfree API calls
 
 // -----------------------------
-// Environment variables used by this server (set on Render / environment)
+// Environment variables required:
 // -----------------------------
-/*
-Required:
+
   FIREBASE_TYPE
   FIREBASE_PROJECT_ID
   FIREBASE_PRIVATE_KEY_ID
-  FIREBASE_PRIVATE_KEY     (escaped single-line or real multiline)
+  FIREBASE_PRIVATE_KEY
   FIREBASE_CLIENT_EMAIL
   FIREBASE_CLIENT_ID
   FIREBASE_AUTH_URI
@@ -33,53 +29,20 @@ Required:
   FIREBASE_CLIENT_CERT_URL
   FIREBASE_UNIVERSE_DOMAIN
   JWT_SECRET
-  RZP_KEY_ID
-  RZP_KEY_SECRET
-  PORT (optional)
-*/
+  CF_APP_ID
+  CF_SECRET_KEY
 
-// -----------------------------
-// Helpers
+
 // -----------------------------
 const safeJson = (res, status, obj) => res.status(status).json(obj);
 
 function rebuildPrivateKey(rawKey) {
   if (!rawKey) return null;
-  // If the key was pasted with literal "\n" escapes (common in Render), convert to actual newlines
   return rawKey.includes("\\n") ? rawKey.replace(/\\n/g, "\n") : rawKey;
 }
 
-function checkRequiredEnvs() {
-  const required = [
-    "FIREBASE_TYPE",
-    "FIREBASE_PROJECT_ID",
-    "FIREBASE_PRIVATE_KEY_ID",
-    "FIREBASE_PRIVATE_KEY",
-    "FIREBASE_CLIENT_EMAIL",
-    "FIREBASE_CLIENT_ID",
-    "FIREBASE_AUTH_URI",
-    "FIREBASE_TOKEN_URI",
-    "FIREBASE_AUTH_PROVIDER_CERT_URL",
-    "FIREBASE_CLIENT_CERT_URL",
-    "FIREBASE_UNIVERSE_DOMAIN",
-    "JWT_SECRET",
-    "RZP_KEY_ID",
-    "RZP_KEY_SECRET",
-  ];
-
-  const missing = required.filter((k) => !process.env[k]);
-  if (missing.length) {
-    console.warn("⚠️ Missing environment variables:", missing.join(", "));
-  } else {
-    console.log("✅ All required environment variables present.");
-  }
-}
-
-// Run check early
-checkRequiredEnvs();
-
 // -----------------------------
-// Firebase Admin initialization (robust)
+// Firebase Admin Init
 // -----------------------------
 let db = null;
 try {
@@ -97,10 +60,6 @@ try {
     universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
   };
 
-  if (!serviceAccount.private_key) {
-    throw new Error("FIREBASE_PRIVATE_KEY is empty or incorrectly formatted.");
-  }
-
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
@@ -108,180 +67,174 @@ try {
   db = admin.firestore();
   console.log("✅ Firebase Admin initialized.");
 } catch (err) {
-  console.error("🔥 Firebase Admin initialization failed:", err && err.message ? err.message : err);
-  // db will be null — endpoints that use db will return errors gracefully
+  console.error("🔥 Firebase Admin init failed:", err);
 }
 
 // -----------------------------
-// Razorpay init
-// -----------------------------
-const razorpay = new Razorpay({
-  key_id: process.env.RZP_KEY_ID || "",
-  key_secret: process.env.RZP_KEY_SECRET || "",
-});
-
-// -----------------------------
-// Express setup
+// Express init
 // -----------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check
 app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
 // -----------------------------
-// Middleware: require admin JWT
+// Middleware: Admin Auth
 // -----------------------------
 function requireAdminToken(req, res, next) {
-  const auth = req.headers.authorization || req.headers.Authorization;
+  const auth = req.headers.authorization;
   if (!auth || !auth.startsWith("Bearer ")) {
     return safeJson(res, 401, { ok: false, error: "Unauthorized" });
   }
-  const token = auth.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
+    const token = auth.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.admin = decoded;
-    return next();
-  } catch (err) {
-    console.warn("Invalid admin token:", err && err.message ? err.message : err);
+    next();
+  } catch {
     return safeJson(res, 401, { ok: false, error: "Invalid token" });
   }
 }
 
 // -----------------------------
-// Route: Admin Login
-// POST /admin/login
-// body: { email, password }
+// Admin Login
 // -----------------------------
 app.post("/admin/login", async (req, res) => {
   try {
-    if (!db) {
-      console.error("/admin/login: Firestore not initialized.");
-      return safeJson(res, 500, { ok: false, error: "Server error" });
-    }
-
-    const { email, password } = req.body || {};
-    if (!email || !password) return safeJson(res, 400, { ok: false, error: "Email and password required" });
+    const { email, password } = req.body;
 
     const doc = await db.collection("admins").doc(email).get();
     if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
 
     const adminData = doc.data();
-    const passwordHash = adminData.passwordHash || adminData.password || "";
+    const match = await bcrypt.compare(password, adminData.passwordHash);
 
-    const match = await bcrypt.compare(password, passwordHash);
     if (!match) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
 
-    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET || "", { expiresIn: "7d" });
+    const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
-    console.error("Admin Login Error:", err && err.message ? err.message : err);
+    console.error("Admin login error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// Route: Admin verify (used by admin UI to check token validity)
-// GET /admin/verify (requires Authorization: Bearer <token>)
+// Admin Token Verify
 // -----------------------------
 app.get("/admin/verify", requireAdminToken, (req, res) => {
-  return safeJson(res, 200, { ok: true, email: req.admin.email, role: req.admin.role });
+  return safeJson(res, 200, { ok: true, email: req.admin.email });
 });
 
 // -----------------------------
-// Route: Admin update status (protected)
-// POST /admin/update-status
-// body: { orderId, status }
+// Admin Update Order Status
 // -----------------------------
 app.post("/admin/update-status", requireAdminToken, async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-    const { orderId, status } = req.body || {};
-    if (!orderId || !status) return safeJson(res, 400, { ok: false, error: "orderId and status required" });
+    const { orderId, status } = req.body;
 
     await db.collection("orders").doc(orderId).update({ status });
+
     return safeJson(res, 200, { ok: true });
   } catch (err) {
-    console.error("Update status error:", err && err.message ? err.message : err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// Route: Create Razorpay order
-// POST /create-order
-// body: { amount, items }
+// CASHFREE: CREATE ORDER
+// /create-order
 // -----------------------------
 app.post("/create-order", async (req, res) => {
   try {
-    const { amount, items } = req.body || {};
-    if (!amount || Number(amount) <= 0) return safeJson(res, 400, { ok: false, error: "amount required" });
+    const { amount, items, phone, email } = req.body;
 
-    const rzpOrder = await razorpay.orders.create({
-      amount: Math.round(Number(amount) * 100), // rupees -> paise
-      currency: "INR",
-      receipt: "rcpt_" + Date.now(),
+    if (!amount) return safeJson(res, 400, { ok: false, error: "amount required" });
+
+    const body = {
+      order_amount: Number(amount),
+      order_currency: "INR",
+      customer_details: {
+        customer_id: phone || "guest",
+        customer_phone: phone || "9999999999",
+        customer_email: email || "guest@email.com",
+      },
+      order_meta: {
+        return_url: "https://sh-the-hunger-point.vercel.app/payment-success",
+      },
+    };
+
+    const cfRes = await fetch("https://api.cashfree.com/pg/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-version": "2022-09-01",
+        "x-client-id": process.env.CF_APP_ID,
+        "x-client-secret": process.env.CF_SECRET_KEY,
+      },
+      body: JSON.stringify(body),
     });
 
-    return safeJson(res, 200, { ok: true, order: rzpOrder, key_id: process.env.RZP_KEY_ID });
+    const data = await cfRes.json();
+
+    return safeJson(res, 200, { ok: true, data });
   } catch (err) {
-    console.error("Create order error:", err && err.message ? err.message : err);
-    return safeJson(res, 500, { ok: false, error: "Failed to create order" });
+    console.error("Cashfree create order error:", err);
+    return safeJson(res, 500, { ok: false, error: "Cashfree order failed" });
   }
 });
 
 // -----------------------------
-// Route: Verify Razorpay payment
-// POST /verify-payment
-// body: { razorpay_order_id, razorpay_payment_id, razorpay_signature, items }
+// CASHFREE: VERIFY PAYMENT
+// /verify-payment
 // -----------------------------
 app.post("/verify-payment", async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items } = req.body || {};
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return safeJson(res, 400, { ok: false, error: "Missing payment fields" });
+    const { orderId, items } = req.body;
+
+    const resp = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`, {
+      headers: {
+        "x-api-version": "2022-09-01",
+        "x-client-id": process.env.CF_APP_ID,
+        "x-client-secret": process.env.CF_SECRET_KEY,
+      },
+    });
+
+    const data = await resp.json();
+
+    if (data.order_status !== "PAID") {
+      return safeJson(res, 200, { ok: false, error: "Payment not completed" });
     }
 
-    const hmac = crypto.createHmac("sha256", process.env.RZP_KEY_SECRET || "");
-    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
-    const generatedSignature = hmac.digest("hex");
-
-    if (generatedSignature !== razorpay_signature) {
-      console.warn("Payment verification failed (signature mismatch).");
-      return safeJson(res, 200, { ok: false, error: "Payment verification failed" });
-    }
-
-    const orderId = "ORD" + Date.now();
     const total =
-      items && Array.isArray(items) ? items.reduce((s, it) => s + (Number(it.price || 0) * Number(it.qty || 1)), 0) : 0;
+      items && Array.isArray(items)
+        ? items.reduce((s, it) => s + it.price * it.qty, 0)
+        : 0;
 
-    if (!db) {
-      console.error("DB not initialized when saving order.");
-      return safeJson(res, 500, { ok: false, error: "Server error" });
-    }
+    const newOrderId = "ORD" + Date.now();
 
-    await db.collection("orders").doc(orderId).set({
-      orderId,
+    await db.collection("orders").doc(newOrderId).set({
+      orderId: newOrderId,
       items,
       amount: total,
-      razorpay_order_id,
-      razorpay_payment_id,
+      cashfree_order_id: orderId,
       timestamp: Date.now(),
       status: "paid",
     });
 
-    return safeJson(res, 200, { ok: true, orderId });
+    return safeJson(res, 200, { ok: true, orderId: newOrderId });
   } catch (err) {
-    console.error("Verify payment error:", err && err.message ? err.message : err);
+    console.error("Cashfree verify payment error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// Start server
+// START SERVER
 // -----------------------------
-const PORT = Number(process.env.PORT) || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 SH Hunger Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () =>
+  console.log(`🚀 SH Cashfree Server running on port ${PORT}`)
+);
