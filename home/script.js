@@ -1,10 +1,8 @@
-/* /home/script.js
-   Centered cart modal (Option B) JS
-   Preserves Razorpay flow + server endpoints
-*/
+/* /home/script.js — Cashfree Integrated Version */
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
+const CASHFREE_MODE = "production"; // use "sandbox" for testing
 
 // helpers
 const $ = (s) => document.querySelector(s);
@@ -72,7 +70,6 @@ function renderCart() {
   if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
 
-  // hook cart controls
   container.querySelectorAll(".cart-dec").forEach(b => {
     b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
@@ -81,8 +78,9 @@ function renderCart() {
         cart[idx].qty = Math.max(1, cart[idx].qty - 1);
         renderCart();
       }
-    }, { passive: true });
+    });
   });
+
   container.querySelectorAll(".cart-inc").forEach(b => {
     b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
@@ -91,8 +89,9 @@ function renderCart() {
         cart[idx].qty += 1;
         renderCart();
       }
-    }, { passive: true });
+    });
   });
+
   container.querySelectorAll(".cart-remove").forEach(b => {
     b.addEventListener("click", (e) => {
       const id = e.currentTarget.dataset.id;
@@ -104,65 +103,43 @@ function renderCart() {
 
 /* MODAL open/close */
 function openModal() {
-  const overlay = $("#overlay");
-  const modal = $("#cartModal");
-  if (overlay) overlay.classList.remove("hidden");
-  if (modal) modal.classList.remove("hidden");
+  $("#overlay")?.classList.remove("hidden");
+  $("#cartModal")?.classList.remove("hidden");
   renderCart();
 }
 function closeModal() {
-  const overlay = $("#overlay");
-  const modal = $("#cartModal");
-  if (overlay) overlay.classList.add("hidden");
-  if (modal) modal.classList.add("hidden");
+  $("#overlay")?.classList.add("hidden");
+  $("#cartModal")?.classList.add("hidden");
 }
 
-// Close-only button (does NOT clear cart)
-document.getElementById("closeOnlyBtn")?.addEventListener("click", () => {
-    closeModal();  // uses your existing modal close function
-});
-
-/* hook cart icon */
-$("#cartToggle")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  openModal();
-});
-
-/* overlay click closes modal */
+$("#closeOnlyBtn")?.addEventListener("click", closeModal);
+$("#cartToggle")?.addEventListener("click", openModal);
 $("#overlay")?.addEventListener("click", closeModal);
-
-/* close button in modal */
 $("#closeCart")?.addEventListener("click", closeModal);
 
-/* clear cart button (also close) */
 $("#clearCart")?.addEventListener("click", () => {
   cart = [];
   renderCart();
   closeModal();
 });
 
-/* Menu: qty controls + add */
+/* Menu + Add to Cart */
 $$(".menu-item").forEach(itemEl => {
   const qtyEl = itemEl.querySelector(".qty");
-  const dec = itemEl.querySelector(".qty-btn.minus");
-  const inc = itemEl.querySelector(".qty-btn.plus");
-  const addBtn = itemEl.querySelector(".add-cart-btn");
-
-  let qty = Number(qtyEl?.textContent) || 1;
-  if (qtyEl) qtyEl.textContent = qty;
+  let qty = Number(qtyEl.textContent);
 
   const setQty = (v) => {
-    qty = Math.max(1, Math.floor(v));
-    if (qtyEl) qtyEl.textContent = qty;
+    qty = Math.max(1, v);
+    qtyEl.textContent = qty;
   };
 
-  dec?.addEventListener("click", () => setQty(qty - 1));
-  inc?.addEventListener("click", () => setQty(qty + 1));
+  itemEl.querySelector(".qty-btn.minus")?.addEventListener("click", () => setQty(qty - 1));
+  itemEl.querySelector(".qty-btn.plus")?.addEventListener("click", () => setQty(qty + 1));
 
-  addBtn?.addEventListener("click", () => {
-    const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
-    const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
-    const id = (""+name).toLowerCase().replace(/\s+/g,"-");
+  itemEl.querySelector(".add-cart-btn")?.addEventListener("click", () => {
+    const name = itemEl.dataset.item;
+    const price = Number(itemEl.dataset.price);
+    const id = name.toLowerCase().replace(/\s+/g, "-");
 
     const idx = findCartIndex(id);
     if (idx >= 0) cart[idx].qty += qty;
@@ -173,130 +150,123 @@ $$(".menu-item").forEach(itemEl => {
   });
 });
 
-/* Tabs switch */
+/* TABS */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     $$(".tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     const tab = btn.dataset.tab;
     $$(".page").forEach(p => p.classList.add("hidden"));
-    const el = document.getElementById(tab);
-    if (el) el.classList.remove("hidden");
+    document.getElementById(tab)?.classList.remove("hidden");
   });
 });
 
-/* Checkout flow (Razorpay) */
+/* Checkout Helpers */
 function setOrderButtonsDisabled(disabled){
-  $$(".add-cart-btn").forEach(b => { b.disabled = disabled; if(!disabled) b.classList.remove("processing"); });
+  $$(".add-cart-btn").forEach(b => {
+    b.disabled = disabled;
+    if(disabled) b.classList.add("processing");
+    else b.classList.remove("processing");
+  });
 }
 
+/* Create order on server */
 async function createOrderOnServer(items, amount) {
   const resp = await fetch(`${SERVER_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount, items })
   });
-  if (!resp.ok) throw new Error("Network error creating order");
   const data = await resp.json();
-  if (!data || !data.ok || !data.order) throw new Error(data?.error || "Order creation failed");
-  return data;
+  if (!data.ok) throw new Error(data.error || "Order creation failed");
+  return data.data;
 }
 
-function openRazorpay(data, items) {
-  if (!window.Razorpay) {
-    showToast("Razorpay script not loaded.");
-    return;
+/* Load Cashfree SDK */
+function loadCashfreeSdk() {
+  return new Promise((resolve, reject) => {
+    if (window.Cashfree) return resolve(window.Cashfree);
+    const s = document.createElement("script");
+    s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    s.onload = () => resolve(window.Cashfree);
+    s.onerror = () => reject();
+    document.head.appendChild(s);
+  });
+}
+
+/* Open Cashfree Checkout */
+async function openCashfreeCheckout(cfData) {
+  await loadCashfreeSdk();
+  const cf = window.Cashfree({ mode: CASHFREE_MODE });
+
+  const paymentSessionId =
+    cfData.payment_session_id ||
+    (cfData.order && cfData.order.payment_session_id);
+
+  return new Promise((resolve, reject) => {
+    cf.checkout({
+      paymentSessionId,
+      redirectTarget: "_self",
+      onClose: () => resolve({ closed: true }),
+      onSuccess: (result) => resolve(result),
+      onError: (err) => reject(err),
+    });
+  });
+}
+
+/* Poll Server For Verification */
+async function pollVerifyPayment(orderId, items) {
+  for (let i = 0; i < 10; i++) {
+    const resp = await fetch(`${SERVER_URL}/verify-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId, items })
+    });
+
+    const data = await resp.json();
+    if (data.ok) return data; 
+    await new Promise(r => setTimeout(r, 2000));
   }
-
-  const options = {
-    key: data.key_id || data.key || "",
-    amount: data.order.amount,
-    currency: "INR",
-    name: "SH — The Hunger Point",
-    description: items.map(i => `${i.name}×${i.qty}`).join(", "),
-    order_id: data.order.id,
-    handler: async function (resp) {
-      try {
-        const verify = await fetch(`${SERVER_URL}/verify-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: resp.razorpay_order_id,
-            razorpay_payment_id: resp.razorpay_payment_id,
-            razorpay_signature: resp.razorpay_signature,
-            items
-          })
-        });
-
-        if (!verify.ok) throw new Error("Verify network error");
-        const result = await verify.json();
-
-        if (result.ok) {
-          cart = [];
-          renderCart();
-          closeModal();
-          // optionally hide menu and show confirmation
-          $$(".menu").forEach(m => m.style.display = "none");
-          const status = document.getElementById("order-status");
-          if (status) {
-            status.classList.remove("hidden");
-            $("#eta-text").textContent = `Order #${result.orderId} confirmed! ETA: 15 mins 🍴`;
-          }
-          showToast("Order confirmed! Enjoy your meal 🍽️", 3000);
-        } else {
-          console.error("Verification failed", result);
-          showToast("Payment verification failed.");
-          setOrderButtonsDisabled(false);
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("Verification failed. Try later.");
-        setOrderButtonsDisabled(false);
-      } finally {
-        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
-      }
-    },
-    modal: {
-      ondismiss: function () {
-        setOrderButtonsDisabled(false);
-        $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
-      }
-    }
-  };
-
-  const rzp = new Razorpay(options);
-  rzp.open();
+  return { ok: false };
 }
 
-/* Checkout button in modal */
+/* Checkout Button */
 $("#checkoutBtn")?.addEventListener("click", async () => {
-  if (cart.length === 0) {
-    showToast("Cart is empty");
-    return;
-  }
+  if (cart.length === 0) return showToast("Cart is empty");
 
   const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  // UI lock
   setOrderButtonsDisabled(true);
-  $$(".add-cart-btn").forEach(b => { b.classList.add("processing"); b.textContent = "Processing..."; });
 
   try {
-    const data = await createOrderOnServer(items, total);
-    openRazorpay(data, items);
+    const cfData = await createOrderOnServer(items, total);
+    const res = await openCashfreeCheckout(cfData);
+
+    const orderId = cfData.order_id || cfData.order?.order_id;
+
+    const verify = await pollVerifyPayment(orderId, items);
+
+    if (verify.ok) {
+      cart = [];
+      renderCart();
+      closeModal();
+      $$(".menu").forEach(m => m.style.display = "none");
+      $("#order-status").classList.remove("hidden");
+      $("#eta-text").textContent = `Order #${verify.orderId} confirmed! ETA: 15 mins 🍴`;
+      showToast("Order confirmed!", 3000);
+    } else {
+      showToast("Payment not verified.");
+    }
+
   } catch (err) {
-    console.error(err);
-    showToast("Server error. Try again.");
-    setOrderButtonsDisabled(false);
-    $$(".add-cart-btn").forEach(b => { b.classList.remove("processing"); b.textContent = "Add"; });
+    showToast("Payment failed.");
   }
+
+  setOrderButtonsDisabled(false);
 });
 
-/* Quick server ping (optional) */
-fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
-
-/* init */
+/* INIT */
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
