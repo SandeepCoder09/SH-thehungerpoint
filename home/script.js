@@ -1,6 +1,7 @@
-/* SH — The Hunger Point
-   Cashfree (Option A) — Full Working Version
-   Uses:
+/* home/script.js
+   SH — The Hunger Point
+   Option A — Cashfree v3 compatible script
+   Backend routes used:
      POST /create-cashfree-order
      POST /verify-cashfree-payment
 */
@@ -14,8 +15,7 @@ const $$ = (s) => Array.from(document.querySelectorAll(s));
 
 function showToast(message, duration = 2200) {
   const container = $("#toast-container");
-  if (!container) return console.log("toast:", message);
-
+  if (!container) { console.log("toast:", message); return; }
   const t = document.createElement("div");
   t.className = "toast";
   t.textContent = message;
@@ -23,35 +23,35 @@ function showToast(message, duration = 2200) {
   setTimeout(() => t.remove(), duration);
 }
 
-/* CART */
-let cart = [];
-
-const findCartIndex = (id) => cart.findIndex(i => i.id === id);
+/* CART STATE */
+let cart = []; // { id, name, price, qty }
+const findCartIndex = (id) => cart.findIndex(c => c.id === id);
 
 function updateCartCount() {
-  $("#cartCount").textContent = cart.reduce((s, i) => s + i.qty, 0);
+  const el = $("#cartCount");
+  if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
+/* Render Cart */
 function renderCart() {
-  const box = $("#cartItems");
-  box.innerHTML = "";
+  const container = $("#cartItems");
+  if (!container) return;
+  container.innerHTML = "";
 
   if (cart.length === 0) {
-    box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal").textContent = "₹0";
+    container.innerHTML = `<p class="empty">Cart is empty</p>`;
+    const tEl = $("#cartTotal");
+    if (tEl) tEl.textContent = "₹0";
     updateCartCount();
     return;
   }
 
   let total = 0;
-
   cart.forEach(item => {
     total += item.qty * item.price;
-
-    const row = document.createElement("div");
-    row.className = "cart-item";
-
-    row.innerHTML = `
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
       <div class="meta">
         <div class="cart-item-name">${item.name}</div>
         <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
@@ -65,93 +65,87 @@ function renderCart() {
 
       <button class="cart-remove" data-id="${item.id}">✕</button>
     `;
-
-    box.appendChild(row);
+    container.appendChild(div);
   });
 
-  $("#cartTotal").textContent = "₹" + total;
+  const totalEl = $("#cartTotal");
+  if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
 
-  // Minus
-  box.querySelectorAll(".cart-dec").forEach(btn =>
-    btn.addEventListener("click", () => {
-      const idx = findCartIndex(btn.dataset.id);
+  // controls
+  container.querySelectorAll(".cart-dec").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      const idx = findCartIndex(id);
       if (idx >= 0) {
         cart[idx].qty = Math.max(1, cart[idx].qty - 1);
         renderCart();
       }
-    })
-  );
+    }, { passive: true });
+  });
 
-  // Plus
-  box.querySelectorAll(".cart-inc").forEach(btn =>
-    btn.addEventListener("click", () => {
-      const idx = findCartIndex(btn.dataset.id);
+  container.querySelectorAll(".cart-inc").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      const idx = findCartIndex(id);
       if (idx >= 0) {
-        cart[idx].qty++;
+        cart[idx].qty += 1;
         renderCart();
       }
-    })
-  );
+    }, { passive: true });
+  });
 
-  // Remove
-  box.querySelectorAll(".cart-remove").forEach(btn =>
-    btn.addEventListener("click", () => {
-      cart = cart.filter(i => i.id !== btn.dataset.id);
+  container.querySelectorAll(".cart-remove").forEach(b => {
+    b.addEventListener("click", () => {
+      cart = cart.filter(i => i.id !== b.dataset.id);
       renderCart();
-    })
-  );
+    });
+  });
 }
 
 /* Modal */
 function openModal() {
-  $("#overlay").classList.remove("hidden");
-  $("#cartModal").classList.remove("hidden");
+  $("#overlay")?.classList.remove("hidden");
+  $("#cartModal")?.classList.remove("hidden");
   renderCart();
 }
 function closeModal() {
-  $("#overlay").classList.add("hidden");
-  $("#cartModal").classList.add("hidden");
+  $("#overlay")?.classList.add("hidden");
+  $("#cartModal")?.classList.add("hidden");
 }
 
-$("#cartToggle").addEventListener("click", openModal);
-$("#overlay").addEventListener("click", closeModal);
-$("#closeCart").addEventListener("click", closeModal);
-$("#closeOnlyBtn").addEventListener("click", closeModal);
+/* hook modal & buttons safely */
+document.getElementById("closeOnlyBtn")?.addEventListener("click", closeModal);
+$("#cartToggle")?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
+$("#overlay")?.addEventListener("click", closeModal);
+$("#closeCart")?.addEventListener("click", closeModal);
+$("#clearCart")?.addEventListener("click", () => { cart = []; renderCart(); closeModal(); });
 
-$("#clearCart").addEventListener("click", () => {
-  cart = [];
-  renderCart();
-  closeModal();
-});
-
-/* Menu Items Add to Cart */
+/* Menu Add to Cart */
 $$(".menu-item").forEach(item => {
-  const qtyEl = item.querySelector(".qty");
+  const qtyDisplay = item.querySelector(".qty");
   const minus = item.querySelector(".qty-btn.minus");
   const plus = item.querySelector(".qty-btn.plus");
   const addBtn = item.querySelector(".add-cart-btn");
 
-  let qty = Number(qtyEl.textContent) || 1;
+  let qty = Number(qtyDisplay?.textContent) || 1;
+  if (qtyDisplay) qtyDisplay.textContent = qty;
 
   const setQty = (v) => {
-    qty = Math.max(1, v);
-    qtyEl.textContent = qty;
+    qty = Math.max(1, Math.floor(v));
+    if (qtyDisplay) qtyDisplay.textContent = qty;
   };
 
-  minus.addEventListener("click", () => setQty(qty - 1));
-  plus.addEventListener("click", () => setQty(qty + 1));
+  minus?.addEventListener("click", () => setQty(qty - 1));
+  plus?.addEventListener("click", () => setQty(qty + 1));
 
-  addBtn.addEventListener("click", () => {
-    const name = item.dataset.item;
+  addBtn?.addEventListener("click", () => {
+    const name = item.dataset.item || item.querySelector("h3")?.textContent || "Item";
     const price = Number(item.dataset.price) || PRICE_DEFAULT;
-    const id = name.toLowerCase().replace(/\s+/g, "-");
-
+    const id = (""+name).toLowerCase().replace(/\s+/g,"-");
     const idx = findCartIndex(id);
-
     if (idx >= 0) cart[idx].qty += qty;
     else cart.push({ id, name, price, qty });
-
     showToast(`${qty} × ${name} added to cart`);
     renderCart();
   });
@@ -160,36 +154,30 @@ $$(".menu-item").forEach(item => {
 /* Tabs */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
-    $$(".tab").forEach(b => b.classList.remove("active"));
+    $$(".tab").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
-
-    const tabName = btn.dataset.tab;
     $$(".page").forEach(p => p.classList.add("hidden"));
-    if (tabName) $("#" + tabName).classList.remove("hidden");
+    const tab = btn.dataset.tab;
+    if (tab) document.getElementById(tab)?.classList.remove("hidden");
   });
 });
 
 /* Disable add buttons during checkout */
-function lockButtons(disabled) {
+function setOrderButtonsDisabled(disabled) {
   $$(".add-cart-btn").forEach(b => {
     b.disabled = disabled;
     b.textContent = disabled ? "Processing…" : "Add";
+    if (!disabled) b.classList.remove("processing");
   });
 }
 
-/* Backend API calls */
+/* Backend API helpers (routes already present on your server) */
 async function createCashfreeOrder(amount, items) {
   const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount,
-      items,
-      phone: "9999999999",
-      email: "guest@example.com",
-    }),
+    body: JSON.stringify({ amount, items, phone: "9999999999", email: "guest@example.com" }),
   });
-
   return res.json();
 }
 
@@ -199,73 +187,187 @@ async function verifyCashfree(orderId, items) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, items }),
   });
-
   return res.json();
 }
 
-/* Checkout */
-$("#checkoutBtn").addEventListener("click", async () => {
+/* -------------------------
+   Cashfree v3 SDK handling
+   ------------------------- */
+let cashfree = null;
+let cashfreeMode = "production"; // change to "test" if using Cashfree test keys
+
+// Attempt to initialize Cashfree SDK once the page loads.
+// Cashfree v3 exposes a top-level `Cashfree` factory function.
+function initCashfreeSDK() {
+  if (window.Cashfree && typeof window.Cashfree === "function") {
+    try {
+      cashfree = Cashfree({ mode: cashfreeMode });
+      console.log("Cashfree SDK initialized (v3).");
+    } catch (err) {
+      console.error("Error creating Cashfree instance:", err);
+      cashfree = null;
+    }
+  } else if (window.Cashfree && typeof window.Cashfree.checkout === "function") {
+    // fallback: if older version exposes checkout directly
+    cashfree = window.Cashfree;
+    console.warn("Using fallback Cashfree object (older SDK style).");
+  } else {
+    console.warn("Cashfree SDK not found on window (sdk script may not have loaded).");
+    cashfree = null;
+  }
+}
+
+/* Nice wrapper that tries both v3 instance and older checkout signature */
+function openCashfreeModal(paymentSessionId) {
+  if (!paymentSessionId) {
+    showToast("Missing payment session");
+    return;
+  }
+
+  if (!cashfree) {
+    // try to initialize again (maybe SDK finished loading)
+    initCashfreeSDK();
+    if (!cashfree) {
+      showToast("Payment SDK failed to load");
+      return;
+    }
+  }
+
+  try {
+    // Preferred v3 usage: cashfree.checkout({ paymentSessionId, redirectTarget })
+    if (typeof cashfree === "function" || (cashfree && cashfree.checkout && typeof cashfree.checkout === "function")) {
+      // cashfree might be the factory function or the instance depending on how we set it above
+      // If cashfree is the factory function, we created an instance earlier and overrwrote `cashfree`.
+      // Call checkout on instance.
+      if (cashfree.checkout) {
+        cashfree.checkout({ paymentSessionId, redirectTarget: "_modal" });
+      } else {
+        // if somehow cashfree is the factory function (rare here), create instance now
+        const inst = Cashfree({ mode: cashfreeMode });
+        inst.checkout({ paymentSessionId, redirectTarget: "_modal" });
+      }
+    } else {
+      showToast("Payment SDK incompatible");
+      console.error("Unsupported cashfree object:", cashfree);
+    }
+  } catch (err) {
+    console.error("Failed to open Cashfree checkout:", err);
+    showToast("Failed to open payment");
+  }
+}
+
+/* Checkout flow */
+$("#checkoutBtn")?.addEventListener("click", async () => {
   if (cart.length === 0) return showToast("Cart is empty");
 
   const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
-  lockButtons(true);
+  // UI lock
+  setOrderButtonsDisabled(true);
 
   try {
-    const cf = await createCashfreeOrder(total, items);
+    const createResp = await createCashfreeOrder(total, items);
 
-    if (!cf.ok) {
-      showToast("Server error");
-      lockButtons(false);
+    // server should return ok: true and at least session + order id (various shapes handled)
+    if (!createResp || !createResp.ok) {
+      console.error("Create order returned:", createResp);
+      showToast(createResp?.error || "Server error");
+      setOrderButtonsDisabled(false);
       return;
     }
 
-    // Open Cashfree modal
-    Cashfree.checkout({
-      paymentSessionId: cf.session,
-      redirectTarget: "_modal",
-    });
+    // Parse possible response shapes
+    // prefer top-level session/order; fallback to data.*
+    let session = createResp.session || createResp.payment_session_id || createResp.paymentSessionId;
+    let cfOrderId = createResp.orderId || createResp.order_id || createResp.orderId;
 
-    // Listen for payment result
-    const onMsg = async (ev) => {
+    if (createResp.data) {
+      session = session || createResp.data.payment_session_id || createResp.data.session || createResp.data.paymentSessionId;
+      cfOrderId = cfOrderId || createResp.data.order_id || createResp.data.orderId || createResp.data.order;
+      if (!session && createResp.data.order && (createResp.data.order.payment_session_id || createResp.data.order.session)) {
+        session = createResp.data.order.payment_session_id || createResp.data.order.session;
+      }
+    }
+
+    if (!session) {
+      console.error("No session in create order response:", createResp);
+      showToast("Payment session missing");
+      setOrderButtonsDisabled(false);
+      return;
+    }
+
+    // open Cashfree modal
+    openCashfreeModal(session);
+
+    // Listen once for the postMessage from Cashfree (v3 still uses postMessage)
+    const onMessage = async (ev) => {
       try {
-        if (ev.data?.paymentMessage === "SUCCESS") {
-          const verify = await verifyCashfree(cf.orderId, items);
+        // Cashfree may send different fields; check common ones
+        const okPayment = ev.data?.paymentMessage === "SUCCESS" || ev.data?.paymentStatus === "SUCCESS";
+        const failedPayment = ev.data?.paymentMessage === "FAILED" || ev.data?.paymentMessage === "CANCELLED" || ev.data?.paymentStatus === "FAILED";
 
-          if (verify.ok) {
+        if (okPayment) {
+          // if event includes cf order id, use it; else use server-provided cfOrderId
+          const detectedCfOrderId = ev.data?.orderId || ev.data?.order_id || ev.data?.cashfree_order_id || cfOrderId;
+
+          // Verify with backend
+          const v = await verifyCashfree(detectedCfOrderId, items);
+
+          if (v.ok) {
             cart = [];
             renderCart();
             closeModal();
 
+            // Hide menu and show order status
             $$(".menu").forEach(m => (m.style.display = "none"));
-            $("#order-status").classList.remove("hidden");
-            $("#eta-text").textContent = `Order #${verify.orderId} confirmed! ETA 15 mins 🍽️`;
+            const status = $("#order-status");
+            if (status) {
+              status.classList.remove("hidden");
+              $("#eta-text").textContent = `Order #${v.orderId || v.order_id || "N/A"} confirmed! ETA 15 mins 🍴`;
+            }
 
-            showToast("Order Confirmed!");
+            showToast("Order confirmed! Enjoy your meal 🍽️", 3000);
           } else {
-            showToast("Verification failed");
+            console.error("Verify response:", v);
+            showToast("Payment verification failed");
           }
+        } else if (failedPayment) {
+          showToast("Payment was cancelled/failed");
+        } else {
+          // unrelated message — ignore
         }
-      } catch {
-        showToast("Verification failed");
+      } catch (err) {
+        console.error("Payment message handler error:", err);
+        showToast("Verification error");
       } finally {
-        window.removeEventListener("message", onMsg);
-        lockButtons(false);
+        // restore UI & cleanup
+        setOrderButtonsDisabled(false);
+        window.removeEventListener("message", onMessage);
       }
     };
 
-    window.addEventListener("message", onMsg);
+    window.addEventListener("message", onMessage, { once: true, passive: true });
+
   } catch (err) {
-    console.error(err);
+    console.error("Checkout error:", err);
     showToast("Checkout error");
-  } finally {
-    lockButtons(false);
+    setOrderButtonsDisabled(false);
   }
 });
 
-/* Init */
+/* Quick server ping (optional) */
+fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
+
+/* Init on DOM ready */
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
+
+  // Try initialize Cashfree SDK (SDK script is loaded with defer, so it should be available)
+  initCashfreeSDK();
+
+  // If SDK loads later, also attempt init again shortly (helps if network delay)
+  setTimeout(() => { if (!cashfree) initCashfreeSDK(); }, 2000);
+  setTimeout(() => { if (!cashfree) initCashfreeSDK(); }, 5000);
 });
