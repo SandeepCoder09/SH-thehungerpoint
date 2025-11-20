@@ -1,36 +1,36 @@
 // server/cashfree-server.js
-// SH — The Hunger Point (Cashfree Payment Gateway)
-// ------------------------------------------------
-// Features:
-// - Firebase Admin Init
-// - Admin login + JWT auth
-// - Admin order status update
-// - Cashfree create order + verify payment
-// - Works with frontend Option-1 (Cashfree.checkout)
-// ------------------------------------------------
-
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import fetch from "node-fetch"; // Cashfree API calls
+import fetch from "node-fetch";
 
 // -----------------------------
-// Helpers
+// Env check (helpful logs)
 // -----------------------------
-const safeJson = (res, status, obj) => res.status(status).json(obj);
-
-function rebuildPrivateKey(rawKey) {
-  if (!rawKey) return null;
-  return rawKey.includes("\\n") ? rawKey.replace(/\\n/g, "\n") : rawKey;
+function rebuildPrivateKey(raw) {
+  if (!raw) return null;
+  return raw.includes("\\n") ? raw.replace(/\\n/g, "\n") : raw;
 }
+const requiredEnvs = [
+  "FIREBASE_TYPE",
+  "FIREBASE_PROJECT_ID",
+  "FIREBASE_PRIVATE_KEY_ID",
+  "FIREBASE_PRIVATE_KEY",
+  "FIREBASE_CLIENT_EMAIL",
+  "JWT_SECRET",
+  "CF_APP_ID",
+  "CF_SECRET_KEY"
+];
+requiredEnvs.forEach(k => {
+  if (!process.env[k]) console.warn("Missing env:", k);
+});
 
 // -----------------------------
-// Firebase Admin Initialization
+// Firebase init
 // -----------------------------
 let db = null;
-
 try {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
@@ -43,69 +43,61 @@ try {
     token_uri: process.env.FIREBASE_TOKEN_URI,
     auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
     client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
-    universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+    universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
   };
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   db = admin.firestore();
-  console.log("✅ Firebase Admin initialized.");
+  console.log("✅ Firebase Admin initialized");
 } catch (err) {
-  console.error("🔥 Firebase Admin init failed:", err);
+  console.error("🔥 Firebase init failed:", err && err.message ? err.message : err);
 }
 
 // -----------------------------
-// Express Init
+// Helpers
 // -----------------------------
-const app = express();
-app.use(cors());
-app.use(express.json());
+const safeJson = (res, status, obj) => res.status(status).json(obj);
 
-// Health check
-app.get("/ping", (req, res) => res.send("Server Awake ✔"));
-
-// -----------------------------
-// Admin Auth Middleware
-// -----------------------------
 function requireAdminToken(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith("Bearer ")) {
-    return safeJson(res, 401, { ok: false, error: "Unauthorized" });
-  }
-
+  const auth = req.headers.authorization || req.headers.Authorization;
+  if (!auth || !auth.startsWith("Bearer ")) return safeJson(res, 401, { ok: false, error: "Unauthorized" });
+  const token = auth.split(" ")[1];
   try {
-    const token = auth.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
     req.admin = decoded;
     next();
-  } catch {
+  } catch (err) {
     return safeJson(res, 401, { ok: false, error: "Invalid token" });
   }
 }
 
 // -----------------------------
-// Admin Login
+// Express app
+// -----------------------------
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get("/ping", (req, res) => res.send("Server Awake ✔"));
+
+// -----------------------------
+// Admin login & verify
 // -----------------------------
 app.post("/admin/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
+    const { email, password } = req.body || {};
+    if (!email || !password) return safeJson(res, 400, { ok: false, error: "email & password required" });
 
     const doc = await db.collection("admins").doc(email).get();
-    if (!doc.exists) {
-      return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
-    }
+    if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const adminData = doc.data();
-    const match = await bcrypt.compare(password, adminData.passwordHash);
+    const hash = adminData.passwordHash || adminData.password || "";
+    const match = await bcrypt.compare(password, hash);
+    if (!match) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
-    if (!match) return safeJson(res, 200, { ok: false, error: "Invalid email or password" });
-
-    const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
+    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET || "", { expiresIn: "7d" });
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
     console.error("Admin login error:", err);
@@ -113,22 +105,18 @@ app.post("/admin/login", async (req, res) => {
   }
 });
 
-// -----------------------------
-// Admin Token Verify
-// -----------------------------
 app.get("/admin/verify", requireAdminToken, (req, res) => {
   return safeJson(res, 200, { ok: true, email: req.admin.email });
 });
 
-// -----------------------------
-// Admin Update Order Status
-// -----------------------------
+// Protected update-status
 app.post("/admin/update-status", requireAdminToken, async (req, res) => {
   try {
-    const { orderId, status } = req.body;
+    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
+    const { orderId, status } = req.body || {};
+    if (!orderId || !status) return safeJson(res, 400, { ok: false, error: "orderId & status required" });
 
     await db.collection("orders").doc(orderId).update({ status });
-
     return safeJson(res, 200, { ok: true });
   } catch (err) {
     console.error("Update status error:", err);
@@ -137,15 +125,12 @@ app.post("/admin/update-status", requireAdminToken, async (req, res) => {
 });
 
 // -----------------------------
-// CASHFREE: CREATE ORDER (USED BY FRONTEND)
+// CASHFREE: create order
 // -----------------------------
 app.post("/create-cashfree-order", async (req, res) => {
   try {
-    const { amount, items, phone, email } = req.body;
-
-    if (!amount) {
-      return safeJson(res, 400, { ok: false, error: "amount required" });
-    }
+    const { amount, items, phone, email } = req.body || {};
+    if (!amount || Number(amount) <= 0) return safeJson(res, 400, { ok: false, error: "amount required" });
 
     const body = {
       order_amount: Number(amount),
@@ -153,8 +138,8 @@ app.post("/create-cashfree-order", async (req, res) => {
       customer_details: {
         customer_id: phone || "guest",
         customer_phone: phone || "9999999999",
-        customer_email: email || "guest@example.com",
-      },
+        customer_email: email || "guest@example.com"
+      }
     };
 
     const cfRes = await fetch("https://api.cashfree.com/pg/orders", {
@@ -162,80 +147,74 @@ app.post("/create-cashfree-order", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         "x-api-version": "2022-09-01",
-        "x-client-id": process.env.CF_APP_ID,
-        "x-client-secret": process.env.CF_SECRET_KEY,
+        "x-client-id": process.env.CF_APP_ID || "",
+        "x-client-secret": process.env.CF_SECRET_KEY || ""
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
 
     const data = await cfRes.json();
 
-    if (!data.order_id || !data.payment_session_id) {
-      console.log("❌ Cashfree Order Error:", data);
-      return safeJson(res, 500, {
-        ok: false,
-        error: "Cashfree failed",
-        raw: data,
-      });
+    // Accept a few shapes and return normalized shape
+    const orderId = data.order_id || data.data?.order_id || data.order?.id;
+    const paymentSession = data.payment_session_id || data.data?.payment_session_id || data.data?.session || data.paymentSessionId;
+
+    if (!orderId || !paymentSession) {
+      console.warn("Cashfree create order failed:", data);
+      return safeJson(res, 500, { ok: false, error: "Cashfree failed", raw: data });
     }
 
-    return safeJson(res, 200, {
-      ok: true,
-      orderId: data.order_id,
-      session: data.payment_session_id,
-    });
+    return safeJson(res, 200, { ok: true, orderId, session: paymentSession, raw: data });
   } catch (err) {
-    console.error("Cashfree create order error:", err);
+    console.error("Create Cashfree order error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// CASHFREE: VERIFY PAYMENT
+// CASHFREE: verify payment + save order
 // -----------------------------
 app.post("/verify-cashfree-payment", async (req, res) => {
   try {
-    const { orderId, items } = req.body;
+    const { orderId, items } = req.body || {};
+    if (!orderId) return safeJson(res, 400, { ok: false, error: "orderId required" });
 
     const resp = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`, {
       headers: {
         "x-api-version": "2022-09-01",
-        "x-client-id": process.env.CF_APP_ID,
-        "x-client-secret": process.env.CF_SECRET_KEY,
-      },
+        "x-client-id": process.env.CF_APP_ID || "",
+        "x-client-secret": process.env.CF_SECRET_KEY || ""
+      }
     });
-
     const data = await resp.json();
 
     if (data.order_status !== "PAID") {
-      return safeJson(res, 200, { ok: false, error: "Payment not completed" });
+      return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
     }
 
-    const total = items.reduce((s, it) => s + it.price * it.qty, 0);
+    // compute total from items if provided, else fallback to data.order_amount
+    const total = items && Array.isArray(items) ? items.reduce((s, it) => s + (Number(it.price || it.amount || 0) * Number(it.qty || 1)), 0) : Number(data.order_amount || 0);
 
     const newOrderId = "ORD" + Date.now();
 
     await db.collection("orders").doc(newOrderId).set({
-      orderId: newOrderId,
-      cashfree_order_id: orderId,
-      items,
-      amount: total,
-      timestamp: Date.now(),
+      total,
+      items: items || [],
       status: "paid",
+      createdAt: admin.firestore.Timestamp.now(),
+      cashfree_order_id: orderId,
+      orderId: newOrderId
     });
 
     return safeJson(res, 200, { ok: true, orderId: newOrderId });
   } catch (err) {
-    console.error("Cashfree verify error:", err);
+    console.error("Verify cashfree error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// START SERVER
+// Start server
 // -----------------------------
-const PORT = process.env.PORT || 10000;
-
-app.listen(PORT, () =>
-  console.log(`🚀 SH Cashfree Server running on port ${PORT}`)
-);
+const PORT = Number(process.env.PORT) || 10000;
+app.listen(PORT, () => console.log(`🚀 SH Cashfree Server running on port ${PORT}`));
