@@ -1,50 +1,99 @@
+/* -------------------------------
+   SH — Admin Login Page Styling
+   clean • centered • mobile-first
+---------------------------------- */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
 body {
-  background: #f3f3f3;
-  font-family: "Poppins", sans-serif;
+  background: #fafafa;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
 }
 
-.login-container {
+/* Login Box */
+.login-main {
+  width: 95%;
+  max-width: 380px;
   background: #fff;
-  padding: 30px;
-  width: 350px;
+  padding: 32px 28px;
   border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   text-align: center;
+  animation: fadeIn 0.35s ease-out;
 }
 
-input, button {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-main h1 {
+  font-size: 26px;
+  margin-bottom: 22px;
+  color: #E23744;
+  font-weight: 700;
+}
+
+/* Input Fields */
+.login-main input {
   width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 13px;
+  margin: 8px 0 14px;
+  border: 1.7px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  background: #fff;
+  transition: 0.25s;
 }
 
-button {
-  background: #e23744;
-  color: white;
-  cursor: pointer;
+.login-main input:focus {
+  border-color: #E23744;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(226,55,68,0.18);
+}
+
+/* Login Button */
+.login-main button {
+  width: 100%;
+  padding: 13px;
+  font-size: 16px;
   font-weight: 600;
-}
-
-.password-field {
-  position: relative;
-}
-
-.eye {
-  position: absolute;
-  right: 14px;
-  top: 12px;
+  color: #fff;
+  background: #E23744;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 18px;
+  margin-top: 6px;
+  transition: 0.25s ease;
 }
 
-.error {
-  color: red;
-  margin-top: 10px;
-  font-weight: 500;
+.login-main button:hover {
+  background: #c82f3b;
+  transform: translateY(-1px);
+}
+
+/* Message text */
+#loginMsg {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Mobile */
+@media (max-width: 420px) {
+  .login-main {
+    padding: 26px 22px;
+    border-radius: 12px;
+  }
+  .login-main h1 {
+    font-size: 22px;
+  }
 }
