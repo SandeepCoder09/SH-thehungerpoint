@@ -24,95 +24,86 @@
           <img src="/home/sh-thehungerpoint.png" class="logo-img">
           <span class="brand">The Hunger Point</span>
         </div>
-        <div class="title">Create Account</div>
+        <h2 class="title">Create Account</h2>
       </header>
 
-      <!-- FORM BODY -->
+      <!-- FORM -->
       <section class="card-body">
         <form id="signupForm">
 
           <!-- NAME -->
           <div class="input-group">
-            <input id="name" type="text" required placeholder=" ">
+            <input type="text" id="name" required />
             <label for="name">Name</label>
           </div>
 
           <!-- EMAIL -->
           <div class="input-group">
-            <input id="email" type="email" required placeholder=" ">
+            <input type="email" id="email" required />
             <label for="email">Email</label>
           </div>
 
           <!-- PASSWORD -->
           <div class="input-group pass-group">
-            <input id="password" type="password" minlength="6" required placeholder=" ">
+            <input type="password" id="password" required minlength="6" />
             <label for="password">Password</label>
 
-            <button type="button" class="toggle" id="togglePass">
-              <!-- eye open -->
-              <svg id="eyePassOpen" class="eye-icon" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                      fill="none" stroke="#333" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" fill="none"
-                        stroke="#333" stroke-width="2"/>
+            <span class="toggle" id="togglePass">
+              <svg id="eyeOpenPass" class="eye-icon" width="22" height="22" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
               </svg>
 
-              <!-- eye slash -->
-              <svg id="eyePassSlash" class="eye-icon hidden" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                      fill="none" stroke="#333" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" fill="none"
-                        stroke="#333" stroke-width="2"/>
-                <line x1="4" y1="20" x2="20" y2="4"
-                      stroke="#333" stroke-width="2"/>
+              <svg id="eyeSlashPass" class="eye-icon hidden" width="22" height="22" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
+                <line x1="5" y1="19" x2="19" y2="5" stroke="#444" stroke-width="2"/>
               </svg>
-            </button>
+            </span>
           </div>
 
           <!-- CONFIRM PASSWORD -->
           <div class="input-group pass-group">
-            <input id="confirm" type="password" minlength="6" required placeholder=" ">
+            <input type="password" id="confirm" required minlength="6" />
             <label for="confirm">Confirm Password</label>
 
-            <button type="button" class="toggle" id="toggleConfirm">
-              <svg id="eyeConfirmOpen" class="eye-icon" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                      fill="none" stroke="#333" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" fill="none"
-                        stroke="#333" stroke-width="2"/>
+            <span class="toggle" id="toggleConfirm">
+              <svg id="eyeOpenConfirm" class="eye-icon" width="22" height="22" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
               </svg>
 
-              <svg id="eyeConfirmSlash" class="eye-icon hidden" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                      fill="none" stroke="#333" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" fill="none"
-                        stroke="#333" stroke-width="2"/>
-                <line x1="4" y1="20" x2="20" y2="4"
-                      stroke="#333" stroke-width="2"/>
+              <svg id="eyeSlashConfirm" class="eye-icon hidden" width="22" height="22" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
+                <line x1="5" y1="19" x2="19" y2="5" stroke="#444" stroke-width="2"/>
               </svg>
-            </button>
+            </span>
           </div>
 
           <!-- LEGAL -->
           <label class="legal">
-            <input type="checkbox" id="legalCheck">
-            <span>I accept the</span>
+            <input type="checkbox" id="legalCheck" />
+            I accept the
             <a href="/legal/terms.html">Terms</a>,
             <a href="/legal/privacy.html">Privacy</a>,
             <a href="/legal/refund.html">Refund</a>,
-            <a href="/legal/shipping.html">Shipping</a>.
+            <a href="/legal/shipping.html">Shipping Policy</a>.
           </label>
 
           <button type="submit" class="btn primary">Create Account</button>
 
           <div class="divider">or</div>
 
-          <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
+          <button type="button" class="btn google" id="googleSignup">
+            Continue with Google
+          </button>
 
           <p class="muted">
             Already have an account?
-            <a href="/auth/login.html" class="signin-link">Sign in</a>
+            <a href="/auth/login.html">Sign in</a>
           </p>
+
         </form>
       </section>
     </div>
