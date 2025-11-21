@@ -1,40 +1,38 @@
-/* -----------------------
+/* ------------------------------
    GLOBAL
-------------------------*/
+------------------------------ */
 body {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif;
   background: #f5f5f5;
+  font-family: "Poppins", sans-serif;
 }
 
-/* -----------------------
-   PAGE LAYOUT
-------------------------*/
 .auth-page {
   display: flex;
   justify-content: center;
   padding: 40px 0;
 }
 
+/* ------------------------------
+   CARD
+------------------------------ */
 .card {
   width: 92%;
   max-width: 420px;
-  background: white;
-  border-radius: 22px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.10);
   overflow: hidden;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.12);
 }
 
-/* -----------------------
+/* ------------------------------
    HEADER
-------------------------*/
+------------------------------ */
 .card-head {
-  background: linear-gradient(90deg, #d10000, #ff4747);
-  padding: 25px;
-  color: white;
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
+  background: linear-gradient(110deg, #d10000, #ff3d3d);
+  padding: 28px;
+  color: #fff;
 }
 
 .logo-box {
@@ -43,182 +41,185 @@ body {
   gap: 12px;
 }
 
-.logo-img {
-  width: 60px;
-  border: 3px solid rgba(255,255,255,0.7);
+.logo-box img {
+  width: 62px;
+  height: 62px;
   border-radius: 16px;
+  border: 3px solid rgba(255,255,255,0.5);
 }
 
 .brand {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
 }
 
 .title {
   font-size: 20px;
-  margin-top: 12px;
   font-weight: 600;
+  margin-top: 12px;
 }
 
-/* -----------------------
-   FORM BODY
-------------------------*/
+/* ------------------------------
+   BODY
+------------------------------ */
 .card-body {
-  padding: 25px;
+  padding: 28px 20px 35px;
 }
 
-/* -----------------------
-   FLOATING INPUT FIELDS (FIXED HEIGHT)
-------------------------*/
+/* ------------------------------
+   INPUT GROUP (FLOATING)
+------------------------------ */
 .input-group {
   position: relative;
-  margin-top: 20px;
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .input-group input {
   width: 100%;
-  padding: 13px 14px 8px 14px;   /* reduced height */
-  border: 1.4px solid #ddd;
-  border-radius: 12px;
+  height: 54px;
+  padding: 16px;
+  padding-right: 46px;
+  font-size: 15px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  background: white;
   outline: none;
-  font-size: 15px;               /* smaller text */
-  background: #fff;
-  height: 48px;                  /* ✨ perfect height */
-  transition: 0.25s;
+  transition: .25s ease;
 }
 
 .input-group input:focus {
-  border-color: #E23744;
-  box-shadow: 0 0 5px rgba(226,55,68,0.2);
+  border-color: #d10000;
+  box-shadow: 0 0 8px rgba(209,0,0,0.25);
 }
 
 .input-group label {
   position: absolute;
-  top: 14px;                      /* adjusted */
-  left: 16px;
-  color: #777;
-  font-size: 14px;
-  pointer-events: none;
-  transition: 0.25s;
-  background: white;
-  padding: 0 4px;
-}
-
-/* FLOAT-UP EFFECT (adjusted for smaller box) */
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
-  top: -7px;
-  left: 12px;
-  font-size: 12px;
-  color: #E23744;
-}
-
-/* -----------------------
-   PASSWORD TOGGLE (EYE)
-------------------------*/
-.pass-group .toggle {
-  position: absolute;
-  right: 14px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
+  font-size: 15px;
+  color: #888;
+  background: white;
+  padding: 0 4px;
+  pointer-events: none;
+  transition: .25s ease;
+}
+
+/* FLOAT EFFECT */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: 6px;
+  font-size: 12px;
+  color: #d10000;
+}
+
+/* ------------------------------
+   EYE ICON
+------------------------------ */
+.pass-eye {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  opacity: 0.7;
+  transition: .2s ease;
 }
 
-.eye-icon {
-  width: 24px;
-  height: 24px;
+.pass-eye:hover {
+  opacity: 1;
 }
 
-.hidden {
-  display: none;
-}
-
-/* -----------------------
-   LEGAL CHECKBOX + LINKS
-------------------------*/
-.legal {
-  margin-top: 18px;
+/* ------------------------------
+   LEGAL CHECKBOX
+------------------------------ */
+.legal-box {
+  margin-top: -10px;
+  margin-bottom: 25px;
   font-size: 14px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
+  text-align: left;
+  padding-left: 10px;
 }
 
-.legal input {
-  width: 18px;
-  height: 18px;
+.legal-box input {
+  width: 20px;
+  height: 20px;
   accent-color: #d10000;
 }
 
-.legal a {
+.legal-box a {
   color: #d10000;
   font-weight: 600;
   text-decoration: none;
 }
 
-/* -----------------------
+/* ------------------------------
    BUTTONS
-------------------------*/
+------------------------------ */
 .btn {
   width: 100%;
   padding: 15px;
-  border-radius: 14px;
-  font-size: 16px;
-  margin-top: 22px;
-  cursor: pointer;
+  border-radius: 16px;
+  font-size: 17px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .primary {
   background: #d10000;
   color: white;
   border: none;
-  box-shadow: 0 5px 20px rgba(209,0,0,0.25);
+  box-shadow: 0 4px 18px rgba(209,0,0,0.35);
 }
 
-.google {
-  background: #fff;
+.primary:hover {
+  background: #b80000;
+}
+
+/* Google Button */
+.google-btn {
+  margin-top: 15px;
   border: 1px solid #ccc;
+  background: #fff;
 }
 
+/* Divider */
 .divider {
   text-align: center;
-  margin: 20px 0;
+  margin: 22px 0;
   color: #777;
-  font-size: 14px;
 }
 
-/* -----------------------
-   FOOTER LINKS
-------------------------*/
-.muted {
+/* Sign in link */
+.bottom-text {
+  margin-top: 20px;
   text-align: center;
-  margin-top: 16px;
-  font-size: 15px;
 }
 
-.signin-link {
+.bottom-text a {
   color: #d10000;
   font-weight: 600;
-  text-decoration: none;
 }
 
-/* -----------------------
-   TOAST MESSAGE
-------------------------*/
+/* ------------------------------
+   TOAST
+------------------------------ */
 .toast {
   position: fixed;
-  bottom: 30px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 14px 20px;
   background: #d10000;
   color: white;
-  padding: 14px 22px;
   border-radius: 14px;
-  font-size: 15px;
-  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
-  z-index: 9999;
+  font-size: 14px;
+  box-shadow: 0 5px 20px rgba(209,0,0,0.45);
+  z-index: 2000;
 }
