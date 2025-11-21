@@ -1,6 +1,4 @@
-/* ------------------------------
-   GLOBAL
------------------------------- */
+/* =============== GLOBAL =============== */
 body {
   margin: 0;
   padding: 0;
@@ -8,31 +6,31 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
+/* Page container */
 .auth-page {
   display: flex;
   justify-content: center;
-  padding: 40px 0;
+  padding: 30px 0;
 }
 
-/* ------------------------------
-   CARD
------------------------------- */
+/* Card container */
 .card {
   width: 92%;
   max-width: 420px;
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.10);
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
-/* ------------------------------
-   HEADER
------------------------------- */
+/* =============== HEADER =============== */
 .card-head {
-  background: linear-gradient(110deg, #d10000, #ff3d3d);
-  padding: 28px;
-  color: #fff;
+  background: linear-gradient(90deg, #d10000, #ff4747);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: white;
 }
 
 .logo-box {
@@ -41,185 +39,180 @@ body {
   gap: 12px;
 }
 
-.logo-box img {
-  width: 62px;
-  height: 62px;
-  border-radius: 16px;
-  border: 3px solid rgba(255,255,255,0.5);
+.logo-img {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  border: 3px solid #ffffff70;
+  object-fit: cover;
 }
 
 .brand {
-  font-size: 23px;
+  font-size: 22px;
   font-weight: 700;
 }
 
 .title {
   font-size: 20px;
+  margin-top: 10px;
   font-weight: 600;
-  margin-top: 12px;
+  letter-spacing: 0.5px;
 }
 
-/* ------------------------------
-   BODY
------------------------------- */
+/* =============== INPUTS =============== */
 .card-body {
-  padding: 28px 20px 35px;
+  padding: 25px;
 }
 
-/* ------------------------------
-   INPUT GROUP (FLOATING)
------------------------------- */
 .input-group {
   position: relative;
-  margin-bottom: 28px;
-  width: 100%;
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 22px;
 }
 
 .input-group input {
   width: 100%;
-  height: 54px;
-  padding: 16px;
-  padding-right: 46px;
-  font-size: 15px;
-  border-radius: 15px;
-  border: 1px solid #ddd;
-  background: white;
+  padding: 14px 16px;
+  padding-right: 45px;
+  border-radius: 14px;
+  border: 1.4px solid #ddd;
   outline: none;
-  transition: .25s ease;
+  font-size: 15px;
+  background: #fff;
+  transition: 0.25s ease;
 }
 
+/* Shrink on focus */
 .input-group input:focus {
   border-color: #d10000;
-  box-shadow: 0 0 8px rgba(209,0,0,0.25);
+  box-shadow: 0px 0px 4px rgba(209,0,0,0.35);
 }
 
+/* FLOAT LABEL */
 .input-group label {
   position: absolute;
-  left: 18px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
+  background: #fff;
+  padding: 0 6px;
   font-size: 15px;
-  color: #888;
-  background: white;
-  padding: 0 4px;
+  color: #777;
   pointer-events: none;
-  transition: .25s ease;
+  transition: 0.25s ease;
 }
 
-/* FLOAT EFFECT */
+/* When typing OR focused */
 .input-group input:focus + label,
 .input-group input:not(:placeholder-shown) + label {
-  top: 6px;
-  font-size: 12px;
+  top: -8px;
+  font-size: 13px;
   color: #d10000;
 }
 
-/* ------------------------------
-   EYE ICON
------------------------------- */
-.pass-eye {
+/* =============== PASSWORD TOGGLE =============== */
+.pass-group .toggle {
   position: absolute;
-  right: 15px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
   cursor: pointer;
-  opacity: 0.7;
-  transition: .2s ease;
+  display: flex;
+  align-items: center;
 }
 
-.pass-eye:hover {
-  opacity: 1;
+.eye-icon {
+  width: 22px;
+  height: 22px;
 }
 
-/* ------------------------------
-   LEGAL CHECKBOX
------------------------------- */
-.legal-box {
-  margin-top: -10px;
-  margin-bottom: 25px;
+.hidden {
+  display: none;
+}
+
+/* =============== LEGAL SECTION =============== */
+.legal {
+  margin-top: 22px;
   font-size: 14px;
-  text-align: left;
-  padding-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
 }
 
-.legal-box input {
-  width: 20px;
-  height: 20px;
+.legal input {
+  width: 18px;
+  height: 18px;
   accent-color: #d10000;
 }
 
-.legal-box a {
+.legal a {
   color: #d10000;
   font-weight: 600;
   text-decoration: none;
 }
 
-/* ------------------------------
-   BUTTONS
------------------------------- */
+/* Fix long link spacing */
+.legal span {
+  margin-right: 4px;
+}
+
+/* =============== BUTTONS =============== */
 .btn {
   width: 100%;
-  padding: 15px;
-  border-radius: 16px;
-  font-size: 17px;
+  padding: 14px;
+  margin-top: 20px;
+  border-radius: 14px;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
 }
 
+/* Primary red button */
 .primary {
   background: #d10000;
   color: white;
   border: none;
-  box-shadow: 0 4px 18px rgba(209,0,0,0.35);
+  box-shadow: 0 8px 25px rgba(209,0,0,0.35);
 }
 
-.primary:hover {
-  background: #b80000;
-}
-
-/* Google Button */
-.google-btn {
-  margin-top: 15px;
-  border: 1px solid #ccc;
+/* Google button */
+.google {
   background: #fff;
+  border: 1px solid #ccc;
 }
 
 /* Divider */
 .divider {
   text-align: center;
-  margin: 22px 0;
+  margin-top: 20px;
+  margin-bottom: 10px;
   color: #777;
 }
 
-/* Sign in link */
-.bottom-text {
-  margin-top: 20px;
+/* Already have account */
+.muted {
   text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
 }
 
-.bottom-text a {
+.signin-link {
   color: #d10000;
   font-weight: 600;
 }
 
-/* ------------------------------
-   TOAST
------------------------------- */
+/* =============== TOAST =============== */
 .toast {
   position: fixed;
-  bottom: 32px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 14px 20px;
   background: #d10000;
   color: white;
+  padding: 15px 20px;
   border-radius: 14px;
-  font-size: 14px;
-  box-shadow: 0 5px 20px rgba(209,0,0,0.45);
-  z-index: 2000;
+  font-size: 15px;
+  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
+  z-index: 9999;
 }
