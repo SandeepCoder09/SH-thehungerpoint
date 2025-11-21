@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -15,54 +15,46 @@
 </head>
 
 <body>
+
   <main class="auth-page">
     <div class="card">
+
+      <!-- HEADER -->
       <header class="card-head">
         <div class="logo-box">
-          <img src="/home/sh-thehungerpoint.png" />
+          <img src="/home/sh-thehungerpoint.png" class="logo-img" />
           <span class="brand">The Hunger Point</span>
         </div>
         <div class="title">Create Account</div>
       </header>
 
+      <!-- FORM -->
       <section class="card-body">
+
         <form id="signupForm">
 
           <label>Name</label>
-          <input id="name" type="text" placeholder="Your full name" required>
+          <input id="name" type="text" placeholder="Your full name" required />
 
           <label>Email</label>
-          <input id="email" type="email" placeholder="you@example.com" required>
+          <input id="email" type="email" placeholder="you@example.com" required />
 
           <label>Password</label>
           <div class="pass-group">
-            <input id="password" type="password" minlength="6" placeholder="Create password" required>
-            <span class="toggle" id="togglePass">
-              <!-- eye-off icon default -->
-              <svg id="icon-pass" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#555" viewBox="0 0 24 24">
-                <path d="M12 5c-7.633 0-11 6.993-11 7s3.367 7 11 7 11-6.993 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5 
-                  0-2.762 2.239-5 5-5s5 2.238 5 5c0 2.761-2.239 5-5 5zm0-8c-1.654 0-3 1.346-3 3 
-                  0 1.653 1.346 3 3 3s3-1.347 3-3c0-1.654-1.346-3-3-3z"/>
-              </svg>
-            </span>
+            <input id="password" type="password" minlength="6" placeholder="Create password" required />
+            <span class="toggle" id="togglePass"></span>
           </div>
 
           <label>Confirm Password</label>
           <div class="pass-group">
-            <input id="confirm" type="password" minlength="6" placeholder="Re-enter password" required>
-            <span class="toggle" id="toggleConfirm">
-              <!-- eye-off icon -->
-              <svg id="icon-confirm" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#555" viewBox="0 0 24 24">
-                <path d="M12 5c-7.633 0-11 6.993-11 7s3.367 7 11 7 11-6.993 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5 
-                  0-2.762 2.239-5 5-5s5 2.238 5 5c0 2.761-2.239 5-5 5zm0-8c-1.654 0-3 1.346-3 3 
-                  0 1.653 1.346 3 3 3s3-1.347 3-3c0-1.654-1.346-3-3-3z"/>
-              </svg>
-            </span>
+            <input id="confirm" type="password" minlength="6" placeholder="Re-enter password" required />
+            <span class="toggle" id="toggleConfirm"></span>
           </div>
 
           <label class="legal">
-            <input type="checkbox" id="legalCheck">
-            I accept the <a href="../legal/terms.html">Terms</a>, 
+            <input type="checkbox" id="legalCheck" />
+            I accept the 
+            <a href="../legal/terms.html">Terms</a>, 
             <a href="../legal/privacy.html">Privacy Policy</a>, 
             <a href="../legal/refund.html">Refund Policy</a>.
           </label>
@@ -78,10 +70,12 @@
             <a href="/auth/login.html" class="signin-link">Sign in</a>
           </p>
         </form>
+
       </section>
     </div>
 
     <div id="toast" class="toast" hidden></div>
+
   </main>
 
   <script src="/auth/firebase-config.js"></script>
