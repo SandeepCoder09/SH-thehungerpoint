@@ -1,4 +1,6 @@
-/* =============== GLOBAL =============== */
+/* -----------------------
+   GLOBAL
+------------------------ */
 body {
   margin: 0;
   padding: 0;
@@ -12,22 +14,27 @@ body {
   padding: 30px 0;
 }
 
+/* -----------------------
+   CARD
+------------------------ */
 .card {
   width: 92%;
-  max-width: 420px;
+  max-width: 430px;
   background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.08);
   overflow: hidden;
 }
 
-/* =============== HEADER =============== */
+/* -----------------------
+   HEADER
+------------------------ */
 .card-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
   padding: 25px;
   color: white;
-  display: flex;
-  flex-direction: column;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .logo-box {
@@ -37,10 +44,9 @@ body {
 }
 
 .logo-img {
-  width: 58px;
-  height: 58px;
+  width: 60px;
   border-radius: 14px;
-  border: 3px solid #ffffff70;
+  border: 3px solid rgba(255,255,255,0.7);
 }
 
 .brand {
@@ -49,91 +55,98 @@ body {
 }
 
 .title {
-  margin-top: 10px;
-  font-size: 20px;
+  font-size: 22px;
+  margin-top: 8px;
   font-weight: 600;
 }
 
-/* =============== INPUTS =============== */
+/* -----------------------
+   BODY
+------------------------ */
 .card-body {
   padding: 25px;
 }
 
+/* -----------------------
+   INPUT GROUP (Floating Label)
+------------------------ */
 .input-group {
   position: relative;
+  margin-bottom: 25px;
   width: 100%;
-  margin-top: 22px;
 }
 
 .input-group input {
   width: 100%;
-  height: 48px;
+  padding: 18px 16px;
+  padding-right: 50px;
+  font-size: 15px;
+  border: 2px solid #ddd;
   border-radius: 12px;
-  padding: 12px 14px;
-  padding-right: 45px;
-  border: 1.4px solid #ddd;
-  font-size: 15px;
   outline: none;
-  transition: all 0.25s ease;
-}
-
-/* Focus style */
-.input-group input:focus {
-  border-color: #d10000;
-  box-shadow: 0px 0px 6px rgba(209,0,0,0.35);
-}
-
-/* Satisfying floating label */
-.input-group label {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  color: #777;
-  padding: 0 4px;
   background: white;
   transition: 0.25s ease;
-  pointer-events: none;
 }
 
-/* Move label up */
+.input-group input:focus {
+  border-color: #d10000;
+}
+
+.input-group label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: #666;
+  font-size: 15px;
+  pointer-events: none;
+  transition: 0.25s ease;
+}
+
+/* FLOAT TO TOP animation */
 .input-group input:focus + label,
 .input-group input:not(:placeholder-shown) + label {
-  top: -9px;
-  font-size: 13px;
+  top: -10px;
+  left: 10px;
+  background: white;
+  padding: 0 6px;
+  font-size: 12px;
   color: #d10000;
 }
 
-/* =============== PASSWORD TOGGLE =============== */
+/* -----------------------
+   PASSWORD TOGGLE ICON
+------------------------ */
 .pass-group .toggle {
   position: absolute;
-  right: 12px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .eye-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
 
 .hidden {
   display: none;
 }
 
-/* =============== LEGAL CHECKBOX =============== */
+/* -----------------------
+   LEGAL CHECKBOX
+------------------------ */
 .legal {
-  margin-top: 22px;
-  font-size: 14px;
-  line-height: 1.4;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 6px;
+  font-size: 14px;
+  margin-bottom: 15px;
 }
 
 .legal input {
@@ -148,50 +161,50 @@ body {
   text-decoration: none;
 }
 
-/* =============== BUTTONS =============== */
+/* -----------------------
+   BUTTONS
+------------------------ */
 .btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
+  padding: 15px;
   border-radius: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 16px;
+  margin-top: 15px;
 }
 
 .primary {
   background: #d10000;
   color: white;
   border: none;
-  box-shadow: 0 8px 25px rgba(209,0,0,0.35);
+  box-shadow: 0 8px 25px rgba(209,0,0,0.3);
 }
 
 .google {
-  background: #fff;
+  background: white;
   border: 1px solid #ccc;
 }
 
 .divider {
-  text-align: center;
   margin: 18px 0;
-  color: #888;
-}
-
-.muted {
   text-align: center;
+  color: #777;
   font-size: 14px;
-  margin-top: 14px;
 }
 
 .signin-link {
   color: #d10000;
   font-weight: 600;
+  text-decoration: none;
 }
 
-/* =============== TOAST =============== */
+/* -----------------------
+   TOAST
+------------------------ */
 .toast {
   position: fixed;
-  bottom: 30px;
+  bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   background: #d10000;
