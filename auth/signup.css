@@ -20,8 +20,9 @@ body {
   overflow: hidden;
 }
 
+/* HEADER */
 .card-head {
-  background: linear-gradient(90deg, #d10000, #ff4747);
+  background: linear-gradient(90deg, #E23744, #B71C1C);
   padding: 25px;
   display: flex;
   flex-direction: column;
@@ -32,12 +33,11 @@ body {
 .logo-box {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.logo-img {
+.logo-box img {
   width: 55px;
-  border-radius: 14px;
 }
 
 .brand {
@@ -47,10 +47,11 @@ body {
 
 .title {
   font-size: 22px;
-  margin-top: 12px;
+  margin-top: 10px;
   font-weight: 600;
 }
 
+/* BODY */
 .card-body {
   padding: 25px;
 }
@@ -60,7 +61,6 @@ label {
   font-weight: 600;
   margin-top: 14px;
   color: #000;
-  font-size: 15px;
 }
 
 input {
@@ -73,6 +73,7 @@ input {
   font-size: 15px;
 }
 
+/* PASSWORD GROUP WITH SVG */
 .pass-group {
   position: relative;
 }
@@ -82,14 +83,26 @@ input {
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
   cursor: pointer;
+  width: 26px;
+  height: 26px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.eye-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* LEGAL */
 .legal {
-  margin-top: 18px;
+  margin-top: 15px;
   font-size: 14px;
   display: flex;
   gap: 8px;
@@ -99,14 +112,15 @@ input {
 .legal input {
   width: 18px;
   height: 18px;
-  accent-color: #d10000;
+  accent-color: #E23744;
 }
 
 .legal a {
-  color: #d10000;
+  color: #E23744;
   font-weight: 600;
 }
 
+/* BUTTONS */
 .btn {
   width: 100%;
   padding: 14px;
@@ -118,7 +132,7 @@ input {
 }
 
 .primary {
-  background: #d10000;
+  background: #E23744;
   color: white;
   border: none;
 }
@@ -130,25 +144,26 @@ input {
 
 .divider {
   text-align: center;
-  margin: 18px 0;
+  margin: 20px 0;
   color: #777;
 }
 
 .signin-link {
-  color: #d10000;
+  color: #E23744;
   font-weight: 600;
 }
 
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background: #d10000;
+  background: #E23744;
   color: white;
   padding: 15px 20px;
   border-radius: 14px;
   font-size: 15px;
-  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
+  box-shadow: 0 6px 25px rgba(226,55,68,0.4);
   z-index: 9999;
 }
