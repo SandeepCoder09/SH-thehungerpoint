@@ -1,6 +1,3 @@
-/* =============================
-   GLOBAL
-============================= */
 body {
   margin: 0;
   padding: 0;
@@ -14,38 +11,33 @@ body {
   padding: 40px 0;
 }
 
-/* =============================
-   CARD
-============================= */
 .card {
   width: 92%;
   max-width: 420px;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
-/* =============================
-   HEADER
-============================= */
 .card-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
   padding: 25px;
-  color: white;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  color: white;
 }
 
 .logo-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.logo-box img {
+.logo-img {
   width: 55px;
+  border-radius: 14px;
 }
 
 .brand {
@@ -59,10 +51,6 @@ body {
   font-weight: 600;
 }
 
-/* =============================
-   BODY FORM
-============================= */
-
 .card-body {
   padding: 25px;
 }
@@ -71,7 +59,8 @@ label {
   display: block;
   font-weight: 600;
   margin-top: 14px;
-  color: #111;
+  color: #000;
+  font-size: 15px;
 }
 
 input {
@@ -82,12 +71,8 @@ input {
   margin-top: 6px;
   outline: none;
   font-size: 15px;
-  background: #fff;
 }
 
-/* =============================
-   PASSWORD GROUP
-============================= */
 .pass-group {
   position: relative;
 }
@@ -97,30 +82,14 @@ input {
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: pointer;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.toggle svg {
   width: 22px;
   height: 22px;
-  fill: #666;
-  transition: 0.25s ease;
+  cursor: pointer;
+  display: flex;
 }
 
-.toggle.active svg {
-  fill: #d10000;
-}
-
-/* =============================
-   LEGAL
-============================= */
 .legal {
-  margin-top: 15px;
+  margin-top: 18px;
   font-size: 14px;
   display: flex;
   gap: 8px;
@@ -136,12 +105,7 @@ input {
 .legal a {
   color: #d10000;
   font-weight: 600;
-  text-decoration: none;
 }
-
-/* =============================
-   BUTTONS
-============================= */
 
 .btn {
   width: 100%;
@@ -151,17 +115,12 @@ input {
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
-  transition: 0.2s ease;
 }
 
 .primary {
   background: #d10000;
-  color: #fff;
+  color: white;
   border: none;
-}
-
-.primary:active {
-  background: #b40000;
 }
 
 .google {
@@ -169,17 +128,9 @@ input {
   border: 1px solid #ccc;
 }
 
-.google:active {
-  background: #f0f0f0;
-}
-
-/* =============================
-   TEXTS
-============================= */
-
 .divider {
   text-align: center;
-  margin: 22px 0;
+  margin: 18px 0;
   color: #777;
 }
 
@@ -188,31 +139,16 @@ input {
   font-weight: 600;
 }
 
-.muted {
-  text-align: center;
-  margin-top: 12px;
-}
-
-/* =============================
-   TOAST
-============================= */
-
 .toast {
   position: fixed;
-  bottom: 35px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   background: #d10000;
   color: white;
-  padding: 14px 22px;
+  padding: 15px 20px;
   border-radius: 14px;
   font-size: 15px;
-  box-shadow: 0 6px 25px rgba(209, 0, 0, 0.35);
+  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
   z-index: 9999;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, 10px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
 }
