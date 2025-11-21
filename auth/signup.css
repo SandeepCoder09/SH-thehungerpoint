@@ -1,15 +1,8 @@
-:root {
-  --primary: #d10000;
-  --primary-dark: #b30000;
-  --muted: #666;
-  --radius: 14px;
-}
-
+/* MAIN LAYOUT */
 body {
   margin: 0;
-  padding: 0;
-  font-family: "Poppins", sans-serif;
   background: #f5f5f5;
+  font-family: "Poppins", sans-serif;
 }
 
 .auth-page {
@@ -21,17 +14,17 @@ body {
 .card {
   width: 92%;
   max-width: 420px;
-  background: #fff;
+  background: white;
   border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
   overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
 }
 
 /* HEADER */
 .card-head {
-  background: linear-gradient(90deg, #d10000, #ff4747);
+  background: linear-gradient(90deg, #E23744, #b71c1c);
+  padding: 28px;
   color: white;
-  padding: 25px;
 }
 
 .logo-box {
@@ -42,82 +35,80 @@ body {
 
 .logo-img {
   width: 55px;
-  border-radius: 14px;
-  border: 2px solid white;
-}
-
-.brand {
-  font-size: 22px;
-  font-weight: 700;
+  height: 55px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 5px;
 }
 
 .title {
-  font-size: 22px;
-  margin-top: 10px;
+  font-size: 24px;
+  margin-top: 15px;
   font-weight: 600;
 }
 
-/* BODY */
+/* FORM BODY */
 .card-body {
   padding: 25px;
 }
 
-/* INPUT GROUP */
+/* SLIDE-UP LABEL INPUTS */
 .input-group {
   position: relative;
-  margin-top: 28px;
+  margin-top: 26px;
 }
 
 .input-group input {
   width: 100%;
-  padding: 16px 18px;
-  border-radius: var(--radius);
-  border: 1px solid #ddd;
-  font-size: 16px;
+  padding: 14px 14px 14px 16px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #fafafa;
   outline: none;
-  background: #fff;
+  transition: border 0.2s ease, background 0.2s;
 }
 
 .input-group input:focus {
-  border-color: var(--primary);
+  border-color: #E23744;
+  background: white;
 }
 
-/* Floating Label — SLIDE UP ONLY */
 .input-group label {
   position: absolute;
-  left: 18px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 16px;
+  background: white;
+  padding: 0 6px;
+  font-size: 15px;
+  color: #777;
+  transition: 0.25s ease;
   pointer-events: none;
-  transition: all .22s ease;
 }
 
-/* When filled or focused → label moves UP only */
+/* SLIDE UP EFFECT */
 .input-group input:focus + label,
-.input-group.filled label {
-  top: 6px;
-  transform: translateY(0);
+.input-group input:not(:placeholder-shown) + label {
+  top: -8px;
   font-size: 13px;
-  color: var(--primary);
+  color: #E23744;
 }
 
-/* PASSWORD GROUP */
+/* PASSWORD ICON */
 .pass-group .toggle {
   position: absolute;
-  right: 16px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
   cursor: pointer;
+  width: 24px;
+  height: 24px;
 }
 
 .eye-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  opacity: 0.85;
 }
 
 .hidden {
@@ -126,39 +117,38 @@ body {
 
 /* LEGAL */
 .legal {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 14px;
+  margin-top: 16px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
 }
 
 .legal input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--primary);
+  margin-top: 3px;
+  accent-color: #E23744;
 }
 
 .legal a {
-  color: var(--primary);
+  color: #E23744;
   font-weight: 600;
 }
 
 /* BUTTONS */
 .btn {
   width: 100%;
-  padding: 15px;
-  border-radius: var(--radius);
-  font-size: 16px;
-  margin-top: 20px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  margin-top: 22px;
   font-weight: 600;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .primary {
-  background: var(--primary);
+  background: #E23744;
   color: white;
-  border: none;
 }
 
 .google {
@@ -166,29 +156,33 @@ body {
   border: 1px solid #ccc;
 }
 
-/* DIVIDER */
 .divider {
   text-align: center;
-  margin: 20px 0;
+  margin: 22px 0;
   color: #777;
 }
 
-/* LINKS */
-.signin-link {
-  color: var(--primary);
+.muted {
+  text-align: center;
+  margin-top: 14px;
+}
+
+.muted a {
+  color: #E23744;
   font-weight: 600;
 }
 
 /* TOAST */
 .toast {
   position: fixed;
-  bottom: 25px;
+  bottom: 26px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--primary);
-  padding: 14px 20px;
+  background: #E23744;
   color: white;
+  padding: 13px 20px;
   border-radius: 12px;
   font-size: 15px;
-  z-index: 999;
+  z-index: 9999;
+  box-shadow: 0 8px 20px rgba(226,55,68,0.35);
 }
