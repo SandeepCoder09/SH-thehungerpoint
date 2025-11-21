@@ -1,52 +1,49 @@
-/* -----------------------
-   GLOBAL
------------------------- */
+:root {
+  --primary: #d10000;
+  --primary-dark: #b30000;
+  --muted: #666;
+  --radius: 14px;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: #f5f5f5;
   font-family: "Poppins", sans-serif;
+  background: #f5f5f5;
 }
 
 .auth-page {
   display: flex;
   justify-content: center;
-  padding: 30px 0;
+  padding: 40px 0;
 }
 
-/* -----------------------
-   CARD
------------------------- */
 .card {
   width: 92%;
-  max-width: 430px;
+  max-width: 420px;
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
-/* -----------------------
-   HEADER
------------------------- */
+/* HEADER */
 .card-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
-  padding: 25px;
   color: white;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  padding: 25px;
 }
 
 .logo-box {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .logo-img {
-  width: 60px;
+  width: 55px;
   border-radius: 14px;
-  border: 3px solid rgba(255,255,255,0.7);
+  border: 2px solid white;
 }
 
 .brand {
@@ -56,77 +53,66 @@ body {
 
 .title {
   font-size: 22px;
-  margin-top: 8px;
+  margin-top: 10px;
   font-weight: 600;
 }
 
-/* -----------------------
-   BODY
------------------------- */
+/* BODY */
 .card-body {
   padding: 25px;
 }
 
-/* -----------------------
-   INPUT GROUP (Floating Label)
------------------------- */
+/* INPUT GROUP */
 .input-group {
   position: relative;
-  margin-bottom: 25px;
-  width: 100%;
+  margin-top: 28px;
 }
 
 .input-group input {
   width: 100%;
-  padding: 18px 16px;
-  padding-right: 50px;
-  font-size: 15px;
-  border: 2px solid #ddd;
-  border-radius: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  border: 1px solid #ddd;
+  font-size: 16px;
   outline: none;
-  background: white;
-  transition: 0.25s ease;
+  background: #fff;
 }
 
 .input-group input:focus {
-  border-color: #d10000;
+  border-color: var(--primary);
 }
 
+/* Floating Label — SLIDE UP ONLY */
 .input-group label {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  color: #666;
-  font-size: 15px;
-  pointer-events: none;
-  transition: 0.25s ease;
-}
-
-/* FLOAT TO TOP animation */
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
-  top: -10px;
-  left: 10px;
-  background: white;
-  padding: 0 6px;
-  font-size: 12px;
-  color: #d10000;
-}
-
-/* -----------------------
-   PASSWORD TOGGLE ICON
------------------------- */
-.pass-group .toggle {
-  position: absolute;
-  right: 15px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 16px;
+  pointer-events: none;
+  transition: all .22s ease;
+}
+
+/* When filled or focused → label moves UP only */
+.input-group input:focus + label,
+.input-group.filled label {
+  top: 6px;
+  transform: translateY(0);
+  font-size: 13px;
+  color: var(--primary);
+}
+
+/* PASSWORD GROUP */
+.pass-group .toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
   cursor: pointer;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .eye-icon {
@@ -138,80 +124,71 @@ body {
   display: none;
 }
 
-/* -----------------------
-   LEGAL CHECKBOX
------------------------- */
+/* LEGAL */
 .legal {
+  margin-top: 18px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   font-size: 14px;
-  margin-bottom: 15px;
 }
 
 .legal input {
   width: 18px;
   height: 18px;
-  accent-color: #d10000;
+  accent-color: var(--primary);
 }
 
 .legal a {
-  color: #d10000;
+  color: var(--primary);
   font-weight: 600;
-  text-decoration: none;
 }
 
-/* -----------------------
-   BUTTONS
------------------------- */
+/* BUTTONS */
 .btn {
   width: 100%;
   padding: 15px;
-  border-radius: 14px;
+  border-radius: var(--radius);
   font-size: 16px;
+  margin-top: 20px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 15px;
 }
 
 .primary {
-  background: #d10000;
+  background: var(--primary);
   color: white;
   border: none;
-  box-shadow: 0 8px 25px rgba(209,0,0,0.3);
 }
 
 .google {
-  background: white;
+  background: #fff;
   border: 1px solid #ccc;
 }
 
+/* DIVIDER */
 .divider {
-  margin: 18px 0;
   text-align: center;
+  margin: 20px 0;
   color: #777;
-  font-size: 14px;
 }
 
+/* LINKS */
 .signin-link {
-  color: #d10000;
+  color: var(--primary);
   font-weight: 600;
-  text-decoration: none;
 }
 
-/* -----------------------
-   TOAST
------------------------- */
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background: #d10000;
+  background: var(--primary);
+  padding: 14px 20px;
   color: white;
-  padding: 15px 20px;
-  border-radius: 14px;
+  border-radius: 12px;
   font-size: 15px;
-  box-shadow: 0 6px 25px rgba(209,0,0,0.4);
-  z-index: 9999;
+  z-index: 999;
 }
