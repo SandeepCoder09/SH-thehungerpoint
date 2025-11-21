@@ -15,4 +15,4 @@ Responsive customer site + Admin PWA + Razorpay (test) + Firebase Firestore.
    ```bash
    cd server
    npm install
-   node razorpay-server.js
+   node cashfree-server.js
