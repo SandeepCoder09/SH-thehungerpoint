@@ -7,130 +7,89 @@ import bcrypt from "bcryptjs";
 import fetch from "node-fetch";
 
 // -----------------------------
-// Env check (helpful logs)
+// Fix Private Key (Render issue)
 // -----------------------------
-function rebuildPrivateKey(raw) {
-  if (!raw) return null;
-  return raw.includes("\\n") ? raw.replace(/\\n/g, "\n") : raw;
+function fixPrivateKey(raw) {
+  return raw?.replace(/\\n/g, "\n");
 }
-const requiredEnvs = [
-  "FIREBASE_TYPE",
+
+// -----------------------------
+// Check envs (good for debugging)
+// -----------------------------
+[
   "FIREBASE_PROJECT_ID",
-  "FIREBASE_PRIVATE_KEY_ID",
   "FIREBASE_PRIVATE_KEY",
   "FIREBASE_CLIENT_EMAIL",
   "JWT_SECRET",
   "CF_APP_ID",
   "CF_SECRET_KEY"
-];
-requiredEnvs.forEach(k => {
-  if (!process.env[k]) console.warn("Missing env:", k);
+].forEach(k => {
+  if (!process.env[k]) console.warn("⚠️ Missing ENV:", k);
 });
 
 // -----------------------------
-// Firebase init
+// Firebase Admin Init
 // -----------------------------
 let db = null;
+
 try {
-  const serviceAccount = {
-    type: process.env.FIREBASE_TYPE,
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: rebuildPrivateKey(process.env.FIREBASE_PRIVATE_KEY),
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_AUTH_URI,
-    token_uri: process.env.FIREBASE_TOKEN_URI,
-    auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
-    client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
-    universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
-  };
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      type: "service_account",
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: fixPrivateKey(process.env.FIREBASE_PRIVATE_KEY),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL
+    })
+  });
 
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   db = admin.firestore();
-  console.log("✅ Firebase Admin initialized");
+  console.log("🔥 Firebase Admin Connected");
 } catch (err) {
-  console.error("🔥 Firebase init failed:", err && err.message ? err.message : err);
+  console.error("❌ Firebase Init Error:", err);
 }
 
 // -----------------------------
-// Helpers
-// -----------------------------
-const safeJson = (res, status, obj) => res.status(status).json(obj);
-
-function requireAdminToken(req, res, next) {
-  const auth = req.headers.authorization || req.headers.Authorization;
-  if (!auth || !auth.startsWith("Bearer ")) return safeJson(res, 401, { ok: false, error: "Unauthorized" });
-  const token = auth.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
-    req.admin = decoded;
-    next();
-  } catch (err) {
-    return safeJson(res, 401, { ok: false, error: "Invalid token" });
-  }
-}
-
-// -----------------------------
-// Express app
+// Express App
 // -----------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/ping", (req, res) => res.send("Server Awake ✔"));
+// -----------------------------
+// Test Route
+// -----------------------------
+app.get("/ping", (req, res) => res.send("Server OK ✔"));
 
 // -----------------------------
-// Admin login & verify
+// ADMIN AUTH
 // -----------------------------
 app.post("/admin/login", async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-    const { email, password } = req.body || {};
-    if (!email || !password) return safeJson(res, 400, { ok: false, error: "email & password required" });
+    const { email, password } = req.body;
 
     const doc = await db.collection("admins").doc(email).get();
-    if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+    if (!doc.exists) return res.json({ ok: false, error: "Invalid credentials" });
 
-    const adminData = doc.data();
-    const hash = adminData.passwordHash || adminData.password || "";
-    const match = await bcrypt.compare(password, hash);
-    if (!match) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+    const data = doc.data();
+    const match = await bcrypt.compare(password, data.passwordHash);
+    if (!match) return res.json({ ok: false, error: "Invalid credentials" });
 
-    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET || "", { expiresIn: "7d" });
-    return safeJson(res, 200, { ok: true, token });
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({ ok: true, token });
   } catch (err) {
-    console.error("Admin login error:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
-  }
-});
-
-app.get("/admin/verify", requireAdminToken, (req, res) => {
-  return safeJson(res, 200, { ok: true, email: req.admin.email });
-});
-
-// Protected update-status
-app.post("/admin/update-status", requireAdminToken, async (req, res) => {
-  try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-    const { orderId, status } = req.body || {};
-    if (!orderId || !status) return safeJson(res, 400, { ok: false, error: "orderId & status required" });
-
-    await db.collection("orders").doc(orderId).update({ status });
-    return safeJson(res, 200, { ok: true });
-  } catch (err) {
-    console.error("Update status error:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
+    console.error(err);
+    res.json({ ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// CASHFREE: create order
+// CREATE CASHFREE ORDER
 // -----------------------------
 app.post("/create-cashfree-order", async (req, res) => {
   try {
-    const { amount, items, phone, email } = req.body || {};
-    if (!amount || Number(amount) <= 0) return safeJson(res, 400, { ok: false, error: "amount required" });
+    const { amount, items, email, phone } = req.body;
 
     const body = {
       order_amount: Number(amount),
@@ -147,74 +106,126 @@ app.post("/create-cashfree-order", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         "x-api-version": "2022-09-01",
-        "x-client-id": process.env.CF_APP_ID || "",
-        "x-client-secret": process.env.CF_SECRET_KEY || ""
+        "x-client-id": process.env.CF_APP_ID,
+        "x-client-secret": process.env.CF_SECRET_KEY
       },
       body: JSON.stringify(body)
     });
 
     const data = await cfRes.json();
+    console.log("CF Create Response →", data);
 
-    // Accept a few shapes and return normalized shape
-    const orderId = data.order_id || data.data?.order_id || data.order?.id;
-    const paymentSession = data.payment_session_id || data.data?.payment_session_id || data.data?.session || data.paymentSessionId;
+    const orderId = data.order_id || data?.data?.order_id;
+    const session = data.payment_session_id || data?.data?.payment_session_id;
 
-    if (!orderId || !paymentSession) {
-      console.warn("Cashfree create order failed:", data);
-      return safeJson(res, 500, { ok: false, error: "Cashfree failed", raw: data });
+    if (!orderId || !session) {
+      return res.json({ ok: false, error: "Cashfree error", raw: data });
     }
 
-    return safeJson(res, 200, { ok: true, orderId, session: paymentSession, raw: data });
+    // TEMP order save (status = pending)
+    await db.collection("tempOrders").doc(orderId).set({
+      orderId,
+      amount,
+      items,
+      email,
+      phone,
+      createdAt: admin.firestore.Timestamp.now(),
+      status: "pending"
+    });
+
+    res.json({ ok: true, orderId, session });
   } catch (err) {
-    console.error("Create Cashfree order error:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
+    console.error(err);
+    res.json({ ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// CASHFREE: verify payment + save order
+// VERIFY PAYMENT AFTER SUCCESS
 // -----------------------------
 app.post("/verify-cashfree-payment", async (req, res) => {
   try {
-    const { orderId, items } = req.body || {};
-    if (!orderId) return safeJson(res, 400, { ok: false, error: "orderId required" });
+    const { orderId } = req.body;
 
-    const resp = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`, {
+    const cf = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`, {
       headers: {
         "x-api-version": "2022-09-01",
-        "x-client-id": process.env.CF_APP_ID || "",
-        "x-client-secret": process.env.CF_SECRET_KEY || ""
+        "x-client-id": process.env.CF_APP_ID,
+        "x-client-secret": process.env.CF_SECRET_KEY
       }
     });
-    const data = await resp.json();
+
+    const data = await cf.json();
+    console.log("CF Verify →", data);
 
     if (data.order_status !== "PAID") {
-      return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
+      return res.json({ ok: false, error: "Payment not completed" });
     }
 
-    // compute total from items if provided, else fallback to data.order_amount
-    const total = items && Array.isArray(items) ? items.reduce((s, it) => s + (Number(it.price || it.amount || 0) * Number(it.qty || 1)), 0) : Number(data.order_amount || 0);
+    const temp = await db.collection("tempOrders").doc(orderId).get();
+    const info = temp.data();
 
-    const newOrderId = "ORD" + Date.now();
+    const finalId = "ORD" + Date.now();
 
-    await db.collection("orders").doc(newOrderId).set({
-      total,
-      items: items || [],
-      status: "paid",
-      createdAt: admin.firestore.Timestamp.now(),
+    await db.collection("orders").doc(finalId).set({
+      orderId: finalId,
       cashfree_order_id: orderId,
-      orderId: newOrderId
+      status: "paid",
+      total: Number(data.order_amount),
+      items: info.items,
+      email: info.email,
+      phone: info.phone,
+      createdAt: admin.firestore.Timestamp.now()
     });
 
-    return safeJson(res, 200, { ok: true, orderId: newOrderId });
+    res.json({ ok: true, orderId: finalId });
   } catch (err) {
-    console.error("Verify cashfree error:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
+    console.error(err);
+    res.json({ ok: false, error: "Server error" });
   }
 });
 
 // -----------------------------
-// Start server
+// CASHFREE WEBHOOK (AUTO VERIFY)
 // -----------------------------
-const PORT = Number(process.env.PORT) || 10000;
-app.listen(PORT, () => console.log(`🚀 SH Cashfree Server running on port ${PORT}`));
+app.post("/cashfree-webhook", async (req, res) => {
+  try {
+    const event = req.body;
+
+    const cfOrderId = event?.data?.order?.order_id;
+    const status = event?.data?.order?.status;
+
+    if (status !== "PAID") return res.json({ ok: true });
+
+    const temp = await db.collection("tempOrders").doc(cfOrderId).get();
+    if (!temp.exists) return res.json({ ok: true });
+
+    const info = temp.data();
+    const finalId = "ORD" + Date.now();
+
+    await db.collection("orders").doc(finalId).set({
+      orderId: finalId,
+      cashfree_order_id: cfOrderId,
+      items: info.items,
+      email: info.email,
+      phone: info.phone,
+      total: info.amount,
+      status: "paid",
+      via: "webhook",
+      createdAt: admin.firestore.Timestamp.now()
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("Webhook error:", err);
+    res.json({ ok: false });
+  }
+});
+
+// -----------------------------
+// START SERVER
+// -----------------------------
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log("🚀 Server Running on PORT " + PORT);
+});
