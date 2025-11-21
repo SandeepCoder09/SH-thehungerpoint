@@ -1,107 +1,101 @@
-// =======================
 // signup.js — SH The Hunger Point
-// =======================
 
-// Wait for Firebase Auth to load
-async function waitForAuth() {
-  return new Promise(resolve => {
-    const check = () => {
-      if (window.auth) resolve();
-      else setTimeout(check, 40);
-    };
-    check();
+// Auto-mark filled inputs
+document.querySelectorAll(".input-group input").forEach(input => {
+  input.addEventListener("input", () => {
+    if (input.value.trim() !== "") {
+      input.parentElement.classList.add("filled");
+    } else {
+      input.parentElement.classList.remove("filled");
+    }
   });
+});
+
+// Password toggles
+function setupToggle(passId, openId, slashId) {
+  const pass = document.getElementById(passId);
+  const open = document.getElementById(openId);
+  const slash = document.getElementById(slashId);
+
+  document.getElementById("toggle" + passId.charAt(0).toUpperCase() + passId.slice(1))
+    .addEventListener("click", () => {
+      if (pass.type === "password") {
+        pass.type = "text";
+        open.classList.add("hidden");
+        slash.classList.remove("hidden");
+      } else {
+        pass.type = "password";
+        slash.classList.add("hidden");
+        open.classList.remove("hidden");
+      }
+    });
 }
 
-(async () => {
-  await waitForAuth();
+setupToggle("password", "eyePassOpen", "eyePassSlash");
+setupToggle("confirm", "eyeConfirmOpen", "eyeConfirmSlash");
 
-  // Elements
-  const form = document.getElementById("signupForm");
-  const googleBtn = document.getElementById("googleSignup");
-  const toast = document.getElementById("toast");
+// Toast
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.hidden = false;
+  setTimeout(() => t.hidden = true, 2500);
+}
 
-  // ===== TOAST FUNCTION =====
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.hidden = false;
-    setTimeout(() => (toast.hidden = true), 2500);
-  }
+// Firebase auth
+const form = document.getElementById("signupForm");
 
-  // ===== SHOW/HIDE PASSWORD =====
-  function setupToggle(inputId, openId, slashId) {
-    const input = document.getElementById(inputId);
-    const openIcon = document.getElementById(openId);
-    const slashIcon = document.getElementById(slashId);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const toggleWrapper = openIcon.parentElement;
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
 
-    toggleWrapper.addEventListener("click", () => {
-      const isHidden = input.type === "password";
+  if (!document.getElementById("legalCheck").checked)
+    return showToast("Please accept all policies.");
 
-      input.type = isHidden ? "text" : "password";
+  if (password !== confirm)
+    return showToast("Passwords do not match.");
 
-      openIcon.classList.toggle("hidden", !isHidden);
-      slashIcon.classList.toggle("hidden", isHidden);
+  try {
+    const userCred = await auth.createUserWithEmailAndPassword(email, password);
+
+    await db.collection("users").doc(userCred.user.uid).set({
+      name,
+      email,
+      createdAt: new Date()
     });
-  }
 
-  setupToggle("password", "eyeOpenPass", "eyeSlashPass");
-  setupToggle("confirm", "eyeOpenConfirm", "eyeSlashConfirm");
+    showToast("Account created!");
 
-  // ===========================
-  // FORM SUBMIT
-  // ===========================
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("password").value;
-    const confirm = document.getElementById("confirm").value;
-    const legal = document.getElementById("legalCheck").checked;
-
-    if (!legal) return showToast("Please accept all legal policies.");
-    if (pass !== confirm) return showToast("Passwords do not match.");
-
-    try {
-      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
-
-      await db.collection("users").doc(userCred.user.uid).set({
-        name,
-        email,
-        createdAt: new Date(),
-      });
-
-      showToast("Account created successfully!");
-
-      setTimeout(() => {
-        window.location.href = "/home/index.html";
-      }, 800);
-    } catch (err) {
-      showToast(err.message);
-    }
-  });
-
-  // ===========================
-  // GOOGLE SIGNUP
-  // ===========================
-  googleBtn.addEventListener("click", async () => {
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      const userCred = await auth.signInWithPopup(provider);
-
-      if (userCred.additionalUserInfo.isNewUser) {
-        await db.collection("users").doc(userCred.user.uid).set({
-          name: userCred.user.displayName,
-          email: userCred.user.email,
-          createdAt: new Date(),
-        });
-      }
-
+    setTimeout(() => {
       window.location.href = "/home/index.html";
-    } catch (err) {
-      showToast(err.message);
+    }, 1000);
+
+  } catch (err) {
+    showToast(err.message);
+  }
+});
+
+// Google signup
+document.getElementById("googleSignup").addEventListener("click", async () => {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const res = await auth.signInWithPopup(provider);
+
+    if (res.additionalUserInfo.isNewUser) {
+      await db.collection("users").doc(res.user.uid).set({
+        name: res.user.displayName,
+        email: res.user.email,
+        createdAt: new Date()
+      });
     }
-  });
-})();
+
+    window.location.href = "/home/index.html";
+
+  } catch (err) {
+    showToast(err.message);
+  }
+});
