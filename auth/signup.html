@@ -24,94 +24,90 @@
           <img src="/home/sh-thehungerpoint.png" class="logo-img">
           <span class="brand">The Hunger Point</span>
         </div>
-        <h2 class="title">Create Account</h2>
+        <div class="title">Create Account</div>
       </header>
 
-      <!-- FORM -->
+      <!-- BODY -->
       <section class="card-body">
         <form id="signupForm">
 
-          <!-- NAME -->
+          <!-- INPUT GROUP -->
           <div class="input-group">
-            <input type="text" id="name" required />
+            <input id="name" type="text" required>
             <label for="name">Name</label>
           </div>
 
-          <!-- EMAIL -->
           <div class="input-group">
-            <input type="email" id="email" required />
+            <input id="email" type="email" required>
             <label for="email">Email</label>
           </div>
 
-          <!-- PASSWORD -->
           <div class="input-group pass-group">
-            <input type="password" id="password" required minlength="6" />
+            <input id="password" type="password" required>
             <label for="password">Password</label>
 
             <span class="toggle" id="togglePass">
-              <svg id="eyeOpenPass" class="eye-icon" width="22" height="22" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
+              <svg class="eye eye-open" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <circle cx="12" cy="12" r="3"
+                  fill="none" stroke="#333" stroke-width="2" />
               </svg>
 
-              <svg id="eyeSlashPass" class="eye-icon hidden" width="22" height="22" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
-                <line x1="5" y1="19" x2="19" y2="5" stroke="#444" stroke-width="2"/>
+              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <circle cx="12" cy="12" r="3"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <line x1="4" y1="20" x2="20" y2="4"
+                  stroke="#333" stroke-width="2" />
               </svg>
             </span>
           </div>
 
-          <!-- CONFIRM PASSWORD -->
           <div class="input-group pass-group">
-            <input type="password" id="confirm" required minlength="6" />
+            <input id="confirm" type="password" required>
             <label for="confirm">Confirm Password</label>
 
             <span class="toggle" id="toggleConfirm">
-              <svg id="eyeOpenConfirm" class="eye-icon" width="22" height="22" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
+              <svg class="eye eye-open" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <circle cx="12" cy="12" r="3"
+                  fill="none" stroke="#333" stroke-width="2" />
               </svg>
 
-              <svg id="eyeSlashConfirm" class="eye-icon hidden" width="22" height="22" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-12 8S1 12 1 12z" stroke="#444" fill="none" stroke-width="2"/>
-                <circle cx="12" cy="12" r="3" stroke="#444" fill="none" stroke-width="2"/>
-                <line x1="5" y1="19" x2="19" y2="5" stroke="#444" stroke-width="2"/>
+              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <circle cx="12" cy="12" r="3"
+                  fill="none" stroke="#333" stroke-width="2" />
+                <line x1="4" y1="20" x2="20" y2="4"
+                  stroke="#333" stroke-width="2" />
               </svg>
             </span>
           </div>
 
           <!-- LEGAL -->
           <label class="legal">
-            <input type="checkbox" id="legalCheck" />
-            I accept the
-            <a href="/legal/terms.html">Terms</a>,
-            <a href="/legal/privacy.html">Privacy</a>,
-            <a href="/legal/refund.html">Refund</a>,
-            <a href="/legal/shipping.html">Shipping Policy</a>.
+            <input type="checkbox" id="legalCheck">
+            <span>I accept all terms.</span>
           </label>
 
           <button type="submit" class="btn primary">Create Account</button>
 
           <div class="divider">or</div>
 
-          <button type="button" class="btn google" id="googleSignup">
-            Continue with Google
-          </button>
-
-          <p class="muted">
-            Already have an account?
-            <a href="/auth/login.html">Sign in</a>
-          </p>
+          <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
 
         </form>
       </section>
+
     </div>
 
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <script src="/auth/firebase-config.js"></script>
   <script src="/auth/signup.js"></script>
 </body>
 </html>
