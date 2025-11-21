@@ -1,135 +1,237 @@
-// ===============================
-// WAIT FOR FIREBASE INITIALIZATION
-// ===============================
-async function waitForAuth() {
-  return new Promise(resolve => {
-    const check = () => {
-      if (window.auth && window.db) resolve();
-      else setTimeout(check, 40);
-    };
-    check();
-  });
-}
+/* auth/signup.js
+   Fully regenerated — robust + self-contained
+   Expects:
+   - firebase compat SDKs already loaded (app-compat, auth-compat, firestore-compat)
+   - ideally /auth/firebase-config.js runs before this and sets `auth` and `db`
+   If not, the script will try to initialize firebase itself if window.firebaseConfig exists.
+*/
 
-// ===============================
-// SVG ICON DATA
-// ===============================
-const ICON_EYE = `
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#666" viewBox="0 0 24 24">
-  <path d="M12 5c-7.633 0-11 6.993-11 7s3.367 7 11 7 11-6.993 11-7-3.367-7-11-7zm0 
-  12c-2.761 0-5-2.239-5-5 0-2.762 2.239-5 5-5s5 2.238 5 
-  5c0 2.761-2.239 5-5 5zm0-8c-1.654 0-3 1.346-3 
-  3 0 1.653 1.346 3 3 3s3-1.347 3-3c0-1.654-1.346-3-3-3z"/>
-</svg>`;
+(() => {
+  "use strict";
 
-const ICON_EYE_OFF = `
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#d10000" viewBox="0 0 24 24">
-  <path d="M1.707 3.293l19 19-1.414 1.414-3.249-3.249C14.856 
-  21.145 13.469 21.5 12 21.5c-7.633 0-11-6.993-11-7 
-  0-.591 1.454-3.626 4.727-5.727L.293 4.707 
-  1.707 3.293zM12 7.5c-1.139 0-2.2.394-3.036 1.053l7.483 
-  7.483C17.606 14.2 18 13.139 18 12c0-2.761-2.239-5-5-5z"/>
-</svg>`;
+  /* ---------- SVG ICONS ---------- */
+  const ICON_EYE = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#555" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 5c-7.633 0-11 6.993-11 7s3.367 7 11 7 11-6.993 11-7-3.367-7-11-7zm0 
+    12c-2.761 0-5-2.239-5-5 0-2.762 2.239-5 5-5s5 2.238 5 
+    5c0 2.761-2.239 5-5 5zm0-8c-1.654 0-3 1.346-3 
+    3 0 1.653 1.346 3 3 3s3-1.347 3-3c0-1.654-1.346-3-3-3z"/>
+  </svg>`.trim();
 
-// ===============================
-// SHOW TOAST
-// ===============================
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.hidden = false;
-  setTimeout(() => t.hidden = true, 2500);
-}
+  // simple single-line slash icon (used for "hidden" toggle)
+  const ICON_SLASH = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <line x1="4" y1="20" x2="20" y2="4" stroke="#d10000" stroke-width="2.5" stroke-linecap="round" />
+  </svg>`.trim();
 
-// ===============================
-// TOGGLE PASSWORD VISIBILITY
-// ===============================
-function setupToggle(inputId, iconId, toggleWrapperId) {
-  const input = document.getElementById(inputId);
-  const wrapper = document.getElementById(toggleWrapperId);
+  /* ---------- DOM helpers ---------- */
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-  wrapper.addEventListener("click", () => {
-    if (input.type === "password") {
-      input.type = "text";
-      wrapper.innerHTML = ICON_EYE_OFF;
-      wrapper.classList.add("active");
-    } else {
-      input.type = "password";
-      wrapper.innerHTML = ICON_EYE;
-      wrapper.classList.remove("active");
+  function showToast(text, ms = 2600) {
+    const t = $("#toast");
+    if (!t) {
+      console.warn("Toast missing:", text);
+      return;
     }
-  });
-}
+    t.textContent = text;
+    t.hidden = false;
+    t.style.opacity = "1";
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => {
+      t.hidden = true;
+      t.style.opacity = "0";
+    }, ms);
+  }
 
-// ===============================
-// MAIN SIGNUP FLOW
-// ===============================
-(async () => {
-  await waitForAuth();
+  /* ---------- Ensure firebase (auth/db) ---------- */
+  async function ensureFirebaseReady() {
+    // if `auth` & `db` already set by your firebase-config.js, use them
+    if (window.auth && window.db) return;
 
-  const form = document.getElementById("signupForm");
-  const googleBtn = document.getElementById("googleSignup");
+    // if firebase SDK exists and firebaseConfig is present, init here
+    if (window.firebase && window.firebase.apps && window.firebaseConfig && !window.firebase.apps.length) {
+      try {
+        firebase.initializeApp(window.firebaseConfig);
+      } catch (e) {
+        // ignore if already initialized
+      }
+    }
 
-  // Setup password toggles
-  setupToggle("password", "icon-pass", "togglePass");
-  setupToggle("confirm", "icon-confirm", "toggleConfirm");
-
-  // ===============================
-  // SUBMIT FORM
-  // ===============================
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const pass = password.value;
-    const confirmPass = confirmPassword.value;
-    const legal = legalCheck.checked;
-
-    if (!legal) return showToast("Please accept all legal policies.");
-    if (pass !== confirmPass) return showToast("Passwords do not match.");
+    // wait until firebase.auth available
+    const waitFor = (cond, timeout = 4000) => new Promise((resolve, reject) => {
+      const start = Date.now();
+      (function check() {
+        if (cond()) return resolve();
+        if (Date.now() - start > timeout) return reject(new Error("Timed out waiting for Firebase"));
+        setTimeout(check, 50);
+      })();
+    });
 
     try {
-      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
-
-      await db.collection("users").doc(userCred.user.uid).set({
-        name,
-        email,
-        createdAt: new Date()
-      });
-
-      showToast("Account created!");
-
-      setTimeout(() => {
-        window.location.href = "/home/index.html";
-      }, 800);
-
+      await waitFor(() => window.firebase && window.firebase.auth && window.firebase.firestore, 4000);
+      // attach convenience globals if not present
+      if (!window.auth) window.auth = firebase.auth();
+      if (!window.db) window.db = firebase.firestore();
     } catch (err) {
-      showToast(err.message);
+      console.warn("Firebase not found or not ready:", err);
+      // leave it — downstream callers will get a readable error when attempting auth ops
     }
-  });
+  }
 
-  // ===============================
-  // GOOGLE SIGNUP
-  // ===============================
-  googleBtn.addEventListener("click", async () => {
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      const userCred = await auth.signInWithPopup(provider);
+  /* ---------- Toggle password UI ---------- */
+  function setupToggle(inputId, toggleId) {
+    const input = document.getElementById(inputId);
+    const toggle = document.getElementById(toggleId);
+    if (!input || !toggle) return;
+    toggle.innerHTML = ICON_EYE;
+    toggle.setAttribute("role", "button");
+    toggle.setAttribute("aria-label", "Show password");
 
-      if (userCred.additionalUserInfo.isNewUser) {
-        await db.collection("users").doc(userCred.user.uid).set({
-          name: userCred.user.displayName,
-          email: userCred.user.email,
-          createdAt: new Date()
-        });
+    toggle.addEventListener("click", () => {
+      if (input.type === "password") {
+        input.type = "text";
+        toggle.innerHTML = ICON_SLASH;
+        toggle.setAttribute("aria-label", "Hide password");
+      } else {
+        input.type = "password";
+        toggle.innerHTML = ICON_EYE;
+        toggle.setAttribute("aria-label", "Show password");
+      }
+    });
+  }
+
+  /* ---------- Validation helpers ---------- */
+  function isEmail(v) {
+    return /\S+@\S+\.\S+/.test(v);
+  }
+
+  function disableButton(btn) {
+    if (!btn) return;
+    btn.disabled = true;
+    btn.dataset.prev = btn.innerHTML;
+    btn.innerHTML = "Please wait…";
+    btn.classList.add("disabled");
+  }
+  function enableButton(btn) {
+    if (!btn) return;
+    btn.disabled = false;
+    if (btn.dataset.prev) btn.innerHTML = btn.dataset.prev;
+    btn.classList.remove("disabled");
+  }
+
+  /* ---------- Main init ---------- */
+  async function init() {
+    await ensureFirebaseReady();
+
+    const form = $("#signupForm");
+    const googleBtn = $("#googleSignup");
+    const togglePass = $("#togglePass");
+    const toggleConfirm = $("#toggleConfirm");
+    const submitBtn = form?.querySelector('button[type="submit"]') || null;
+
+    setupToggle("password", "togglePass");
+    setupToggle("confirm", "toggleConfirm");
+
+    if (!form) {
+      console.error("Signup form not found");
+      return;
+    }
+
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      // basic guard
+      if (submitBtn && submitBtn.disabled) return;
+
+      const name = (document.getElementById("name")?.value || "").trim();
+      const email = (document.getElementById("email")?.value || "").trim();
+      const password = (document.getElementById("password")?.value || "");
+      const confirm = (document.getElementById("confirm")?.value || "");
+      const legal = !!document.getElementById("legalCheck")?.checked;
+
+      if (!name) { showToast("Enter your name"); return; }
+      if (!email || !isEmail(email)) { showToast("Enter a valid email"); return; }
+      if (!password || password.length < 6) { showToast("Password must be at least 6 characters"); return; }
+      if (password !== confirm) { showToast("Passwords do not match"); return; }
+      if (!legal) { showToast("Please accept the policies"); return; }
+
+      if (!window.auth) {
+        showToast("Auth not ready. Contact admin.");
+        return;
       }
 
-      window.location.href = "/home/index.html";
+      disableButton(submitBtn);
 
-    } catch (err) {
-      showToast(err.message);
+      try {
+        const userCred = await window.auth.createUserWithEmailAndPassword(email, password);
+        const uid = userCred?.user?.uid;
+        if (!uid) throw new Error("Signup failed");
+
+        // optional: update displayName
+        try { await userCred.user.updateProfile({ displayName: name }); } catch(e){ /* ignore */ }
+
+        // save user doc in Firestore
+        if (window.db) {
+          await window.db.collection("users").doc(uid).set({
+            name,
+            email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        }
+
+        showToast("Account created — redirecting…", 1800);
+        setTimeout(() => { window.location.href = "/home/index.html"; }, 1000);
+
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : String(err);
+        // friendly mapping for common firebase errors
+        let friendly = msg;
+        if (msg.includes("auth/email-already-in-use")) friendly = "Email already in use — try logging in";
+        if (msg.includes("auth/invalid-email")) friendly = "Invalid email address";
+        if (msg.includes("auth/weak-password")) friendly = "Password is too weak";
+        showToast(friendly, 3000);
+        console.error("Signup error:", err);
+      } finally {
+        enableButton(submitBtn);
+      }
+    });
+
+    // Google signup/signin
+    if (googleBtn) {
+      googleBtn.addEventListener("click", async () => {
+        if (!window.auth) { showToast("Auth not ready"); return; }
+        disableButton(googleBtn);
+        try {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          const result = await window.auth.signInWithPopup(provider);
+
+          // if new user, create doc
+          const isNew = result?.additionalUserInfo?.isNewUser;
+          const user = result?.user;
+          if (isNew && user && window.db) {
+            await window.db.collection("users").doc(user.uid).set({
+              name: user.displayName || "",
+              email: user.email || "",
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          }
+
+          window.location.href = "/home/index.html";
+        } catch (err) {
+          showToast(err?.message || "Google sign-in failed");
+          console.error("Google sign-in", err);
+        } finally {
+          enableButton(googleBtn);
+        }
+      });
     }
-  });
+  }
+
+  // DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 
 })();
