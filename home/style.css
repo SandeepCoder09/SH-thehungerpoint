@@ -103,37 +103,20 @@ body {
 .hero-border::before {
 	content: "";
 	position: absolute;
-
-	/* Slightly outside box for thicker border */
 	top: -4px;
 	left: -4px;
 	right: -4px;
 	bottom: -4px;
-
 	border-radius: 26px;
-
-	/* Border thickness */
-	padding: 4px;
-
-	/* Your gradient colors */
-	background: linear-gradient(0deg,
-			#ff6b7a,
-			#e23744,
-			#ff6b7a,
-			#ff9ba8);
-
+	padding: 4px!
+	background: linear-gradient(0deg, #ff6b7a, #e23744, #ff6b7a, #ff9ba8);
 	background-size: 400% 400%;
-
-	/* Infinite, smooth, continuous animation */
 	animation: moveBorder 5s linear infinite;
-
-	/* Mask so ONLY BORDER shows */
 	-webkit-mask:
 		linear-gradient(#fff 0 0) content-box,
 		linear-gradient(#fff 0 0);
 	-webkit-mask-composite: xor;
 	mask-composite: exclude;
-
 	pointer-events: none;
 }
 
