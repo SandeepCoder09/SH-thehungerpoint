@@ -52,25 +52,30 @@
 <body>
 
   <!-- HEADER -->
-  <header class="nav">
-    <div class="brand">
-      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
-      <div class="brand-text">
-        <div class="name">The Hunger Point</div>
-        <div class="tag">Family style • Premium • Fast food</div>
+<header class="nav">
+  <div class="brand">
+    <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
+    <div class="brand-text">
+      <div class="name">The Hunger Point</div>
+      <div class="tag">Family style • Premium • Fast food</div>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button id="cartToggle" class="icon-btn">🛒 <span id="cartCount">0</span></button>
+
+    <!-- New Language Icon -->
+    <div class="lang-wrapper">
+      <button class="lang-icon">🌐</button>
+
+      <!-- Dropdown Menu -->
+      <div class="lang-menu">
+        <div onclick="SHTranslate.setLanguage('en')">English</div>
+        <div onclick="SHTranslate.setLanguage('hi')">हिन्दी</div>
       </div>
     </div>
-
-<!-- Language selection, Hindi & English -->
-<div class="language-toggle">
-  <button onclick="SHTranslate.setLanguage('en')">English</button>
-  <button onclick="SHTranslate.setLanguage('hi')">हिंदी</button>
-</div>
-
-    <div class="header-actions">
-      <button id="cartToggle" class="icon-btn">🛒 <span id="cartCount">0</span></button>
-    </div>
-  </header>
+  </div>
+</header>
 
   <!-- MAIN -->
   <main class="container">
