@@ -496,3 +496,108 @@ body {
 		max-height: calc(100vh - 120px)
 	}
 }
+
+/* =========================================================
+   HOME PAGE MENU ITEMS — MATCH CART ITEM STYLING
+   ========================================================= */
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 22px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+/* Image wrapper matches cart image design */
+.menu-img-wrap {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* same red glow as cart */
+  box-shadow: 0 0 18px rgba(226, 55, 68, 0.35);
+}
+
+.menu-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Text styling same as cart */
+.menu-meta h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.menu-meta .price {
+  font-size: 14px;
+  color: #444;
+}
+
+.menu-meta {
+  flex: 1;
+}
+
+/* Controls match cart quantity buttons */
+
+.menu-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-pill {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 14px;
+  padding: 4px 8px;
+  box-shadow: 0 0 18px rgba(226, 55, 68, 0.35);
+}
+
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #E23744;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.qty-display {
+  width: 34px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* Add button matches style of cart remove button shape */
+.add-cart-btn {
+  padding: 8px 20px;
+  background: #E23744;
+  color: #fff;
+  border-radius: 12px;
+  border: 2px solid #E23744;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(226, 55, 68, 0.25);
+}
+
+.add-cart-btn:active {
+  transform: scale(0.96);
+}
