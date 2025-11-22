@@ -120,20 +120,30 @@ iframe.skiptranslate {
   display: none !important;
 }
 
-/* Hide Google Translate feedback popup */
-.goog-tooltip,
-.goog-tooltip:hover,
-.goog-text-highlight {
+/* Remove Google Translate tooltip / feedback popup */
+#goog-gt-tt,
+#goog-gt-tt * {
   display: none !important;
   visibility: hidden !important;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  opacity: 0 !important;
+}
+
+/* Hide Google Translate feedback iframe */
+iframe.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Hide Google translate menu iframe */
+iframe.goog-te-menu-frame {
+  display: none !important;
 }
 
 /* Remove yellow highlight on translated text */
 .goog-text-highlight {
   background: none !important;
+  box-shadow: none !important;
   color: inherit !important;
 }
 
