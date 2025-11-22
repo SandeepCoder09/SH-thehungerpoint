@@ -2,6 +2,19 @@
 // Full script: menu qty + add-to-cart + cart modal + Cashfree checkout + toast
 // Preserves your server integration and UX. Updated to match new menu layout.
 
+// Language Translation Fixing Button ✅ 
+document.querySelector(".lang-icon").addEventListener("click", () => {
+  const menu = document.querySelector(".lang-menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+});
+
+// Close menu if clicked outside
+window.addEventListener("click", (e) => {
+  if (!e.target.closest(".lang-wrapper")) {
+    document.querySelector(".lang-menu").style.display = "none";
+  }
+});
+
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
