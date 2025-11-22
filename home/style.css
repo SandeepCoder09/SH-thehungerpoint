@@ -1,202 +1,282 @@
-/* ========== Base / layout ========== */
+/* ========== /home/style.css ========== */
+/* Full stylesheet — preserves your brand colors and layout; includes new menu card style (Option A) */
+
+/* ---------- Root / Vars ---------- */
 :root {
 	--brand: #E23744;
+	--brand-dark: #C22A3A;
 	--bg: #fafafa;
-	--card-bg: #fff;
+	--card: #ffffff;
 	--muted: #6b6b6b;
-	--radius: 14px;
+	--radius: 18px;
+	--glass: rgba(255, 255, 255, 0.85);
+	--shadow-1: 0 6px 18px rgba(0, 0, 0, 0.06);
+	--shadow-2: 0 14px 40px rgba(0, 0, 0, 0.08);
 }
 
+/* ---------- Reset ---------- */
 * {
 	box-sizing: border-box;
+	margin: 0;
+	padding: 0
+}
+
+html,
+body {
+	height: 100%
 }
 
 body {
-	margin: 0;
-	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 	background: var(--bg);
 	color: #111;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	line-height: 1.3;
+	padding-bottom: 40px;
 }
 
-/* header */
+/* ---------- Header ---------- */
 .nav {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	padding: 12px 16px;
-	background: linear-gradient(90deg, rgba(226, 55, 68, 1) 0%, rgba(226, 55, 68, 0.95) 100%);
-	color: #fff;
+	justify-content: space-between;
 	gap: 12px;
+	padding: 12px 18px;
+	background: linear-gradient(90deg, rgba(226, 55, 68, 1) 0%, rgba(226, 55, 68, 0.94) 100%);
+	color: #fff;
+	box-shadow: 0 6px 18px rgba(226, 55, 68, 0.06);
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 12px
 }
 
 .logo-img {
-	height: 44px;
+	height: 48px;
+	border-radius: 10px
 }
 
 .brand-text .name {
 	font-weight: 700;
+	font-size: 18px
+}
+
+.brand-text .tag {
+	font-size: 13px;
+	opacity: 0.95
+}
+
+/* header actions */
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px
 }
 
 .icon-btn {
 	background: transparent;
-	border: none;
+	border: 0;
 	color: inherit;
-	font-size: 16px;
 	cursor: pointer;
-}
-
-.header-actions {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	font-size: 16px
 }
 
 #cartCount {
 	background: #fff;
 	color: var(--brand);
-	padding: 2px 8px;
+	padding: 4px 8px;
 	border-radius: 999px;
 	font-weight: 700;
-	margin-left: 8px;
+	margin-left: 8px
 }
 
-/* container */
+/* ---------- Page container ---------- */
 .container {
-	padding: 18px;
 	max-width: 980px;
 	margin: 0 auto;
+	padding: 22px
 }
 
-/* hero */
+/* ---------- Hero ---------- */
 .hero {
-	margin: 18px 0;
+	margin: 20px 0 18px;
+	padding: 18px;
+	border-radius: 18px;
+	background: linear-gradient(180deg, rgba(255, 250, 248, 1) 0%, rgba(255, 246, 244, 1) 100%);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04)
 }
 
 .hero h1 {
-	margin: 0 0 6px 0;
 	font-size: 28px;
+	margin-bottom: 6px;
+	font-weight: 700
 }
 
 .hero p {
-	margin: 0;
-	color: var(--muted);
+	color: var(--muted)
 }
 
-/* tabs */
+/* ---------- Tabs ---------- */
 .top-tabs {
 	display: flex;
-	gap: 8px;
-	margin: 12px 0 18px;
+	gap: 12px;
+	margin: 18px 0
 }
 
 .tab {
-	background: transparent;
-	border: 1px solid rgba(0, 0, 0, 0.06);
-	padding: 8px 12px;
+	padding: 10px 16px;
 	border-radius: 12px;
-	cursor: pointer;
+	background: transparent;
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	cursor: pointer
 }
 
 .tab.active {
-	background: #fff;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+	background: var(--brand);
+	color: #fff;
+	box-shadow: var(--shadow-2)
 }
 
-/* menu grid */
+/* ---------- MENU GRID (keeps responsive behavior) ---------- */
 .menu {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-	gap: 12px;
+	grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+	gap: 18px;
 }
 
+/* ---------- NEW MENU ITEM CARD (Option A) ---------- */
 .menu-item {
-	background: var(--card-bg);
-	border-radius: 14px;
-	padding: 12px;
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+	gap: 18px;
+	background: var(--card);
+	border-radius: 20px;
+	padding: 16px;
+	box-shadow: var(--shadow-1);
+	min-height: 110px;
+}
+
+/* Left image block */
+.menu-img-wrap {
+	width: 92px;
+	height: 92px;
+	border-radius: 18px;
+	overflow: hidden;
+	flex: 0 0 92px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(250, 250, 250, 1));
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .menu-img {
-	width: 72px;
-	height: 72px;
-	border-radius: 12px;
+	width: 80px;
+	height: 80px;
+	border-radius: 14px;
 	object-fit: cover;
-	box-shadow: 0 0 18px rgba(226, 55, 68, 0.18);
+	display: block;
+	box-shadow: 0 12px 30px rgba(226, 55, 68, 0.14);
 }
 
-.mi-center {
+/* Center content (title + price) */
+.menu-meta {
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0
 }
 
-.mi-center h3 {
+.menu-meta h3 {
+	font-size: 18px;
 	margin: 0;
-	font-size: 16px;
+	font-weight: 700
+}
+
+.menu-meta .price {
+	color: var(--brand);
 	font-weight: 700;
+	font-size: 16px
 }
 
-.price {
+.menu-meta .price small {
+	font-weight: 400;
 	color: var(--muted);
-	font-size: 13px;
-	margin-top: 4px;
+	font-size: 12px;
+	margin-left: 6px
 }
 
-.controls {
+/* Right controls: pill qty + add button */
+.menu-controls {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 12px
 }
 
-.qty-wrap {
+/* Pill qty */
+.qty-pill {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
 	background: #fff;
 	border-radius: 999px;
-	padding: 4px 6px;
-	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+	padding: 6px;
+	box-shadow: 0 8px 20px rgba(226, 55, 68, 0.12);
+	align-items: center;
 }
 
 .qty-btn {
-	width: 34px;
-	height: 34px;
-	border-radius: 50%;
+	width: 46px;
+	height: 46px;
+	border-radius: 999px;
 	border: none;
 	background: var(--brand);
 	color: #fff;
-	font-size: 18px;
+	font-size: 20px;
+	display: grid;
+	place-items: center;
 	cursor: pointer;
+	box-shadow: 0 8px 18px rgba(226, 55, 68, 0.18);
 }
 
+.qty-display {
+	width: 56px;
+	text-align: center;
+	font-weight: 700;
+	font-size: 18px;
+	background: #fff;
+	border-radius: 8px;
+	padding: 8px 6px;
+	box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Add button (rounded) */
 .add-cart-btn {
 	background: var(--brand);
-	color: #fff;
 	border: none;
-	padding: 8px 12px;
-	border-radius: 10px;
+	color: #fff;
+	padding: 10px 14px;
+	border-radius: 22px;
 	cursor: pointer;
 	font-weight: 700;
+	box-shadow: 0 8px 20px rgba(226, 55, 68, 0.18);
 }
 
-/* cart modal + overlay */
+/* ---------- Cart modal styles (unchanged except images added) ---------- */
 .overlay {
 	position: fixed;
 	inset: 0;
 	background: rgba(0, 0, 0, 0.45);
 	z-index: 60;
-	display: none;
-}
-
-.overlay.hidden {
-	display: none;
+	display: none
 }
 
 .overlay:not(.hidden) {
-	display: block;
+	display: block
 }
 
 .cart-modal {
@@ -214,7 +294,7 @@ body {
 }
 
 .cart-modal.hidden {
-	display: none;
+	display: none
 }
 
 .cart-modal-head {
@@ -223,7 +303,7 @@ body {
 	align-items: center;
 	padding-bottom: 6px;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-	margin-bottom: 8px;
+	margin-bottom: 8px
 }
 
 .cart-modal-foot {
@@ -231,13 +311,13 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 10px;
+	gap: 10px
 }
 
 .cart-modal-actions {
 	display: flex;
 	gap: 8px;
-	align-items: center;
+	align-items: center
 }
 
 .primary {
@@ -246,7 +326,7 @@ body {
 	border: none;
 	padding: 8px 12px;
 	border-radius: 10px;
-	cursor: pointer;
+	cursor: pointer
 }
 
 .muted {
@@ -254,15 +334,15 @@ body {
 	border: 1px solid rgba(0, 0, 0, 0.06);
 	padding: 8px 10px;
 	border-radius: 10px;
-	cursor: pointer;
+	cursor: pointer
 }
 
-/* ====== CART ITEM (compact, image-left, right controls) ====== */
+/* Cart item (compact image-left layout) */
 .cart-items {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	padding: 6px 2px;
+	padding: 6px 2px
 }
 
 .cart-item {
@@ -270,60 +350,43 @@ body {
 	align-items: center;
 	gap: 12px;
 	background: #fff;
-	padding: 10px;
+	padding: 12px;
 	border-radius: 12px;
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
 }
 
-/* image with red glow */
-.cart-item-img {
-	width: 64px;
-	height: 64px;
+.cart-img {
+	width: 60px;
+	height: 60px;
 	border-radius: 12px;
 	object-fit: cover;
-	flex: 0 0 64px;
-	box-shadow: 0 6px 18px rgba(226, 55, 68, 0.28);
-	/* RED glow */
+	flex: 0 0 60px;
+	box-shadow: 0 6px 18px rgba(226, 55, 68, 0.28)
 }
 
-/* center meta */
-.meta {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	min-width: 0;
+.cart-info {
+	flex: 1
 }
 
-.cart-title {
+.cart-name {
 	font-weight: 700;
 	font-size: 15px;
 	white-space: nowrap;
 	overflow: hidden;
-	text-overflow: ellipsis;
+	text-overflow: ellipsis
 }
 
 .cart-sub {
-	color: var(--muted);
 	font-size: 13px;
+	color: var(--muted)
 }
 
-/* right controls in one line */
-.qty-controls {
+.cart-actions {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	margin-left: 6px;
-	white-space: nowrap;
-}
-
-.qty-controls button {
-	border: none;
-	background: transparent;
-	cursor: pointer;
-	font-size: 18px;
-	padding: 6px;
-	border-radius: 8px;
+	white-space: nowrap
 }
 
 .cart-dec,
@@ -333,28 +396,30 @@ body {
 	border-radius: 8px;
 	background: var(--brand);
 	color: #fff;
+	border: 0;
 	font-weight: 700;
+	cursor: pointer;
 	display: inline-grid;
-	place-items: center;
+	place-items: center
 }
 
 .cart-remove {
-	border: 2px solid var(--brand);
-	color: var(--brand);
-	background: #fff;
 	width: 34px;
 	height: 34px;
 	border-radius: 8px;
+	border: 2px solid var(--brand);
+	background: #fff;
+	color: var(--brand);
+	cursor: pointer
 }
 
-/* empty text */
+/* Empty text and toast */
 .empty {
 	color: var(--muted);
 	padding: 12px;
-	text-align: center;
+	text-align: center
 }
 
-/* toast */
 .toast-container {
 	position: fixed;
 	left: 50%;
@@ -364,7 +429,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	pointer-events: none;
+	pointer-events: none
 }
 
 .toast {
@@ -372,25 +437,62 @@ body {
 	color: #fff;
 	padding: 8px 12px;
 	border-radius: 8px;
-	pointer-events: auto;
+	pointer-events: auto
 }
 
-/* responsive */
-@media (max-width: 480px) {
-	.cart-modal {
-		left: 10px;
-		right: 10px;
-		top: 72px;
-		width: auto;
-		max-height: calc(100vh - 120px);
+/* ---------- Footer ---------- */
+.footer {
+	padding: 18px;
+	text-align: center;
+	margin-top: 20px;
+	background: linear-gradient(90deg, rgba(226, 55, 68, 0.06), rgba(226, 55, 68, 0.02));
+	border-radius: 12px
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px) {
+	.menu {
+		grid-template-columns: repeat(auto-fill, minmax(420px, 1fr))
+	}
+}
+
+@media (max-width:520px) {
+	.menu {
+		grid-template-columns: 1fr
 	}
 
-	.menu {
-		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	.menu-item {
+		padding: 12px;
+		gap: 12px;
+		min-height: 98px
+	}
+
+	.menu-img-wrap {
+		width: 74px;
+		height: 74px;
+		flex: 0 0 74px
 	}
 
 	.menu-img {
-		width: 60px;
-		height: 60px;
+		width: 64px;
+		height: 64px;
+		border-radius: 12px
+	}
+
+	.qty-btn {
+		width: 40px;
+		height: 40px
+	}
+
+	.qty-display {
+		width: 48px
+	}
+
+	.cart-modal {
+		left: 12px;
+		right: 12px;
+		width: auto;
+		top: 72px;
+		max-height: calc(100vh - 120px)
 	}
 }
