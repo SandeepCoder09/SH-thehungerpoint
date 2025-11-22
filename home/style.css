@@ -100,6 +100,33 @@ body {
   font-size: 14px;
 }
 
+/* Hide Google top frame */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Move page back to normal position */
+body {
+  top: 0px !important;
+}
+
+/* Hide if Google adds extra iframe */
+iframe.skiptranslate {
+  display: none !important;
+}
+
+/* Hide Google Translate logo popup */
+.goog-logo-link,
+.goog-te-gadget span,
+.goog-te-gadget img {
+  display: none !important;
+}
+
+/* Ensures no space is left at top */
+.goog-te-banner {
+  display: none !important;
+}
+
 #cartCount {
 	background: #fff;
 	color: var(--brand);
