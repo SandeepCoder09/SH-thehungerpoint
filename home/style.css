@@ -186,6 +186,58 @@ iframe.skiptranslate {
   justify-content: center;
 }
 
+/* Header right side (cart + language) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Language icon */
+.lang-icon {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+}
+
+/* Dropdown wrapper */
+.lang-wrapper {
+  position: relative;
+}
+
+/* Hidden dropdown menu */
+.lang-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  color: #E23744;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  overflow: hidden;
+  display: none;
+  width: 120px;
+  z-index: 9999;
+}
+
+/* Each item */
+.lang-menu div {
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.lang-menu div:hover {
+  background: #ffe6e8;
+}
+
 /* ---------- Page container ---------- */
 .container {
 	max-width: 980px;
