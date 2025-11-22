@@ -631,17 +631,13 @@ body {
    ========================================================= */
 
 /* Main card wrapper */
+./* Home page menu items – match cart spacing exactly */
+
 .menu-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  background: #ffffff;
-  border-radius: 20px;
+  margin: 12px 0 !important;     /* SAME as cart */
   padding: 14px 16px !important;
-  margin: 10px 0 !important;
+  border-radius: 20px !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  transition: transform 0.1s ease;
 }
 
 .menu-item:active {
