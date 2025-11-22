@@ -84,6 +84,22 @@ body {
 	font-size: 16px
 }
 
+.language-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+/* Language Selection, Hindi & English */
+.language-toggle button {
+  background: #E23744;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
 #cartCount {
 	background: #fff;
 	color: var(--brand);
