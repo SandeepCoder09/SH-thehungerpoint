@@ -1,7 +1,6 @@
 // /home/script.js
-// SH — The Hunger Point
-// Option A — Cashfree modal checkout (robust, tolerant parser)
-// Preserves your UI + cart logic, fixes order/session detection, verification and cart reset.
+// SH — The Hunger Point (regenerated files)
+// Keeps Cashfree flow intact; adds compact cart images with red glow.
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
@@ -38,6 +37,29 @@ function updateCartCount() {
   if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
+/* -------------------------
+   Image map (food name -> image)
+   Add aliases to be tolerant of small name changes.
+   ------------------------- */
+const imageMap = {
+  "momo": "/home/sh-momo.png",
+  "finger": "/home/sh-french-fries.png",
+  "fries": "/home/sh-french-fries.png",
+  "tea": "/home/sh-hot-tea.png",
+  "hot tea": "/home/sh-hot-tea.png",
+  "bread pakoda": "/home/sh-bread-pakoda.png",
+  "bread-pakoda": "/home/sh-bread-pakoda.png"
+};
+
+function getImageForName(name) {
+  if (!name) return "";
+  const key = ("" + name).trim().toLowerCase();
+  return imageMap[key] || "";
+}
+
+/* -------------------------
+   renderCart (compact image-left layout)
+   ------------------------- */
 function renderCart() {
   const container = $("#cartItems");
   if (!container) return;
@@ -54,13 +76,18 @@ function renderCart() {
   let total = 0;
   cart.forEach(item => {
     total += item.qty * item.price;
+    const imgSrc = getImageForName(item.name);
+
     const node = document.createElement("div");
     node.className = "cart-item";
+
     node.innerHTML = `
+      <img class="cart-item-img" src="${imgSrc}" alt="${item.name}" loading="lazy" />
       <div class="meta">
-        <div style="font-weight:700">${item.name}</div>
-        <div>₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
+        <div class="cart-title">${item.name}</div>
+        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
       </div>
+
       <div class="qty-controls">
         <button class="cart-dec" data-id="${item.id}" aria-label="decrease">−</button>
         <span style="min-width:26px; text-align:center; display:inline-block;">${item.qty}</span>
@@ -68,6 +95,7 @@ function renderCart() {
         <button class="cart-remove" data-id="${item.id}" title="Remove">✕</button>
       </div>
     `;
+
     container.appendChild(node);
   });
 
@@ -122,6 +150,7 @@ function closeModal() {
 $("#cartToggle")?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
 $("#overlay")?.addEventListener("click", closeModal);
 $("#closeCart")?.addEventListener("click", closeModal);
+$("#closeOnlyBtn")?.addEventListener("click", closeModal);
 // Clear button should only clear cart if it's the "Clear All Items" button
 $("#clearCart")?.addEventListener("click", () => {
   cart = [];
@@ -226,11 +255,9 @@ let cashfreeMode = "production"; // adjust if needed
 function initCashfreeSDK() {
   try {
     if (window.Cashfree && typeof window.Cashfree === "function") {
-      // v3-style: factory function
       cashfreeInstance = Cashfree({ mode: cashfreeMode });
       console.log("Cashfree v3 initialized via factory.");
     } else if (window.Cashfree && window.Cashfree.checkout) {
-      // older SDK that exposes checkout
       cashfreeInstance = window.Cashfree;
       console.log("Cashfree fallback available.");
     } else {
@@ -243,10 +270,6 @@ function initCashfreeSDK() {
   }
 }
 
-/**
- * openCashfreeModal(paymentSessionId)
- * Accepts many response shapes and opens checkout safely.
- */
 function openCashfreeModal(paymentSessionId) {
   if (!paymentSessionId) {
     showToast("Payment session missing");
@@ -260,13 +283,11 @@ function openCashfreeModal(paymentSessionId) {
   }
 
   try {
-    // Preferred v3 API
     if (cashfreeInstance.checkout) {
       cashfreeInstance.checkout({ paymentSessionId, redirectTarget: "_modal" });
       return;
     }
 
-    // If cashfreeInstance is a function (factory), create instance and call checkout
     if (typeof cashfreeInstance === "function") {
       const inst = cashfreeInstance({ mode: cashfreeMode });
       if (inst.checkout) {
@@ -311,11 +332,9 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
     let session = null;
     let cfOrderId = null;
 
-    // common keys
     session = session || createResp.session || createResp.payment_session_id || createResp.paymentSessionId || createResp.data?.payment_session_id || createResp.data?.session;
     cfOrderId = cfOrderId || createResp.orderId || createResp.order_id || createResp.data?.order_id || createResp.data?.orderId || createResp.data?.order?.id;
 
-    // some APIs return under raw.data.order or raw.order
     if (!session) {
       const raw = createResp.raw || createResp.data || createResp;
       if (raw) {
@@ -334,11 +353,9 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
     // Open Cashfree modal
     openCashfreeModal(session);
 
-    // Single-use message listener to capture Cashfree postMessage
     const onMessage = async (ev) => {
       try {
         const data = ev.data || {};
-        // Cashfree uses several different event shapes; check for success signals
         const success =
           data.paymentMessage === "SUCCESS" ||
           data.paymentStatus === "SUCCESS" ||
@@ -351,19 +368,15 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
           (typeof data === "string" && data.toUpperCase().includes("FAILED"));
 
         if (success) {
-          // Determine cf order id from event or fallback to value previously parsed
           const detectedCfOrderId = data.orderId || data.order_id || data.cashfree_order_id || cfOrderId;
 
-          // If we still don't have an external CF order id, server verify will try to look it up via create response (server should accept)
           const verifyResp = await verifyCashfree(detectedCfOrderId || cfOrderId || session, items);
 
           if (verifyResp && verifyResp.ok) {
-            // success path - clear cart + UI
             cart = [];
             renderCart();
             closeModal();
 
-            // hide menu (your existing UX)
             $$(".menu").forEach(m => m.style.display = "none");
 
             const status = $("#order-status");
@@ -379,8 +392,6 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
           }
         } else if (failed) {
           showToast("Payment cancelled or failed");
-        } else {
-          // unrelated message: ignore
         }
       } catch (err) {
         console.error("onMessage handler error:", err);
@@ -391,7 +402,6 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
       }
     };
 
-    // listen once (cleanup done inside handler)
     window.addEventListener("message", onMessage, { once: true, passive: true });
 
   } catch (err) {
