@@ -98,6 +98,64 @@ body {
 	font-size: 15px;
 }
 
+/* -------------------------
+   TABS CONTAINER
+-------------------------- */
+.top-tabs {
+  margin-top: 12px;                     /* space above */
+  margin-bottom: 12px;                  /* space below */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  background: #fff;                     /* matches your card background */
+  padding: 10px 14px;
+  border-radius: 18px;                  /* rounded group */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;                   /* center the whole block */
+}
+
+/* -------------------------
+   EACH TAB BUTTON
+-------------------------- */
+.top-tabs .tab {
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 2px solid #ddd;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  text-decoration: none;                /* for <a> */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* -------------------------
+   ACTIVE TAB
+-------------------------- */
+.top-tabs .tab.active {
+  background: #E23744;                 /* your SH theme color */
+  border-color: #E23744;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(226, 55, 68, 0.35);
+}
+
+/* -------------------------
+   HOVER EFFECT
+-------------------------- */
+.top-tabs .tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
+}
 
 /* ⭐ AMAZON-STYLE BORDER — FULL MOVING ANIMATION */
 .hero-border::before {
