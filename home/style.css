@@ -1,10 +1,10 @@
 /* =====================================================
    SH — The Hunger Point
-   home/style.css (Regenerated: Mixed Theme - Option C)
+   home/style.css (Regenerated: Pure Black Dark Mode)
    - Center modal cart (Option 1)
    - Rounded pill qty controls (Option A)
+   - Fixed dark-mode visibility (Pure Black)
    - Responsive, non-duplicated, clean
-   - Uses prefers-color-scheme for Light/Dark switching
    ===================================================== */
 
 /* -----------------------
@@ -35,21 +35,21 @@
 }
 
 /* -----------------------
-   Dark mode overrides
+   Dark mode overrides (PURE BLACK)
    ----------------------- */
 @media (prefers-color-scheme: dark) {
 	:root {
-		--primary: #ff5b6b;
-		--primary-dark: #e23a4a;
+		--primary: #ff6b7a;
+		--primary-dark: #ff4f63;
 		--accent: #ffcf6a;
-		--bg: #0b0d10;
-		--card: #0f1316;
-		--muted: #a0a0a0;
-		--text: #efefef;
-		--shadow-1: 0 6px 18px rgba(0, 0, 0, 0.7);
-		--shadow-2: 0 18px 48px rgba(0, 0, 0, 0.75);
-		--glass: rgba(255, 255, 255, 0.03);
-		--focus-ring: 3px solid rgba(255, 91, 107, 0.12);
+		--bg: #0d0d0d;
+		--card: #161616;
+		--muted: #bdbdbd;
+		--text: #ffffff;
+		--shadow-1: 0 6px 12px rgba(0, 0, 0, 0.75);
+		--shadow-2: 0 12px 40px rgba(0, 0, 0, 0.85);
+		--glass: rgba(255, 255, 255, 0.02);
+		--focus-ring: 3px solid rgba(255, 107, 122, 0.12);
 	}
 }
 
@@ -80,12 +80,11 @@ body {
 	-webkit-tap-highlight-color: transparent;
 }
 
-/* Utility hidden */
+/* Utility */
 .hidden {
 	display: none !important;
 }
 
-/* Links & buttons reset */
 a {
 	color: inherit;
 	text-decoration: none
@@ -96,7 +95,7 @@ button {
 }
 
 /* ========================
-   Container
+   Layout container
    ======================== */
 .container {
 	max-width: var(--maxWidth);
@@ -107,7 +106,7 @@ button {
 }
 
 /* ========================
-   Header / Nav
+   HEADER / NAV
    ======================== */
 .nav {
 	display: flex;
@@ -208,7 +207,7 @@ button {
 }
 
 /* ========================
-   Hero
+   HERO
    ======================== */
 .hero {
 	background: linear-gradient(180deg, rgba(246, 176, 66, 0.08), rgba(226, 50, 50, 0.04));
@@ -230,7 +229,7 @@ button {
 }
 
 /* ========================
-   Tabs
+   TABS
    ======================== */
 .top-tabs {
 	display: flex;
@@ -264,7 +263,7 @@ button {
 }
 
 /* ========================
-   Menu grid + items
+   MENU GRID + ITEMS
    ======================== */
 .menu {
 	display: grid;
@@ -272,7 +271,6 @@ button {
 	gap: 18px;
 }
 
-/* Menu item card */
 .menu-item {
 	background: var(--card);
 	padding: 16px;
@@ -289,7 +287,7 @@ button {
 	box-shadow: var(--shadow-2)
 }
 
-/* Image */
+/* Food Image */
 .menu-img {
 	width: 90px;
 	height: 90px;
@@ -299,7 +297,7 @@ button {
 	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Center content */
+/* Middle content */
 .mi-center {
 	flex: 1
 }
@@ -321,7 +319,7 @@ button {
 	color: var(--muted)
 }
 
-/* Controls column */
+/* Controls */
 .controls {
 	display: flex;
 	align-items: center;
@@ -372,13 +370,10 @@ button {
 
 .add-cart-btn:hover {
 	background: var(--primary);
-	color: #fff;
-	transition: background var(--transition-fast)
+	color: #fff
 }
 
-/* ========================
-   Order status / misc
-   ======================== */
+/* Order status */
 .order-status {
 	padding: 16px;
 	text-align: center;
@@ -388,9 +383,8 @@ button {
 }
 
 /* ========================
-   Overlay & Cart Modal (Centered)
+   Overlay & Cart Modal (centered)
    ======================== */
-
 /* overlay */
 .overlay {
 	position: fixed;
@@ -430,7 +424,7 @@ button {
 	visibility: visible
 }
 
-/* header & footer */
+/* header & footer of modal */
 .cart-modal-head,
 .cart-modal-foot {
 	padding: 16px 18px;
@@ -447,21 +441,21 @@ button {
 	flex-wrap: wrap
 }
 
-/* Items container */
+/* items container */
 .cart-items {
 	padding: 18px;
 	max-height: 55vh;
 	overflow-y: auto
 }
 
-/* Empty */
+/* empty */
 .cart-items .empty {
 	text-align: center;
 	color: var(--muted);
 	padding: 28px 8px
 }
 
-/* Cart item card */
+/* cart item */
 .cart-item {
 	background: linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.00));
 	padding: 16px;
@@ -491,9 +485,7 @@ button {
 	font-size: 14px
 }
 
-/* ========================
-   Rounded pill qty controls (Option A)
-   ======================== */
+/* Rounded pill qty controls (Option A) */
 .qty-controls {
 	display: flex;
 	align-items: center;
@@ -530,7 +522,6 @@ button {
 	border-right: 2px solid rgba(226, 55, 68, 0.08)
 }
 
-/* remove button */
 .cart-remove {
 	margin-left: 12px;
 	background: transparent;
@@ -561,7 +552,7 @@ button {
 	padding: 10px 16px;
 	border-radius: 12px;
 	font-weight: 800;
-	cursor: pointer;
+	cursor: pointer
 }
 
 .muted {
@@ -573,7 +564,6 @@ button {
 	cursor: pointer
 }
 
-/* close-only button */
 .close-only-btn {
 	background: rgba(0, 0, 0, 0.04);
 	border: none;
@@ -583,9 +573,7 @@ button {
 	cursor: pointer
 }
 
-/* ========================
-   Footer
-   ======================== */
+/* footer */
 .footer {
 	background: linear-gradient(90deg, var(--primary), var(--primary-dark));
 	padding: 16px;
@@ -596,7 +584,7 @@ button {
 }
 
 /* ========================
-   Toast container
+   Toast Container
    ======================== */
 .toast-container {
 	position: fixed;
@@ -694,12 +682,139 @@ button {
 }
 
 /* ========================
-   Accessibility focus + utility
+   DARK MODE — PURE BLACK FIXES
    ======================== */
+@media (prefers-color-scheme: dark) {
+
+	/* background + cards */
+	body {
+		background: #0d0d0d !important;
+		color: #fff !important;
+	}
+
+	.container {
+		color: #fff !important;
+	}
+
+	.menu-item,
+	.cart-item {
+		background: #161616 !important;
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85) !important;
+	}
+
+	/* text visibility */
+	.menu-item h3,
+	.mi-center .price,
+	.cart-item .meta div {
+		color: #ffffff !important;
+	}
+
+	.price small,
+	.cart-item .meta div:last-child {
+		color: #bbbbbb !important;
+	}
+
+	/* tabs */
+	.tab {
+		background: #1c1c1c !important;
+		border-color: #2d2d2d !important;
+		color: #dddddd !important;
+	}
+
+	.tab.active {
+		background: linear-gradient(90deg, #ff6b7a, #ff4f63) !important;
+		color: #fff !important;
+		border: none !important;
+	}
+
+	/* qty controls (menu items) */
+	.qty-wrap {
+		border: 1px solid #ff6b7a !important;
+		background: #161616 !important;
+	}
+
+	.qty-btn {
+		background: #ff6b7a !important;
+		color: #fff !important;
+	}
+
+	.qty {
+		color: #fff !important;
+	}
+
+	/* Add button */
+	.add-cart-btn {
+		border-color: #ff6b7a !important;
+		color: #ff6b7a !important;
+		background: #161616 !important;
+	}
+
+	.add-cart-btn:hover {
+		background: #ff6b7a !important;
+		color: #fff !important;
+	}
+
+	/* cart modal */
+	.cart-modal {
+		background: #161616 !important;
+		border: 1px solid #2a2a2a !important;
+	}
+
+	.cart-modal-head,
+	.cart-modal-foot {
+		border-color: #2a2a2a !important;
+	}
+
+	#cartTotal {
+		color: #fff !important;
+	}
+
+	/* cart qty control (inside modal) */
+	.qty-controls {
+		border: 2px solid rgba(255, 107, 122, 0.45) !important;
+		background: #161616 !important;
+	}
+
+	.cart-dec,
+	.cart-inc {
+		background: #ff6b7a !important;
+		color: #fff !important;
+	}
+
+	.qty-controls span {
+		color: #fff !important;
+		background: #161616 !important;
+		border-left: 2px solid rgba(255, 255, 255, 0.08) !important;
+		border-right: 2px solid rgba(255, 255, 255, 0.08) !important;
+	}
+
+	/* remove button */
+	.cart-remove {
+		border-color: #ff6b7a !important;
+		color: #ff6b7a !important;
+	}
+
+	/* footer */
+	.footer {
+		background: linear-gradient(90deg, #ff6b7a, #ff4f63) !important;
+	}
+
+	/* toast */
+	.toast {
+		background: #161616 !important;
+		border-color: #ff6b7a !important;
+		color: #fff !important;
+	}
+}
+
+/* ========================
+   Accessibility + Utility
+   ======================== */
+
 button:focus,
 a:focus {
 	outline: none;
-	box-shadow: var(--focus-ring)
+	box-shadow: var(--focus-ring);
 }
 
 .sr-only {
@@ -708,9 +823,9 @@ a:focus {
 	top: auto;
 	width: 1px;
 	height: 1px;
-	overflow: hidden
+	overflow: hidden;
 }
 
 /* ========================
-   End of file
+   END OF FILE
    ======================== */
