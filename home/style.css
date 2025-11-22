@@ -255,44 +255,40 @@ iframe.goog-te-menu-frame {
 	padding: 22px
 }
 
-/* ---------- Hero ---------- */
+/* HERO SECTION — remove big gap */
 .hero {
-	margin: 20px 0 18px;
-	padding: 18px;
-	border-radius: 18px;
-	background: linear-gradient(180deg, rgba(255, 250, 248, 1) 0%, rgba(255, 246, 244, 1) 100%);
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04)
+  margin-top: 10px !important;      /* fix large top gap */
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  text-align: center;
 }
 
 .hero h1 {
-	font-size: 28px;
-	margin-bottom: 6px;
-	font-weight: 700
+  margin: 0 !important;
+  font-size: 28px;
 }
 
 .hero p {
-	color: var(--muted)
+  margin-top: 4px !important;
+  margin-bottom: 6px !important;
+  font-size: 15px;
+  opacity: 0.8;
 }
 
-/* ---------- Tabs ---------- */
+/* TABS (green section) — make compact */
 .top-tabs {
-	display: flex;
-	gap: 12px;
-	margin: 18px 0
+  margin-top: 8px !important;       /* reduce space above tabs */
+  margin-bottom: 10px !important;   /* reduce space below tabs */
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
-.tab {
-	padding: 10px 16px;
-	border-radius: 12px;
-	background: transparent;
-	border: 1px solid rgba(0, 0, 0, 0.04);
-	cursor: pointer
-}
-
-.tab.active {
-	background: var(--brand);
-	color: #fff;
-	box-shadow: var(--shadow-2)
+.top-tabs .tab {
+  padding: 8px 12px !important;     /* compact buttons */
+  margin: 0;
+  border-radius: 10px;
+  font-size: 14px;
 }
 
 /* ---------- MENU GRID (keeps responsive behavior) ---------- */
@@ -300,6 +296,9 @@ iframe.goog-te-menu-frame {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
 	gap: 18px;
+/* MENU SECTION spacing fix */
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 /* ---------- NEW MENU ITEM CARD (Option A) ---------- */
