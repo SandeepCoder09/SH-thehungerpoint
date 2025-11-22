@@ -72,69 +72,61 @@ body {
   margin-top: -2px;
 }
 
-/* Move hero upward and make compact */
-.hero-box {
-  margin-top: 5px !important;
+/* HERO CONTAINER */
+.hero-border {
+  margin-top: 5px;
   padding: 18px 20px;
   text-align: center;
-  background: #ffffff;
+  background: #fff;
   border-radius: 20px;
   position: relative;
   overflow: hidden;
-
-  /* subtle white shadow */
-  box-shadow: 0 10px 25px rgba(226, 55, 68, 0.10);
+  box-shadow: 0 8px 20px rgba(226, 55, 68, 0.08);
 }
 
-.hero-box h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.hero-box p {
-  margin-top: 6px;
-  font-size: 15px;
-  color: #444;
-}
-/* Glowing animated border */
-.hero-box::before {
+/* AMAZON-STYLE ANIMATED BORDER ONLY */
+.hero-border::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
   border-radius: 22px;
+
+  /* Border thickness (Amazon-like) */
   padding: 3px;
 
+  /* COLOR matching SH theme */
   background: linear-gradient(
-    0deg,
-    #ff4d5d,
+    90deg,
+    #ff6b7a,
     #e23744,
-    #ff6d7a,
-    #ff4d5d
+    #ff6b7a,
+    #ff9ba8
   );
-  background-size: 400% 400%;
+  background-size: 300% 300%;
 
-  animation: borderGlow 8s linear infinite;
-  z-index: -1;
+  /* Amazon-style slow & smooth motion */
+  animation: amazonBorder 6s linear infinite;
+
+  /* Only border visible */
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
 }
 
-/* Actual white inner box */
-.hero-box {
-  background: #fff;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes borderGlow {
-  0%   { background-position: 0% 0%; }
-  25%  { background-position: 100% 0%; }
+/* ANIMATION – Move around border */
+@keyframes amazonBorder {
+  0%   { background-position: 0%   50%; }
+  25%  { background-position: 100% 50%; }
   50%  { background-position: 100% 100%; }
-  75%  { background-position: 0% 100%; }
-  100% { background-position: 0% 0%; }
+  75%  { background-position: 0%   100%; }
+  100% { background-position: 0%   50%; }
 }
 
 /" Language Selection Hindi English/*
