@@ -1,6 +1,6 @@
-// /home/script.js
-// SH — The Hunger Point (regenerated files)
-// Keeps Cashfree flow intact; adds compact cart images with red glow.
+// ========== /home/script.js ==========
+// Full script: menu qty + add-to-cart + cart modal + Cashfree checkout + toast
+// Preserves your server integration and UX. Updated to match new menu layout.
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
@@ -26,9 +26,9 @@ function showToast(message, duration = 2500) {
 }
 
 /* -------------------------
-   CART STATE & UI
+   Cart state
    ------------------------- */
-let cart = []; // { id, name, price, qty }
+let cart = []; // items: { id, name, price, qty }
 
 const findCartIndex = (id) => cart.findIndex(c => c.id === id);
 
@@ -38,8 +38,7 @@ function updateCartCount() {
 }
 
 /* -------------------------
-   Image map (food name -> image)
-   Add aliases to be tolerant of small name changes.
+   Image map for menu + cart
    ------------------------- */
 const imageMap = {
   "momo": "/home/sh-momo.png",
@@ -51,14 +50,13 @@ const imageMap = {
   "bread-pakoda": "/home/sh-bread-pakoda.png"
 };
 
-function getImageForName(name) {
-  if (!name) return "";
-  const key = ("" + name).trim().toLowerCase();
-  return imageMap[key] || "";
+function getImageFor(name){
+  if(!name) return "";
+  return imageMap[String(name).trim().toLowerCase()] || "";
 }
 
 /* -------------------------
-   renderCart (compact image-left layout)
+   renderCart() — cart modal (compact with images)
    ------------------------- */
 function renderCart() {
   const container = $("#cartItems");
@@ -74,28 +72,28 @@ function renderCart() {
   }
 
   let total = 0;
+
   cart.forEach(item => {
     total += item.qty * item.price;
-    const imgSrc = getImageForName(item.name);
+
+    const img = getImageFor(item.name);
 
     const node = document.createElement("div");
     node.className = "cart-item";
 
     node.innerHTML = `
-      <img class="cart-item-img" src="${imgSrc}" alt="${item.name}" loading="lazy" />
-      <div class="meta">
-        <div class="cart-title">${item.name}</div>
+      <img src="${img}" class="cart-img" alt="${item.name}" loading="lazy" />
+      <div class="cart-info">
+        <div class="cart-name">${item.name}</div>
         <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
       </div>
-
-      <div class="qty-controls">
+      <div class="cart-actions">
         <button class="cart-dec" data-id="${item.id}" aria-label="decrease">−</button>
-        <span style="min-width:26px; text-align:center; display:inline-block;">${item.qty}</span>
+        <span class="cart-qty" aria-live="polite">${item.qty}</span>
         <button class="cart-inc" data-id="${item.id}" aria-label="increase">+</button>
-        <button class="cart-remove" data-id="${item.id}" title="Remove">✕</button>
+        <button class="cart-remove" data-id="${item.id}" aria-label="remove">✕</button>
       </div>
     `;
-
     container.appendChild(node);
   });
 
@@ -103,7 +101,7 @@ function renderCart() {
   if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
 
-  // attach item controls
+  // attach handlers
   container.querySelectorAll(".cart-dec").forEach(b => {
     b.onclick = (e) => {
       const id = e.currentTarget.dataset.id;
@@ -151,28 +149,25 @@ $("#cartToggle")?.addEventListener("click", (e) => { e.preventDefault(); openMod
 $("#overlay")?.addEventListener("click", closeModal);
 $("#closeCart")?.addEventListener("click", closeModal);
 $("#closeOnlyBtn")?.addEventListener("click", closeModal);
-// Clear button should only clear cart if it's the "Clear All Items" button
-$("#clearCart")?.addEventListener("click", () => {
-  cart = [];
-  renderCart();
-});
+$("#clearCart")?.addEventListener("click", () => { cart = []; renderCart(); });
 
 /* -------------------------
-   Menu qty + add logic
+   Menu qty + add-to-cart logic (matches new markup)
    ------------------------- */
 $$(".menu-item").forEach(itemEl => {
-  const qtyEl = itemEl.querySelector(".qty");
+  const qtyDisplay = itemEl.querySelector(".qty-display");
   const dec = itemEl.querySelector(".qty-btn.minus");
   const inc = itemEl.querySelector(".qty-btn.plus");
   const addBtn = itemEl.querySelector(".add-cart-btn");
 
-  let qty = Number(qtyEl?.textContent) || 1;
-  if (qtyEl) qtyEl.textContent = qty;
+  // initialize qty
+  let qty = Number(qtyDisplay?.textContent) || 1;
+  if (qtyDisplay) qtyDisplay.textContent = qty;
 
-  const setQty = (v) => {
+  function setQty(v){
     qty = Math.max(1, Math.floor(v || 1));
-    if (qtyEl) qtyEl.textContent = qty;
-  };
+    if (qtyDisplay) qtyDisplay.textContent = qty;
+  }
 
   dec?.addEventListener("click", () => setQty(qty - 1));
   inc?.addEventListener("click", () => setQty(qty + 1));
@@ -191,7 +186,9 @@ $$(".menu-item").forEach(itemEl => {
   });
 });
 
-/* Tabs */
+/* -------------------------
+   Tabs (unchanged)
+   ------------------------- */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     $$(".tab").forEach(b => b.classList.remove("active"));
@@ -220,7 +217,7 @@ function setOrderButtonsDisabled(disabled) {
 }
 
 /* -------------------------
-   Backend connectors
+   Backend connectors (same as original)
    ------------------------- */
 async function createCashfreeOrder(amount, items, customer = {}) {
   const payload = {
@@ -247,10 +244,10 @@ async function verifyCashfree(orderId, items) {
 }
 
 /* -------------------------
-   Cashfree SDK helpers (modal)
+   Cashfree SDK init & modal open (kept original logic)
    ------------------------- */
 let cashfreeInstance = null;
-let cashfreeMode = "production"; // adjust if needed
+let cashfreeMode = "production";
 
 function initCashfreeSDK() {
   try {
@@ -305,7 +302,7 @@ function openCashfreeModal(paymentSessionId) {
 }
 
 /* -------------------------
-   Checkout flow (modal)
+   Checkout flow (unchanged logic)
    ------------------------- */
 $("#checkoutBtn")?.addEventListener("click", async () => {
   if (cart.length === 0) {
@@ -328,13 +325,11 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
       return;
     }
 
-    // Robust parsing of response shapes
+    // robust parsing
     let session = null;
     let cfOrderId = null;
-
     session = session || createResp.session || createResp.payment_session_id || createResp.paymentSessionId || createResp.data?.payment_session_id || createResp.data?.session;
     cfOrderId = cfOrderId || createResp.orderId || createResp.order_id || createResp.data?.order_id || createResp.data?.orderId || createResp.data?.order?.id;
-
     if (!session) {
       const raw = createResp.raw || createResp.data || createResp;
       if (raw) {
@@ -350,7 +345,6 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
       return;
     }
 
-    // Open Cashfree modal
     openCashfreeModal(session);
 
     const onMessage = async (ev) => {
@@ -369,22 +363,18 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
 
         if (success) {
           const detectedCfOrderId = data.orderId || data.order_id || data.cashfree_order_id || cfOrderId;
-
           const verifyResp = await verifyCashfree(detectedCfOrderId || cfOrderId || session, items);
 
           if (verifyResp && verifyResp.ok) {
             cart = [];
             renderCart();
             closeModal();
-
             $$(".menu").forEach(m => m.style.display = "none");
-
             const status = $("#order-status");
             if (status) {
               status.classList.remove("hidden");
               $("#eta-text").textContent = `Order #${verifyResp.orderId || verifyResp.order_id || "N/A"} confirmed! ETA: 15 mins 🍴`;
             }
-
             showToast("Order confirmed! Enjoy your meal 🍽️", 3200);
           } else {
             console.error("Verify returned not ok:", verifyResp);
@@ -419,10 +409,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCartCount();
   initCashfreeSDK();
 
-  // retry init if SDK loads late
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 2000);
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 6000);
 
-  // optional ping to wake backend
+  // wake backend
   fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 });
