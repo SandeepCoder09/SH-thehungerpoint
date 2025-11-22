@@ -415,16 +415,3 @@ document.addEventListener("DOMContentLoaded", () => {
   // wake backend
   fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 });
-
-
-
-
-// Hide Google Feedback Popup
-setInterval(() => {
-  // Hide Google popup iframe completely
-  const frames = document.querySelectorAll(
-    "iframe.goog-te-menu-frame, iframe.goog-te-balloon-frame"
-  );
-  frames.forEach(f => f.style.display = "none");
-}, 300);
-</script>
