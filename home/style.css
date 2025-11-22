@@ -601,3 +601,27 @@ body {
 .add-cart-btn:active {
   transform: scale(0.96);
 }
+
+/* Reduce vertical space between menu items */
+.menu-item {
+  margin: 10px 0 !important;   /* originally ~16px or more */
+  padding: 14px !important;    /* reduce inner space slightly */
+}
+
+/* Reduce image glow spread so spacing feels tighter */
+.menu-img-wrap {
+  width: 65px;
+  height: 65px;
+  box-shadow: 0 0 12px rgba(226, 55, 68, 0.28) !important;
+}
+
+/* Reduce space inside qty pill */
+.qty-pill {
+  padding: 3px 6px !important;
+  box-shadow: 0 0 14px rgba(226, 55, 68, 0.28) !important;
+}
+
+/* Reduce space between controls */
+.menu-controls {
+  gap: 8px !important;
+}
