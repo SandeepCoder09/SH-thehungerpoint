@@ -38,8 +38,6 @@ body {
 
 /* HEADER CONTAINER */
 .nav {
-  position: fixed;
-  top: 0px;
   display: flex;
   align-items: center;
   justify-content: space-between;
