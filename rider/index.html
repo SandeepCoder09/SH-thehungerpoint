@@ -1,49 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SH Rider App</title>
-
-  <link rel="stylesheet" href="/rider/rider.css">
-
-  <!-- Google Maps -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="/auth/firebase-config.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rider Dashboard — SH</title>
+  <link rel="stylesheet" href="/rider/rider.css" />
+  <!-- Google Maps (optional — add API key if you want map) -->
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY"></script> -->
 </head>
-
 <body>
-
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen" class="screen active">
-    <h2>Rider Login</h2>
-    <input id="riderEmail" type="email" placeholder="Email" />
-    <input id="riderPass" type="password" placeholder="Password" />
-    <button id="loginBtn">Login</button>
-    <p class="note">Only riders approved by admin can log in.</p>
+  <div class="topbar">
+    <div class="title">SH — Rider Dashboard</div>
+    <div class="right">
+      <span id="riderName">—</span>
+      <button id="btnLogout">Logout</button>
+    </div>
   </div>
 
-  <!-- RIDER DASHBOARD -->
-  <div id="dashboardScreen" class="screen">
-    <header class="top-bar">
-      <h2>Welcome, <span id="riderName"></span></h2>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </header>
+  <main class="container">
+    <section class="orders">
+      <h3>Active Orders</h3>
+      <div id="orderContainer" class="order-list">No active orders</div>
+    </section>
 
-    <h3>Your Active Orders</h3>
-    <div id="orderContainer" class="order-list"></div>
+    <section class="map-wrap">
+      <h3>Live Location</h3>
+      <div id="map" class="map">Map will appear here (optional)</div>
+    </section>
+  </main>
 
-    <div id="map" class="map"></div>
-  </div>
-
+  <!-- socket.io client (cdn) -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    window.SH = window.SH || {};
+    window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
+  </script>
   <script src="/rider/socket-client.js"></script>
   <script src="/rider/rider-gps.js"></script>
-
+  <script src="/rider/rider.js"></script>
 </body>
 </html>
