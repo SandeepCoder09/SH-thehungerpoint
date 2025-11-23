@@ -104,6 +104,8 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <script src="/auth/signup.js"></script>
+ <!-- Firebase config must be loaded BEFORE signup.js -->
+<script src="/auth/firebase-config.js"></script>
+<script src="/auth/signup.js"></script>
 </body>
 </html>
