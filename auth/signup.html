@@ -5,10 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase -->
+  <!-- Firebase MUST load before firebase-config.js -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase config MUST load before signup.js -->
+  <script src="/auth/firebase-config.js"></script>
+
+  <!-- Signup JS loads last -->
+  <script src="/auth/signup.js" defer></script>
 
   <link rel="stylesheet" href="/auth/signup.css" />
   <link rel="icon" href="/home/sh-favicon.png" />
@@ -18,7 +24,7 @@
   <main class="auth-page">
     <div class="card">
 
-      <!-- CORRECTED HEADER -->
+      <!-- HEADER -->
       <header class="new-head">
         <div class="left-wrap">
           <img src="/home/sh-thehungerpoint.png" class="header-logo">
@@ -26,7 +32,7 @@
         </div>
       </header>
 
-      <!-- CORRECTED POSITION -->
+      <!-- TITLE BELOW HEADER -->
       <h2 class="page-title">Create Account</h2>
 
       <!-- BODY -->
@@ -46,6 +52,7 @@
           <div class="input-group pass-group">
             <input id="password" type="password" required>
             <label for="password">Password</label>
+
             <span class="toggle" id="togglePass">
               <svg class="eye eye-open" viewBox="0 0 24 24">
                 <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
@@ -53,6 +60,7 @@
                 <circle cx="12" cy="12" r="3"
                   fill="none" stroke="#333" stroke-width="2" />
               </svg>
+
               <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
                 <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
                   fill="none" stroke="#333" stroke-width="2" />
@@ -67,6 +75,7 @@
           <div class="input-group pass-group">
             <input id="confirm" type="password" required>
             <label for="confirm">Confirm Password</label>
+
             <span class="toggle" id="toggleConfirm">
               <svg class="eye eye-open" viewBox="0 0 24 24">
                 <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
@@ -74,6 +83,7 @@
                 <circle cx="12" cy="12" r="3"
                   fill="none" stroke="#333" stroke-width="2" />
               </svg>
+
               <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
                 <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
                   fill="none" stroke="#333" stroke-width="2" />
@@ -104,8 +114,5 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
- <!-- Firebase config must be loaded BEFORE signup.js -->
-<script src="/auth/firebase-config.js"></script>
-<script src="/auth/signup.js"></script>
 </body>
 </html>
