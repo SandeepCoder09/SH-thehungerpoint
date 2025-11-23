@@ -1,4 +1,4 @@
-// server/cashfree-server.js
+content = r"""// server/cashfree-server.js
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
@@ -228,8 +228,69 @@ app.post("/verify-cashfree-payment", async (req, res) => {
   }
 });
 
-// -----------------------------
-// Start server
-// -----------------------------
+// ========================================================================
+// REAL-TIME LIVE TRACKING SYSTEM  (ADDED BELOW EXISTING CODE - NO DELETIONS)
+// ========================================================================
+
+import http from "http";
+import { Server } from "socket.io";
+
+// Create HTTP server for Express + Socket.IO
+const httpServer = http.createServer(app);
+
+// Initialize socket server
+const io = new Server(httpServer, {
+  cors: { origin: "*" }
+});
+
+// Store last known rider positions
+const lastPositions = new Map();
+
+io.on("connection", (socket) => {
+  console.log("🟢 Socket connected:", socket.id);
+
+  // When rider logs in and joins socket
+  socket.on("rider:join", ({ riderId }) => {
+    socket.data.riderId = riderId;
+    console.log("🏍️ Rider Joined:", riderId);
+  });
+
+  // Rider sending live location
+  socket.on("rider:location", (data) => {
+    if (!data) return;
+
+    // Save last known rider location
+    lastPositions.set(data.riderId, data);
+
+    // Broadcast to admin panel
+    io.emit("admin:riderLocation", data);
+
+    // Broadcast to user tracking screen (specific order)
+    io.to("order_" + data.orderId).emit("order:riderLocation", data);
+  });
+
+  // User joins their order tracking room
+  socket.on("order:join", ({ orderId }) => {
+    socket.join("order_" + orderId);
+    console.log("👤 User joined order room:", orderId);
+  });
+
+  // Admin joins tracking dashboard
+  socket.on("admin:join", () => {
+    socket.emit("admin:initialRiders", Array.from(lastPositions.values()));
+    console.log("🛡️ Admin connected to tracking dashboard");
+  });
+
+  socket.on("disconnect", () => {
+    console.log("🔴 Socket disconnected:", socket.id);
+  });
+});
+
+// ========================================================================
+// START SERVER (REPLACES app.listen)
+// ========================================================================
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 SH Cashfree server running on ${PORT}`));
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 SH Server + Realtime Tracking running on port ${PORT}`);
+});
