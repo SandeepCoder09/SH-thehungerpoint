@@ -1045,3 +1045,43 @@ body {
 .add-cart-btn:active {
 	transform: scale(0.96);
 }
+
+/* GENERAL TYPING STYLES */
+.type-h1, .type-p {
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+}
+
+/* H1 typing: left → right */
+.type-h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-right: 3px solid #e23744;
+  animation: caretBlink 0.7s infinite;
+}
+
+/* Paragraph typing right → left */
+.type-p {
+  font-size: 15px;
+  margin-top: 6px;
+  color: #444;
+  direction: rtl; /* important */
+  border-left: 2px solid #e23744;
+  animation: caretBlinkRight 0.7s infinite;
+}
+
+/* caret blinking for h1 */
+@keyframes caretBlink {
+  0% { border-color: #e23744; }
+  50% { border-color: transparent; }
+  100% { border-color: #e23744; }
+}
+
+/* caret blinking for paragraph */
+@keyframes caretBlinkRight {
+  0% { border-color: #e23744; }
+  50% { border-color: transparent; }
+  100% { border-color: #e23744; }
+}
