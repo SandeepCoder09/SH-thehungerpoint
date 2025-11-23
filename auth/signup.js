@@ -1,48 +1,74 @@
 // signup.js — SH The Hunger Point
 
-// Auto-mark filled inputs
+/* -------------------------------
+   FLOATING INPUT LABEL HANDLING
+-------------------------------- */
 document.querySelectorAll(".input-group input").forEach(input => {
-  input.addEventListener("input", () => {
+  const group = input.parentElement;
+
+  const check = () => {
     if (input.value.trim() !== "") {
-      input.parentElement.classList.add("filled");
+      group.classList.add("filled");
     } else {
-      input.parentElement.classList.remove("filled");
+      group.classList.remove("filled");
     }
-  });
+  };
+
+  input.addEventListener("input", check);
+  check();
 });
 
-// Password toggles
-function setupToggle(passId, openId, slashId) {
-  const pass = document.getElementById(passId);
-  const open = document.getElementById(openId);
-  const slash = document.getElementById(slashId);
 
-  document.getElementById("toggle" + passId.charAt(0).toUpperCase() + passId.slice(1))
-    .addEventListener("click", () => {
-      if (pass.type === "password") {
-        pass.type = "text";
-        open.classList.add("hidden");
-        slash.classList.remove("hidden");
-      } else {
-        pass.type = "password";
-        slash.classList.add("hidden");
-        open.classList.remove("hidden");
-      }
-    });
+/* -------------------------------
+   PASSWORD VISIBILITY TOGGLE
+-------------------------------- */
+function setupPasswordToggle(groupSelector) {
+  const group = document.querySelector(groupSelector);
+  if (!group) return;
+
+  const input = group.querySelector("input");
+  const openIcon = group.querySelector(".eye-open");
+  const slashIcon = group.querySelector(".eye-slash");
+  const toggleBtn = group.querySelector(".toggle");
+
+  toggleBtn.addEventListener("click", () => {
+    const isHidden = input.type === "password";
+
+    input.type = isHidden ? "text" : "password";
+    openIcon.classList.toggle("hidden", isHidden);
+    slashIcon.classList.toggle("hidden", !isHidden);
+  });
 }
 
-setupToggle("password", "eyePassOpen", "eyePassSlash");
-setupToggle("confirm", "eyeConfirmOpen", "eyeConfirmSlash");
+setupPasswordToggle(".pass-group:nth-of-type(3)"); // password
+setupPasswordToggle(".pass-group:nth-of-type(4)"); // confirm password
 
-// Toast
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.hidden = false;
-  setTimeout(() => t.hidden = true, 2500);
+
+/* -------------------------------
+   TOAST MESSAGE
+-------------------------------- */
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.hidden = false;
+
+  toast.style.opacity = "1";
+  toast.style.transform = "translateX(-50%) translateY(0)";
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(10px)";
+  }, 2200);
+
+  setTimeout(() => {
+    toast.hidden = true;
+  }, 2600);
 }
 
-// Firebase auth
+
+/* -------------------------------
+   FIREBASE SETUP
+-------------------------------- */
 const form = document.getElementById("signupForm");
 
 form.addEventListener("submit", async (e) => {
@@ -52,12 +78,11 @@ form.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
+  const legal = document.getElementById("legalCheck");
 
-  if (!document.getElementById("legalCheck").checked)
-    return showToast("Please accept all policies.");
+  if (!legal.checked) return showToast("Please accept all terms.");
 
-  if (password !== confirm)
-    return showToast("Passwords do not match.");
+  if (password !== confirm) return showToast("Passwords do not match.");
 
   try {
     const userCred = await auth.createUserWithEmailAndPassword(email, password);
@@ -68,21 +93,25 @@ form.addEventListener("submit", async (e) => {
       createdAt: new Date()
     });
 
-    showToast("Account created!");
+    showToast("Account created successfully!");
 
     setTimeout(() => {
       window.location.href = "/home/index.html";
-    }, 1000);
+    }, 1200);
 
-  } catch (err) {
-    showToast(err.message);
+  } catch (error) {
+    showToast(error.message);
   }
 });
 
-// Google signup
+
+/* -------------------------------
+   GOOGLE SIGN UP
+-------------------------------- */
 document.getElementById("googleSignup").addEventListener("click", async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
   try {
-    const provider = new firebase.auth.GoogleAuthProvider();
     const res = await auth.signInWithPopup(provider);
 
     if (res.additionalUserInfo.isNewUser) {
