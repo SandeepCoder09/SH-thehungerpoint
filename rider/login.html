@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rider Login — SH The Hunger Point</title>
+  <link rel="stylesheet" href="/rider/login.css" />
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <h1>Rider Login</h1>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="username" />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+
+      <button id="btnLogin">Login</button>
+
+      <p id="info" class="info" aria-live="polite"></p>
+      <p class="hint">Only riders approved by admin can log in.</p>
+    </div>
+  </main>
+
+  <script>
+    // API base used by login.js (server URL)
+    window.SH = window.SH || {};
+    window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
+  </script>
+
+  <script src="/rider/login.js"></script>
+</body>
+</html>
