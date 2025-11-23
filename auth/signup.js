@@ -1,71 +1,86 @@
-// Wait until Firebase config loads fully
-async function waitForFirebase() {
+// signup.js — SH The Hunger Point (FULLY FIXED)
+
+// ------------------------------
+// WAIT FOR FIREBASE TO INITIALIZE
+// ------------------------------
+async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
-      if (window.auth && window.db) resolve();
-      else setTimeout(check, 50);
+      if (window.auth && window.db) {
+        console.log("Firebase Ready:", window.auth);
+        resolve();
+      } else {
+        setTimeout(check, 50);
+      }
     };
     check();
   });
 }
 
 (async () => {
-  // Wait until firebase-config.js loads auth + db
-  await waitForFirebase();
+  console.log("Waiting for Firebase...");
+  await waitForAuth();
+  console.log("Firebase Loaded ✔");
 
-  console.log("Firebase ready:", auth, db);
 
-  /* -------------------------------
-     FLOATING INPUT LABEL HANDLING
-  -------------------------------- */
+  // ------------------------------
+  // FLOATING LABEL INPUTS
+  // ------------------------------
   document.querySelectorAll(".input-group input").forEach(input => {
     const group = input.parentElement;
 
-    function update() {
+    const update = () => {
       if (input.value.trim() !== "") {
         group.classList.add("filled");
       } else {
         group.classList.remove("filled");
       }
-    }
+    };
 
     input.addEventListener("input", update);
     update();
   });
 
-  /* -------------------------------
-     PASSWORD VISIBILITY TOGGLE
-  -------------------------------- */
-  function setupToggle(inputId, toggleId) {
-    const input = document.getElementById(inputId);
-    const toggle = document.getElementById(toggleId);
-    const openIcon = toggle.querySelector(".eye-open");
-    const slashIcon = toggle.querySelector(".eye-slash");
 
-    toggle.addEventListener("click", () => {
-      const show = input.type === "password";
-      input.type = show ? "text" : "password";
-      openIcon.classList.toggle("hidden", show);
-      slashIcon.classList.toggle("hidden", !show);
+  // ------------------------------
+  // PASSWORD TOGGLE
+  // ------------------------------
+  function setupPasswordToggle(groupSelector) {
+    const group = document.querySelector(groupSelector);
+    if (!group) return;
+
+    const input = group.querySelector("input");
+    const openIcon = group.querySelector(".eye-open");
+    const slashIcon = group.querySelector(".eye-slash");
+    const toggleBtn = group.querySelector(".toggle");
+
+    toggleBtn.addEventListener("click", () => {
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+
+      openIcon.classList.toggle("hidden", !showing);
+      slashIcon.classList.toggle("hidden", showing);
     });
   }
 
-  setupToggle("password", "togglePass");
-  setupToggle("confirm", "toggleConfirm");
+  setupPasswordToggle(".pass-group:nth-of-type(3)");
+  setupPasswordToggle(".pass-group:nth-of-type(4)");
 
-  /* -------------------------------
-     TOAST SYSTEM
-  -------------------------------- */
+
+  // ------------------------------
+  // TOAST MESSAGE
+  // ------------------------------
   function showToast(message) {
     const t = document.getElementById("toast");
     t.textContent = message;
     t.hidden = false;
-    setTimeout(() => (t.hidden = true), 2500);
+    setTimeout(() => t.hidden = true, 2500);
   }
 
-  /* -------------------------------
-     SIGNUP WITH EMAIL
-  -------------------------------- */
+
+  // ------------------------------
+  // EMAIL + PASSWORD SIGNUP
+  // ------------------------------
   const form = document.getElementById("signupForm");
 
   form.addEventListener("submit", async (e) => {
@@ -76,13 +91,16 @@ async function waitForFirebase() {
     const password = document.getElementById("password").value;
     const confirm = document.getElementById("confirm").value;
 
-    if (!document.getElementById("legalCheck").checked)
+    if (!document.getElementById("legalCheck").checked) {
       return showToast("Please accept all terms.");
+    }
 
-    if (password !== confirm)
+    if (password !== confirm) {
       return showToast("Passwords do not match.");
+    }
 
     try {
+      console.log("Creating user...");
       const userCred = await auth.createUserWithEmailAndPassword(email, password);
 
       await db.collection("users").doc(userCred.user.uid).set({
@@ -98,13 +116,15 @@ async function waitForFirebase() {
       }, 800);
 
     } catch (err) {
+      console.error("Signup Error:", err);
       showToast(err.message);
     }
   });
 
-  /* -------------------------------
-     GOOGLE SIGNUP
-  -------------------------------- */
+
+  // ------------------------------
+  // GOOGLE SIGNUP
+  // ------------------------------
   document.getElementById("googleSignup").addEventListener("click", async () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -121,7 +141,9 @@ async function waitForFirebase() {
       window.location.href = "/home/index.html";
 
     } catch (err) {
+      console.error("Google Signup Error:", err);
       showToast(err.message);
     }
   });
+
 })();
