@@ -1,99 +1,52 @@
-// SCREEN ELEMENTS
-const loginScreen = document.getElementById("loginScreen");
-const dashboardScreen = document.getElementById("dashboardScreen");
+// rider/rider.js
+const API_BASE = window.SH?.API_BASE ?? "";
 const riderNameEl = document.getElementById("riderName");
+const orderContainer = document.getElementById("orderContainer");
+const btnLogout = document.getElementById("btnLogout");
 
-// LOGIN ELEMENTS
-const emailInput = document.getElementById("riderEmail");
-const passInput = document.getElementById("riderPass");
-const loginBtn = document.getElementById("loginBtn");
+// check session
+const riderId = localStorage.getItem("riderId");
+const token = localStorage.getItem("riderToken");
 
-// LOGOUT
-const logoutBtn = document.getElementById("logoutBtn");
-
-
-// -------------------------------
-// SHOW / HIDE SCREENS
-// -------------------------------
-function showLogin() {
-  loginScreen.classList.add("active");
-  dashboardScreen.classList.remove("active");
+if (!riderId || !token) {
+  // not logged in
+  window.location.replace("/rider/login.html");
 }
 
-function showDashboard() {
-  loginScreen.classList.remove("active");
-  dashboardScreen.classList.add("active");
-}
+// show rider info
+riderNameEl.textContent = riderId;
 
-
-// -------------------------------
-// CHECK IF RIDER IS ALREADY LOGGED IN
-// -------------------------------
-const savedRiderId = localStorage.getItem("riderId");
-const savedToken = localStorage.getItem("riderToken");
-
-if (savedRiderId && savedToken) {
-  checkApproval(savedRiderId);
-}
-
-
-// -------------------------------
-// LOGIN LOGIC
-// -------------------------------
-loginBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passInput.value.trim();
-
-  if (!email || !password) {
-    alert("Enter email and password");
-    return;
+// logout handler
+btnLogout?.addEventListener("click", () => {
+  localStorage.removeItem("riderId");
+  localStorage.removeItem("riderToken");
+  if (window.socket) {
+    try { window.socket.disconnect(); } catch {}
   }
-
-  const res = await fetch("/rider/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if (!data.ok) {
-    alert(data.error);
-    return;
-  }
-
-  // SAVE LOGIN SESSION
-  localStorage.setItem("riderId", data.riderId);
-  localStorage.setItem("riderToken", data.token);
-
-  checkApproval(data.riderId);
+  window.location.href = "/rider/login.html";
 });
 
-
-// -------------------------------
-// APPROVAL CHECK
-// -------------------------------
-async function checkApproval(riderId) {
-  const res = await fetch("/rider/check?riderId=" + riderId);
-  const data = await res.json();
-
-  if (!data.ok) {
-    alert("Not approved yet.");
-    showLogin();
-    return;
+// placeholder function to load active orders from Firestore via your server (optional)
+async function loadActiveOrders() {
+  try {
+    // update when you implement backend API for orders
+    orderContainer.innerHTML = "<div class='muted'>No active orders assigned</div>";
+  } catch (err) {
+    console.error("Load orders error", err);
+    orderContainer.innerHTML = "<div class='muted'>Unable to fetch orders</div>";
   }
-
-  // APPROVED → show dashboard + start GPS
-  riderNameEl.innerText = riderId;
-  showDashboard();
-
-  startGPS(); // from rider-gps.js
 }
 
+// Start GPS if socket connected (socket-client will set window.socket)
+function startTrackingWhenReady() {
+  if (typeof window.startGPS === "function") {
+    window.startGPS();
+  } else {
+    // wait a bit
+    setTimeout(startTrackingWhenReady, 500);
+  }
+}
 
-// -------------------------------
-// LOGOUT
-// -------------------------------
-logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("riderId");
-  localStorage.removeItem("riderToken
+// when socket connects it emits rider:join in socket-client.js
+startTrackingWhenReady();
+loadActiveOrders();
