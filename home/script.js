@@ -15,49 +15,46 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// H1 Text Loop (Fast, Fresh, Delicious) 
-const h1Texts = ["Delicious", "Fast", "Fresh"];
+/* H1 — RIGHT TO LEFT */
+const h1Words = ["Delicious", "Fast", "Fresh"];
+let h1Index = 0, h1Char = 0, h1Deleting = false;
 const h1El = document.querySelector(".type-h1");
 
-let h1Index = 0;
-let h1Char = 0;
-let h1IsDeleting = false;
-
 function typeH1() {
-  const current = h1Texts[h1Index];
-  if (!h1IsDeleting) {
+  const word = h1Words[h1Index];
+
+  if (!h1Deleting) {
     h1Char++;
-    h1El.textContent = current.substring(0, h1Char);
-    if (h1Char === current.length) {
-      setTimeout(() => (h1IsDeleting = true), 1200);
+    h1El.textContent = word.substring(word.length - h1Char);
+    if (h1Char === word.length) {
+      setTimeout(() => (h1Deleting = true), 900);
     }
   } else {
     h1Char--;
-    h1El.textContent = current.substring(0, h1Char);
+    h1El.textContent = word.substring(word.length - h1Char);
     if (h1Char === 0) {
-      h1IsDeleting = false;
-      h1Index = (h1Index + 1) % h1Texts.length;
+      h1Deleting = false;
+      h1Index = (h1Index + 1) % h1Words.length;
     }
   }
-  setTimeout(typeH1, h1IsDeleting ? 80 : 120);
+
+  setTimeout(typeH1, h1Deleting ? 60 : 90);
 }
 typeH1();
 
 
 
-// PARAGRAPH Typing (Right → Left) infinite 
+/* P — LEFT TO RIGHT */
 const pText = "Family-style fast food — momo, finger, tea & more.";
+let pChar = 0, pDeleting = false;
 const pEl = document.querySelector(".type-p");
-
-let pChar = 0;
-let pDeleting = false;
 
 function typeP() {
   if (!pDeleting) {
     pChar++;
     pEl.textContent = pText.substring(0, pChar);
     if (pChar === pText.length) {
-      setTimeout(() => (pDeleting = true), 1500);
+      setTimeout(() => (pDeleting = true), 1100);
     }
   } else {
     pChar--;
@@ -66,10 +63,10 @@ function typeP() {
       pDeleting = false;
     }
   }
-  setTimeout(typeP, pDeleting ? 50 : 65);
+
+  setTimeout(typeP, pDeleting ? 50 : 70);
 }
 typeP();
-
 
 // Server Codes Starting //
 
