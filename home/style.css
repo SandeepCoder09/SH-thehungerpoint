@@ -157,54 +157,112 @@ body {
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
 }
 
-/* 100% WORKING ANIMATED BORDER */
-.animated-border-box {
-  position: relative !important;
-  padding: 20px;
-  background: #fff;
-  border-radius: 20px;
-  margin-top: 10px;
+/* 100% WORKING ANIMATED BORDER 
+body {
+  background: #f6f6f6;
+  padding: 40px 10px;
+  font-family: "Poppins", sans-serif;
+} */
+
+
+/* --------------------------------------
+   HERO BOX — FULLY FIXED VERSION
+--------------------------------------- */
+
+.hero-box {
+  position: relative;
+  width: 92%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0;
+  height: 140px;         /* fixed — never changes */
+  border-radius: 25px;
   overflow: hidden;
 }
 
-/* Main animation layer */
-.animated-border-box::after {
+
+/* Outer animated border glow */
+.hero-box::before {
   content: "";
   position: absolute;
-  inset: -3px;                 /* slightly outside for thicker border */
-  border-radius: 22px;
+  inset: 0;
+  border-radius: 25px;
 
-  padding: 3px;                /* border thickness */
-
-  /* TEMPORARY VISIBLE COLORS (test animation) */
-  background: linear-gradient(
-    90deg,
-    #ff0000,
-    #00ff00,
-    #0000ff,
-    #ff0000
-  );
-
+  background: linear-gradient(90deg, #ff6b7a, #e23744, #ff6b7a, #ff9ba8);
   background-size: 300% 300%;
-  animation: borderMoveTest 4s linear infinite;
+  animation: borderMove 5s linear infinite;
 
-  /* show border only */
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-
-  pointer-events: none;
+  z-index: 0;
+  filter: blur(8px);
 }
 
-/* animation movement */
-@keyframes borderMoveTest {
-  0%   { background-position:   0%   0%; }
-  25%  { background-position: 100%   0%; }
-  50%  { background-position: 100% 100%; }
-  75%  { background-position:   0% 100%; }
-  100% { background-position:   0%   0%; }
+/* Inner white mask */
+.hero-inner {
+  position: absolute;
+  inset: 6px;
+  border-radius: 20px;
+  background: #fff;
+  z-index: 2;
+
+  /* fixed text container */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: calc(100% - 12px);     /* border spacing fix */
+}
+
+
+/* Border animation */
+@keyframes borderMove {
+  0% { background-position: 0% 0%; }
+ 25% { background-position: 100% 0%; }
+ 50% { background-position: 100% 100%; }
+ 75% { background-position: 0% 100%; }
+100% { background-position: 0% 0%; }
+}
+
+
+
+/* --------------------------------------
+   TEXT — NO JUMP, NO SHAKE, NO MOVING
+--------------------------------------- */
+
+.type-h1, .type-p {
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  text-align: center;
+
+  /* remove font baseline jumps */
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+
+  /* prevent vertical movement completely */
+  display: block;
+}
+
+/* H1 — fixed height */
+.type-h1 {
+  height: 34px;
+  font-size: 26px;
+  font-weight: 700;
+  border-left: 3px solid #e23744;
+  direction: rtl;
+  padding-left: 6px;
+}
+
+/* P — fixed height */
+.type-p {
+  height: 22px;
+  font-size: 15px;
+  color: #555;
+  margin-top: 6px;
+  border-right: 3px solid #e23744;
+  direction: ltr;
+  padding-right: 6px;
 }
 
 /* Language Selection Hindi English */
