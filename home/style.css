@@ -157,49 +157,57 @@ body {
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
 }
 
-/* ⭐ AMAZON-STYLE BORDER — FULL MOVING ANIMATION */
-.hero-border::before {
-	content: "";
-	position: absolute;
-	top: -4px;
-	left: -4px;
-	right: -4px;
-	bottom: -4px;
-	border-radius: 26px;
-	padding: 4px!
-	background: linear-gradient(0deg, #ff6b7a, #e23744, #ff6b7a, #ff9ba8);
-	background-size: 400% 400%;
-	animation: moveBorder 5s linear infinite;
-	-webkit-mask:
-		linear-gradient(#fff 0 0) content-box,
-		linear-gradient(#fff 0 0);
-	-webkit-mask-composite: xor;
-	mask-composite: exclude;
-	pointer-events: none;
+.hero-animated-border {
+  position: relative;
+  padding: 20px;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 20px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(226, 55, 68, 0.10);
+}
+
+/* main animated border layer */
+.hero-animated-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  border-radius: 20px;
+
+  /* gradient that moves around the box */
+  background: linear-gradient(
+    90deg,
+    #ff4d5d,
+    #e23744,
+    #ff4d5d,
+    #ff7e8c
+  );
+
+  background-size: 300% 300%;
+  animation: moveBorderGlow 4s linear infinite;
+  
+  /* only show border, not fill */
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+
+  padding: 3px; /* thickness of glowing border */
 }
 
 
-/* ⭐ The animation that moves around the border */
-@keyframes moveBorder {
-	0% {
-		background-position: 0% 0%;
-	}
-
-	25% {
-		background-position: 100% 0%;
-	}
-
-	50% {
-		background-position: 100% 100%;
-	}
-
-	75% {
-		background-position: 0% 100%;
-	}
-
-	100% {
-		background-position: 0% 0%;
-	}
+/* animation that rotates glow around */
+@keyframes moveBorderGlow {
+  0%   { background-position: 0%   0%; }
+  25%  { background-position: 100% 0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0%   100%; }
+  100% { background-position: 0%   0%; }
 }
 
 /* Language Selection Hindi English */
