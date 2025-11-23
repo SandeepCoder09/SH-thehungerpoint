@@ -1,53 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Track Order — SH The Hunger Point</title>
-
-  <link rel="stylesheet" href="/track/track.css" />
-
-  <!-- Google Maps: put your API key here -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
-
-  <!-- Firebase (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-  <!-- Your Firebase config -->
-  <script src="/auth/firebase-config.js"></script>
-
-  <script src="/track/track.js" defer></script>
+  <title>Track Your Order</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body,html { margin:0; height:100%; }
+    #map { height:70vh; }
+    #info { padding:10px; font-size:16px; }
+  </style>
 </head>
 <body>
-  <main class="track-page">
-    <header class="track-head">
-      <div class="brand">
-        <img src="/home/sh-thehungerpoint.png" alt="SH" class="logo">
-        <div class="title">Track Your Order</div>
-      </div>
 
-      <div class="controls">
-        <button id="detectLocation" class="btn">Detect My Location</button>
-        <div id="eta" class="eta">ETA: —</div>
-      </div>
-    </header>
+  <div id="map"></div>
 
-    <section class="track-info">
-      <div class="status">
-        <div><strong>Order:</strong> <span id="orderIdLabel">—</span></div>
-        <div><strong>Status:</strong> <span id="orderStatus">—</span></div>
-        <div><strong>Rider:</strong> <span id="riderName">—</span></div>
-        <div><strong>Distance:</strong> <span id="distanceText">—</span></div>
-      </div>
-    </section>
+  <div id="info">
+    Distance: <span id="distance">--</span> |
+    ETA: <span id="eta">--</span> |
+    Last Update: <span id="rider-last-update">--</span>
+  </div>
 
-    <div id="map" class="map"></div>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/rider/socket-client.js"></script>
+  <script>
+    window.ORDER_ID = "ORDER_123";      /* dynamic */
+    window.USER_LAT = 28.7041;          /* dynamic */
+    window.USER_LNG = 77.1025;          /* dynamic */
+  </script>
+  <script src="/track/track.js"></script>
 
-    <footer class="track-foot">
-      <small>Contact support: +91-xxxxxxxxxx</small>
-    </footer>
-  </main>
 </body>
 </html>
