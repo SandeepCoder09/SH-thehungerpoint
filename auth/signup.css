@@ -21,35 +21,37 @@ body {
   overflow: hidden;
 }
 
-/* HEADER */
-.card-head {
-  background: linear-gradient(90deg, #d10000, #ff4747);
-  padding: 28px;
-  color: #fff;
-  text-align: left;
+/* NEW CLEAN HEADER */
+.top-header {
+  text-align: center;
+  padding: 25px 20px 10px;
 }
 
-.logo-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* smaller SH logo */
+.small-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
-.logo-img {
-  width: 52px;
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.65);
-}
-
-.brand {
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.title {
+/* MAIN APP TITLE */
+.app-title {
   font-size: 20px;
+  font-weight: 700;
+  color: #d10000;
+  margin: 0;
+}
+
+/* PAGE TITLE (Create Account) */
+.page-title {
+  font-size: 18px;
   font-weight: 600;
-  margin-top: 10px;
+  margin-top: 6px;
+  color: #444;
+  text-align: center;
+  margin-bottom: 5px;
 }
 
 /* BODY */
