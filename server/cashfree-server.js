@@ -8,14 +8,17 @@ import fetch from "node-fetch";
 import http from "http";
 import { Server } from "socket.io";
 
-// -----------------------------
-// Convert private key from env
-// -----------------------------
+/* -------------------------------------------------------
+   Rebuild Firebase private key
+------------------------------------------------------- */
 function rebuildPrivateKey(raw) {
   if (!raw) return null;
   return raw.includes("\\n") ? raw.replace(/\\n/g, "\n") : raw;
 }
 
+/* -------------------------------------------------------
+   Required Environment Variables Check
+------------------------------------------------------- */
 const requiredEnvs = [
   "FIREBASE_TYPE",
   "FIREBASE_PROJECT_ID",
@@ -27,13 +30,13 @@ const requiredEnvs = [
   "CF_SECRET_KEY"
 ];
 
-requiredEnvs.forEach(k => {
-  if (!process.env[k]) console.warn("⚠ Missing env:", k);
+requiredEnvs.forEach(key => {
+  if (!process.env[key]) console.warn("⚠ Missing env variable:", key);
 });
 
-// -----------------------------
-// Firebase Admin initialization
-// -----------------------------
+/* -------------------------------------------------------
+   Firebase Admin Initialization
+------------------------------------------------------- */
 let db = null;
 
 try {
@@ -58,49 +61,47 @@ try {
   console.error("🔥 Firebase init failed:", err.message);
 }
 
-// -----------------------------
-// Helpers
-// -----------------------------
+/* -------------------------------------------------------
+   Helpers
+------------------------------------------------------- */
 const safeJson = (res, status, obj) => res.status(status).json(obj);
 
 function requireAdminToken(req, res, next) {
   const auth = req.headers.authorization || "";
-  if (!auth.startsWith("Bearer ")) return safeJson(res, 401, { ok: false, error: "Unauthorized" });
+  if (!auth.startsWith("Bearer "))
+    return safeJson(res, 401, { ok: false, error: "Unauthorized" });
 
-  const token = auth.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = decoded;
+    const token = auth.split(" ")[1];
+    req.admin = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch {
     return safeJson(res, 401, { ok: false, error: "Invalid token" });
   }
 }
 
-// -----------------------------
-// Express setup
-// -----------------------------
+/* -------------------------------------------------------
+   Express Setup
+------------------------------------------------------- */
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/ping", (req, res) => res.send("Server Awake ✔"));
+app.get("/ping", (req, res) => res.send("Server Running ✔"));
 
-// -----------------------------
-// Admin login system
-// -----------------------------
+/* -------------------------------------------------------
+   ADMIN LOGIN
+------------------------------------------------------- */
 app.post("/admin/login", async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-
     const { email, password } = req.body;
-    if (!email || !password) return safeJson(res, 400, { ok: false, error: "Missing inputs" });
 
     const doc = await db.collection("admins").doc(email).get();
     if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const adminData = doc.data();
     const hash = adminData.passwordHash || adminData.password;
+
     const match = await bcrypt.compare(password, hash);
     if (!match) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
@@ -113,52 +114,109 @@ app.post("/admin/login", async (req, res) => {
     return safeJson(res, 200, { ok: true, token });
 
   } catch (err) {
-    console.error("Admin login error:", err);
+    console.error("Admin login failed:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
+/* -------------------------------------------------------
+   ADMIN VERIFY
+------------------------------------------------------- */
 app.get("/admin/verify", requireAdminToken, (req, res) => {
   return safeJson(res, 200, { ok: true, email: req.admin.email });
 });
 
-// -----------------------------
-// Update order status
-// -----------------------------
-app.post("/admin/update-status", requireAdminToken, async (req, res) => {
+/* -------------------------------------------------------
+   ADMIN APPROVES RIDER
+------------------------------------------------------- */
+app.post("/admin/approve-rider", requireAdminToken, async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
+    const { riderId } = req.body;
+    if (!riderId)
+      return safeJson(res, 400, { ok: false, error: "riderId required" });
 
-    const { orderId, status } = req.body;
-    if (!orderId || !status) return safeJson(res, 400, { ok: false, error: "Missing inputs" });
+    await db.collection("riders").doc(riderId).update({ approved: true });
 
-    await db.collection("orders").doc(orderId).update({ status });
-
-    return safeJson(res, 200, { ok: true });
+    return safeJson(res, 200, { ok: true, message: "Rider approved" });
 
   } catch (err) {
-    console.error("Status update error:", err);
+    console.error("Approve rider error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
-// -----------------------------
-// Cashfree — Create Order
-// -----------------------------
+/* -------------------------------------------------------
+   RIDER LOGIN (Using EMAIL as document ID)
+------------------------------------------------------- */
+app.post("/rider/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return safeJson(res, 400, { ok: false, error: "Missing inputs" });
+
+    const doc = await db.collection("riders").doc(email).get();
+    if (!doc.exists)
+      return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+
+    const rider = doc.data();
+
+    if (!rider.approved)
+      return safeJson(res, 200, { ok: false, error: "Rider not approved yet" });
+
+    const match = await bcrypt.compare(password, rider.password);
+    if (!match)
+      return safeJson(res, 200, { ok: false, error: "Incorrect password" });
+
+    const token = jwt.sign(
+      { riderId: email, role: "rider" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return safeJson(res, 200, { ok: true, riderId: email, token });
+
+  } catch (err) {
+    console.error("Rider login failed:", err);
+    return safeJson(res, 500, { ok: false, error: "Server error" });
+  }
+});
+
+/* -------------------------------------------------------
+   RIDER APPROVAL CHECK
+------------------------------------------------------- */
+app.get("/rider/check", async (req, res) => {
+  try {
+    const { riderId } = req.query;
+
+    const doc = await db.collection("riders").doc(riderId).get();
+    if (!doc.exists)
+      return safeJson(res, 200, { ok: false, error: "Rider not found" });
+
+    if (!doc.data().approved)
+      return safeJson(res, 200, { ok: false, error: "Not approved" });
+
+    return safeJson(res, 200, { ok: true });
+
+  } catch (err) {
+    return safeJson(res, 500, { ok: false, error: "Server error" });
+  }
+});
+
+/* -------------------------------------------------------
+   CASHFREE — CREATE ORDER
+------------------------------------------------------- */
 app.post("/create-cashfree-order", async (req, res) => {
   try {
-    const { amount, items, phone, email } = req.body;
-
-    if (!amount || Number(amount) <= 0)
-      return safeJson(res, 400, { ok: false, error: "Amount required" });
+    const { amount, phone, email } = req.body;
 
     const body = {
       order_amount: Number(amount),
       order_currency: "INR",
       customer_details: {
         customer_id: phone || "guest",
-        customer_phone: phone || "9999999999",
-        customer_email: email || "guest@example.com"
+        customer_phone: phone,
+        customer_email: email
       }
     };
 
@@ -174,70 +232,20 @@ app.post("/create-cashfree-order", async (req, res) => {
     });
 
     const data = await cfRes.json();
-
     const orderId = data.order_id || data.data?.order_id;
     const session = data.payment_session_id || data.data?.payment_session_id;
 
-    if (!orderId || !session) {
-      return safeJson(res, 500, { ok: false, error: "Cashfree failed", raw: data });
-    }
-
-    return safeJson(res, 200, { ok: true, orderId, session, raw: data });
+    return safeJson(res, 200, { ok: true, orderId, session });
 
   } catch (err) {
-    console.error("Cashfree create order error:", err);
+    console.error("Cashfree error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
-// -----------------------------
-// Cashfree — Verify Payment
-// -----------------------------
-app.post("/verify-cashfree-payment", async (req, res) => {
-  try {
-    const { orderId, items } = req.body;
-
-    if (!orderId) return safeJson(res, 400, { ok: false, error: "orderId required" });
-
-    const resp = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`, {
-      headers: {
-        "x-api-version": "2022-09-01",
-        "x-client-id": process.env.CF_APP_ID,
-        "x-client-secret": process.env.CF_SECRET_KEY
-      }
-    });
-
-    const data = await resp.json();
-
-    if (data.order_status !== "PAID") {
-      return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
-    }
-
-    const total = items.reduce(
-      (s, it) => s + (Number(it.price || 0) * Number(it.qty || 1)),
-      0
-    );
-
-    await db.collection("orders").doc(orderId).set({
-      items,
-      total,
-      status: "paid",
-      cashfree_order_id: orderId,
-      createdAt: admin.firestore.Timestamp.now()
-    });
-
-    return safeJson(res, 200, { ok: true, orderId });
-
-  } catch (err) {
-    console.error("Cashfree verify error:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
-  }
-});
-
-// ========================================================================
-// 🚀 REAL-TIME LIVE TRACKING (RIDER + ADMIN + USER)
-// ========================================================================
-
+/* -------------------------------------------------------
+   SOCKET.IO — LIVE RIDER TRACKING
+------------------------------------------------------- */
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
@@ -246,44 +254,41 @@ const io = new Server(httpServer, {
 
 const lastPositions = new Map();
 
-io.on("connection", (socket) => {
-  console.log("🟢 Socket connected:", socket.id);
+io.on("connection", socket => {
+  console.log("🟢 Socket connected", socket.id);
 
   socket.on("rider:join", ({ riderId }) => {
     socket.data.riderId = riderId;
-    console.log("🏍️ Rider Joined:", riderId);
+    console.log("🏍 Rider joined:", riderId);
   });
 
-  socket.on("rider:location", (data) => {
+  socket.on("rider:location", data => {
     if (!data) return;
 
     lastPositions.set(data.riderId, data);
 
     io.emit("admin:riderLocation", data);
-
     io.to("order_" + data.orderId).emit("order:riderLocation", data);
   });
 
   socket.on("order:join", ({ orderId }) => {
     socket.join("order_" + orderId);
-    console.log("👤 User joined order room:", orderId);
   });
 
   socket.on("admin:join", () => {
     socket.emit("admin:initialRiders", Array.from(lastPositions.values()));
-    console.log("🛡️ Admin connected to tracking dashboard");
   });
 
   socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
+    console.log("🔴 Socket disconnected");
   });
 });
 
-// ========================================================================
-// START SERVER
-// ========================================================================
+/* -------------------------------------------------------
+   START SERVER
+------------------------------------------------------- */
 const PORT = process.env.PORT || 10000;
 
 httpServer.listen(PORT, () => {
-  console.log(`🚀 SH Server + Cashfree + Realtime Tracking running on ${PORT}`);
+  console.log(`🚀 SH + Cashfree + Tracking Server running on ${PORT}`);
 });
