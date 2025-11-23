@@ -24,9 +24,10 @@ body {
 /* RED HEADER */
 .new-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
-  padding: 22px 25px;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   border-radius: 18px 18px 0 0;
 }
 
@@ -54,8 +55,8 @@ body {
   font-size: 19px;
   font-weight: 600;
   color: #d10000;
-  margin-top: 10px;
-  margin-bottom: -2px;
+  margin-top: 8px;
+  margin-bottom: 2px;
 }
 
 /* BODY */
