@@ -15,6 +15,64 @@ window.addEventListener("click", (e) => {
   }
 });
 
+// H1 Text Loop (Fast, Fresh, Delicious) 
+const h1Texts = ["Delicious", "Fast", "Fresh"];
+const h1El = document.querySelector(".type-h1");
+
+let h1Index = 0;
+let h1Char = 0;
+let h1IsDeleting = false;
+
+function typeH1() {
+  const current = h1Texts[h1Index];
+  if (!h1IsDeleting) {
+    h1Char++;
+    h1El.textContent = current.substring(0, h1Char);
+    if (h1Char === current.length) {
+      setTimeout(() => (h1IsDeleting = true), 1200);
+    }
+  } else {
+    h1Char--;
+    h1El.textContent = current.substring(0, h1Char);
+    if (h1Char === 0) {
+      h1IsDeleting = false;
+      h1Index = (h1Index + 1) % h1Texts.length;
+    }
+  }
+  setTimeout(typeH1, h1IsDeleting ? 80 : 120);
+}
+typeH1();
+
+
+
+// PARAGRAPH Typing (Right → Left) infinite 
+const pText = "Family-style fast food — momo, finger, tea & more.";
+const pEl = document.querySelector(".type-p");
+
+let pChar = 0;
+let pDeleting = false;
+
+function typeP() {
+  if (!pDeleting) {
+    pChar++;
+    pEl.textContent = pText.substring(0, pChar);
+    if (pChar === pText.length) {
+      setTimeout(() => (pDeleting = true), 1500);
+    }
+  } else {
+    pChar--;
+    pEl.textContent = pText.substring(0, pChar);
+    if (pChar === 0) {
+      pDeleting = false;
+    }
+  }
+  setTimeout(typeP, pDeleting ? 50 : 65);
+}
+typeP();
+
+
+// Server Codes Starting //
+
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
