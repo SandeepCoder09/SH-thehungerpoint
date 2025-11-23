@@ -1,10 +1,12 @@
-content = r"""// server/cashfree-server.js
+// server/cashfree-server.js
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import fetch from "node-fetch";
+import http from "http";
+import { Server } from "socket.io";
 
 // -----------------------------
 // Convert private key from env
@@ -102,7 +104,11 @@ app.post("/admin/login", async (req, res) => {
     const match = await bcrypt.compare(password, hash);
     if (!match) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
-    const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { email: adminData.email, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     return safeJson(res, 200, { ok: true, token });
 
@@ -116,7 +122,9 @@ app.get("/admin/verify", requireAdminToken, (req, res) => {
   return safeJson(res, 200, { ok: true, email: req.admin.email });
 });
 
-// Update status
+// -----------------------------
+// Update order status
+// -----------------------------
 app.post("/admin/update-status", requireAdminToken, async (req, res) => {
   try {
     if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
@@ -205,14 +213,12 @@ app.post("/verify-cashfree-payment", async (req, res) => {
       return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
     }
 
-    const total = items.reduce((s, it) =>
-      s + (Number(it.price || 0) * Number(it.qty || 1)), 0
+    const total = items.reduce(
+      (s, it) => s + (Number(it.price || 0) * Number(it.qty || 1)),
+      0
     );
 
-    // FIXED 🔥 — Firebase order ID MUST match Cashfree order ID
-    const newOrderId = orderId;
-
-    await db.collection("orders").doc(newOrderId).set({
+    await db.collection("orders").doc(orderId).set({
       items,
       total,
       status: "paid",
@@ -220,7 +226,7 @@ app.post("/verify-cashfree-payment", async (req, res) => {
       createdAt: admin.firestore.Timestamp.now()
     });
 
-    return safeJson(res, 200, { ok: true, orderId: newOrderId });
+    return safeJson(res, 200, { ok: true, orderId });
 
   } catch (err) {
     console.error("Cashfree verify error:", err);
@@ -229,53 +235,40 @@ app.post("/verify-cashfree-payment", async (req, res) => {
 });
 
 // ========================================================================
-// REAL-TIME LIVE TRACKING SYSTEM  (ADDED BELOW EXISTING CODE - NO DELETIONS)
+// 🚀 REAL-TIME LIVE TRACKING (RIDER + ADMIN + USER)
 // ========================================================================
 
-import http from "http";
-import { Server } from "socket.io";
-
-// Create HTTP server for Express + Socket.IO
 const httpServer = http.createServer(app);
 
-// Initialize socket server
 const io = new Server(httpServer, {
   cors: { origin: "*" }
 });
 
-// Store last known rider positions
 const lastPositions = new Map();
 
 io.on("connection", (socket) => {
   console.log("🟢 Socket connected:", socket.id);
 
-  // When rider logs in and joins socket
   socket.on("rider:join", ({ riderId }) => {
     socket.data.riderId = riderId;
     console.log("🏍️ Rider Joined:", riderId);
   });
 
-  // Rider sending live location
   socket.on("rider:location", (data) => {
     if (!data) return;
 
-    // Save last known rider location
     lastPositions.set(data.riderId, data);
 
-    // Broadcast to admin panel
     io.emit("admin:riderLocation", data);
 
-    // Broadcast to user tracking screen (specific order)
     io.to("order_" + data.orderId).emit("order:riderLocation", data);
   });
 
-  // User joins their order tracking room
   socket.on("order:join", ({ orderId }) => {
     socket.join("order_" + orderId);
     console.log("👤 User joined order room:", orderId);
   });
 
-  // Admin joins tracking dashboard
   socket.on("admin:join", () => {
     socket.emit("admin:initialRiders", Array.from(lastPositions.values()));
     console.log("🛡️ Admin connected to tracking dashboard");
@@ -287,10 +280,10 @@ io.on("connection", (socket) => {
 });
 
 // ========================================================================
-// START SERVER (REPLACES app.listen)
+// START SERVER
 // ========================================================================
 const PORT = process.env.PORT || 10000;
 
 httpServer.listen(PORT, () => {
-  console.log(`🚀 SH Server + Realtime Tracking running on port ${PORT}`);
+  console.log(`🚀 SH Server + Cashfree + Realtime Tracking running on ${PORT}`);
 });
