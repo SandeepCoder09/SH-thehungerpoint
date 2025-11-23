@@ -1,8 +1,8 @@
-// Wait until Firebase config loads
-async function waitForAuth() {
+// Wait until Firebase config loads fully
+async function waitForFirebase() {
   return new Promise(resolve => {
     const check = () => {
-      if (window.auth) resolve();
+      if (window.auth && window.db) resolve();
       else setTimeout(check, 50);
     };
     check();
@@ -10,63 +10,61 @@ async function waitForAuth() {
 }
 
 (async () => {
-  await waitForAuth();
+  // Wait until firebase-config.js loads auth + db
+  await waitForFirebase();
+
+  console.log("Firebase ready:", auth, db);
 
   /* -------------------------------
      FLOATING INPUT LABEL HANDLING
   -------------------------------- */
   document.querySelectorAll(".input-group input").forEach(input => {
     const group = input.parentElement;
-    const check = () => {
+
+    function update() {
       if (input.value.trim() !== "") {
         group.classList.add("filled");
       } else {
         group.classList.remove("filled");
       }
-    };
-    input.addEventListener("input", check);
-    check();
-  });
+    }
 
+    input.addEventListener("input", update);
+    update();
+  });
 
   /* -------------------------------
      PASSWORD VISIBILITY TOGGLE
   -------------------------------- */
-  function setupPasswordToggle(groupSelector) {
-    const group = document.querySelector(groupSelector);
-    if (!group) return;
+  function setupToggle(inputId, toggleId) {
+    const input = document.getElementById(inputId);
+    const toggle = document.getElementById(toggleId);
+    const openIcon = toggle.querySelector(".eye-open");
+    const slashIcon = toggle.querySelector(".eye-slash");
 
-    const input = group.querySelector("input");
-    const openIcon = group.querySelector(".eye-open");
-    const slashIcon = group.querySelector(".eye-slash");
-    const toggleBtn = group.querySelector(".toggle");
-
-    toggleBtn.addEventListener("click", () => {
-      const isHidden = input.type === "password";
-
-      input.type = isHidden ? "text" : "password";
-      openIcon.classList.toggle("hidden", isHidden);
-      slashIcon.classList.toggle("hidden", !isHidden);
+    toggle.addEventListener("click", () => {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      openIcon.classList.toggle("hidden", show);
+      slashIcon.classList.toggle("hidden", !show);
     });
   }
 
-  setupPasswordToggle(".pass-group:nth-of-type(3)");
-  setupPasswordToggle(".pass-group:nth-of-type(4)");
-
+  setupToggle("password", "togglePass");
+  setupToggle("confirm", "toggleConfirm");
 
   /* -------------------------------
-     TOAST
+     TOAST SYSTEM
   -------------------------------- */
   function showToast(message) {
     const t = document.getElementById("toast");
     t.textContent = message;
     t.hidden = false;
-    setTimeout(() => t.hidden = true, 2500);
+    setTimeout(() => (t.hidden = true), 2500);
   }
 
-
   /* -------------------------------
-     FIREBASE SIGN UP
+     SIGNUP WITH EMAIL
   -------------------------------- */
   const form = document.getElementById("signupForm");
 
@@ -97,13 +95,12 @@ async function waitForAuth() {
 
       setTimeout(() => {
         window.location.href = "/home/index.html";
-      }, 1000);
+      }, 800);
 
     } catch (err) {
       showToast(err.message);
     }
   });
-
 
   /* -------------------------------
      GOOGLE SIGNUP
@@ -127,5 +124,4 @@ async function waitForAuth() {
       showToast(err.message);
     }
   });
-
 })();
