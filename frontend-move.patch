@@ -1,0 +1,44 @@
+diff --git a/home b/frontend/home
+rename from home
+rename to frontend/home
+diff --git a/rider b/frontend/rider
+rename from rider
+rename to frontend/rider
+diff --git a/track b/frontend/track
+rename from track
+rename to frontend/track
+diff --git a/admin b/frontend/admin
+rename from admin
+rename to frontend/admin
+diff --git a/auth b/frontend/auth
+rename from auth
+rename to frontend/auth
+diff --git a/languages b/frontend/languages
+rename from languages
+rename to frontend/languages
+diff --git a/legal b/frontend/legal
+rename from legal
+rename to frontend/legal
+diff --git a/profile b/frontend/profile
+rename from profile
+rename to frontend/profile
+
+diff --git a/index.html b/frontend/index.html
+rename from index.html
+rename to frontend/index.html
+
+diff --git a/manifest.json b/frontend/manifest.json
+rename from manifest.json
+rename to frontend/manifest.json
+
+diff --git a/firebase-messaging-sw.js b/frontend/firebase-messaging-sw.js
+rename from firebase-messaging-sw.js
+rename to frontend/firebase-messaging-sw.js
+
+diff --git a/service-worker.js b/frontend/service-worker.js
+rename from service-worker.js
+rename to frontend/service-worker.js
+
+diff --git a/style.css b/frontend/style.css
+rename from style.css
+rename to frontend/style.css
