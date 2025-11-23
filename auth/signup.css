@@ -60,54 +60,63 @@ body {
 /* INPUTS */
 .input-group {
   position: relative;
-  margin-top: 22px;
+  margin-top: 20px;
+}
+
+.input-group {
+  position: relative;
+  margin-top: 20px;
 }
 
 .input-group input {
-  width: 100%;
-  height: 50px;
-  padding: 0 16px;
-  font-size: 15px;
-  border-radius: 14px;
+  width: 90%;
+  height: 42px; /* reduced height */
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: 12px;
   border: 2px solid #d6d6d6;
   outline: none;
   transition: 0.25s ease;
+  display: block;
+  margin: 0 auto; /* centers the input */
+  background: #fff;
 }
 
 .input-group input:focus {
   border-color: #d10000;
 }
 
-/* FLOATING LABEL */
+/* floating label */
 .input-group label {
   position: absolute;
-  left: 16px;
+  left: 28px; /* adjust due to 90% width */
   top: 50%;
   transform: translateY(-50%);
   background: #fff;
   padding: 0 6px;
-  font-size: 15px;
+  font-size: 14px;
   color: #777;
   pointer-events: none;
   transition: 0.25s ease;
 }
 
-.input-group input:focus + label,
-.input-group.filled label {
-  top: -9px;
-  font-size: 12px;
+.input-group.filled label,
+.input-group input:focus + label {
+  top: -10px;
+  font-size: 11.5px;
   color: #d10000;
 }
 
-/* PASSWORD TOGGLE */
+/* Password icon reposition */
 .pass-group .toggle {
   position: absolute;
-  right: 14px;
+  right: 30px; /* aligned for 90% width */
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   padding: 5px;
 }
+
 
 .eye {
   width: 22px;
