@@ -73,7 +73,7 @@ body {
 }
 
 /* Move hero UP near green line */
-.hero-border {
+.animated-border-box {
 	margin-top: 6px !important;
 	padding: 20px;
 	background: #ffffff;
@@ -85,14 +85,14 @@ body {
 }
 
 /* HERO TEXT */
-.hero-border h1 {
+.animated-border-box h1 {
 	margin: 0;
 	font-size: 28px;
 	color: #1a1a1a;
 	font-weight: 700;
 }
 
-.hero-border p {
+.animated-border-box p {
 	margin-top: 6px;
 	color: #444;
 	font-size: 15px;
@@ -157,57 +157,54 @@ body {
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
 }
 
-.hero-animated-border {
-  position: relative;
+/* 100% WORKING ANIMATED BORDER */
+.animated-border-box {
+  position: relative !important;
   padding: 20px;
-  margin-top: 10px;
   background: #fff;
   border-radius: 20px;
-  text-align: center;
+  margin-top: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(226, 55, 68, 0.10);
 }
 
-/* main animated border layer */
-.hero-animated-border::before {
+/* Main animation layer */
+.animated-border-box::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: -3px;                 /* slightly outside for thicker border */
+  border-radius: 22px;
 
-  border-radius: 20px;
+  padding: 3px;                /* border thickness */
 
-  /* gradient that moves around the box */
+  /* TEMPORARY VISIBLE COLORS (test animation) */
   background: linear-gradient(
     90deg,
-    #ff4d5d,
-    #e23744,
-    #ff4d5d,
-    #ff7e8c
+    #ff0000,
+    #00ff00,
+    #0000ff,
+    #ff0000
   );
 
   background-size: 300% 300%;
-  animation: moveBorderGlow 4s linear infinite;
-  
-  /* only show border, not fill */
-  mask:
+  animation: borderMoveTest 4s linear infinite;
+
+  /* show border only */
+  -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
-  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
 
-  padding: 3px; /* thickness of glowing border */
+  pointer-events: none;
 }
 
-
-/* animation that rotates glow around */
-@keyframes moveBorderGlow {
-  0%   { background-position: 0%   0%; }
-  25%  { background-position: 100% 0%; }
+/* animation movement */
+@keyframes borderMoveTest {
+  0%   { background-position:   0%   0%; }
+  25%  { background-position: 100%   0%; }
   50%  { background-position: 100% 100%; }
-  75%  { background-position: 0%   100%; }
-  100% { background-position: 0%   0%; }
+  75%  { background-position:   0% 100%; }
+  100% { background-position:   0%   0%; }
 }
 
 /* Language Selection Hindi English */
