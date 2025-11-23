@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Track Order — SH The Hunger Point</title>
+
+  <link rel="stylesheet" href="/track/track.css" />
+
+  <!-- Google Maps: put your API key here -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Your Firebase config -->
+  <script src="/auth/firebase-config.js"></script>
+
+  <script src="/track/track.js" defer></script>
+</head>
+<body>
+  <main class="track-page">
+    <header class="track-head">
+      <div class="brand">
+        <img src="/home/sh-thehungerpoint.png" alt="SH" class="logo">
+        <div class="title">Track Your Order</div>
+      </div>
+
+      <div class="controls">
+        <button id="detectLocation" class="btn">Detect My Location</button>
+        <div id="eta" class="eta">ETA: —</div>
+      </div>
+    </header>
+
+    <section class="track-info">
+      <div class="status">
+        <div><strong>Order:</strong> <span id="orderIdLabel">—</span></div>
+        <div><strong>Status:</strong> <span id="orderStatus">—</span></div>
+        <div><strong>Rider:</strong> <span id="riderName">—</span></div>
+        <div><strong>Distance:</strong> <span id="distanceText">—</span></div>
+      </div>
+    </section>
+
+    <div id="map" class="map"></div>
+
+    <footer class="track-foot">
+      <small>Contact support: +91-xxxxxxxxxx</small>
+    </footer>
+  </main>
+</body>
+</html>
