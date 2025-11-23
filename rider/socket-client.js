@@ -1,16 +1,36 @@
-// /rider/socket-client.js
+// rider/socket-client.js
+(function () {
+  const API_BASE = window.SH?.API_BASE ?? "";
+  const SOCKET_URL = API_BASE || window.location.origin;
 
-const BACKEND_URL = window.SOCKET_BACKEND || window.location.origin;
+  if (!window.io) {
+    console.warn("socket.io client not loaded");
+    return;
+  }
 
-function createSocket(authToken) {
-  const socket = io(BACKEND_URL, {
-    transports: ['websocket'],
-    auth: authToken ? { token: authToken } : undefined,
+  const token = localStorage.getItem("riderToken");
+  const riderId = localStorage.getItem("riderId");
+
+  // connect to server with websocket transport
+  const socket = io(SOCKET_URL, {
+    transports: ["websocket"],
+    auth: { token } // server may ignore but harmless
   });
 
-  socket.on("connect", () => console.log("Socket connected:", socket.id));
-  socket.on("disconnect", (reason) => console.log("Socket disconnected:", reason));
-  socket.on("connect_error", (err) => console.error("Socket error:", err));
+  socket.on("connect", () => {
+    console.log("socket connected", socket.id);
+    if (riderId) socket.emit("rider:join", { riderId });
+  });
 
-  return socket;
-}
+  socket.on("connect_error", (err) => {
+    console.warn("Socket connect error:", err);
+  });
+
+  // server -> client messages (optional)
+  socket.on("order:assigned", (payload) => {
+    console.log("Order assigned:", payload);
+    // you can update UI here
+  });
+
+  window.socket = socket;
+})();
