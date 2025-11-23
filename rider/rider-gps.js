@@ -1,46 +1,123 @@
-// /rider/rider-gps.js
+/* -------------------------------------------------------------
+   SH Rider — Optimized GPS Tracking Script
+------------------------------------------------------------- */
 
-const RIDER_ID = window.RIDER_ID || "RIDER_1";
-let ORDER_ID = window.ORDER_ID || null;
+// SOCKET instance comes from /rider/socket-client.js
+// Save riderId from localStorage
+const riderId = localStorage.getItem("riderId");
 
-const EMIT_INTERVAL_MS = 3000;
+// ===================================================================================
+// 1) GPS START FUNCTION
+// ===================================================================================
+function startGPS() {
+  if (!riderId) {
+    console.error("❌ No riderId found. Cannot start GPS.");
+    return;
+  }
 
-const socket = createSocket();
-socket.emit("rider:join", { riderId: RIDER_ID });
+  console.log("📍 Starting GPS tracking for:", riderId);
 
-// Throttle function
-function throttle(fn, time) {
-  let last = 0;
-  return (...args) => {
-    const now = Date.now();
-    if (now - last >= time) {
-      last = now;
-      fn(...args);
-    }
-  };
+  // Get initial location immediately
+  getSingleLocation();
+
+  // Start continuous tracking
+  startContinuousTracking();
 }
 
-function sendLocation(lat, lng, speed, accuracy) {
-  const payload = {
-    riderId: RIDER_ID,
-    orderId: ORDER_ID,
-    lat,
-    lng,
-    speed,
-    accuracy,
-    timestamp: new Date().toISOString(),
-  };
-  socket.emit("rider:location", payload);
-}
 
-// Live GPS tracking
-if ("geolocation" in navigator) {
-  navigator.geolocation.watchPosition(
-    throttle((pos) => {
-      const { latitude: lat, longitude: lng, accuracy, speed } = pos.coords;
-      sendLocation(lat, lng, speed || 0, accuracy || 0);
-    }, EMIT_INTERVAL_MS),
-    (err) => console.error("GPS Error:", err),
-    { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
+// ===================================================================================
+// 2) GET SINGLE LOCATION (first fix)
+// ===================================================================================
+function getSingleLocation() {
+  if (!navigator.geolocation) {
+    alert("Your device does not support GPS.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const data = buildLocationPayload(pos);
+      sendLocation(data);
+    },
+    (err) => {
+      console.error("GPS Error:", err);
+      alert("Please allow GPS to start tracking.");
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
   );
 }
+
+
+// ===================================================================================
+// 3) CONTINUOUS TRACKING (watchPosition)
+// ===================================================================================
+let watchId = null;
+
+function startContinuousTracking() {
+  if (!navigator.geolocation) return;
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const data = buildLocationPayload(pos);
+      sendLocation(data);
+    },
+    (err) => {
+      console.warn("⚠ GPS watch error:", err);
+      // Automatically try again after 5 seconds
+      setTimeout(startContinuousTracking, 5000);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 15000,
+    }
+  );
+}
+
+
+// ===================================================================================
+// 4) Build payload for server
+// ===================================================================================
+function buildLocationPayload(pos) {
+  return {
+    riderId: riderId,
+    lat: pos.coords.latitude,
+    lng: pos.coords.longitude,
+    speed: pos.coords.speed || 0,
+    heading: pos.coords.heading || null,
+    accuracy: pos.coords.accuracy,
+    timestamp: Date.now(),
+    // If you add order assignment later, include:
+    orderId: localStorage.getItem("activeOrderId") || null
+  };
+}
+
+
+// ===================================================================================
+// 5) Send location to backend through socket.io
+// ===================================================================================
+function sendLocation(data) {
+  if (!window.socket) {
+    console.warn("Socket not ready, cannot send location.");
+    return;
+  }
+
+  console.log("📤 Sending rider location:", data);
+  window.socket.emit("rider:location", data);
+}
+
+
+// ===================================================================================
+// 6) STOP GPS (optional]
+// ===================================================================================
+function stopGPS() {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    console.log("🛑 GPS tracking stopped.");
+  }
+}
+
+
+// Make functions globally available
+window.startGPS = startGPS;
+window.stopGPS = stopGPS;
