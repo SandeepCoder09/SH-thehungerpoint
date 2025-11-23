@@ -21,39 +21,44 @@ body {
   overflow: hidden;
 }
 
-/* NEW HEADER LAYOUT WITH RED BACKGROUND */
+/* RED HEADER */
 .new-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
   padding: 22px 25px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* text left, logo right */
   border-radius: 18px 18px 0 0;
 }
 
-/* Brand name next to the logo (on left side) */
+/* Align logo + text on left */
+.left-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.7);
+}
+
+/* Brand name next to logo */
 .brand-text {
   font-size: 22px;
   font-weight: 700;
   color: #fff;
 }
 
-/* Logo on right side */
-.header-logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.7);
-}
-
-/* Create Account centered below red header */
+/* Create Account centered & close to inputs */
 .page-title {
   text-align: center;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
-  color: #d10000; /* matches your theme */
-  margin-top: 14px;     /* small gap under header */
-  margin-bottom: -5px;  /* slight lift upward */
+  color: #d10000;
+  margin-top: 10px;  /* LESS space from header */
+  margin-bottom: -2px; /* Brings it closer to Name input */
 }
 
 /* BODY */
