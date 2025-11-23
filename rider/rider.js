@@ -1,115 +1,99 @@
-let currentRider = null;
-let map;
-let riderMarker;
+// SCREEN ELEMENTS
+const loginScreen = document.getElementById("loginScreen");
+const dashboardScreen = document.getElementById("dashboardScreen");
+const riderNameEl = document.getElementById("riderName");
 
-// LOGIN
-document.getElementById("loginBtn").onclick = async () => {
-  const email = riderEmail.value;
-  const pass = riderPass.value;
+// LOGIN ELEMENTS
+const emailInput = document.getElementById("riderEmail");
+const passInput = document.getElementById("riderPass");
+const loginBtn = document.getElementById("loginBtn");
 
-  try {
-    await firebase.auth().signInWithEmailAndPassword(email, pass);
-  } catch (err) {
-    return alert("Login failed");
-  }
-};
+// LOGOUT
+const logoutBtn = document.getElementById("logoutBtn");
 
-// LISTEN AUTH
-firebase.auth().onAuthStateChanged(async (user) => {
-  if (!user) {
-    document.getElementById("loginScreen").classList.add("active");
-    document.getElementById("dashboardScreen").classList.remove("active");
+
+// -------------------------------
+// SHOW / HIDE SCREENS
+// -------------------------------
+function showLogin() {
+  loginScreen.classList.add("active");
+  dashboardScreen.classList.remove("active");
+}
+
+function showDashboard() {
+  loginScreen.classList.remove("active");
+  dashboardScreen.classList.add("active");
+}
+
+
+// -------------------------------
+// CHECK IF RIDER IS ALREADY LOGGED IN
+// -------------------------------
+const savedRiderId = localStorage.getItem("riderId");
+const savedToken = localStorage.getItem("riderToken");
+
+if (savedRiderId && savedToken) {
+  checkApproval(savedRiderId);
+}
+
+
+// -------------------------------
+// LOGIN LOGIC
+// -------------------------------
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passInput.value.trim();
+
+  if (!email || !password) {
+    alert("Enter email and password");
     return;
   }
 
-  currentRider = user;
-  riderName.textContent = user.email;
-  document.getElementById("loginScreen").classList.remove("active");
-  document.getElementById("dashboardScreen").classList.add("active");
-
-  loadRiderOrders();
-  startLiveLocation();
-});
-
-// LOGOUT
-logoutBtn.onclick = () => firebase.auth().signOut();
-
-// LOAD ORDERS ASSIGNED TO RIDER
-function loadRiderOrders() {
-  firebase.firestore().collection("orders")
-    .where("riderId", "==", currentRider.uid)
-    .onSnapshot((snap) => {
-      orderContainer.innerHTML = "";
-
-      snap.forEach((doc) => {
-        const order = doc.data();
-        const div = document.createElement("div");
-        div.className = "order-item";
-
-        div.innerHTML = `
-          <b>Order ID:</b> ${doc.id}<br>
-          <b>Status:</b> ${order.status}<br>
-          <button class="status-btn" onclick="updateStatus('${doc.id}', 'picked')">Picked Up</button>
-          <button class="status-btn" onclick="updateStatus('${doc.id}', 'delivering')">Delivering</button>
-          <button class="status-btn" onclick="updateStatus('${doc.id}', 'delivered')">Delivered</button>
-        `;
-
-        orderContainer.appendChild(div);
-      });
-    });
-}
-
-function updateStatus(id, status) {
-  firebase.firestore().collection("orders").doc(id).update({
-    status,
-    updatedAt: new Date()
+  const res = await fetch("/rider/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
   });
-}
 
-// LIVE LOCATION SENDER
-function startLiveLocation() {
-  navigator.geolocation.watchPosition((pos) => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+  const data = await res.json();
 
-    // save in rider profile
-    firebase.firestore().collection("riders").doc(currentRider.uid).set({
-      name: currentRider.email,
-      currentLocation: { lat, lng },
-      online: true
-    }, { merge: true });
-
-    // send to active orders
-    firebase.firestore().collection("orders")
-      .where("riderId", "==", currentRider.uid)
-      .get()
-      .then((snap) => {
-        snap.forEach((doc) => {
-          firebase.firestore().collection("orders").doc(doc.id).update({
-            riderLocation: { lat, lng }
-          });
-        });
-      });
-
-    // Update map
-    updateMap(lat, lng);
-  });
-}
-
-function updateMap(lat, lng) {
-  if (!map) {
-    map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 16,
-      center: { lat, lng }
-    });
-
-    riderMarker = new google.maps.Marker({
-      map,
-      position: { lat, lng },
-      icon: "/assets/icons/rider.png"
-    });
+  if (!data.ok) {
+    alert(data.error);
+    return;
   }
 
-  riderMarker.setPosition({ lat, lng });
-  map.setCenter({ lat, lng });
+  // SAVE LOGIN SESSION
+  localStorage.setItem("riderId", data.riderId);
+  localStorage.setItem("riderToken", data.token);
+
+  checkApproval(data.riderId);
+});
+
+
+// -------------------------------
+// APPROVAL CHECK
+// -------------------------------
+async function checkApproval(riderId) {
+  const res = await fetch("/rider/check?riderId=" + riderId);
+  const data = await res.json();
+
+  if (!data.ok) {
+    alert("Not approved yet.");
+    showLogin();
+    return;
+  }
+
+  // APPROVED → show dashboard + start GPS
+  riderNameEl.innerText = riderId;
+  showDashboard();
+
+  startGPS(); // from rider-gps.js
 }
+
+
+// -------------------------------
+// LOGOUT
+// -------------------------------
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("riderId");
+  localStorage.removeItem("riderToken
