@@ -24,7 +24,7 @@ body {
 /* RED HEADER */
 .new-head {
   background: linear-gradient(90deg, #d10000, #ff4747);
-  padding: 10px 18px;   /* decreased height */
+  padding: 6px 16px;   /* decreased height */
   display: flex;
   align-items: center;
   justify-content: flex-start;
