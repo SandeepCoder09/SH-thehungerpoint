@@ -30,7 +30,6 @@ body {
   border-radius: 18px 18px 0 0;
 }
 
-/* Align logo + text on left */
 .left-wrap {
   display: flex;
   align-items: center;
@@ -44,21 +43,19 @@ body {
   border: 2px solid rgba(255,255,255,0.7);
 }
 
-/* Brand name next to logo */
 .brand-text {
   font-size: 22px;
   font-weight: 700;
   color: #fff;
 }
 
-/* Create Account centered & close to inputs */
 .page-title {
   text-align: center;
   font-size: 19px;
   font-weight: 600;
   color: #d10000;
-  margin-top: 10px;  /* LESS space from header */
-  margin-bottom: -2px; /* Brings it closer to Name input */
+  margin-top: 10px;
+  margin-bottom: -2px;
 }
 
 /* BODY */
