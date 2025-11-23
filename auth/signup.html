@@ -39,74 +39,101 @@
       <section class="card-body">
         <form id="signupForm">
 
-          <div class="input-group">
-            <input id="name" type="text" required>
-            <label for="name">Name</label>
-          </div>
+  <!-- NAME -->
+  <div class="input-group icon-input">
+    <span class="input-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+      </svg>
+    </span>
+    <input id="name" type="text" required>
+    <label for="name">Name</label>
+  </div>
 
-          <div class="input-group">
-            <input id="email" type="email" required>
-            <label for="email">Email</label>
-          </div>
+  <!-- EMAIL -->
+  <div class="input-group icon-input">
+    <span class="input-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 4h20v16H2V4zm10 7L3.5 6.5h17L12 11z"/>
+      </svg>
+    </span>
+    <input id="email" type="email" required>
+    <label for="email">Email</label>
+  </div>
 
-          <div class="input-group pass-group">
-            <input id="password" type="password" required>
-            <label for="password">Password</label>
+  <!-- PASSWORD -->
+  <div class="input-group pass-group icon-input">
+    <span class="input-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
+      </svg>
+    </span>
 
-            <span class="toggle" id="togglePass">
-              <svg class="eye eye-open" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <circle cx="12" cy="12" r="3"
-                  fill="none" stroke="#333" stroke-width="2" />
-              </svg>
+    <input id="password" type="password" required>
+    <label for="password">Password</label>
 
-              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <circle cx="12" cy="12" r="3"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <line x1="4" y1="20" x2="20" y2="4"
-                  stroke="#333" stroke-width="2" />
-              </svg>
-            </span>
-          </div>
+    <!-- Your eye icons remain same -->
+    <span class="toggle" id="togglePass">
+      <svg class="eye eye-open" viewBox="0 0 24 24">
+        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+          fill="none" stroke="#333" stroke-width="2" />
+        <circle cx="12" cy="12" r="3"
+          fill="none" stroke="#333" stroke-width="2" />
+      </svg>
 
-          <div class="input-group pass-group">
-            <input id="confirm" type="password" required>
-            <label for="confirm">Confirm Password</label>
+      <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+          fill="none" stroke="#333" stroke-width="2" />
+        <circle cx="12" cy="12" r="3"
+          fill="none" stroke="#333" stroke-width="2" />
+        <line x1="4" y1="20" x2="20" y2="4"
+          stroke="#333" stroke-width="2" />
+      </svg>
+    </span>
+  </div>
 
-            <span class="toggle" id="toggleConfirm">
-              <svg class="eye eye-open" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <circle cx="12" cy="12" r="3"
-                  fill="none" stroke="#333" stroke-width="2" />
-              </svg>
+  <!-- CONFIRM PASSWORD -->
+  <div class="input-group pass-group icon-input">
+    <span class="input-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
+      </svg>
+    </span>
 
-              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
-                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <circle cx="12" cy="12" r="3"
-                  fill="none" stroke="#333" stroke-width="2" />
-                <line x1="4" y1="20" x2="20" y2="4"
-                  stroke="#333" stroke-width="2" />
-              </svg>
-            </span>
-          </div>
+    <input id="confirm" type="password" required>
+    <label for="confirm">Confirm Password</label>
 
-          <label class="legal">
-            <input type="checkbox" id="legalCheck">
-            <span>I accept all terms.</span>
-          </label>
+    <!-- Your eye icons remain same -->
+    <span class="toggle" id="toggleConfirm">
+      <svg class="eye eye-open" viewBox="0 0 24 24">
+        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+          fill="none" stroke="#333" stroke-width="2" />
+        <circle cx="12" cy="12" r="3"
+          fill="none" stroke="#333" stroke-width="2" />
+      </svg>
 
-          <button type="submit" class="btn primary">Create Account</button>
+      <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+          fill="none" stroke="#333" stroke-width="2" />
+        <circle cx="12" cy="12" r="3"
+          fill="none" stroke="#333" stroke-width="2" />
+        <line x1="4" y1="20" x2="20" y2="4"
+          stroke="#333" stroke-width="2" />
+      </svg>
+    </span>
+  </div>
 
-          <div class="divider">or</div>
+  <!-- Rest unchanged -->
+  <label class="legal">
+    <input type="checkbox" id="legalCheck">
+    <span>I accept all terms.</span>
+  </label>
 
-          <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
+  <button type="submit" class="btn primary">Create Account</button>
+  <div class="divider">or</div>
+  <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
 
-        </form>
+</form>
       </section>
 
     </div>
