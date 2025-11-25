@@ -1,52 +1,65 @@
 // rider/rider.js
+import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
 const API_BASE = window.SH?.API_BASE ?? "";
 const riderNameEl = document.getElementById("riderName");
+const riderEmailEl = document.getElementById("riderEmail");
 const orderContainer = document.getElementById("orderContainer");
 const btnLogout = document.getElementById("btnLogout");
 
-// check session
+// Session Check
 const riderId = localStorage.getItem("riderId");
 const token = localStorage.getItem("riderToken");
 
 if (!riderId || !token) {
-  // not logged in
   window.location.replace("/rider/login.html");
 }
 
-// show rider info
-riderNameEl.textContent = riderId;
-
-// logout handler
-btnLogout?.addEventListener("click", () => {
-  localStorage.removeItem("riderId");
-  localStorage.removeItem("riderToken");
-  if (window.socket) {
-    try { window.socket.disconnect(); } catch {}
-  }
-  window.location.href = "/rider/login.html";
-});
-
-// placeholder function to load active orders from Firestore via your server (optional)
-async function loadActiveOrders() {
+// Load Rider Name + Email
+async function loadRiderProfile() {
   try {
-    // update when you implement backend API for orders
-    orderContainer.innerHTML = "<div class='muted'>No active orders assigned</div>";
+    const ref = doc(db, "riders", riderId);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      riderNameEl.textContent = data.name || "Unknown Rider";
+      riderEmailEl.textContent = data.email || "";
+    } else {
+      riderNameEl.textContent = riderId;
+    }
   } catch (err) {
-    console.error("Load orders error", err);
-    orderContainer.innerHTML = "<div class='muted'>Unable to fetch orders</div>";
+    console.error("Profile load error:", err);
+    riderNameEl.textContent = riderId;
   }
 }
 
-// Start GPS if socket connected (socket-client will set window.socket)
+// Logout
+btnLogout?.addEventListener("click", () => {
+  localStorage.removeItem("riderId");
+  localStorage.removeItem("riderToken");
+  try { window.socket?.disconnect(); } catch {}
+  window.location.href = "/rider/login.html";
+});
+
+// Active Orders placeholder
+async function loadActiveOrders() {
+  orderContainer.innerHTML = "<div class='muted'>No active orders assigned</div>";
+}
+
+// GPS Start
 function startTrackingWhenReady() {
   if (typeof window.startGPS === "function") {
     window.startGPS();
   } else {
-    // wait a bit
     setTimeout(startTrackingWhenReady, 500);
   }
 }
 
-// when socket connects it emits rider:join in socket-client.js
-startTrackingWhenReady();
-loadActiveOrders();
+// INIT
+(function init() {
+  loadRiderProfile();
+  loadActiveOrders();
+  startTrackingWhenReady();
+})();
