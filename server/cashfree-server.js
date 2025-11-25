@@ -2,32 +2,7 @@
 /**
  * SH — Cashfree + Firebase Admin + Rider Login + Socket.IO
  * Hardened / improved version (keeps backwards compatibility)
- *
- * Requirements (env):
- * - FIREBASE_TYPE
- * - FIREBASE_PROJECT_ID
- * - FIREBASE_PRIVATE_KEY_ID
- * - FIREBASE_PRIVATE_KEY
- * - FIREBASE_CLIENT_EMAIL
- * - JWT_SECRET
- * - CF_APP_ID
- * - CF_SECRET_KEY
- * Optional:
- * - CF_MODE = "sandbox" or "production" (default: production)
- * - ADMIN_HELPER_TOKEN (string) -> protects /rider/create-test helper
  */
-
-app.get("/__makehash", async (req, res) => {
-  try {
-    const pw = req.query.pw || "";
-    if (!pw) return res.json({ ok: false, error: "pw missing" });
-
-    const hash = await bcrypt.hash(pw, 10);
-    return res.json({ ok: true, pw, hash });
-  } catch (err) {
-    return res.json({ ok: false, error: err.message });
-  }
-});
 
 import express from "express";
 import cors from "cors";
@@ -119,7 +94,23 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
 // -----------------------------
-// Admin login (unchanged)
+// Small utility route: generate bcrypt hash (dev only)
+// NOTE: Keep behind firewall or remove in production
+// -----------------------------
+app.get("/__makehash", async (req, res) => {
+  try {
+    const pw = req.query.pw || "";
+    if (!pw) return res.json({ ok: false, error: "pw missing" });
+
+    const hash = await bcrypt.hash(pw, 10);
+    return res.json({ ok: true, pw, hash });
+  } catch (err) {
+    return res.json({ ok: false, error: err.message });
+  }
+});
+
+// -----------------------------
+// Admin login
 // -----------------------------
 app.post("/admin/login", async (req, res) => {
   try {
@@ -163,8 +154,6 @@ app.post("/admin/approve-rider", requireAdminToken, async (req, res) => {
 
 // -----------------------------
 // Rider helpers: flexible lookup
-// - Accepts email (doc id) OR phone (looks up document by phone field)
-// - Accepts riders stored with `password` or `passwordHash`
 // -----------------------------
 async function findRiderByEmailOrPhone(identifier) {
   if (!db) return null;
@@ -203,7 +192,7 @@ async function findRiderByEmailOrPhone(identifier) {
 }
 
 // -----------------------------
-// Rider login (improved & tolerant)
+// Rider login
 // -----------------------------
 app.post("/rider/login", async (req, res) => {
   try {
@@ -257,8 +246,6 @@ app.get("/rider/check", async (req, res) => {
 
 // -----------------------------
 // Optional helper to create a test rider quickly
-// Protected by ADMIN_HELPER_TOKEN so it's not public.
-// Use only for testing/development.
 // -----------------------------
 app.post("/rider/create-test", async (req, res) => {
   try {
@@ -291,7 +278,6 @@ app.post("/rider/create-test", async (req, res) => {
 
 // -----------------------------
 // Cashfree: create order & verify
-// - supports sandbox/production via CF_MODE
 // -----------------------------
 app.post("/create-cashfree-order", async (req, res) => {
   try {
@@ -320,7 +306,6 @@ app.post("/create-cashfree-order", async (req, res) => {
     });
 
     const data = await cfRes.json();
-    // robust extraction
     const orderId = data.order_id || data.data?.order_id || data.data?.order?.id;
     const session = data.payment_session_id || data.data?.payment_session_id || data.data?.session;
 
@@ -350,17 +335,13 @@ app.post("/verify-cashfree-payment", async (req, res) => {
     });
 
     const data = await resp.json();
-    // Cashfree returns order_status etc.
     const status = data.order_status || data.data?.order_status || data.status;
     if (String(status).toUpperCase() !== "PAID") {
       return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
     }
 
-    // Here you can save the order to Firestore and return orderId matching CF order id
-    // Keep behavior consistent with previous version:
-    const newOrderId = orderId; // use Cashfree order id as Firestore doc id
+    const newOrderId = orderId;
     try {
-      // Expect client to pass items, but fallback gracefully
       const items = req.body.items || [];
       const total = items.reduce((s, it) => s + Number(it.price || 0) * Number(it.qty || 1), 0);
 
@@ -405,10 +386,8 @@ io.on("connection", socket => {
       if (!data || !data.riderId) return;
       lastPositions.set(data.riderId, data);
 
-      // broadcast for admin dashboard
       io.emit("admin:riderLocation", data);
 
-      // if order-specific, broadcast to that room
       if (data.orderId) {
         io.to("order_" + data.orderId).emit("order:riderLocation", data);
       }
