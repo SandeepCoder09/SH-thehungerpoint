@@ -1,22 +1,21 @@
 /* -------------------------------------------
-   SH Rider Login System (Fixed & Optimized)
+   SH Rider Login System (FINAL WORKING VERSION)
    File: /rider/login.js
 -------------------------------------------- */
 
-// YOUR backend server base URL
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
+const SERVER_URL = window.SH?.API_BASE || "https://sh-thehungerpoint.onrender.com";
 
-// DOM helpers
+// DOM shortcuts
 const $ = (s) => document.querySelector(s);
 
 // Elements
 const emailInput = $("#riderEmail");
-const passInput = $("#riderPassword");
-const loginBtn  = $("#loginBtn");
-const msgBox    = $("#loginMsg");
+const passInput  = $("#riderPassword");
+const loginBtn   = $("#loginBtn");
+const msgBox     = $("#loginMsg");
 
 /* -----------------------------------------------------
-   Toast Message Helper
+   Toast-like message
 ----------------------------------------------------- */
 function showMsg(text, color = "red") {
   msgBox.textContent = text;
@@ -25,7 +24,7 @@ function showMsg(text, color = "red") {
 }
 
 /* -----------------------------------------------------
-   Save rider session
+   Save session after login
 ----------------------------------------------------- */
 function saveSession(token, riderId) {
   localStorage.setItem("riderToken", token);
@@ -33,14 +32,14 @@ function saveSession(token, riderId) {
 }
 
 /* -----------------------------------------------------
-   Login Function
+   Perform login
 ----------------------------------------------------- */
 async function riderLogin() {
   const email = emailInput.value.trim();
   const password = passInput.value.trim();
 
   if (!email || !password) {
-    showMsg("Please enter all fields");
+    showMsg("Please enter both fields");
     return;
   }
 
@@ -55,28 +54,26 @@ async function riderLogin() {
     });
 
     const data = await res.json();
-    console.log("Login Response:", data);
+    console.log("Rider Login Response:", data);
 
     if (!data.ok) {
-      showMsg(data.error || "Invalid credentials");
+      showMsg(data.error || "Incorrect credentials");
       loginBtn.disabled = false;
       loginBtn.textContent = "Login";
       return;
     }
 
-    // Save session
+    // Success
     saveSession(data.token, data.riderId);
-
     showMsg("Login successful ✔", "green");
 
-    // Redirect to rider dashboard
     setTimeout(() => {
       window.location.href = "/rider/index.html";
-    }, 800);
+    }, 700);
 
   } catch (err) {
     console.error("Login error:", err);
-    showMsg("Server error, try again");
+    showMsg("Server error. Try again.");
   }
 
   loginBtn.disabled = false;
@@ -89,7 +86,7 @@ async function riderLogin() {
 loginBtn.addEventListener("click", riderLogin);
 
 /* -----------------------------------------------------
-   Enter key support
+   Enter key triggers login
 ----------------------------------------------------- */
 passInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") riderLogin();
