@@ -1,27 +1,85 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Admin — Live Rider Tracking</title>
+  <title>Admin — Live Tracking</title>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="/admin/admin.css" />
   <style>
-    body,html { margin:0; padding:0; height:100%; }
-    #header { background:#111; color:white; padding:10px; }
-    #map { height:92vh; width:100%; }
+    /* page-specific small CSS */
+    #map { height: calc(100vh - 70px); width: 100%; }
+    .topbar {
+      height: 70px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 18px;
+      background: linear-gradient(90deg,#071726,#081f2a);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 900;
+    }
+    .topbar .title { font-weight:700; font-size:1.05rem; }
+    .panel {
+      position: absolute;
+      right: 18px;
+      top: 86px;
+      width: 320px;
+      max-height: calc(100vh - 130px);
+      overflow: auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+    .panel h3 { margin: 6px 0 10px; font-size: 14px; color:#333; }
+    .tracker-row {
+      display:flex; gap:8px; align-items:center;
+      padding:8px; border-radius:8px;
+      border:1px solid rgba(0,0,0,0.06);
+      margin-bottom:8px;
+      background:#fff;
+    }
+    .tracker-row img { width:36px; height:36px; border-radius:8px; object-fit:cover; }
+    .tracker-body { flex:1; }
+    .tracker-body .title { font-weight:700; font-size:13px; color:#111; }
+    .tracker-body .meta { font-size:12px; color:#666; margin-top:4px; }
+    .status-badge { font-size:11px; padding:4px 8px; border-radius:999px; background:#f1f1f1; color:#333; }
+    .btn-small { font-size:12px; padding:6px 8px; border-radius:6px; cursor:pointer; border:1px solid #ddd; background:#fafafa; }
+    .legend { position:absolute; left:18px; top:86px; z-index:1000; background:rgba(255,255,255,0.95); padding:10px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.12);}
   </style>
 </head>
 <body>
-
-  <div id="header">
-    Riders Connected: <span id="rider-count">0</span>
+  <div class="topbar">
+    <div class="title">SH — Live Tracking (Admin)</div>
+    <div class="right">
+      <span id="connectionStatus">Socket: <strong id="sockState">—</strong></span>
+    </div>
   </div>
 
   <div id="map"></div>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/rider/socket-client.js"></script>
-  <script src="/admin/track-rider.js"></script>
+  <div class="legend">
+    <div><strong>Legend</strong></div>
+    <div style="margin-top:6px;">
+      <span style="display:inline-block;width:12px;height:12px;background:#1978c8;border-radius:3px;margin-right:6px;"></span> Rider
+      <span style="display:inline-block;width:12px;height:12px;background:#2ecc71;border-radius:3px;margin:0 6px 0 14px;"></span> Customer
+    </div>
+  </div>
 
+  <div class="panel" id="panel">
+    <h3>Active Trackers</h3>
+    <div id="trackList">No active trackers</div>
+  </div>
+
+  <!-- Leaflet + socket.io -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <script type="module" src="/admin/track-rider.js"></script>
 </body>
 </html>
