@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rider Login — SH The Hunger Point</title>
   <link rel="stylesheet" href="/rider/login.css" />
 </head>
@@ -12,11 +12,21 @@
     <div class="card">
       <h1>Rider Login</h1>
 
-      <label>Email</label>
-      <input id="riderEmail" type="email" placeholder="you@example.com" autocomplete="username" />
+      <label for="riderEmail">Email</label>
+      <input 
+        id="riderEmail" 
+        type="email" 
+        placeholder="you@example.com"
+        autocomplete="username"
+      />
 
-      <label>Password</label>
-      <input id="riderPassword" type="password" placeholder="Password" autocomplete="current-password" />
+      <label for="riderPassword">Password</label>
+      <input 
+        id="riderPassword" 
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      />
 
       <button id="loginBtn">Login</button>
 
@@ -25,6 +35,7 @@
     </div>
   </main>
 
+  <!-- API base for JS -->
   <script>
     window.SH = window.SH || {};
     window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
