@@ -1,85 +1,16 @@
-// ========== /home/script.js ==========
-// Full script: menu qty + add-to-cart + cart modal + Cashfree checkout + toast
-// Preserves your server integration and UX. Updated to match new menu layout.
-
-// Language Translation Fixing Button ✅ 
-document.querySelector(".lang-icon").addEventListener("click", () => {
-  const menu = document.querySelector(".lang-menu");
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
-});
-
-// Close menu if clicked outside
-window.addEventListener("click", (e) => {
-  if (!e.target.closest(".lang-wrapper")) {
-    document.querySelector(".lang-menu").style.display = "none";
-  }
-});
-
-/* H1 — RIGHT TO LEFT */
-const h1Words = ["Delicious", "Fast", "Fresh"];
-let h1Index = 0, h1Char = 0, h1Deleting = false;
-const h1El = document.querySelector(".type-h1");
-
-function typeH1() {
-  const word = h1Words[h1Index];
-
-  if (!h1Deleting) {
-    h1Char++;
-    h1El.textContent = word.substring(word.length - h1Char);
-    if (h1Char === word.length) {
-      setTimeout(() => (h1Deleting = true), 900);
-    }
-  } else {
-    h1Char--;
-    h1El.textContent = word.substring(word.length - h1Char);
-    if (h1Char === 0) {
-      h1Deleting = false;
-      h1Index = (h1Index + 1) % h1Words.length;
-    }
-  }
-
-  setTimeout(typeH1, h1Deleting ? 60 : 90);
-}
-typeH1();
-
-
-
-/* P — LEFT TO RIGHT */
-const pText = "Family-style fast food — momo, finger, tea & more.";
-let pChar = 0, pDeleting = false;
-const pEl = document.querySelector(".type-p");
-
-function typeP() {
-  if (!pDeleting) {
-    pChar++;
-    pEl.textContent = pText.substring(0, pChar);
-    if (pChar === pText.length) {
-      setTimeout(() => (pDeleting = true), 1100);
-    }
-  } else {
-    pChar--;
-    pEl.textContent = pText.substring(0, pChar);
-    if (pChar === 0) {
-      pDeleting = false;
-    }
-  }
-
-  setTimeout(typeP, pDeleting ? 50 : 70);
-}
-typeP();
-
-// Server Codes Starting //
+// ========== /home/script.js (FINAL) ==========
+// Merged: menu/cart + checkout popup (Option B) + Cashfree + Firestore order creation (v8) + backend notify
+// Requires: /home/firebase-config.js (v8 namespaced firebase) and server endpoints:
+// POST /create-cashfree-order, POST /verify-cashfree-payment, POST /notify-order-created, GET /ping
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
-// DOM helpers
+/* DOM helpers */
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-/* -------------------------
-   Toast helper
-   ------------------------- */
+/* Toast */
 function showToast(message, duration = 2500) {
   const container = $("#toast-container");
   if (!container) {
@@ -93,21 +24,15 @@ function showToast(message, duration = 2500) {
   setTimeout(() => t.remove(), duration);
 }
 
-/* -------------------------
-   Cart state
-   ------------------------- */
-let cart = []; // items: { id, name, price, qty }
-
+/* Cart state */
+let cart = [];
 const findCartIndex = (id) => cart.findIndex(c => c.id === id);
-
 function updateCartCount() {
   const el = $("#cartCount");
   if (el) el.textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
-/* -------------------------
-   Image map for menu + cart
-   ------------------------- */
+/* Image map */
 const imageMap = {
   "momo": "/home/sh-momo.png",
   "finger": "/home/sh-french-fries.png",
@@ -117,20 +42,16 @@ const imageMap = {
   "bread pakoda": "/home/sh-bread-pakoda.png",
   "bread-pakoda": "/home/sh-bread-pakoda.png"
 };
-
 function getImageFor(name){
   if(!name) return "";
   return imageMap[String(name).trim().toLowerCase()] || "";
 }
 
-/* -------------------------
-   renderCart() — cart modal (compact with images)
-   ------------------------- */
+/* renderCart */
 function renderCart() {
   const container = $("#cartItems");
   if (!container) return;
   container.innerHTML = "";
-
   if (cart.length === 0) {
     container.innerHTML = `<p class="empty">Cart is empty</p>`;
     const t = $("#cartTotal");
@@ -138,17 +59,12 @@ function renderCart() {
     updateCartCount();
     return;
   }
-
   let total = 0;
-
   cart.forEach(item => {
     total += item.qty * item.price;
-
     const img = getImageFor(item.name);
-
     const node = document.createElement("div");
     node.className = "cart-item";
-
     node.innerHTML = `
       <img src="${img}" class="cart-img" alt="${item.name}" loading="lazy" />
       <div class="cart-info">
@@ -164,12 +80,10 @@ function renderCart() {
     `;
     container.appendChild(node);
   });
-
   const totalEl = $("#cartTotal");
   if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
-
-  // attach handlers
+  // handlers
   container.querySelectorAll(".cart-dec").forEach(b => {
     b.onclick = (e) => {
       const id = e.currentTarget.dataset.id;
@@ -199,9 +113,7 @@ function renderCart() {
   });
 }
 
-/* -------------------------
-   Modal open/close
-   ------------------------- */
+/* Modal open/close */
 function openModal() {
   $("#overlay")?.classList.remove("hidden");
   $("#cartModal")?.classList.remove("hidden");
@@ -211,52 +123,39 @@ function closeModal() {
   $("#overlay")?.classList.add("hidden");
   $("#cartModal")?.classList.add("hidden");
 }
-
-/* Hook modal triggers */
 $("#cartToggle")?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
 $("#overlay")?.addEventListener("click", closeModal);
 $("#closeCart")?.addEventListener("click", closeModal);
 $("#closeOnlyBtn")?.addEventListener("click", closeModal);
 $("#clearCart")?.addEventListener("click", () => { cart = []; renderCart(); });
 
-/* -------------------------
-   Menu qty + add-to-cart logic (matches new markup)
-   ------------------------- */
+/* Menu qty + add-to-cart */
 $$(".menu-item").forEach(itemEl => {
   const qtyDisplay = itemEl.querySelector(".qty-display");
   const dec = itemEl.querySelector(".qty-btn.minus");
   const inc = itemEl.querySelector(".qty-btn.plus");
   const addBtn = itemEl.querySelector(".add-cart-btn");
-
-  // initialize qty
   let qty = Number(qtyDisplay?.textContent) || 1;
   if (qtyDisplay) qtyDisplay.textContent = qty;
-
   function setQty(v){
     qty = Math.max(1, Math.floor(v || 1));
     if (qtyDisplay) qtyDisplay.textContent = qty;
   }
-
   dec?.addEventListener("click", () => setQty(qty - 1));
   inc?.addEventListener("click", () => setQty(qty + 1));
-
   addBtn?.addEventListener("click", () => {
     const name = itemEl.dataset.item || itemEl.querySelector("h3")?.textContent || "Item";
     const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
     const id = ("" + name).toLowerCase().replace(/\s+/g, "-");
-
     const idx = findCartIndex(id);
     if (idx >= 0) cart[idx].qty += qty;
     else cart.push({ id, name, price, qty });
-
     showToast(`${qty} × ${name} added to cart`);
     renderCart();
   });
 });
 
-/* -------------------------
-   Tabs (unchanged)
-   ------------------------- */
+/* Tabs */
 $$(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     $$(".tab").forEach(b => b.classList.remove("active"));
@@ -268,9 +167,7 @@ $$(".tab").forEach(btn => {
   });
 });
 
-/* -------------------------
-   Disable add buttons helper
-   ------------------------- */
+/* Disable add buttons */
 function setOrderButtonsDisabled(disabled) {
   $$(".add-cart-btn").forEach(b => {
     b.disabled = disabled;
@@ -284,16 +181,9 @@ function setOrderButtonsDisabled(disabled) {
   });
 }
 
-/* -------------------------
-   Backend connectors (same as original)
-   ------------------------- */
+/* Backend connectors */
 async function createCashfreeOrder(amount, items, customer = {}) {
-  const payload = {
-    amount: Number(amount),
-    items,
-    phone: customer.phone || undefined,
-    email: customer.email || undefined
-  };
+  const payload = { amount: Number(amount), items, phone: customer.phone || undefined, email: customer.email || undefined };
   const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -301,7 +191,6 @@ async function createCashfreeOrder(amount, items, customer = {}) {
   });
   return res.json();
 }
-
 async function verifyCashfree(orderId, items) {
   const res = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
     method: "POST",
@@ -311,22 +200,16 @@ async function verifyCashfree(orderId, items) {
   return res.json();
 }
 
-/* -------------------------
-   Cashfree SDK init & modal open (kept original logic)
-   ------------------------- */
+/* Cashfree init */
 let cashfreeInstance = null;
 let cashfreeMode = "production";
-
 function initCashfreeSDK() {
   try {
     if (window.Cashfree && typeof window.Cashfree === "function") {
       cashfreeInstance = Cashfree({ mode: cashfreeMode });
-      console.log("Cashfree v3 initialized via factory.");
     } else if (window.Cashfree && window.Cashfree.checkout) {
       cashfreeInstance = window.Cashfree;
-      console.log("Cashfree fallback available.");
     } else {
-      console.warn("Cashfree SDK not available yet.");
       cashfreeInstance = null;
     }
   } catch (err) {
@@ -334,25 +217,21 @@ function initCashfreeSDK() {
     cashfreeInstance = null;
   }
 }
-
 function openCashfreeModal(paymentSessionId) {
   if (!paymentSessionId) {
     showToast("Payment session missing");
     return;
   }
-
   if (!cashfreeInstance) initCashfreeSDK();
   if (!cashfreeInstance) {
     showToast("Payment SDK not loaded");
     return;
   }
-
   try {
     if (cashfreeInstance.checkout) {
       cashfreeInstance.checkout({ paymentSessionId, redirectTarget: "_modal" });
       return;
     }
-
     if (typeof cashfreeInstance === "function") {
       const inst = cashfreeInstance({ mode: cashfreeMode });
       if (inst.checkout) {
@@ -360,40 +239,126 @@ function openCashfreeModal(paymentSessionId) {
         return;
       }
     }
-
     showToast("Payment SDK incompatible");
-    console.error("Unsupported Cashfree instance:", cashfreeInstance);
   } catch (err) {
     console.error("openCashfreeModal error:", err);
     showToast("Failed to open payment");
   }
 }
 
-/* -------------------------
-   Checkout flow (unchanged logic)
-   ------------------------- */
-$("#checkoutBtn")?.addEventListener("click", async () => {
+/* Firestore helpers (v8) */
+function tryGetBrowserLocation(timeout = 8000) {
+  if (!("geolocation" in navigator)) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    let done = false;
+    const id = setTimeout(() => {
+      if (!done) { done = true; resolve(null); }
+    }, timeout);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (done) return;
+        done = true;
+        clearTimeout(id);
+        resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy || null });
+      },
+      (err) => {
+        if (done) return;
+        done = true;
+        clearTimeout(id);
+        resolve(null);
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout }
+    );
+  });
+}
+async function createOrderInFirestore({ items, total, customer = {}, locationChoice = "manual" }) {
+  if (typeof firebase === "undefined" || !firebase.firestore) {
+    throw new Error("Firestore not available");
+  }
+  const orderObj = {
+    items,
+    totalAmount: Number(total),
+    status: "pending",
+    riderId: null,
+    customerName: customer.name || customer.email || "Guest",
+    customerPhone: customer.phone || null,
+    customerEmail: customer.email || null,
+    manualAddress: customer.manualAddress || null,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    locationChoice
+  };
+  if (locationChoice === "gps") {
+    const loc = await tryGetBrowserLocation(8000);
+    if (loc) orderObj.userLocation = { lat: loc.lat, lng: loc.lng, accuracy: loc.accuracy || null };
+  }
+  const col = firebase.firestore().collection("orders");
+  const docRef = await col.add(orderObj);
+  await col.doc(docRef.id).set({ orderId: docRef.id }, { merge: true });
+  return { orderId: docRef.id, order: orderObj };
+}
+async function notifyBackendOrderCreated(orderId) {
+  try {
+    const res = await fetch(`${SERVER_URL}/notify-order-created`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId })
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn("notifyBackendOrderCreated error", err);
+    return false;
+  }
+}
+
+/* Checkout popup flow */
+function openCheckoutPopup() {
+  $("#checkoutOverlay")?.classList.remove("hidden");
+  $("#checkoutModal")?.classList.remove("hidden");
+  $("#checkoutMsg").textContent = "";
+}
+function closeCheckoutPopup() {
+  $("#checkoutOverlay")?.classList.add("hidden");
+  $("#checkoutModal")?.classList.add("hidden");
+}
+$("#checkoutBtn")?.addEventListener("click", (e) => {
+  e.preventDefault();
   if (cart.length === 0) {
     showToast("Cart is empty");
     return;
   }
+  openCheckoutPopup();
+});
+$("#closeCheckout")?.addEventListener("click", closeCheckoutPopup);
+$("#cancelCheckout")?.addEventListener("click", (e) => { e.preventDefault(); closeCheckoutPopup(); });
+function getCustomerFromForm() {
+  return {
+    name: document.getElementById("custName")?.value?.trim() || "",
+    phone: document.getElementById("custPhone")?.value?.trim() || "",
+    email: document.getElementById("custEmail")?.value?.trim() || "",
+    manualAddress: document.getElementById("custAddress")?.value?.trim() || ""
+  };
+}
 
+/* Confirm & Pay */
+$("#confirmCheckout")?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  if (cart.length === 0) { showToast("Cart is empty"); closeCheckoutPopup(); return; }
+  const customer = getCustomerFromForm();
+  const useGPS = document.getElementById("useGPS")?.checked;
   const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
   const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
-
   setOrderButtonsDisabled(true);
-
+  $("#checkoutMsg").textContent = "Starting payment...";
   try {
-    const createResp = await createCashfreeOrder(total, items);
-
+    const createResp = await createCashfreeOrder(total, items, customer);
     if (!createResp || createResp.ok === false) {
       console.error("create order failed:", createResp);
       showToast(createResp?.error || "Server error creating order");
       setOrderButtonsDisabled(false);
+      $("#checkoutMsg").textContent = "";
       return;
     }
-
-    // robust parsing
     let session = null;
     let cfOrderId = null;
     session = session || createResp.session || createResp.payment_session_id || createResp.paymentSessionId || createResp.data?.payment_session_id || createResp.data?.session;
@@ -405,16 +370,14 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
         cfOrderId = cfOrderId || raw.order_id || raw.orderId || raw.order?.id || raw.order?.order_id;
       }
     }
-
     if (!session) {
       console.error("No payment session found in create order response:", createResp);
       showToast("Payment session missing from server");
       setOrderButtonsDisabled(false);
+      $("#checkoutMsg").textContent = "";
       return;
     }
-
     openCashfreeModal(session);
-
     const onMessage = async (ev) => {
       try {
         const data = ev.data || {};
@@ -422,28 +385,35 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
           data.paymentMessage === "SUCCESS" ||
           data.paymentStatus === "SUCCESS" ||
           (typeof data === "string" && data.toUpperCase().includes("SUCCESS"));
-
         const failed =
           data.paymentMessage === "FAILED" ||
           data.paymentMessage === "CANCELLED" ||
           data.paymentStatus === "FAILED" ||
           (typeof data === "string" && data.toUpperCase().includes("FAILED"));
-
         if (success) {
           const detectedCfOrderId = data.orderId || data.order_id || data.cashfree_order_id || cfOrderId;
           const verifyResp = await verifyCashfree(detectedCfOrderId || cfOrderId || session, items);
-
           if (verifyResp && verifyResp.ok) {
-            cart = [];
-            renderCart();
-            closeModal();
-            $$(".menu").forEach(m => m.style.display = "none");
-            const status = $("#order-status");
-            if (status) {
-              status.classList.remove("hidden");
-              $("#eta-text").textContent = `Order #${verifyResp.orderId || verifyResp.order_id || "N/A"} confirmed! ETA: 15 mins 🍴`;
+            const locationChoice = useGPS ? "gps" : "manual";
+            $("#checkoutMsg").textContent = "Saving order...";
+            const saveResult = await createOrderInFirestore({ items, total, customer, locationChoice });
+            if (saveResult && saveResult.orderId) {
+              await notifyBackendOrderCreated(saveResult.orderId);
+              cart = [];
+              renderCart();
+              closeModal();
+              closeCheckoutPopup();
+              $$(".menu").forEach(m => m.style.display = "none");
+              const status = $("#order-status");
+              if (status) {
+                status.classList.remove("hidden");
+                $("#eta-text").textContent = `Order #${saveResult.orderId} confirmed! ETA: 15 mins 🍴`;
+              }
+              showToast("Order confirmed! Sent to admin.", 3200);
+            } else {
+              console.error("Failed to save order to Firestore", saveResult);
+              showToast("Order saved failed. Contact support.");
             }
-            showToast("Order confirmed! Enjoy your meal 🍽️", 3200);
           } else {
             console.error("Verify returned not ok:", verifyResp);
             showToast(verifyResp?.error || "Payment verification failed");
@@ -456,30 +426,25 @@ $("#checkoutBtn")?.addEventListener("click", async () => {
         showToast("Payment verification error");
       } finally {
         setOrderButtonsDisabled(false);
+        $("#checkoutMsg").textContent = "";
         window.removeEventListener("message", onMessage);
       }
     };
-
     window.addEventListener("message", onMessage, { once: true, passive: true });
-
   } catch (err) {
     console.error("Checkout error:", err);
     showToast("Checkout error. Try again.");
     setOrderButtonsDisabled(false);
+    $("#checkoutMsg").textContent = "";
   }
 });
 
-/* -------------------------
-   Init
-   ------------------------- */
+/* Init */
 document.addEventListener("DOMContentLoaded", () => {
   renderCart();
   updateCartCount();
   initCashfreeSDK();
-
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 2000);
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 6000);
-
-  // wake backend
   fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
 });
