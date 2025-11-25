@@ -42,8 +42,8 @@ const imageMap = {
   "bread pakoda": "/home/sh-bread-pakoda.png",
   "bread-pakoda": "/home/sh-bread-pakoda.png"
 };
-function getImageFor(name){
-  if(!name) return "";
+function getImageFor(name) {
+  if (!name) return "";
   return imageMap[String(name).trim().toLowerCase()] || "";
 }
 
@@ -137,7 +137,7 @@ $$(".menu-item").forEach(itemEl => {
   const addBtn = itemEl.querySelector(".add-cart-btn");
   let qty = Number(qtyDisplay?.textContent) || 1;
   if (qtyDisplay) qtyDisplay.textContent = qty;
-  function setQty(v){
+  function setQty(v) {
     qty = Math.max(1, Math.floor(v || 1));
     if (qtyDisplay) qtyDisplay.textContent = qty;
   }
@@ -446,5 +446,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initCashfreeSDK();
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 2000);
   setTimeout(() => { if (!cashfreeInstance) initCashfreeSDK(); }, 6000);
-  fetch(`${SERVER_URL}/ping`).catch(()=>console.log("Ping failed (ok)"));
+  fetch(`${SERVER_URL}/ping`).catch(() => console.log("Ping failed (ok)"));
 });
