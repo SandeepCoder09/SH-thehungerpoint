@@ -1,52 +1,56 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Admin Dashboard — SH</title>
-  <link rel="stylesheet" href="/admin/admin.css">
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Leaflet (for small preview maps if you want later) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>SH — Admin</h1>
-    <div>
-      <button id="logoutBtn">Logout</button>
+  <div class="topbar">
+    <div class="title">SH — Admin Dashboard</div>
+    <div class="right">
+      <div class="card small">Socket: <span id="sockStatus">—</span></div>
+      <div class="card small">Active Orders: <strong id="cardActive">0</strong></div>
+      <div class="card small">Delivered: <strong id="cardDelivered">0</strong></div>
+      <button id="btnRefresh" class="btn">Refresh</button>
     </div>
-  </header>
+  </div>
 
-  <section class="dashboard-grid">
-    <aside class="controls">
-      <input id="searchInput" placeholder="Search orders or item..." />
-      <select id="statusFilter">
-        <option value="">All</option>
-        <option value="paid">Paid</option>
-        <option value="preparing">Preparing</option>
-        <option value="on the way">On the way</option>
-        <option value="completed">Completed</option>
-      </select>
+  <main class="layout">
+    <section class="left-col">
+      <div class="panel">
+        <h3>Orders (live)</h3>
+        <div id="ordersList" class="orders-list">
+          Loading orders…
+        </div>
+      </div>
+    </section>
 
-      <div class="stats">
-        <div>Total Orders: <span id="totalOrders">0</span></div>
-        <div>Total Sales: <span id="totalSales">₹0</span></div>
-        <div>Recent (1h): <span id="recentOrders">0</span></div>
+    <section class="right-col">
+      <div class="panel">
+        <h3>Order Details</h3>
+        <div id="orderDetails" class="order-details muted">Select an order to see details</div>
       </div>
 
-      <div class="charts">
-        <canvas id="hourChart"></canvas>
-        <canvas id="weekChart"></canvas>
+      <div class="panel">
+        <h3>Quick Actions</h3>
+        <div style="display:flex;gap:8px;">
+          <button id="btnCenterAll" class="btn">Center Map</button>
+          <button id="btnShowMap" class="btn">Open Tracking Map</button>
+        </div>
       </div>
-    </aside>
+    </section>
+  </main>
 
-    <main class="orders-area">
-      <div id="ordersList"></div>
-    </main>
-  </section>
+  <!-- libs -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <audio id="newOrderSound" src="/admin/new-order.mp3" preload="auto"></audio>
-  <div id="liveOrderPopup" class="popup"><div><div id="popupOrderId"></div><div id="popupOrderItems"></div><button id="popupClose">Close</button></div></div>
-
-  <script type="module" src="/admin/dashboard.js"></script>
+  <script type="module" src="/admin/admin.js"></script>
 </body>
 </html>
