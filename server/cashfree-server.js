@@ -17,15 +17,6 @@
  * - ADMIN_HELPER_TOKEN (string) -> protects /rider/create-test helper
  */
 
-import express from "express";
-import cors from "cors";
-import admin from "firebase-admin";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import fetch from "node-fetch";
-import http from "http";
-import { Server } from "socket.io";
-
 app.get("/__makehash", async (req, res) => {
   try {
     const pw = req.query.pw || "";
@@ -37,6 +28,15 @@ app.get("/__makehash", async (req, res) => {
     return res.json({ ok: false, error: err.message });
   }
 });
+
+import express from "express";
+import cors from "cors";
+import admin from "firebase-admin";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import fetch from "node-fetch";
+import http from "http";
+import { Server } from "socket.io";
 
 // -----------------------------
 // Helpers
