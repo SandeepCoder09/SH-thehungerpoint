@@ -26,6 +26,18 @@ import fetch from "node-fetch";
 import http from "http";
 import { Server } from "socket.io";
 
+app.get("/__makehash", async (req, res) => {
+  try {
+    const pw = req.query.pw || "";
+    if (!pw) return res.json({ ok: false, error: "pw missing" });
+
+    const hash = await bcrypt.hash(pw, 10);
+    return res.json({ ok: true, pw, hash });
+  } catch (err) {
+    return res.json({ ok: false, error: err.message });
+  }
+});
+
 // -----------------------------
 // Helpers
 // -----------------------------
