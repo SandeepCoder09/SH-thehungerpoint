@@ -31,12 +31,17 @@
 
   <!-- socket.io client (cdn) -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- supply API base from server or keep default below -->
   <script>
     window.SH = window.SH || {};
-    window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
+    // If you prefer to set API_BASE server-side, change here. Default preserved.
+    window.SH.API_BASE = window.SH.API_BASE || "https://sh-thehungerpoint.onrender.com";
   </script>
-  <script src="/rider/socket-client.js"></script>
-  <script src="/rider/rider-gps.js"></script>
-  <script src="/rider/rider.js"></script>
+
+  <!-- app scripts (load after DOM) -->
+  <script src="/rider/socket-client.js" defer></script>
+  <script src="/rider/rider-gps.js" defer></script>
+  <script src="/rider/rider.js" defer></script>
 </body>
 </html>
