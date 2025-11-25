@@ -1,76 +1,280 @@
-:root{
-    --bg:#071028;
-    --card:#081525;
-    --accent:#ff6b6b;
-    --text:#e6eef8
+/* /rider/login.css
+   SH — Rider Login (Dark, modern, responsive)
+   - Targets both #riderEmail/#email and #riderPassword/#password
+   - Targets #loginBtn/#btnLogin and #loginMsg/#info
+   - Glass/card style, subtle animations, accessible focus states
+*/
+
+/* -------- theme variables -------- */
+:root {
+    --bg-1: #071225;
+    /* page background */
+    --bg-2: #0b2133;
+    /* panel background */
+    --panel-glow: rgba(255, 95, 87, 0.08);
+    --accent-start: #ff7a66;
+    --accent-end: #ff5f57;
+    --muted: #98a3af;
+    --card: rgba(255, 255, 255, 0.03);
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --success: #55c27a;
+    --danger: #ff6b6b;
+    --radius: 12px;
+    --shadow: 0 10px 30px rgba(2, 8, 20, 0.6);
+    --glass-shadow: 0 6px 18px rgba(2, 8, 20, 0.5);
+    --max-width: 420px;
+    --transition: 220ms cubic-bezier(.2, .9, .3, 1);
 }
- *{
-    box-sizing:border-box
+
+/* -------- page layout -------- */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(255, 95, 87, 0.04), transparent 6%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    color: #e6eef6;
+    line-height: 1.35;
 }
- html,body{
-    height:100%;
-    margin:0;
-    font-family:Inter,system-ui,Arial;
-    background:linear-gradient(180deg,#071028 0%, #071022 100%);
-    color:var(--text)
+
+/* center container */
+.wrap,
+main {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    box-sizing: border-box;
 }
- .wrap{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:2rem
+
+/* -------- card -------- */
+.card {
+    width: 100%;
+    max-width: var(--max-width);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.015));
+    border-radius: calc(var(--radius) + 6px);
+    padding: clamp(20px, 3.6vw, 32px);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
+    transition: transform var(--transition), box-shadow var(--transition);
 }
- .card{
-    background:var(--card);
-    padding:2rem;
-    border-radius:12px;
-    max-width:420px;
-    width:100%;
-    box-shadow:0 8px 30px rgba(2,6,23,.6)
+
+/* subtle hover lift on desktop */
+@media (hover: hover) and (min-width: 700px) {
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(2, 8, 20, 0.72);
+    }
 }
- h1{
-    margin:0 0 1rem;
-    font-size:1.25rem
+
+/* decorative glow strip */
+.card::before {
+    content: "";
+    position: absolute;
+    left: -40%;
+    top: -30%;
+    width: 180%;
+    height: 60%;
+    transform: rotate(-12deg);
+    background: linear-gradient(90deg, rgba(255, 122, 102, 0.06), rgba(255, 95, 87, 0.03));
+    filter: blur(24px);
+    pointer-events: none;
 }
- label{
-    display:block;
-    margin-top:.75rem;
-    color:#b9c6d8;
-    font-size:.85rem
+
+/* card header */
+.card h1 {
+    margin: 0 0 10px 0;
+    font-size: clamp(20px, 3.6vw, 24px);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: #ffffff;
 }
- input{
-    width:100%;
-    padding:.6rem .8rem;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,.04);
-    background:#081021;
-    color:var(--text);
-    margin-top:.25rem
+
+/* hint text below */
+.hint {
+    margin: 12px 0 0 0;
+    color: var(--muted);
+    font-size: 13px;
 }
- button{
-    width:100%;
-    margin-top:1rem;
-    padding:.75rem;
-    border-radius:10px;
-    border:0;
-    background:linear-gradient(90deg,var(--accent),#ff8a65);
-    color:white;
-    font-weight:600;
-    cursor:pointer
+
+/* -------- form fields -------- */
+label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 14px 0 6px;
 }
- button:active{
-    transform:translateY(1px)
+
+/* inputs - target both possible ids */
+input[type="email"],
+input[type="password"],
+#riderEmail,
+#email,
+#riderPassword,
+#password {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.007), rgba(255, 255, 255, 0.01));
+    color: #eaf4ff;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    font-size: 15px;
 }
- .info{
-    margin-top:.5rem;
-    color:#ffd6d6;
-    font-size:.9rem;
-    min-height:1.2em
+
+/* placeholder color */
+input::placeholder {
+    color: rgba(230, 238, 246, 0.34);
 }
- .hint{
-    margin-top:.5rem;
-    color:#9fb0c8;
-    font-size:.85rem
+
+/* focus */
+input:focus {
+    border-color: rgba(255, 95, 87, 0.85);
+    box-shadow: 0 6px 18px rgba(255, 95, 87, 0.06);
 }
- 
+
+/* spacing for stacked fields */
+.form-row {
+    margin-bottom: 8px;
+}
+
+/* -------- button -------- */
+button#loginBtn,
+button#btnLogin,
+#loginBtn,
+#btnLogin {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    box-shadow: 0 8px 22px rgba(255, 95, 87, 0.14), inset 0 -2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 160ms ease, box-shadow var(--transition), opacity var(--transition);
+}
+
+/* pressed + hover */
+@media (hover: hover) {
+
+    button#loginBtn:hover,
+    button#btnLogin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 38px rgba(255, 95, 87, 0.18);
+    }
+
+    button#loginBtn:active,
+    button#btnLogin:active {
+        transform: translateY(0);
+        opacity: 0.98;
+    }
+}
+
+/* disabled state */
+button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(0.05);
+}
+
+/* -------- message area (error / success) -------- */
+#loginMsg,
+#info,
+#loginMsg span,
+#info span {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--danger);
+    visibility: visible;
+    /* default visible; JS can toggle */
+}
+
+/* allow green success */
+#loginMsg.success,
+#info.success {
+    color: var(--success);
+}
+
+/* small helper style for hidden state (JS can toggle) */
+.hidden-msg {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* -------- small screens layout -------- */
+@media (max-width: 520px) {
+    .card {
+        padding: 18px;
+        border-radius: 12px;
+        margin: 8px;
+    }
+
+    .wrap {
+        padding: 12px;
+    }
+}
+
+/* -------- accessibility -------- */
+input:focus-visible,
+button:focus-visible {
+    outline: 3px solid rgba(255, 122, 102, 0.14);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+/* -------- optional tiny animation for entrance -------- */
+@keyframes cardIn {
+    from {
+        transform: translateY(18px) scale(0.995);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.card {
+    animation: cardIn 360ms cubic-bezier(.2, .9, .3, 1) both;
+}
+
+/* -------- image / logo slot (if you add) -------- */
+.card .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+/* -------- fallback for older browsers -------- */
+@supports (not (display: grid)) {
+    .wrap {
+        display: block;
+        padding: 28px;
+    }
+
+    .card {
+        margin: 0 auto;
+    }
+}
