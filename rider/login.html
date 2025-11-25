@@ -1,43 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rider Login — SH The Hunger Point</title>
-
   <link rel="stylesheet" href="/rider/login.css" />
 </head>
 
 <body>
   <main class="wrap">
     <div class="card">
-
       <h1>Rider Login</h1>
 
-      <!-- Email -->
-      <label for="riderEmail">Email</label>
-      <input 
-        id="riderEmail" 
-        type="email" 
-        placeholder="you@example.com"
-        autocomplete="username"
-      />
+      <label>Email</label>
+      <input id="riderEmail" type="email" placeholder="you@example.com" autocomplete="username" />
 
-      <!-- Password -->
-      <label for="riderPassword">Password</label>
-      <input 
-        id="riderPassword" 
-        type="password" 
-        placeholder="Password"
-        autocomplete="current-password"
-      />
+      <label>Password</label>
+      <input id="riderPassword" type="password" placeholder="Password" autocomplete="current-password" />
 
-      <!-- Login button -->
       <button id="loginBtn">Login</button>
 
-      <!-- Message -->
-      <p id="loginMsg" class="info" style="visibility:hidden;" aria-live="polite"></p>
-
+      <p id="loginMsg" class="info" aria-live="polite"></p>
       <p class="hint">Only riders approved by admin can log in.</p>
     </div>
   </main>
