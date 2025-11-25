@@ -1,20 +1,39 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Admin Login — SH</title>
   <link rel="stylesheet" href="/admin/login.css">
 </head>
 <body>
-  <main class="login-main">
-    <h1>Admin Login</h1>
-    <form id="loginForm">
-      <input id="email" type="email" placeholder="admin email" required />
-      <input id="password" type="password" placeholder="password" required />
-      <button type="submit">Sign in</button>
+
+  <div class="bg"></div>
+
+  <main class="login-card">
+    <div class="logo">SH Admin</div>
+
+    <h1>Welcome Back</h1>
+    <p class="subtitle">Sign in to manage orders & riders</p>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="input-group">
+        <input id="email" type="email" required />
+        <label>Email Address</label>
+      </div>
+
+      <div class="input-group">
+        <input id="password" type="password" required />
+        <label>Password</label>
+      </div>
+
+      <button type="submit" class="login-btn">
+        Sign In
+      </button>
     </form>
-    <div id="loginMsg" class="muted"></div>
+
+    <div id="loginMsg" class="msg"></div>
   </main>
-  <script src="/admin/login.js" type="module"></script>
+
+  <script type="module" src="/admin/login.js"></script>
 </body>
 </html>
