@@ -5,14 +5,34 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rider Dashboard — SH</title>
   <link rel="stylesheet" href="/rider/rider.css" />
-  <!-- Google Maps (optional — add API key if you want map) -->
-  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY"></script> -->
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
+      authDomain: "sh-the-hunger-point.firebaseapp.com",
+      projectId: "sh-the-hunger-point",
+      storageBucket: "sh-the-hunger-point.firebasestorage.app",
+      messagingSenderId: "401237282420",
+      appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
+      measurementId: "G-4KP3RJ15E9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.db = getFirestore(app);
+  </script>
 </head>
+
 <body>
   <div class="topbar">
     <div class="title">SH — Rider Dashboard</div>
+
     <div class="right">
-      <span id="riderName">—</span>
+      <span id="riderName">Loading...</span>
+      <span id="riderEmail" style="color:#9fb0c8; font-size:0.85rem;">—</span>
       <button id="btnLogout">Logout</button>
     </div>
   </div>
@@ -29,19 +49,17 @@
     </section>
   </main>
 
-  <!-- socket.io client (cdn) -->
+  <!-- socket.io -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-  <!-- supply API base from server or keep default below -->
   <script>
     window.SH = window.SH || {};
-    // If you prefer to set API_BASE server-side, change here. Default preserved.
-    window.SH.API_BASE = window.SH.API_BASE || "https://sh-thehungerpoint.onrender.com";
+    window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
   </script>
 
-  <!-- app scripts (load after DOM) -->
-  <script src="/rider/socket-client.js" defer></script>
-  <script src="/rider/rider-gps.js" defer></script>
-  <script src="/rider/rider.js" defer></script>
+  <script type="module" src="/rider/socket-client.js" defer></script>
+  <script type="module" src="/rider/rider-gps.js" defer></script>
+  <script type="module" src="/rider/rider.js" defer></script>
+
 </body>
 </html>
