@@ -1,281 +1,182 @@
-/* ============================================================
-   SH — THE HUNGER POINT
-   GLOBAL ADMIN PANEL THEME  (admin/admin.css)
-   Clean • Mobile Friendly • Red Theme
-   ============================================================ */
+/* admin/admin.css - Dashboard styling (modern) */
+:root {
+    --bg: #071028;
+    --panel: #071726;
+    --accent: #E23744;
+    --muted: #9fb0c8;
+    --text: #e6eef8;
+    --card-bg: #ffffff;
+}
 
-/* RESET */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    box-sizing: border-box
 }
 
 body {
-    background: #f7f7f7;
-    color: #222;
-    line-height: 1.5;
+    margin: 0;
+    font-family: Inter, system-ui, Arial;
+    background: linear-gradient(180deg, #071028, #05121a);
+    color: var(--text);
+    min-height: 100vh;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
-.admin-header {
-    background: #e23744;
-    padding: 18px 20px;
-    color: #fff;
-    font-size: 22px;
-    font-weight: 600;
-    text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+/* topbar */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, #081a2a, #071726);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
 }
 
-/* ============================================================
-   CONTAINER BOX
-   ============================================================ */
-.admin-container {
-    max-width: 850px;
-    margin: 40px auto;
-    padding: 0 20px;
+.topbar .title {
+    font-weight: 700
 }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-
-.btn {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 15px;
-    font-size: 17px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: 0.2s;
+.topbar .right {
+    display: flex;
+    gap: 12px;
+    align-items: center
 }
 
-/* RED BUTTON */
-.btn-primary {
-    background: #e23744;
-    color: #fff;
-}
-.btn-primary:hover {
-    background: #c72e38;
-}
-
-/* OUTLINE */
-.btn-outline {
-    background: #fff;
-    border: 2px solid #e23744;
-    color: #e23744;
-}
-.btn-outline:hover {
-    background: #ffecee;
-}
-
-/* SMALL BUTTON */
-.btn-sm {
-    padding: 8px 12px;
+.card.small {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 8px 10px;
+    border-radius: 8px;
     font-size: 14px;
 }
 
-/* ============================================================
-   INPUTS
-   ============================================================ */
-.input-group {
-    margin-bottom: 18px;
+.btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
-input, select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 9px;
-    border: 2px solid #ddd;
-    outline: none;
-    font-size: 15px;
-    transition: 0.2s;
+.btn:hover {
+    filter: brightness(.95)
 }
 
-input:focus, select:focus {
-    border-color: #e23744;
-}
-
-/* ============================================================
-   LOGIN CARD
-   ============================================================ */
-.login-card {
-    background: #fff;
-    padding: 25px;
-    border-radius: 14px;
-    border: 2px solid #e23744;
-    max-width: 420px;
-    margin: 50px auto;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-
-.login-card h2 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: #e23744;
-}
-
-/* ============================================================
-   DASHBOARD CARDS
-   ============================================================ */
-.stats-grid {
+/* layout */
+.layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 18px;
-    margin-bottom: 25px;
-}
-
-.stat-card {
-    background: white;
+    grid-template-columns: 420px 1fr;
+    gap: 16px;
     padding: 18px;
-    border-radius: 14px;
-    text-align: center;
-    border: 2px solid #e23744;
 }
 
-.stat-card h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #e23744;
+.panel {
+    background: var(--panel);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.stat-card span {
-    font-size: 22px;
+/* orders list */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100vh - 160px);
+    overflow: auto;
+    padding: 6px
+}
+
+.order-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.order-row:hover {
+    transform: translateY(-2px);
+    transition: all .12s
+}
+
+.order-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.03)
+}
+
+.order-body {
+    flex: 1;
+    min-width: 0
+}
+
+.order-title {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 14px
+}
+
+.order-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px
+}
+
+.order-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center
+}
+
+.status {
+    padding: 6px 8px;
+    border-radius: 999px;
+    font-size: 12px;
     font-weight: 700;
 }
 
-/* ============================================================
-   ORDER LIST
-   ============================================================ */
-.order-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 18px;
-    border-left: 5px solid #e23744;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
+.status.assigned {
+    background: #264653;
+    color: #bfe3ff
 }
 
-.order-card ul { margin-top: 10px; }
-
-.order-card li {
-    list-style: none;
-    padding: 2px 0;
+.status.picked {
+    background: #f7b267;
+    color: #3a2300
 }
 
-/* RIGHT SIDE — STATUS DROPDOWN */
-.order-card .right {
-    display: flex;
-    align-items: center;
+.status.delivered {
+    background: #2ecc71;
+    color: #04300f
 }
 
-.order-card select {
-    padding: 10px;
-    border-radius: 8px;
-    border: 2px solid #e23744;
-    font-size: 15px;
-    color: #e23744;
-    background: #fff;
+/* order details */
+.order-details {
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 220px
 }
 
-.order-card select option {
-    color: #000;
+.order-details .row {
+    margin-bottom: 10px
 }
 
-/* ============================================================
-   SEARCH + FILTER BAR
-   ============================================================ */
-.search-box {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+.muted {
+    color: var(--muted)
 }
 
-/* ============================================================
-   LIVE POPUP
-   ============================================================ */
-.live-popup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #e23744;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 12px;
-    width: 300px;
-    display: none;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
-    animation: slideIn 0.4s ease-out;
-}
-
-.live-popup.show {
-    display: block;
-}
-
-.live-popup h4 {
-    margin-bottom: 6px;
-    font-size: 18px;
-}
-
-.live-popup p {
-    font-size: 14px;
-}
-
-#popupClose {
-    cursor: pointer;
-    font-weight: bold;
-    position: absolute;
-    top: 8px;
-    right: 12px;
-}
-
-/* Popup animation */
-@keyframes slideIn {
-    from { transform: translateY(80px); opacity: 0; }
-    to   { transform: translateY(0); opacity: 1; }
-}
-
-/* ============================================================
-   CHARTS
-   ============================================================ */
-.chart-box {
-    background: white;
-    padding: 18px;
-    border-radius: 14px;
-    border: 2px solid #e23744;
-    margin-bottom: 25px;
-}
-
-/* ============================================================
-   FOOTER
-   ============================================================ */
-.admin-footer {
-    text-align: center;
-    margin: 40px 0 20px;
-    font-size: 14px;
-    color: #777;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 600px) {
-    .order-card {
-        flex-direction: column;
+/* responsive */
+@media (max-width:1000px) {
+    .layout {
+        grid-template-columns: 1fr;
+        padding: 12px
     }
 
-    .search-box {
-        flex-direction: column;
+    .right-col {
+        order: 2
     }
 }
