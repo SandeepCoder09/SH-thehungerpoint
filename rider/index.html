@@ -5,25 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rider Dashboard — SH</title>
   <link rel="stylesheet" href="/rider/rider.css" />
-
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
-      authDomain: "sh-the-hunger-point.firebaseapp.com",
-      projectId: "sh-the-hunger-point",
-      storageBucket: "sh-the-hunger-point.firebasestorage.app",
-      messagingSenderId: "401237282420",
-      appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
-      measurementId: "G-4KP3RJ15E9"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    window.db = getFirestore(app);
-  </script>
 </head>
 
 <body>
@@ -57,6 +38,8 @@
     window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
   </script>
 
+  <!-- App Scripts -->
+  <script type="module" src="/rider/firebase.js" defer></script>
   <script type="module" src="/rider/socket-client.js" defer></script>
   <script type="module" src="/rider/rider-gps.js" defer></script>
   <script type="module" src="/rider/rider.js" defer></script>
