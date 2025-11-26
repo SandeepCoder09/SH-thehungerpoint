@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Track Order — SH The Hunger Point</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/orders/track-order.css" />
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="/home/firebase-config.js"></script>
+
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+
+<body>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- GLASS BOTTOM SHEET -->
+  <div class="bottom-sheet">
+
+    <div class="sheet-status-row">
+      <span id="orderStatus" class="status-badge">Out for Delivery</span>
+      <span id="etaText" class="eta-text">12 min</span>
+    </div>
+
+    <div id="itemsList" class="items-list"></div>
+
+    <div class="timeline">
+      <div class="step" id="step1">Preparing</div>
+      <div class="step" id="step2">Out for Delivery</div>
+      <div class="step" id="step3">Delivered</div>
+    </div>
+
+  </div>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="/orders/track-order.js"></script>
+
+</body>
+</html>
