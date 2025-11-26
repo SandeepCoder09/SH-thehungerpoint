@@ -1,119 +1,209 @@
-/* Track-order script (Leaflet + Socket) */
+/**
+ * track-order.js
+ * - Connects to Firestore and reads order details
+ * - Connects to socket.io server to receive `order:riderLocation`
+ * - Updates Leaflet map markers, ETA and timeline
+ *
+ * Requires:
+ * - Firebase v8 loaded (global firebase)
+ * - Socket.IO client library loaded
+ * - Leaflet loaded
+ *
+ * Server socket: https://sh-thehungerpoint.onrender.com
+ */
 
-const SERVER_SOCKET = "https://sh-thehungerpoint.onrender.com"; // your server
+const SERVER_SOCKET = "https://sh-thehungerpoint.onrender.com";
 const params = new URLSearchParams(window.location.search);
-const orderId = params.get('orderId') || null;
+const ORDER_ID = params.get("orderId") || null;
 
-const $ = (s) => document.querySelector(s);
+// Defensive: ensure firebase is available
+if (typeof firebase === "undefined") {
+  console.warn("Firebase not loaded - track page may still work for socket updates.");
+}
 
-let map, riderMarker, userMarker;
-let socket;
+// Initialize firebase if not already (small check - won't reinit if already initialized)
+try {
+  if (typeof firebase !== "undefined" && !firebase.apps?.length) {
+    // NOTE: we expect home/firebase-config.js to run in other pages.
+    // If you prefer, you can paste your firebaseConfig block here.
+    // For safety we do not attempt to init here if config missing.
+    console.log("Firebase present but not initialized here. If you see errors, ensure firebase-config is loaded.");
+  }
+} catch (e) {
+  console.warn("Firebase init check error", e);
+}
 
-/* init map after leaflet loads */
+/* ---- Map & markers ---- */
+let map = null;
+let riderMarker = null;
+let userMarker = null;
+
 function initMap() {
   try {
-    map = L.map('map', { zoomControl: false }).setView([25.15, 82.58], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: ''
+    map = L.map("map", { zoomControl: true }).setView([25.15, 82.58], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: ""
     }).addTo(map);
   } catch (err) {
-    console.error('Map init failed', err);
-    document.getElementById('map').style.background = '#ddd';
+    console.error("Leaflet init error", err);
+    document.getElementById("map").style.background = "#ddd";
   }
 }
 
-/* add or update markers */
-function addOrUpdateRider(lat,lng) {
+function addOrMoveRider(lat, lng) {
   if (!map) return;
   if (!riderMarker) {
-    riderMarker = L.marker([lat,lng], {
-      icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/2972/2972185.png', iconSize: [38,38] })
+    riderMarker = L.marker([lat, lng], {
+      icon: L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/2972/2972185.png",
+        iconSize: [40, 40]
+      })
     }).addTo(map);
-  } else riderMarker.setLatLng([lat,lng]);
-  map.panTo([lat,lng], { animate: true, duration: 0.6 });
+  } else {
+    riderMarker.setLatLng([lat, lng]);
+  }
+  map.panTo([lat, lng], { animate: true, duration: 0.5 });
 }
 
-function addOrUpdateUser(lat,lng) {
+function addOrMoveUser(lat, lng) {
   if (!map) return;
   if (!userMarker) {
-    userMarker = L.marker([lat,lng], {
-      icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', iconSize: [34,34] })
+    userMarker = L.marker([lat, lng], {
+      icon: L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+        iconSize: [34, 34]
+      })
     }).addTo(map);
-  } else userMarker.setLatLng([lat,lng]);
+  } else {
+    userMarker.setLatLng([lat, lng]);
+  }
 }
 
-/* update UI status and timeline */
+/* ---- UI helpers ---- */
 function setStatus(status, eta) {
-  const st = (status||'preparing').toLowerCase();
-  const statusText = st === 'out_for_delivery' ? 'Out for Delivery' : (st === 'delivered' ? 'Delivered' : 'Preparing');
-  $('#orderStatus').textContent = statusText;
-  $('#etaText').textContent = (eta ? (eta + ' min') : '— min');
+  const st = (status || "preparing").toString().toLowerCase();
+  const statusEl = document.getElementById("orderStatus");
+  const etaEl = document.getElementById("etaText");
 
-  // timeline
-  const stepMap = { preparing:1, out_for_delivery:2, delivered:3 };
-  const step = stepMap[st] || 1;
-  [1,2,3].forEach(n => {
-    const el = document.getElementById('step'+n);
+  if (st === "out_for_delivery" || st === "out" || st === "on_the_way") {
+    statusEl.textContent = "Out for Delivery";
+    activateStep(2);
+  } else if (st === "delivered" || st === "completed") {
+    statusEl.textContent = "Delivered";
+    activateStep(3);
+  } else {
+    statusEl.textContent = "Preparing";
+    activateStep(1);
+  }
+
+  if (typeof eta !== "undefined" && eta !== null && eta !== "") {
+    etaEl.textContent = `${eta} min`;
+  } else {
+    etaEl.textContent = "—";
+  }
+}
+
+function activateStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById("step" + i);
     if (!el) return;
-    if (n <= step) el.classList.add('active'); else el.classList.remove('active');
+    if (i <= n) el.classList.add("active");
+    else el.classList.remove("active");
   });
 }
 
-/* load order from firestore and init markers */
-async function loadOrder() {
-  if (!orderId) return alert('Order id missing');
-  if (typeof firebase === 'undefined' || !firebase.firestore) {
-    console.warn('Firebase missing');
+/* ---- Load order from Firestore (if available) ---- */
+async function loadOrderFromFirestore(orderId) {
+  if (typeof firebase === "undefined" || !firebase.firestore) {
+    console.warn("Firestore not available - skipping order load");
     return;
   }
   try {
-    const doc = await firebase.firestore().collection('orders').doc(orderId).get();
-    if (!doc.exists) return alert('Order not found');
-
+    const doc = await firebase.firestore().collection("orders").doc(orderId).get();
+    if (!doc.exists) {
+      console.warn("Order not found in Firestore:", orderId);
+      document.getElementById("itemsList").textContent = "Order data unavailable";
+      return;
+    }
     const data = doc.data();
-    // items
-    $('#itemsList').innerHTML = (data.items||[]).map(i => `${i.name} × ${i.qty}`).join('<br>');
-    // status
-    setStatus(data.status, data.eta);
 
-    // user location if provided
+    // items
+    const items = data.items || data.orderItems || [];
+    document.getElementById("itemsList").innerHTML =
+      (items.length ? items.map(i => `${i.name} × ${i.qty}`).join("<br>") : "No items");
+
+    // status & eta
+    const status = data.status || data.order_status || "";
+    const eta = data.eta || data.ETA || data.estimatedTime || null;
+    setStatus(status, eta);
+
+    // user location
     if (data.userLocation && data.userLocation.lat && data.userLocation.lng) {
-      addOrUpdateUser(data.userLocation.lat, data.userLocation.lng);
-      if (map) map.fitBounds([[data.userLocation.lat, data.userLocation.lng]], { maxZoom: 15 });
+      addOrMoveUser(Number(data.userLocation.lat), Number(data.userLocation.lng));
+      // adjust map view to show markers if rider exists later
+      if (map && !riderMarker) map.setView([Number(data.userLocation.lat), Number(data.userLocation.lng)], 13);
     }
   } catch (err) {
-    console.error('loadOrder failed', err);
+    console.error("Failed to load order from Firestore", err);
   }
 }
 
-/* socket connection to receive rider updates for order */
-function startSocket() {
+/* ---- Socket: subscribe to rider location for this order ---- */
+function startSocket(orderId) {
   try {
-    socket = io(SERVER_SOCKET, { transports: ['websocket', 'polling'] });
-    socket.on('connect', () => {
-      if (orderId) socket.emit('order:join', { orderId });
+    if (!orderId) return console.warn("orderId missing - socket not started");
+    const socket = io(SERVER_SOCKET, { transports: ["websocket", "polling"] });
+
+    socket.on("connect", () => {
+      socket.emit("order:join", { orderId });
     });
 
-    socket.on('order:riderLocation', (data) => {
+    socket.on("order:riderLocation", (data) => {
       if (!data) return;
+      // server may send { orderId, lat, lng, status, eta }
       if (data.orderId && String(data.orderId) !== String(orderId)) return;
-      if (data.lat && data.lng) addOrUpdateRider(data.lat, data.lng);
-      if (data.status) setStatus(data.status, data.eta);
+      if (data.lat && data.lng) addOrMoveRider(Number(data.lat), Number(data.lng));
+      if (data.status) setStatus(data.status, data.eta || data.ETA);
+      if (data.userLocation && data.userLocation.lat && data.userLocation.lng) {
+        addOrMoveUser(Number(data.userLocation.lat), Number(data.userLocation.lng));
+      }
     });
 
-    socket.on('connect_error', (err) => console.warn('socket err', err));
+    socket.on("connect_error", (err) => {
+      console.warn("Socket connect error", err);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
   } catch (err) {
-    console.warn('socket failed', err);
+    console.warn("Socket failed to start", err);
   }
 }
 
-/* init */
-document.addEventListener('DOMContentLoaded', () => {
+/* ---- initialization ---- */
+document.addEventListener("DOMContentLoaded", () => {
   initMap();
-  loadOrder();
-  startSocket();
 
-  // optional actions
-  $('#callBtn').onclick = () => window.location.href = 'tel:+911234567890';
-  $('#helpBtn').onclick = () => alert('Contact support at +91 12345 67890');
+  // validate order id
+  if (!ORDER_ID) {
+    document.getElementById("itemsList").textContent = "No orderId provided in URL.";
+    setStatus("preparing", null);
+    return;
+  }
+
+  // attempt to load order from Firestore
+  loadOrderFromFirestore(ORDER_ID);
+
+  // connect to socket server for live updates
+  startSocket(ORDER_ID);
+
+  // actions
+  document.getElementById("callBtn").onclick = () => {
+    window.location.href = "tel:+911234567890";
+  };
+  document.getElementById("helpBtn").onclick = () => {
+    alert("Contact support at +91 12345 67890");
+  };
 });
