@@ -1,37 +1,31 @@
-/* Final Bottom-sheet script (B1) */
-/* Replace file: /home/script.js
-   - drag-down-to-close
-   - overlay & close handlers
-   - add-to-cart, qty, fly animation
-   - checkout via server -> Cashfree
-*/
+/* ------------------------------------------
+   SH - The Hunger Point
+   FINAL JS for Bottom Sheet Cart (B1)
+   ------------------------------------------ */
 
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; // keep your render url
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
 /* DOM helpers */
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
 
 /* Toast */
-function showToast(msg, d=2000) {
-  const c = $("#toast-container");
-  if (!c) { console.log(msg); return; }
-  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; c.appendChild(t);
-  setTimeout(()=> t.remove(), d);
+function showToast(msg, dur = 2200) {
+  const box = $("#toast-container");
+  if (!box) return console.log("TOAST:", msg);
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  box.appendChild(t);
+  setTimeout(() => t.remove(), dur);
 }
 
-/* Cart state */
+/* CART STATE */
 let cart = [];
-const findCartIndex = id => cart.findIndex(c => c.id === id);
-function updateSheetCount() {
-  const txt = $("#cartCountText");
-  if (!txt) return;
-  const total = cart.reduce((s,i)=> s + i.qty, 0);
-  txt.textContent = `${total} items`;
-}
+const findItem = (id) => cart.findIndex((i) => i.id === id);
 
-/* image map */
+/* IMAGE MAP */
 const imageMap = {
   "momo": "/home/sh-momo.png",
   "finger": "/home/sh-french-fries.png",
@@ -39,246 +33,283 @@ const imageMap = {
   "tea": "/home/sh-hot-tea.png",
   "bread pakoda": "/home/sh-bread-pakoda.png"
 };
-function getImageFor(name){ return imageMap[name?.toLowerCase()] || "/home/SH-Favicon.png"; }
+function getImg(name) {
+  return imageMap[name.toLowerCase()] || "/home/SH-Favicon.png";
+}
 
-/* render cart */
+/* UPDATE CART COUNT */
+function updateCartCount() {
+  const btn = $("#bottomCartBtn");
+  if (!btn) return;
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  btn.setAttribute("data-count", total);
+}
+
+/* RENDER CART */
 function renderCart() {
-  const container = $("#cartItems");
-  container.innerHTML = "";
+  const box = $("#cartItems");
+  if (!box) return;
+
+  box.innerHTML = "";
+
   if (cart.length === 0) {
-    container.innerHTML = `<p class="muted">Cart is empty</p>`;
-    $("#cartTotal").textContent = "₹0";
-    updateSheetCount();
+    box.innerHTML = `<p class="empty">Cart is empty</p>`;
+    $("#cartTotal") && ($("#cartTotal").textContent = "₹0");
+    updateCartCount();
     return;
   }
+
   let total = 0;
-  cart.forEach(item => {
-    total += item.qty * item.price;
-    const node = document.createElement("div");
-    node.className = "cart-item";
-    node.dataset.id = item.id;
-    node.innerHTML = `
-      <img class="cart-img" src="${getImageFor(item.name)}" alt="${item.name}">
+
+  cart.forEach((item) => {
+    total += item.price * item.qty;
+
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.dataset.id = item.id;
+
+    row.innerHTML = `
+      <img class="cart-img" src="${getImg(item.name)}">
       <div class="cart-info">
         <div class="cart-name">${item.name}</div>
-        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price*item.qty}</div>
+        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
       </div>
+
       <div class="cart-actions">
-        <button class="cart-dec" data-id="${item.id}">−</button>
-        <span class="cart-qty">${item.qty}</span>
-        <button class="cart-inc" data-id="${item.id}">+</button>
-        <button class="cart-remove" data-id="${item.id}">✕</button>
+        <button class="c-dec" data-id="${item.id}">−</button>
+        <span>${item.qty}</span>
+        <button class="c-inc" data-id="${item.id}">+</button>
+        <button class="c-rem" data-id="${item.id}">✕</button>
       </div>
     `;
-    container.appendChild(node);
+
+    box.appendChild(row);
   });
+
   $("#cartTotal").textContent = "₹" + total;
-  updateSheetCount();
+
+  updateCartCount();
   attachCartButtons();
 }
 
-/* attach cart buttons */
+/* ATTACH CART BUTTON EVENTS */
 function attachCartButtons() {
-  $$(".cart-dec").forEach(b => b.onclick = () => {
-    const id = b.dataset.id; const idx = findCartIndex(id);
-    if (idx>=0) { cart[idx].qty = Math.max(1, cart[idx].qty-1); renderCart(); }
-  });
-  $$(".cart-inc").forEach(b => b.onclick = () => {
-    const id = b.dataset.id; const idx = findCartIndex(id);
-    if (idx>=0) { cart[idx].qty += 1; renderCart(); }
-  });
-  $$(".cart-remove").forEach(b => b.onclick = () => {
-    const id = b.dataset.id;
-    cart = cart.filter(c => c.id !== id);
-    renderCart();
-  });
+  $$(".c-dec").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      const i = findItem(id);
+      if (i >= 0) {
+        cart[i].qty = Math.max(1, cart[i].qty - 1);
+        renderCart();
+      }
+    })
+  );
+
+  $$(".c-inc").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      const i = findItem(id);
+      if (i >= 0) {
+        cart[i].qty++;
+        renderCart();
+      }
+    })
+  );
+
+  $$(".c-rem").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.id;
+      cart = cart.filter((x) => x.id !== id);
+      renderCart();
+    })
+  );
 }
 
-/* open & close sheet */
-function openSheet() {
-  $("#overlay")?.classList.remove("hidden");
-  $("#cartSheet")?.classList.remove("hidden");
-  document.documentElement.style.overflow = "hidden";
+/* FLY TO CART ANIMATION */
+function flyToCart(img) {
+  if (!img) return;
+
+  const r = img.getBoundingClientRect();
+  const clone = img.cloneNode(true);
+
+  clone.style.position = "fixed";
+  clone.style.left = r.left + "px";
+  clone.style.top = r.top + "px";
+  clone.style.width = r.width + "px";
+  clone.style.height = r.height + "px";
+  clone.style.borderRadius = "12px";
+  clone.style.objectFit = "cover";
+  clone.style.zIndex = 3000;
+  clone.style.transition = "transform .75s ease, opacity .75s";
+  document.body.appendChild(clone);
+
+  const target = $("#bottomCartBtn").getBoundingClientRect();
+
+  requestAnimationFrame(() => {
+    clone.style.transform = `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
+    clone.style.opacity = "0";
+  });
+
+  setTimeout(() => clone.remove(), 800);
+}
+
+/* BOTTOM SHEET OPEN/CLOSE */
+function openCartSheet() {
+  $("#overlay").classList.add("active");
+  $("#cartSheet").classList.add("active");
+
   document.body.style.overflow = "hidden";
   renderCart();
 }
-function closeSheet() {
-  $("#overlay")?.classList.add("hidden");
-  $("#cartSheet")?.classList.add("hidden");
-  document.documentElement.style.overflow = "";
+
+function closeCartSheet() {
+  $("#overlay").classList.remove("active");
+  $("#cartSheet").classList.remove("active");
   document.body.style.overflow = "";
 }
 
-/* overlay & control hooks */
-function initOverlayControls() {
-  $("#openCartBtn")?.addEventListener("click", () => openSheet());
-  $("#overlay")?.addEventListener("click", () => closeSheet());
-  $("#closeSheet")?.addEventListener("click", () => closeSheet());
-  $("#clearCart")?.addEventListener("click", () => { cart = []; renderCart(); showToast("Cart cleared"); });
-}
+$("#bottomCartBtn")?.addEventListener("click", openCartSheet);
+$("#overlay")?.addEventListener("click", closeCartSheet);
+$("#closeSheet")?.addEventListener("click", closeCartSheet);
 
-/* fly animation */
-function flyToCart(imgEl) {
-  if (!imgEl) return;
-  const rect = imgEl.getBoundingClientRect();
-  const clone = imgEl.cloneNode(true);
-  clone.style.position = "fixed";
-  clone.style.left = rect.left + "px";
-  clone.style.top = rect.top + "px";
-  clone.style.width = rect.width + "px";
-  clone.style.height = rect.height + "px";
-  clone.style.zIndex = 12000;
-  clone.style.borderRadius = "10px";
-  clone.style.objectFit = "cover";
-  clone.style.transition = "transform .7s cubic-bezier(.12,.82,.36,1), opacity .7s";
-  document.body.appendChild(clone);
-  const target = $("#openCartBtn").getBoundingClientRect();
-  const dx = (target.left + target.width/2) - (rect.left + rect.width/2);
-  const dy = (target.top + target.height/2) - (rect.top + rect.height/2);
-  requestAnimationFrame(()=> {
-    clone.style.transform = `translate(${dx}px, ${dy}px) scale(.18)`;
-    clone.style.opacity = "0";
-  });
-  setTimeout(()=> clone.remove(), 800);
-}
-
-/* menu init */
+/* MENU ACTIONS (qty + add) */
 function initMenu() {
-  $$(".menu-item").forEach(itemEl => {
-    const minus = itemEl.querySelector(".qty-btn.minus");
-    const plus = itemEl.querySelector(".qty-btn.plus");
-    const display = itemEl.querySelector(".qty-display");
-    const addBtn = itemEl.querySelector(".add-cart-btn");
+  $$(".menu-item").forEach((el) => {
+    const minus = el.querySelector(".qty-btn.minus");
+    const plus = el.querySelector(".qty-btn.plus");
+    const disp = el.querySelector(".qty-display");
+    const add = el.querySelector(".add-cart-btn");
+    const img = el.querySelector(".menu-img");
+
     let qty = 1;
-    if (display) display.textContent = qty;
-    minus?.addEventListener("click", ()=> { qty = Math.max(1, qty-1); if (display) display.textContent = qty; });
-    plus?.addEventListener("click", ()=> { qty++; if (display) display.textContent = qty; });
-    addBtn?.addEventListener("click", ()=> {
-      flyToCart(itemEl.querySelector(".menu-img"));
-      const name = itemEl.dataset.item || itemEl.querySelector(".menu-title")?.textContent || "Item";
-      const price = Number(itemEl.dataset.price) || PRICE_DEFAULT;
-      const id = name.toLowerCase().replace(/\s+/g,"-");
-      const idx = findCartIndex(id);
-      if (idx>=0) cart[idx].qty += qty; else cart.push({ id, name, price, qty });
+    disp.textContent = qty;
+
+    minus?.addEventListener("click", () => {
+      qty = Math.max(1, qty - 1);
+      disp.textContent = qty;
+    });
+
+    plus?.addEventListener("click", () => {
+      qty++;
+      disp.textContent = qty;
+    });
+
+    add?.addEventListener("click", () => {
+      flyToCart(img);
+
+      const name = el.dataset.item;
+      const price = Number(el.dataset.price) || PRICE_DEFAULT;
+      const id = name.toLowerCase().replace(/\s+/g, "-");
+
+      const i = findItem(id);
+      if (i >= 0) cart[i].qty += qty;
+      else cart.push({ id, name, price, qty });
+
       showToast(`${qty} × ${name} added`);
       renderCart();
-      qty = 1; if (display) display.textContent = qty;
-      // nudge scroll if near bottom
-      setTimeout(()=> {
-        const nearBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 60);
-        if (nearBottom) window.scrollBy({ top: -120, behavior: "smooth" });
-      }, 200);
+
+      qty = 1;
+      disp.textContent = qty;
     });
   });
 }
 
-/* search & chips */
-function initFilters() {
-  $("#menuSearch")?.addEventListener("input", (e) => {
-    const q = (e.target.value || "").toLowerCase().trim();
-    $$(".menu-item").forEach(it => {
-      const name = (it.dataset.item||"").toLowerCase();
-      const desc = (it.querySelector(".menu-desc")?.textContent||"").toLowerCase();
-      it.style.display = (name.includes(q) || desc.includes(q)) ? "flex" : "none";
-    });
+/* SEARCH */
+$("#menuSearch")?.addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase();
+  $$(".menu-item").forEach((el) => {
+    const name = el.dataset.item.toLowerCase();
+    const desc = el.querySelector(".menu-desc").textContent.toLowerCase();
+    el.style.display = name.includes(q) || desc.includes(q) ? "flex" : "none";
   });
-  $$(".chip").forEach(ch => ch.addEventListener("click", ()=> {
-    $$(".chip").forEach(x=>x.classList.remove("active"));
-    ch.classList.add("active");
-    const cat = ch.dataset.cat;
-    $$(".menu-item").forEach(it => it.style.display = (cat === "all" || it.dataset.cat === cat) ? "flex" : "none");
-  }));
-}
+});
 
-/* sheet drag to close (vertical) */
-function initSheetDrag() {
-  const sheet = $("#cartSheet");
-  const handle = $("#sheetHandle") || sheet;
-  if (!sheet) return;
-  let startY = 0, currentY = 0, dragging = false;
-  const sheetHeight = () => sheet.getBoundingClientRect().height;
+/* CATEGORY FILTER */
+$$(".chip").forEach((chip) =>
+  chip.addEventListener("click", () => {
+    $$(".chip").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
 
-  const touchStart = (e) => {
-    dragging = true;
-    startY = (e.touches ? e.touches[0].clientY : e.clientY);
-    sheet.style.transition = "none";
-  };
-  const touchMove = (e) => {
-    if (!dragging) return;
-    currentY = (e.touches ? e.touches[0].clientY : e.clientY);
-    const dy = Math.max(0, currentY - startY);
-    sheet.style.transform = `translateY(${dy}px)`;
-  };
-  const touchEnd = (e) => {
-    if (!dragging) return;
-    dragging = false;
-    sheet.style.transition = "";
-    const dy = Math.max(0, currentY - startY);
-    const thresh = sheetHeight() * 0.36; // threshold to close
-    if (dy > thresh) closeSheet();
-    else sheet.style.transform = ""; // snap back
-  };
-
-  handle.addEventListener("touchstart", touchStart, { passive:true });
-  handle.addEventListener("touchmove", touchMove, { passive:true });
-  handle.addEventListener("touchend", touchEnd);
-  // support mouse for debugging on desktop
-  handle.addEventListener("mousedown", (e)=> { e.preventDefault(); touchStart(e); document.addEventListener("mousemove", touchMove); document.addEventListener("mouseup", ()=> { touchEnd(); document.removeEventListener("mousemove", touchMove); }); });
-}
-
-/* checkout flow */
-async function startCheckout() {
-  if (cart.length === 0) { showToast("Cart is empty"); return; }
-  const items = cart.map(i => ({ name: i.name, qty: i.qty, price: i.price }));
-  const amount = cart.reduce((s,i) => s + i.qty * i.price, 0);
-  showToast("Starting payment...");
-  try {
-    const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
-      method: "POST", headers: { "Content-Type":"application/json" }, body: JSON.stringify({ amount, items })
+    const cat = chip.dataset.cat;
+    $$(".menu-item").forEach((el) => {
+      el.style.display = cat === "all" || el.dataset.cat === cat ? "flex" : "none";
     });
-    const data = await res.json();
-    if (!data || data.ok === false) { console.error("create failed", data); showToast(data?.error || "Payment failed"); return; }
-    const session = data.session || data.payment_session_id || data.data?.payment_session_id || data.data?.session;
-    const orderId = data.orderId || data.order_id || data.data?.order_id || data.data?.order?.id || session;
-    if (!session) { console.error("no session", data); showToast("Payment session missing"); return; }
+  })
+);
 
-    if (window.Cashfree && (window.Cashfree.checkout || typeof window.Cashfree === "function")) {
-      try {
-        if (window.Cashfree.checkout) window.Cashfree.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
-        else { const inst = window.Cashfree(); inst.checkout({ paymentSessionId: session, redirectTarget: "_modal" }); }
-      } catch (err) { console.error("open cf", err); showToast("Failed to open payment"); return; }
-    } else { showToast("Payment SDK not loaded"); console.warn("Cashfree missing"); return; }
-
-    const handler = async (ev) => {
-      try {
-        const msg = ev.data || {};
-        const success = msg.paymentStatus === "SUCCESS" || msg.paymentMessage === "SUCCESS" || (typeof msg === "string" && msg.toUpperCase().includes("SUCCESS"));
-        const failed = msg.paymentStatus === "FAILED" || msg.paymentMessage === "FAILED" || (typeof msg === "string" && msg.toUpperCase().includes("FAILED"));
-        if (success) {
-          showToast("Verifying payment...");
-          const vres = await fetch(`${SERVER_URL}/verify-cashfree-payment`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ orderId: orderId || session, items }) });
-          const vdata = await vres.json();
-          if (vdata && vdata.ok) {
-            showToast("Payment success 🎉");
-            cart = []; renderCart(); closeSheet();
-          } else { showToast(vdata?.error || "Verification failed"); console.warn("verify fail", vdata); }
-        } else if (failed) showToast("Payment failed or cancelled");
-      } catch (err) { console.error("payment handler", err); showToast("Payment verification error"); }
-      finally { window.removeEventListener("message", handler); }
-    };
-    window.addEventListener("message", handler, { once:true, passive:true });
-  } catch (err) { console.error("checkout error", err); showToast("Checkout error"); }
-}
-
-/* init on DOM ready */
-document.addEventListener("DOMContentLoaded", ()=> {
-  initMenu(); initFilters(); initOverlayControls(); initSheetDrag();
+/* CLEAR CART */
+$("#clearCart")?.addEventListener("click", () => {
+  cart = [];
   renderCart();
+  showToast("Cart cleared");
+});
 
-  // open cart btn
-  $("#openCartBtn")?.addEventListener("click", openSheet);
-  // checkout hook
-  $("#checkoutBtn")?.addEventListener("click", (e)=> { e.preventDefault(); startCheckout(); });
+/* CHECKOUT → CASHFREE */
+$("#checkoutBtn")?.addEventListener("click", startCheckoutFlow);
 
-  console.info("Bottom-sheet UI ready");
+async function startCheckoutFlow() {
+  if (cart.length === 0) return showToast("Cart is empty");
+
+  const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
+  const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
+
+  try {
+    showToast("Starting payment...");
+    const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, items })
+    });
+
+    const data = await res.json();
+    if (!data.ok) return showToast(data.error || "Payment failed");
+
+    const session = data.session;
+    const orderId = data.orderId;
+
+    // Cashfree modal
+    if (window.Cashfree) {
+      const cf = window.Cashfree;
+      cf.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
+    } else {
+      return showToast("Cashfree SDK missing");
+    }
+
+    // Wait for payment message
+    const handler = async (e) => {
+      const msg = e.data;
+
+      if (msg?.paymentStatus === "SUCCESS") {
+        showToast("Payment verifying...");
+
+        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId, items })
+        });
+
+        const ok = await vr.json();
+        if (ok?.ok) {
+          showToast("Order Confirmed 🎉");
+          cart = [];
+          renderCart();
+          closeCartSheet();
+        } else {
+          showToast("Payment verify failed");
+        }
+      }
+      window.removeEventListener("message", handler);
+    };
+
+    window.addEventListener("message", handler);
+  } catch (err) {
+    console.error(err);
+    showToast("Checkout error");
+  }
+}
+
+/* INIT */
+document.addEventListener("DOMContentLoaded", () => {
+  initMenu();
+  renderCart();
 });
