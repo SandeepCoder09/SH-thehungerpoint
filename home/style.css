@@ -509,3 +509,34 @@ body {
 		height: 150px;
 	}
 }
+
+/* ===== Swipe-to-delete (Cart) ===== */
+.cart-item-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.cart-swipe-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 80px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  z-index: 1;
+}
+
+.cart-item.swipe-move {
+  transition: transform 0.15s ease-out;
+}
+
+.cart-item.swiped {
+  transform: translateX(-80px);
+}
