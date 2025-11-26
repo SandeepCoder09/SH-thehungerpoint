@@ -5,7 +5,6 @@
   <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
-
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
   <!-- Firebase (v8 compatibility global) -->
@@ -18,6 +17,7 @@
 </head>
 <body>
 
+  <!-- TOP NAV -->
   <header class="nav">
     <div class="brand">
       <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
@@ -40,8 +40,9 @@
     </div>
   </header>
 
+  <!-- APP SHELL -->
   <main class="app-shell">
-    <!-- Hero + Search -->
+    <!-- HERO + SEARCH + CHIPS -->
     <section class="hero-box">
       <div class="hero-inner">
         <h1 class="type-h1">Fresh & Fast</h1>
@@ -49,10 +50,9 @@
 
         <div class="search-row">
           <input id="menuSearch" class="search-input" type="search" placeholder="Search for dishes, e.g. momo, tea" />
-          <button class="icon-btn search-btn" aria-label="voice or filter">🔍</button>
+          <button class="icon-btn search-btn" aria-label="search">🔍</button>
         </div>
 
-        <!-- category chips -->
         <div class="chips" role="tablist" aria-label="Categories">
           <button class="chip active" data-cat="all">All</button>
           <button class="chip" data-cat="momos">Momos</button>
@@ -63,11 +63,10 @@
       </div>
     </section>
 
-    <!-- GRID MENU -->
+    <!-- GRID MENU (2 columns, contain images, descriptions kept) -->
     <section id="home" class="page">
       <section class="menu grid-menu">
 
-        <!-- card: note class names kept for JS -->
         <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
           <div class="card-media">
             <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
@@ -83,9 +82,9 @@
 
             <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus">−</button>
-                <div class="qty-display">1</div>
-                <button class="qty-btn plus">+</button>
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
               </div>
               <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
@@ -107,9 +106,9 @@
 
             <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus">−</button>
-                <div class="qty-display">1</div>
-                <button class="qty-btn plus">+</button>
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
               </div>
               <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
@@ -131,9 +130,9 @@
 
             <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus">−</button>
-                <div class="qty-display">1</div>
-                <button class="qty-btn plus">+</button>
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
               </div>
               <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
@@ -155,38 +154,26 @@
 
             <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus">−</button>
-                <div class="qty-display">1</div>
-                <button class="qty-btn plus">+</button>
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
               </div>
               <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
           </div>
         </article>
 
-        <!-- add more items as needed with same structure -->
+        <!-- Add additional menu-item articles with same structure as needed -->
+
       </section>
     </section>
 
-    <section id="orders" class="page hidden">
-      <h2>Your Orders</h2>
-      <div id="pastOrders">No orders yet.</div>
-    </section>
+    <!-- Hidden pages (kept in DOM for routing but hidden to match FoodGo look) -->
+    <section id="orders" class="page hidden" aria-hidden="true"></section>
+    <section id="profile" class="page hidden" aria-hidden="true"></section>
+    <section id="offers" class="page hidden" aria-hidden="true"></section>
 
-    <section id="profile" class="page hidden">
-      <h2>Profile</h2>
-      <p>User profile info will appear.</p>
-    </section>
-
-    <section id="offers" class="page hidden">
-      <h2>Offers</h2>
-      <p>No active offers.</p>
-    </section>
-
-    <section id="order-status" class="order-status hidden">
-      <h3>Order Confirmed 🎉</h3>
-      <p id="eta-text"></p>
-    </section>
+    <section id="order-status" class="order-status hidden" aria-hidden="true"></section>
   </main>
 
   <!-- KEEP your original modals, cart markup, toast, footer — unchanged IDs & structure -->
@@ -197,35 +184,27 @@
       <h3>Delivery details</h3>
       <button id="closeCheckout" class="icon-btn">✕</button>
     </header>
-
     <div class="checkout-body">
       <label class="checkbox-row">
-        <input type="checkbox" id="useGPS" />
-        Use my current location (recommended)
+        <input type="checkbox" id="useGPS" /> Use my current location (recommended)
       </label>
-
       <div class="field">
         <label for="custName">Name</label>
         <input id="custName" type="text" placeholder="Your name (optional)">
       </div>
-
       <div class="field">
         <label for="custPhone">Phone</label>
         <input id="custPhone" type="tel" placeholder="Phone number (optional)">
       </div>
-
       <div class="field">
         <label for="custEmail">Email</label>
         <input id="custEmail" type="email" placeholder="Email (optional)">
       </div>
-
       <div class="field">
         <label for="custAddress">Delivery address (if not using GPS)</label>
         <textarea id="custAddress" rows="3" placeholder="House number, street, landmark"></textarea>
       </div>
-
       <div id="checkoutMsg" class="muted" style="margin-top:8px;"></div>
-
       <footer class="cart-modal-foot" style="margin-top:12px;">
         <div style="display:flex;gap:8px;">
           <button id="confirmCheckout" class="primary">Confirm & Pay</button>
@@ -242,14 +221,11 @@
       <h3>Your Cart</h3>
       <button id="closeCart" class="icon-btn">✕</button>
     </header>
-
     <div id="cartItems" class="cart-items">
       <p class="empty">Cart is empty</p>
     </div>
-
     <footer class="cart-modal-foot">
       <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
-
       <div class="cart-modal-actions">
         <button id="checkoutBtn" class="primary">Checkout</button>
         <button id="clearCart" class="muted">Clear</button>
@@ -262,11 +238,11 @@
 
   <!-- bottom nav (FoodGo style) -->
   <nav class="bottom-nav" role="navigation" aria-label="Bottom navigation">
-    <button class="bn-item"><span>☰</span><small>Menu</small></button>
-    <button class="bn-item"><span>🧾</span><small>Orders</small></button>
-    <button class="bn-center" aria-label="Open cart">🛒</button>
-    <button class="bn-item"><span>👤</span><small>Profile</small></button>
-    <button class="bn-item"><span>⚙️</span><small>More</small></button>
+    <button class="bn-item" aria-label="Menu"><span>☰</span><small>Menu</small></button>
+    <button class="bn-item" aria-label="Orders"><span>🧾</span><small>Orders</small></button>
+    <button class="bn-center" id="bottomCartBtn" aria-label="Open cart">🛒</button>
+    <button class="bn-item" aria-label="Profile"><span>👤</span><small>Profile</small></button>
+    <button class="bn-item" aria-label="More"><span>⚙️</span><small>More</small></button>
   </nav>
 
   <footer class="footer">
@@ -276,10 +252,10 @@
   <!-- Cashfree -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
 
-  <!-- Main Script -->
+  <!-- Main Script (keep your existing logic) -->
   <script src="/home/script.js" defer></script>
 
-  <!-- Translate (if you have) -->
+  <!-- Translate (optional) -->
   <script src="/languages/translate.js" defer></script>
 </body>
 </html>
