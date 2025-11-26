@@ -1,4 +1,4 @@
-/* Final app style — mobile-first */
+/* Material 3-inspired styles + fixes for scrolling & modal visibility */
 
 /* Theme */
 :root {
@@ -8,10 +8,10 @@
 	--text: #0b1220;
 	--accent: #E23744;
 	--accent-2: #c83a3a;
-	--glass: rgba(11, 18, 32, 0.04);
-	--card-shadow: 0 10px 30px rgba(11, 18, 32, 0.08);
-	--radius-lg: 16px;
-	--gutter: 12px;
+	--glass: rgba(255, 255, 255, 0.6);
+	--card-shadow: 0 14px 40px rgba(11, 18, 32, 0.08);
+	--nav-height: 78px;
+	/* bottom nav height */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,8 +20,8 @@
 		--surface: #0b1220;
 		--muted: #9fb0c8;
 		--text: #e6eef8;
-		--glass: rgba(255, 255, 255, 0.04);
-		--card-shadow: 0 14px 50px rgba(0, 0, 0, 0.45);
+		--glass: rgba(11, 18, 32, 0.18);
+		--card-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
 	}
 }
 
@@ -41,15 +41,15 @@ body {
 	color: var(--text);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	padding-bottom: 110px;
-	/* space for bottom nav */
+	/* add bottom safe padding so content scrolls above nav */
+	padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 12px));
 }
 
 /* Top nav */
 .nav {
 	position: sticky;
 	top: 0;
-	z-index: 100;
+	z-index: 120;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -154,7 +154,7 @@ body {
 	box-shadow: 0 8px 30px rgba(226, 55, 68, 0.16)
 }
 
-/* grid menu */
+/* grid menu — body scroll natural */
 .grid-menu {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -271,13 +271,13 @@ body {
 	box-shadow: 0 8px 22px rgba(226, 55, 68, 0.16)
 }
 
-/* overlay and modal */
+/* overlay and modal (ensure z-index above bottom nav) */
 .overlay {
 	position: fixed;
 	inset: 0;
 	background: rgba(0, 0, 0, 0.45);
 	display: none;
-	z-index: 80
+	z-index: 980
 }
 
 .overlay:not(.hidden) {
@@ -288,16 +288,17 @@ body {
 	position: fixed;
 	left: 50%;
 	top: 50%;
-	transform: translate(-50%, -50%) scale(.95);
+	transform: translate(-50%, -50%) scale(.96);
 	opacity: 0;
 	background: var(--surface);
 	width: 92%;
-	max-width: 420px;
-	border-radius: 18px;
+	max-width: 430px;
+	border-radius: 20px;
 	padding: 12px;
-	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-	z-index: 90;
-	transition: all .18s ease
+	box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	transition: all .16s ease;
+	backdrop-filter: blur(6px) saturate(120%);
 }
 
 .cart-modal:not(.hidden) {
@@ -306,7 +307,7 @@ body {
 }
 
 .cart-popup-anim {
-	padding: 8px
+	padding: 6px
 }
 
 .cart-modal-head {
@@ -318,7 +319,7 @@ body {
 
 /* cart items */
 .cart-items {
-	max-height: 360px;
+	max-height: 420px;
 	overflow: auto;
 	padding-right: 6px
 }
@@ -400,8 +401,8 @@ body {
 	position: fixed;
 	left: 50%;
 	transform: translateX(-50%);
-	bottom: 120px;
-	z-index: 120
+	bottom: calc(var(--nav-height) + 24px);
+	z-index: 1100
 }
 
 .toast {
@@ -413,21 +414,24 @@ body {
 	font-size: 14px
 }
 
-/* bottom nav */
+/* bottom nav: Material 3 style (blur + floating) */
 .bottom-nav {
 	position: fixed;
 	left: 12px;
 	right: 12px;
 	bottom: 12px;
-	background: var(--surface);
-	height: 64px;
-	border-radius: 999px;
+	height: var(--nav-height);
+	border-radius: 28px;
 	display: flex;
 	justify-content: space-between;
-	padding: 0 14px;
 	align-items: center;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-	z-index: 100
+	padding: 0 14px;
+	gap: 10px;
+	z-index: 900;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.7));
+	box-shadow: 0 20px 50px rgba(11, 18, 32, 0.18);
+	backdrop-filter: blur(10px) saturate(130%);
+	border: 1px solid rgba(11, 18, 32, 0.06);
 }
 
 .bn-item {
@@ -442,9 +446,18 @@ body {
 	font-size: 13px
 }
 
+.bn-item span {
+	font-size: 20px
+}
+
+.bn-item small {
+	display: block;
+	margin-top: 6px
+}
+
 .bn-center {
-	width: 64px;
-	height: 64px;
+	width: 66px;
+	height: 66px;
 	border-radius: 50%;
 	background: linear-gradient(90deg, var(--accent), var(--accent-2));
 	color: #fff;
@@ -453,14 +466,29 @@ body {
 	align-items: center;
 	justify-content: center;
 	font-size: 22px;
-	margin-top: -28px;
-	box-shadow: 0 12px 40px rgba(226, 55, 68, 0.24);
-	cursor: pointer
+	margin-top: -30px;
+	box-shadow: 0 18px 40px rgba(226, 55, 68, 0.22);
+	cursor: pointer;
+	transform: translateY(-6px);
+}
+
+/* ensure last content isn't hidden */
+.app-shell {
+	padding-bottom: calc(var(--nav-height) + 28px)
 }
 
 /* responsive tweaks */
-@media (max-width:360px) {
+@media (max-width:420px) {
+	.grid-menu {
+		gap: 12px;
+		padding: 12px
+	}
+
 	.menu-img {
 		height: 110px
+	}
+
+	.cart-items {
+		max-height: 320px
 	}
 }
