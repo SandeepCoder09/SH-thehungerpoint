@@ -1,124 +1,96 @@
-/* SH The Hunger Point — Orders Page */
+/* ----------------------------
+   Firebase Init
+----------------------------- */
 
-const dbRef = firebase.firestore().collection("orders");
+const firebaseConfig = {
+  apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
+  authDomain: "sh-the-hunger-point.firebaseapp.com",
+  projectId: "sh-the-hunger-point",
+  storageBucket: "sh-the-hunger-point.firebasestorage.app",
+  messagingSenderId: "401237282420",
+  appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
+  measurementId: "G-4KP3RJ15E9"
+};
 
-/* Get all orders */
+// Init Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const ordersList = document.getElementById("ordersList");
+const testBtn = document.getElementById("createTestOrder");
+
+// ---------------------------------------
+// Load Orders
+// ---------------------------------------
 async function loadOrders() {
-  const snap = await dbRef.orderBy("createdAt", "desc").get();
+  ordersList.innerHTML = `<p class="loading">Loading orders…</p>`;
 
-  const ongoingOrderCard = document.getElementById("ongoingOrder");
-  const pastOrdersBox = document.getElementById("pastOrders");
+  const snap = await db.collection("orders")
+    .orderBy("createdAt", "desc")
+    .get();
 
-  let ongoing = null;
-  let past = [];
-
-  snap.forEach(doc => {
-    const data = doc.data();
-    const id = doc.id;
-
-    if (data.status !== "delivered" && data.status !== "cancelled") {
-      if (!ongoing) ongoing = { id, ...data };
-    } else {
-      past.push({ id, ...data });
-    }
-  });
-
-  renderOngoing(ongoing);
-  renderPast(past);
-}
-
-/* Render Ongoing Order */
-function renderOngoing(order) {
-  const card = document.getElementById("ongoingOrder");
-
-  if (!order) {
-    card.classList.add("hidden");
+  if (snap.empty) {
+    ordersList.innerHTML = `<p style="opacity:0.6">No orders yet</p>`;
     return;
   }
 
-  card.classList.remove("hidden");
+  ordersList.innerHTML = "";
 
-  document.getElementById("ongoingStatus").textContent =
-    order.status === "out_for_delivery"
-      ? "Out for Delivery 🚴‍♂️"
-      : order.status === "preparing"
-      ? "Preparing 🔥"
-      : order.status;
+  snap.forEach(doc => {
+    const o = doc.data();
+    const id = doc.id;
 
-  document.getElementById("ongoingETA").textContent = order.eta
-    ? `ETA: ${order.eta} min`
-    : "";
+    let statusClass =
+      o.status === "preparing" ? "st-preparing" :
+      o.status === "out" ? "st-out" :
+      "st-delivered";
 
-  document.getElementById("ongoingTotal").textContent = "₹" + order.totalAmount;
+    const itemsText = o.items.map(i => `${i.qty} × ${i.name}`).join(", ");
 
-  // Items
-  const itemsBox = document.getElementById("ongoingItems");
-  itemsBox.innerHTML = "";
-  order.items.forEach(i => {
-    itemsBox.innerHTML += `${i.name} × ${i.qty}<br>`;
-  });
-
-  // Track Order Button
-  document.getElementById("trackButton").onclick = () => {
-    window.location.href = `/orders/track-order.html?orderId=${order.orderId}`;
-  };
-}
-
-/* Render Past Orders */
-function renderPast(list) {
-  const box = document.getElementById("pastOrders");
-  box.innerHTML = "";
-
-  list.forEach(o => {
     const card = document.createElement("div");
     card.className = "order-card";
-
     card.innerHTML = `
-      <div class="order-row">
-        <strong>${o.items.map(i => i.name).join(", ")}</strong>
-        <span>₹${o.totalAmount}</span>
+      <div class="order-row-1">
+        <span>Order #${id.slice(0,6)}</span>
+        <span class="order-status ${statusClass}">${o.status}</span>
       </div>
 
-      <div class="order-time">
-        Delivered in ${o.deliveryTime || "N/A"} min
-      </div>
+      <div class="order-items">${itemsText}</div>
 
-      <button class="reorder-btn">Reorder</button>
+      <button class="track-btn" data-id="${id}">
+        Track Order
+      </button>
     `;
 
-    // Reorder button
-    card.querySelector(".reorder-btn").onclick = () => {
-      localStorage.setItem("reorderItems", JSON.stringify(o.items));
-      window.location.href = "/home/index.html";
-    };
+    ordersList.appendChild(card);
+  });
 
-    box.appendChild(card);
+  document.querySelectorAll(".track-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      window.location.href = `track-order.html?orderId=${id}`;
+    });
   });
 }
 
-document.addEventListener("DOMContentLoaded", loadOrders);
+loadOrders();
 
-// --- Create Test Order ---
-document.getElementById("createTestOrder").addEventListener("click", async () => {
-  const testOrder = {
-    status: "out_for_delivery",
-    createdAt: new Date(),
-    totalAmount: 40,
+// ---------------------------------------
+// Create Test Order
+// ---------------------------------------
+testBtn.addEventListener("click", async () => {
+  const id = "test_" + Date.now();
+
+  await db.collection("orders").doc(id).set({
     items: [
       { name: "Momo", qty: 1, price: 10 },
-      { name: "Hot Tea", qty: 1, price: 10 },
-      { name: "Bread Pakoda", qty: 1, price: 10 },
-      { name: "Finger", qty: 1, price: 10 }
+      { name: "Hot Tea", qty: 1, price: 10 }
     ],
-    userLocation: { lat: 25.140, lng: 82.570 },
-    riderLocation: { lat: 25.145, lng: 82.575 },
-    eta: 12
-  };
+    total: 20,
+    status: "out",
+    createdAt: firebase.firestore.Timestamp.now()
+  });
 
-  const id = "order_" + Date.now();
-
-  await firebase.firestore().collection("orders").doc(id).set(testOrder);
-
-  alert("Test Order Created ✔ Now refresh Orders Page");
+  alert("Test order created!");
   loadOrders();
 });
