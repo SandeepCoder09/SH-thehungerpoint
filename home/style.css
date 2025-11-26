@@ -1,14 +1,12 @@
-/* FoodGo-style GRID UI for SH - Mobile-first
-   - 2-column grid cards
-   - Search, category chips
-   - Floating add button inside each card
-   - Keeps all JS selectors: .menu-item, .qty-btn, .qty-display, .add-cart-btn, #cartToggle
+/* FINAL FoodGo-style GRID UI (Contain images, descriptions kept)
+   - 2-column grid forced on mobile (FoodGo look)
+   - Bottom navigation enabled
+   - Preserves .menu-item, .qty-btn, .qty-display, .add-cart-btn, #cartToggle, #cartCount
 */
 
-/* ---------- Theme vars (light default) ---------- */
+/* ---------- Theme variables (light default) ---------- */
 :root {
 	--bg: #fff7f8;
-	/* subtle warm */
 	--surface: #ffffff;
 	--muted: #6b7280;
 	--text: #0b1220;
@@ -22,7 +20,7 @@
 	--gutter: 12px;
 }
 
-/* Auto dark theme (keeps UI readable) */
+/* Auto dark theme */
 @media (prefers-color-scheme: dark) {
 	:root {
 		--bg: #071226;
@@ -54,15 +52,15 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-tap-highlight-color: transparent;
-	padding-bottom: 84px;
-	/* leave room for bottom-nav */
+	padding-bottom: 108px;
+	/* room for bottom-nav */
 }
 
 /* ---------- Top nav ---------- */
 .nav {
 	position: sticky;
 	top: 0;
-	z-index: 50;
+	z-index: 60;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -187,7 +185,7 @@ body {
 	box-shadow: 0 8px 30px rgba(226, 55, 68, 0.12)
 }
 
-/* ---------- Grid menu ---------- */
+/* ---------- Grid menu (forced 2 columns on mobile) ---------- */
 .grid-menu {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -218,20 +216,23 @@ body {
 
 .card-media {
 	width: 100%;
-	height: 120px;
+	height: 110px;
 	border-radius: 12px;
 	overflow: hidden;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--glass)
+	background: var(--glass);
 }
 
 .card-media .menu-img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	display: block
+	width: calc(100% - 24px);
+	/* contain mode: add padding inside */
+	height: calc(100% - 24px);
+	object-fit: contain;
+	display: block;
+	border-radius: 10px;
+	background: transparent;
 }
 
 /* body */
@@ -316,13 +317,20 @@ body {
 	transform: translateY(1px)
 }
 
-/* ---------- Hover/focus for desktop ---------- */
+/* hover/focus for desktop */
 .menu-item:hover {
 	box-shadow: 0 18px 50px rgba(11, 18, 32, 0.08)
 }
 
 .menu-item:focus-within .add-cart-btn.floating {
 	box-shadow: 0 18px 50px rgba(226, 55, 68, 0.12)
+}
+
+/* ---------- Hide other pages (so only home grid shows) ---------- */
+#orders,
+#profile,
+#offers {
+	display: none !important;
 }
 
 /* ---------- Cart modal & overlays ---------- */
@@ -477,7 +485,7 @@ body {
 	position: fixed;
 	left: 50%;
 	transform: translateX(-50%);
-	bottom: 94px;
+	bottom: 128px;
 	z-index: 999
 }
 
@@ -500,38 +508,42 @@ body {
 }
 
 /* ---------- Responsive adjustments ---------- */
+/* Force 2 columns for most phones to match your requested look */
 @media (max-width:720px) {
 	.grid-menu {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 12px;
+		grid-template-columns: repeat(2, 1fr) !important;
+		gap: 10px;
 		padding: 12px
 	}
 
 	.card-media {
 		height: 110px
 	}
+
+	.card-media .menu-img {
+		width: calc(100% - 24px);
+		height: calc(100% - 24px);
+	}
 }
 
-@media (max-width:460px) {
+/* Very small screens - still 2 columns but slightly taller images */
+@media (max-width:360px) {
 	.grid-menu {
-		grid-template-columns: repeat(1, 1fr)
+		grid-template-columns: repeat(2, 1fr) !important;
+		gap: 10px;
+		padding: 10px
 	}
 
 	.card-media {
-		height: 160px
+		height: 100px
 	}
 
 	body {
-		padding-bottom: 120px
-	}
-
-	.bottom-nav {
-		left: 8px;
-		right: 8px
+		padding-bottom: 108px
 	}
 }
 
-/* small tweaks for desktop */
+/* Tablet / desktop */
 @media (min-width:1000px) {
 	.grid-menu {
 		grid-template-columns: repeat(3, 1fr);
