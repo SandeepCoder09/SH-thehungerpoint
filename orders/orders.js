@@ -97,3 +97,28 @@ function renderPast(list) {
 }
 
 document.addEventListener("DOMContentLoaded", loadOrders);
+
+// --- Create Test Order ---
+document.getElementById("createTestOrder").addEventListener("click", async () => {
+  const testOrder = {
+    status: "out_for_delivery",
+    createdAt: new Date(),
+    totalAmount: 40,
+    items: [
+      { name: "Momo", qty: 1, price: 10 },
+      { name: "Hot Tea", qty: 1, price: 10 },
+      { name: "Bread Pakoda", qty: 1, price: 10 },
+      { name: "Finger", qty: 1, price: 10 }
+    ],
+    userLocation: { lat: 25.140, lng: 82.570 },
+    riderLocation: { lat: 25.145, lng: 82.575 },
+    eta: 12
+  };
+
+  const id = "order_" + Date.now();
+
+  await firebase.firestore().collection("orders").doc(id).set(testOrder);
+
+  alert("Test Order Created ✔ Now refresh Orders Page");
+  loadOrders();
+});
