@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders — SH The Hunger Point</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/orders/orders.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="/home/firebase-config.js"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <h2>My Orders</h2>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="order-page">
+
+    <!-- ONGOING ORDER -->
+    <section id="ongoingOrder" class="glass-card hidden">
+      <div class="order-status-row">
+        <span class="order-status-badge" id="ongoingStatus">Preparing</span>
+        <span id="ongoingETA" class="order-eta"></span>
+      </div>
+
+      <div id="ongoingItems" class="order-items"></div>
+
+      <div class="order-total">Total: <span id="ongoingTotal">₹0</span></div>
+
+      <button id="trackButton" class="primary-btn">Track Order</button>
+    </section>
+
+    <!-- PAST ORDERS -->
+    <h3 class="section-title">Past Orders</h3>
+    <section id="pastOrders"></section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a href="/home/index.html" class="bn-item">🏠<small>Home</small></a>
+    <a href="/orders/orders.html" class="bn-item active">🧾<small>Orders</small></a>
+    <button id="bottomCartBtn" class="bn-center">🛒</button>
+    <a href="/auth/signup.html" class="bn-item">👤<small>Profile</small></a>
+    <a href="#" class="bn-item">⚙️<small>More</small></a>
+  </nav>
+
+  <script src="/orders/orders.js" defer></script>
+
+</body>
+</html>
