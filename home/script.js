@@ -9,7 +9,7 @@
    ✔ Checkout → Cashfree payment page redirect
    ========================================================== */
 
-const SERVER_URL = "/server/cashfree-server.js"; 
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com"; 
 const PRICE_DEFAULT = 10;
 
 /* DOM shortcuts */
