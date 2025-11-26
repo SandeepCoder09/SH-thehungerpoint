@@ -402,6 +402,30 @@ img {
   font-size: 16px;
 }
 
+/* ---- Cart Top Close Button (X) ---- */
+.cart-close-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f3f3f3;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #444;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.cart-close-btn:active {
+  transform: scale(0.92);
+  background: #e6e6e6;
+}
+
 /* ------------ CART FOOTER (Fixed & Beautiful) ------------ */
 
 .cart-footer {
