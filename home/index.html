@@ -2,18 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>SH - The Hunger Point | Fresh & Fast Food</title>
+  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
+
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- CSS -->
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
+  <script src="/home/firebase-config.js" defer></script>
+
+  <!-- Styles -->
   <link rel="stylesheet" href="/home/style.css" />
 </head>
+
 <body>
 
   <!-- TOP NAV -->
-  <header class="nav" role="banner">
+  <header class="nav">
     <div class="brand">
       <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
       <div class="brand-text">
@@ -23,68 +30,67 @@
     </div>
 
     <div class="header-actions">
-      <div class="lang-wrapper">
-        <button class="lang-icon icon-btn" aria-label="language">🌐</button>
-        <div class="lang-menu" aria-hidden="true">
-          <div onclick="SHTranslate?.setLanguage && SHTranslate.setLanguage('en')">🇬🇧 English</div>
-          <div onclick="SHTranslate?.setLanguage && SHTranslate.setLanguage('hi')">🇮🇳 हिन्दी</div>
-        </div>
-      </div>
+      <button class="lang-btn">🌐 English / हिन्दी</button>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="app-shell" id="appShell">
+  <!-- MAIN AREA -->
+  <main class="app-shell">
 
     <section class="hero-box">
-      <div class="hero-inner">
-        <h1 class="type-h1">Fresh & Fast</h1>
-        <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
+      <h1 class="type-h1">Fresh & Fast</h1>
+      <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
 
-        <div class="search-row">
-          <input id="menuSearch" class="search-input" type="search" placeholder="Search for dishes, e.g. momo, tea" />
-          <button class="icon-btn search-btn" aria-label="search">🔍</button>
-        </div>
+      <!-- SEARCH -->
+      <div class="search-row">
+        <input id="menuSearch" class="search-input" type="search"
+               placeholder="Search for dishes, e.g. momo, tea" />
+        <button class="search-btn">🔍</button>
+      </div>
 
-        <div class="chips" role="tablist" aria-label="Categories">
-          <button class="chip active" data-cat="all">All</button>
-          <button class="chip" data-cat="momos">Momos</button>
-          <button class="chip" data-cat="snacks">Snacks</button>
-          <button class="chip" data-cat="tea">Tea</button>
-          <button class="chip" data-cat="special">Special</button>
-        </div>
+      <!-- CHIPS -->
+      <div class="chips">
+        <button class="chip active" data-cat="all">All</button>
+        <button class="chip" data-cat="momos">Momos</button>
+        <button class="chip" data-cat="snacks">Snacks</button>
+        <button class="chip" data-cat="tea">Tea</button>
+        <button class="chip" data-cat="special">Special</button>
       </div>
     </section>
 
-    <!-- GRID MENU (body scroll) -->
-    <section class="menu grid-menu" id="menuGrid">
+    <!-- MENU GRID -->
+    <section class="grid-menu">
 
-      <!-- Momo -->
+      <!-- ITEM TEMPLATE 1 -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
         <div class="card-media">
-          <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
+          <img src="/home/sh-momo.png" class="menu-img">
         </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Momo</h3>
             <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
           </div>
+
           <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
+
           <div class="card-actions">
-            <div class="qty-pill" role="group" aria-label="Quantity">
-              <button class="qty-btn minus" aria-label="decrease">−</button>
-              <div class="qty-display" aria-live="polite">1</div>
-              <button class="qty-btn plus" aria-label="increase">+</button>
+            <div class="qty-pill">
+              <button class="qty-btn minus">−</button>
+              <span class="qty-display">1</span>
+              <button class="qty-btn plus">+</button>
             </div>
+
             <button class="add-cart-btn">Add</button>
           </div>
         </div>
       </article>
 
-      <!-- Finger -->
+      <!-- ITEM TEMPLATE 2 -->
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
         <div class="card-media">
-          <img src="/home/sh-french-fries.png" class="menu-img" alt="Finger">
+          <img src="/home/sh-french-fries.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -94,19 +100,19 @@
           <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
           <div class="card-actions">
             <div class="qty-pill">
-              <button class="qty-btn minus" aria-label="decrease">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus" aria-label="increase">+</button>
+              <button class="qty-btn minus">−</button>
+              <span class="qty-display">1</span>
+              <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
         </div>
       </article>
 
-      <!-- Hot Tea -->
-      <article class="menu-item" data-item="Tea" data-price="10" data-cat="tea">
+      <!-- ITEM 3 -->
+      <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
         <div class="card-media">
-          <img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea">
+          <img src="/home/sh-hot-tea.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -116,19 +122,19 @@
           <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
           <div class="card-actions">
             <div class="qty-pill">
-              <button class="qty-btn minus" aria-label="decrease">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus" aria-label="increase">+</button>
+              <button class="qty-btn minus">−</button>
+              <span class="qty-display">1</span>
+              <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
         </div>
       </article>
 
-      <!-- Bread Pakoda -->
+      <!-- ITEM 4 -->
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
         <div class="card-media">
-          <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda">
+          <img src="/home/sh-bread-pakoda.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -138,9 +144,9 @@
           <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
           <div class="card-actions">
             <div class="qty-pill">
-              <button class="qty-btn minus" aria-label="decrease">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus" aria-label="increase">+</button>
+              <button class="qty-btn minus">−</button>
+              <span class="qty-display">1</span>
+              <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
@@ -148,61 +154,50 @@
       </article>
 
     </section>
-
   </main>
 
-  <!-- CART OVERLAY + MODAL (above bottom nav) -->
-  <div id="overlay" class="overlay hidden" aria-hidden="true"></div>
+  <!-- OVERLAY -->
+  <div id="overlay" class="overlay hidden"></div>
 
-  <div id="cartModal" class="cart-modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="cart-popup-anim">
-      <header class="cart-modal-head">
+  <!-- CART MODAL -->
+  <div id="cartModal" class="cart-modal hidden">
+    <div class="cart-popup">
+
+      <header class="cart-head">
         <h3>Your Cart</h3>
-        <button id="closeCart" class="icon-btn" aria-label="close">✕</button>
+        <button id="closeCart" class="close-btn">✕</button>
       </header>
 
-      <div id="cartItems" class="cart-items">
-        <p class="empty">Cart is empty</p>
-      </div>
+      <div id="cartItems" class="cart-items"></div>
 
-      <footer class="cart-modal-foot">
+      <footer class="cart-foot">
         <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
-        <div class="cart-modal-actions">
-          <button id="checkoutBtn" class="primary">Checkout</button>
-          <button id="clearCart" class="muted">Clear</button>
-          <button id="closeOnlyBtn" class="muted">Close</button>
-        </div>
+
+        <button id="checkoutBtn" class="primary-btn">Checkout</button>
+        <button id="closeOnlyBtn" class="muted-btn">Close</button>
       </footer>
+
     </div>
   </div>
 
-  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+  <!-- Toast -->
+  <div id="toast-container" class="toast-container"></div>
 
-  <!-- MATERIAL-3 STYLE BOTTOM NAV (blur + rounded) -->
-  <nav class="bottom-nav" role="navigation" aria-label="Main">
-    <button class="bn-item" aria-label="menu">
-      <span>☰</span><small>Menu</small>
-    </button>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bn-item">☰<small>Menu</small></button>
+    <button class="bn-item">🧾<small>Orders</small></button>
 
-    <button class="bn-item" aria-label="orders">
-      <span>🧾</span><small>Orders</small>
-    </button>
+    <button id="bottomCartBtn" class="bn-center">🛒</button>
 
-    <button class="bn-center" id="bottomCartBtn" aria-label="open cart">🛒</button>
-
-    <button class="bn-item" aria-label="profile">
-      <span>👤</span><small>Profile</small>
-    </button>
-
-    <button class="bn-item" aria-label="more">
-      <span>⚙️</span><small>More</small>
-    </button>
+    <button class="bn-item">👤<small>Profile</small></button>
+    <button class="bn-item">⚙️<small>More</small></button>
   </nav>
 
-  <!-- Cashfree SDK -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
+  <!-- Cashfree -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-  <!-- Main script -->
+  <!-- Main Script -->
   <script src="/home/script.js" defer></script>
 </body>
 </html>
