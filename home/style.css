@@ -402,27 +402,52 @@ img {
   font-size: 16px;
 }
 
-/* FOOTER ACTIONS */
-.cart-sheet-foot {
-  padding-top: 8px;
+/* ------------ CART FOOTER (Fixed & Beautiful) ------------ */
+
+.cart-footer {
+  padding: 14px 20px;
+  background: #fff;
   border-top: 1px solid #eee;
+  border-radius: 0 0 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
 }
 
-.cart-sheet-foot .total-row {
+.cart-total-text {
   font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-weight: 600;
+  color: #111;
 }
 
-.checkout-btn {
-  background: #e23744;
-  color: #fff;
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
+.cart-footer-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-clear {
+  flex: 1;
+  background: #f0f0f0;
   border: none;
-  border-radius: 14px;
-  font-weight: 700;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-checkout {
+  flex: 1.4;
+  background: #e23744;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(226,55,68,0.3);
 }
 
 /* -------------------------------------
