@@ -157,7 +157,6 @@ function flyToCart(img) {
 function openCartSheet() {
   $("#overlay").classList.add("active");
   $("#cartSheet").classList.add("active");
-
   document.body.style.overflow = "hidden";
   renderCart();
 }
@@ -170,7 +169,14 @@ function closeCartSheet() {
 
 $("#bottomCartBtn")?.addEventListener("click", openCartSheet);
 $("#overlay")?.addEventListener("click", closeCartSheet);
-$("#closeSheet")?.addEventListener("click", closeCartSheet);
+
+/* FIX: ensure X button always works */
+document.addEventListener("DOMContentLoaded", () => {
+  const xBtn = document.getElementById("closeSheet");
+  if (xBtn) {
+    xBtn.addEventListener("click", closeCartSheet);
+  }
+});
 
 /* MENU ACTIONS (qty + add) */
 function initMenu() {
@@ -267,7 +273,6 @@ async function startCheckoutFlow() {
     const session = data.session;
     const orderId = data.orderId;
 
-    // Cashfree modal
     if (window.Cashfree) {
       const cf = window.Cashfree;
       cf.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
@@ -275,7 +280,6 @@ async function startCheckoutFlow() {
       return showToast("Cashfree SDK missing");
     }
 
-    // Wait for payment message
     const handler = async (e) => {
       const msg = e.data;
 
