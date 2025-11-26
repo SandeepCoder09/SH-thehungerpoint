@@ -1,210 +1,273 @@
 <!doctype html>
 <html lang="en">
-   <head>
-      <meta charset="utf-8" />
-      <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <meta name="theme-color" content="#E23744" />
-      <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-      <!-- Firebase (v8 compatibility global) -->
-      <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-      <script src="/home/firebase-config.js"></script>
-      <!-- CSS -->
-      <link rel="stylesheet" href="/home/style.css" />
-   </head>
-   <body>
-      <header class="nav">
-         <div class="brand">
-            <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
-            <div class="brand-text">
-               <div class="name">The Hunger Point</div>
-               <div class="tag">Family style • Premium • Fast food</div>
-            </div>
-         </div>
-         <div class="header-actions">
-            <button id="cartToggle" class="icon-btn">🛒 <span id="cartCount">0</span></button>
-            <div class="lang-wrapper">
-               <button class="lang-icon">🌐</button>
-               <div class="lang-menu">
-                  <div onclick="SHTranslate.setLanguage('en')">🇬🇧 English</div>
-                  <div onclick="SHTranslate.setLanguage('hi')">🇮🇳 हिन्दी</div>
-               </div>
-            </div>
-         </div>
-      </header>
-      <main class="app-shell">
-         <section class="hero-box">
-            <div class="hero-inner">
-               <h1 class="type-h1">Fresh & Fast</h1>
-               <p class="type-p">Local flavors, served hot — order in seconds.</p>
-            </div>
-         </section>
-         <nav class="top-tabs">
-            <button class="tab active" data-tab="home">Home</button>
-            <button class="tab" data-tab="orders">My Orders</button>
-            <a href="/auth/signup.html" class="tab">Profile</a>
-            <a href="/profile/profile.html" class="tab">Offers</a>
-         </nav>
-         <section id="home" class="page">
-            <section class="menu list-menu">
-               <article class="menu-item" data-item="Momo" data-price="10">
-                  <div class="menu-left">
-                     <div class="menu-img-wrap"><img src="/home/sh-momo.png" class="menu-img" alt="Momo"></div>
-                  </div>
-                  <div class="menu-center">
-                     <h3 class="menu-title">Momo</h3>
-                     <div class="menu-desc">Steam-fresh dumplings • 4 pcs</div>
-                     <div class="price">₹10 <small>/ 4 piece</small></div>
-                  </div>
-                  <div class="menu-right">
-                     <div class="qty-pill">
-                        <button class="qty-btn minus">−</button>
-                        <div class="qty-display">1</div>
-                        <button class="qty-btn plus">+</button>
-                     </div>
-                     <button class="add-cart-btn pill">Add</button>
-                  </div>
-               </article>
-               <article class="menu-item" data-item="Finger" data-price="10">
-                  <div class="menu-left">
-                     <div class="menu-img-wrap"><img src="/home/sh-french-fries.png" class="menu-img" alt="Finger"></div>
-                  </div>
-                  <div class="menu-center">
-                     <h3 class="menu-title">Finger</h3>
-                     <div class="menu-desc">Crispy fries • Plate</div>
-                     <div class="price">₹10 <small>/ plate</small></div>
-                  </div>
-                  <div class="menu-right">
-                     <div class="qty-pill">
-                        <button class="qty-btn minus">−</button>
-                        <div class="qty-display">1</div>
-                        <button class="qty-btn plus">+</button>
-                     </div>
-                     <button class="add-cart-btn pill">Add</button>
-                  </div>
-               </article>
-               <article class="menu-item" data-item="Tea" data-price="10">
-                  <div class="menu-left">
-                     <div class="menu-img-wrap"><img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea"></div>
-                  </div>
-                  <div class="menu-center">
-                     <h3 class="menu-title">Hot Tea</h3>
-                     <div class="menu-desc">Masala / Adrak • Cup</div>
-                     <div class="price">₹10 <small>/ cup</small></div>
-                  </div>
-                  <div class="menu-right">
-                     <div class="qty-pill">
-                        <button class="qty-btn minus">−</button>
-                        <div class="qty-display">1</div>
-                        <button class="qty-btn plus">+</button>
-                     </div>
-                     <button class="add-cart-btn pill">Add</button>
-                  </div>
-               </article>
-               <article class="menu-item" data-item="Bread Pakoda" data-price="10">
-                  <div class="menu-left">
-                     <div class="menu-img-wrap"><img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda"></div>
-                  </div>
-                  <div class="menu-center">
-                     <h3 class="menu-title">Bread Pakoda</h3>
-                     <div class="menu-desc">Crispy & spicy • 1 piece</div>
-                     <div class="price">₹10 <small>/ piece</small></div>
-                  </div>
-                  <div class="menu-right">
-                     <div class="qty-pill">
-                        <button class="qty-btn minus">−</button>
-                        <div class="qty-display">1</div>
-                        <button class="qty-btn plus">+</button>
-                     </div>
-                     <button class="add-cart-btn pill">Add</button>
-                  </div>
-               </article>
-            </section>
-         </section>
-         <section id="orders" class="page hidden">
-            <h2>Your Orders</h2>
-            <div id="pastOrders">No orders yet.</div>
-         </section>
-         <section id="profile" class="page hidden">
-            <h2>Profile</h2>
-            <p>User profile info will appear.</p>
-         </section>
-         <section id="offers" class="page hidden">
-            <h2>Offers</h2>
-            <p>No active offers.</p>
-         </section>
-         <section id="order-status" class="order-status hidden">
-            <h3>Order Confirmed 🎉</h3>
-            <p id="eta-text"></p>
-         </section>
-      </main>
-      <!-- CHECKOUT POPUP, CART MODAL, TOAST, FOOTER remain same -->
-      <!-- (unchanged code from your original - keep those elements and IDs intact) -->
-      <!-- KEEP your original modals, cart markup, and footer here -->
-      <div id="checkoutOverlay" class="overlay hidden"></div>
-      <div id="checkoutModal" class="checkout-modal hidden" aria-hidden="true">
-         <header class="cart-modal-head">
-            <h3>Delivery details</h3>
-            <button id="closeCheckout" class="icon-btn">✕</button>
-         </header>
-         <div class="checkout-body">
-            <label class="checkbox-row">
-            <input type="checkbox" id="useGPS" />
-            Use my current location (recommended)
-            </label>
-            <div class="field">
-               <label for="custName">Name</label>
-               <input id="custName" type="text" placeholder="Your name (optional)">
-            </div>
-            <div class="field">
-               <label for="custPhone">Phone</label>
-               <input id="custPhone" type="tel" placeholder="Phone number (optional)">
-            </div>
-            <div class="field">
-               <label for="custEmail">Email</label>
-               <input id="custEmail" type="email" placeholder="Email (optional)">
-            </div>
-            <div class="field">
-               <label for="custAddress">Delivery address (if not using GPS)</label>
-               <textarea id="custAddress" rows="3" placeholder="House number, street, landmark"></textarea>
-            </div>
-            <div id="checkoutMsg" class="muted" style="margin-top:8px;"></div>
-            <footer class="cart-modal-foot" style="margin-top:12px;">
-               <div style="display:flex;gap:8px;">
-                  <button id="confirmCheckout" class="primary">Confirm & Pay</button>
-                  <button id="cancelCheckout" class="muted">Cancel</button>
-               </div>
-            </footer>
-         </div>
+<head>
+  <meta charset="utf-8" />
+  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#E23744" />
+
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Firebase (v8 compatibility global) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
+  <script src="/home/firebase-config.js" defer></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/home/style.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="brand">
+      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
+      <div class="brand-text">
+        <div class="name">The Hunger Point</div>
+        <div class="tag">Family style • Premium • Fast food</div>
       </div>
-      <div id="overlay" class="overlay hidden"></div>
-      <div id="cartModal" class="cart-modal hidden">
-         <header class="cart-modal-head">
-            <h3>Your Cart</h3>
-            <button id="closeCart" class="icon-btn">✕</button>
-         </header>
-         <div id="cartItems" class="cart-items">
-            <p class="empty">Cart is empty</p>
-         </div>
-         <footer class="cart-modal-foot">
-            <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
-            <div class="cart-modal-actions">
-               <button id="checkoutBtn" class="primary">Checkout</button>
-               <button id="clearCart" class="muted">Clear</button>
-               <button id="closeOnlyBtn" class="muted">Close</button>
-            </div>
-         </footer>
+    </div>
+
+    <div class="header-actions">
+      <button id="cartToggle" class="icon-btn" aria-label="Open cart">🛒 <span id="cartCount">0</span></button>
+
+      <div class="lang-wrapper" aria-hidden="false">
+        <button class="lang-icon icon-btn" aria-haspopup="true" aria-expanded="false">🌐</button>
+        <div class="lang-menu" role="menu" aria-label="Languages">
+          <div role="menuitem" onclick="SHTranslate.setLanguage('en')">🇬🇧 English</div>
+          <div role="menuitem" onclick="SHTranslate.setLanguage('hi')">🇮🇳 हिन्दी</div>
+        </div>
       </div>
-      <div id="toast-container" class="toast-container"></div>
-      <footer class="footer">
-         <p>© 2025 SH — The Hunger Point</p>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero-box">
+      <div class="hero-inner">
+        <h1 class="type-h1">Fresh & Fast</h1>
+        <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
+      </div>
+    </section>
+
+    <nav class="top-tabs" role="tablist">
+      <button class="tab active" data-tab="home" role="tab" aria-selected="true">Home</button>
+      <button class="tab" data-tab="orders" role="tab">My Orders</button>
+      <a href="/auth/signup.html" class="tab" role="tab">Profile</a>
+      <a href="/profile/profile.html" class="tab" role="tab">Offers</a>
+    </nav>
+
+    <section id="home" class="page">
+      <section class="menu list-menu">
+
+        <article class="menu-item" data-item="Momo" data-price="10">
+          <div class="menu-media">
+            <div class="menu-img-wrap">
+              <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
+            </div>
+          </div>
+
+          <div class="menu-body">
+            <div class="menu-row">
+              <h3 class="menu-title">Momo</h3>
+              <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
+            </div>
+            <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney on the side.</p>
+
+            <div class="menu-actions">
+              <div class="qty-pill">
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
+              </div>
+
+              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="menu-item" data-item="Finger" data-price="10">
+          <div class="menu-media">
+            <div class="menu-img-wrap">
+              <img src="/home/sh-french-fries.png" class="menu-img" alt="Finger">
+            </div>
+          </div>
+
+          <div class="menu-body">
+            <div class="menu-row">
+              <h3 class="menu-title">Finger</h3>
+              <div class="menu-price">₹10 <small>/ plate</small></div>
+            </div>
+            <p class="menu-desc">Crispy fries, double-fried for extra crunch — pair with ketchup.</p>
+
+            <div class="menu-actions">
+              <div class="qty-pill">
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
+              </div>
+
+              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="menu-item" data-item="Tea" data-price="10">
+          <div class="menu-media">
+            <div class="menu-img-wrap">
+              <img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea">
+            </div>
+          </div>
+
+          <div class="menu-body">
+            <div class="menu-row">
+              <h3 class="menu-title">Hot Tea</h3>
+              <div class="menu-price">₹10 <small>/ cup</small></div>
+            </div>
+            <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
+
+            <div class="menu-actions">
+              <div class="qty-pill">
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
+              </div>
+
+              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="menu-item" data-item="Bread Pakoda" data-price="10">
+          <div class="menu-media">
+            <div class="menu-img-wrap">
+              <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda">
+            </div>
+          </div>
+
+          <div class="menu-body">
+            <div class="menu-row">
+              <h3 class="menu-title">Bread Pakoda</h3>
+              <div class="menu-price">₹10 <small>/ piece</small></div>
+            </div>
+            <p class="menu-desc">Crispy, spiced batter fry — classic chai-time snack.</p>
+
+            <div class="menu-actions">
+              <div class="qty-pill">
+                <button class="qty-btn minus" aria-label="Decrease">−</button>
+                <div class="qty-display" aria-live="polite">1</div>
+                <button class="qty-btn plus" aria-label="Increase">+</button>
+              </div>
+
+              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+            </div>
+          </div>
+        </article>
+
+      </section>
+    </section>
+
+    <section id="orders" class="page hidden">
+      <h2>Your Orders</h2>
+      <div id="pastOrders">No orders yet.</div>
+    </section>
+
+    <section id="profile" class="page hidden">
+      <h2>Profile</h2>
+      <p>User profile info will appear.</p>
+    </section>
+
+    <section id="offers" class="page hidden">
+      <h2>Offers</h2>
+      <p>No active offers.</p>
+    </section>
+
+    <section id="order-status" class="order-status hidden">
+      <h3>Order Confirmed 🎉</h3>
+      <p id="eta-text"></p>
+    </section>
+  </main>
+
+  <!-- KEEP your original modals, cart markup, toast, footer — unchanged IDs & structure -->
+  <div id="checkoutOverlay" class="overlay hidden"></div>
+
+  <div id="checkoutModal" class="checkout-modal hidden" aria-hidden="true">
+    <header class="cart-modal-head">
+      <h3>Delivery details</h3>
+      <button id="closeCheckout" class="icon-btn">✕</button>
+    </header>
+
+    <div class="checkout-body">
+      <label class="checkbox-row">
+        <input type="checkbox" id="useGPS" />
+        Use my current location (recommended)
+      </label>
+
+      <div class="field">
+        <label for="custName">Name</label>
+        <input id="custName" type="text" placeholder="Your name (optional)">
+      </div>
+
+      <div class="field">
+        <label for="custPhone">Phone</label>
+        <input id="custPhone" type="tel" placeholder="Phone number (optional)">
+      </div>
+
+      <div class="field">
+        <label for="custEmail">Email</label>
+        <input id="custEmail" type="email" placeholder="Email (optional)">
+      </div>
+
+      <div class="field">
+        <label for="custAddress">Delivery address (if not using GPS)</label>
+        <textarea id="custAddress" rows="3" placeholder="House number, street, landmark"></textarea>
+      </div>
+
+      <div id="checkoutMsg" class="muted" style="margin-top:8px;"></div>
+
+      <footer class="cart-modal-foot" style="margin-top:12px;">
+        <div style="display:flex;gap:8px;">
+          <button id="confirmCheckout" class="primary">Confirm & Pay</button>
+          <button id="cancelCheckout" class="muted">Cancel</button>
+        </div>
       </footer>
-      <!-- Cashfree -->
-      <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
-      <!-- Main Script -->
-      <script src="/home/script.js" defer></script>
-      <!-- Translate (if you have) -->
-      <script src="/languages/translate.js" defer></script>
-   </body>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay hidden"></div>
+
+  <div id="cartModal" class="cart-modal hidden">
+    <header class="cart-modal-head">
+      <h3>Your Cart</h3>
+      <button id="closeCart" class="icon-btn">✕</button>
+    </header>
+
+    <div id="cartItems" class="cart-items">
+      <p class="empty">Cart is empty</p>
+    </div>
+
+    <footer class="cart-modal-foot">
+      <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
+
+      <div class="cart-modal-actions">
+        <button id="checkoutBtn" class="primary">Checkout</button>
+        <button id="clearCart" class="muted">Clear</button>
+        <button id="closeOnlyBtn" class="muted">Close</button>
+      </div>
+    </footer>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <footer class="footer">
+    <p>© 2025 SH — The Hunger Point</p>
+  </footer>
+
+  <!-- Cashfree -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
+
+  <!-- Main Script -->
+  <script src="/home/script.js" defer></script>
+
+  <!-- Translate (if you have) -->
+  <script src="/languages/translate.js" defer></script>
+</body>
 </html>
