@@ -7,9 +7,25 @@
 
   <link rel="stylesheet" href="orders.css">
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+  <!-- Firebase Core -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- Firebase Config (ADD THIS HERE) -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
+    authDomain: "sh-the-hunger-point.firebaseapp.com",
+    projectId: "sh-the-hunger-point",
+    storageBucket: "sh-the-hunger-point.firebasestorage.app",
+    messagingSenderId: "401237282420",
+    appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
+    measurementId: "G-4KP3RJ15E9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
 
 </head>
 
