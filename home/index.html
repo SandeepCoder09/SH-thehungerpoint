@@ -2,53 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
+  <title>SH - The Hunger Point | Fresh & Fast Food</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
-
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
-  <script src="/home/firebase-config.js" defer></script>
-
-  <!-- Styles -->
   <link rel="stylesheet" href="/home/style.css" />
 </head>
-
 <body>
 
   <!-- TOP NAV -->
-  <header class="nav">
+  <header class="nav" role="banner">
     <div class="brand">
       <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
       <div class="brand-text">
         <div class="name">The Hunger Point</div>
-        <div class="tag">Family style • Premium • Fast food</div>
+        <div class="tag">Family style · Premium · Fast food</div>
       </div>
     </div>
-
     <div class="header-actions">
-      <button class="lang-btn">🌐 English / हिन्दी</button>
+      <button class="lang-btn">🌐</button>
     </div>
   </header>
 
-  <!-- MAIN AREA -->
-  <main class="app-shell">
-
+  <!-- MAIN -->
+  <main id="appShell" class="app-shell">
     <section class="hero-box">
       <h1 class="type-h1">Fresh & Fast</h1>
       <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
 
-      <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search"
-               placeholder="Search for dishes, e.g. momo, tea" />
+        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea...)">
         <button class="search-btn">🔍</button>
       </div>
 
-      <!-- CHIPS -->
       <div class="chips">
         <button class="chip active" data-cat="all">All</button>
         <button class="chip" data-cat="momos">Momos</button>
@@ -58,44 +45,35 @@
       </div>
     </section>
 
-    <!-- MENU GRID -->
-    <section class="grid-menu">
-
-      <!-- ITEM TEMPLATE 1 -->
+    <!-- GRID MENU -->
+    <section class="grid-menu" id="menuGrid">
+      <!-- Momo -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-        <div class="card-media">
-          <img src="/home/sh-momo.png" class="menu-img">
-        </div>
-
+        <div class="card-media"><img src="/home/sh-momo.png" class="menu-img" alt="Momo"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Momo</h3>
-            <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
+            <div class="menu-price">₹10 <small>/4 pcs</small></div>
           </div>
-
           <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
-
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
               <span class="qty-display">1</span>
               <button class="qty-btn plus">+</button>
             </div>
-
             <button class="add-cart-btn">Add</button>
           </div>
         </div>
       </article>
 
-      <!-- ITEM TEMPLATE 2 -->
+      <!-- Finger -->
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-french-fries.png" class="menu-img">
-        </div>
+        <div class="card-media"><img src="/home/sh-french-fries.png" class="menu-img" alt="Finger"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Finger</h3>
-            <div class="menu-price">₹10 <small>/ plate</small></div>
+            <div class="menu-price">₹10 <small>/plate</small></div>
           </div>
           <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
           <div class="card-actions">
@@ -109,15 +87,13 @@
         </div>
       </article>
 
-      <!-- ITEM 3 -->
+      <!-- Hot Tea -->
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-        <div class="card-media">
-          <img src="/home/sh-hot-tea.png" class="menu-img">
-        </div>
+        <div class="card-media"><img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Hot Tea</h3>
-            <div class="menu-price">₹10 <small>/ cup</small></div>
+            <div class="menu-price">₹10 <small>/cup</small></div>
           </div>
           <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
           <div class="card-actions">
@@ -131,15 +107,13 @@
         </div>
       </article>
 
-      <!-- ITEM 4 -->
+      <!-- Bread Pakoda -->
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-bread-pakoda.png" class="menu-img">
-        </div>
+        <div class="card-media"><img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Bread Pakoda</h3>
-            <div class="menu-price">₹10 <small>/ piece</small></div>
+            <div class="menu-price">₹10 <small>/piece</small></div>
           </div>
           <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
           <div class="card-actions">
@@ -156,48 +130,54 @@
     </section>
   </main>
 
-  <!-- OVERLAY -->
-  <div id="overlay" class="overlay hidden"></div>
+  <!-- BACKDROP (click to close sheet) -->
+  <div id="overlay" class="overlay hidden" aria-hidden="true"></div>
 
-  <!-- CART MODAL -->
-  <div id="cartModal" class="cart-modal hidden">
-    <div class="cart-popup">
+  <!-- BOTTOM SHEET (HALF SCREEN) -->
+  <div id="cartSheet" class="cart-sheet hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sheet-handle" id="sheetHandle" aria-hidden="true"></div>
 
-      <header class="cart-head">
+    <header class="sheet-head">
+      <div>
         <h3>Your Cart</h3>
-        <button id="closeCart" class="close-btn">✕</button>
-      </header>
+        <div id="cartCountText" class="muted small">0 items</div>
+      </div>
+      <div class="sheet-controls">
+        <button id="clearCart" class="muted-btn small">Clear</button>
+        <button id="closeSheet" class="close-btn">✕</button>
+      </div>
+    </header>
 
+    <div id="sheetContent" class="sheet-content">
       <div id="cartItems" class="cart-items"></div>
-
-      <footer class="cart-foot">
-        <div class="cart-total">Total: <span id="cartTotal">₹0</span></div>
-
-        <button id="checkoutBtn" class="primary-btn">Checkout</button>
-        <button id="closeOnlyBtn" class="muted-btn">Close</button>
-      </footer>
-
     </div>
+
+    <footer class="sheet-foot">
+      <div class="sheet-total">Total: <strong id="cartTotal">₹0</strong></div>
+      <div class="sheet-actions">
+        <button id="checkoutBtn" class="primary-btn">Checkout</button>
+      </div>
+    </footer>
   </div>
 
   <!-- Toast -->
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
+  <!-- Bottom nav (Material-3 style) -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main">
     <button class="bn-item">☰<small>Menu</small></button>
     <button class="bn-item">🧾<small>Orders</small></button>
 
-    <button id="bottomCartBtn" class="bn-center">🛒</button>
+    <button id="openCartBtn" class="bn-center" aria-label="Open cart">🛒</button>
 
     <button class="bn-item">👤<small>Profile</small></button>
     <button class="bn-item">⚙️<small>More</small></button>
   </nav>
 
-  <!-- Cashfree -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <!-- Cashfree SDK -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
 
-  <!-- Main Script -->
+  <!-- Main script -->
   <script src="/home/script.js" defer></script>
 </body>
 </html>
