@@ -1,0 +1,164 @@
+/* Base */
+body {
+  margin: 0;
+  font-family: Inter, Arial;
+  background: linear-gradient(180deg, #060c1b, #09121e);
+  color: #e6eef8;
+}
+
+.top-header {
+  padding: 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.order-page {
+  padding: 16px;
+  padding-bottom: 120px;
+}
+
+.section-title {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+.hidden {
+  display: none;
+}
+
+/* Ongoing Order */
+.order-status-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.order-status-badge {
+  background: #ffb74d;
+  color: #000;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.order-eta {
+  color: #b7c4d9;
+}
+
+.order-items {
+  margin-bottom: 12px;
+  line-height: 22px;
+}
+
+.order-total {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: #E23744;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+/* Past Orders */
+.order-card {
+  background: rgba(255,255,255,0.05);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+}
+
+.order-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.order-time {
+  color: #9fb0c8;
+  font-size: 13px;
+}
+
+.reorder-btn {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  background: #E23744;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(12,18,32,0.9);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.bn-item {
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  opacity: 0.7;
+  text-decoration: none;
+}
+
+.bn-item small {
+  display: block;
+  font-size: 11px;
+}
+
+.bn-item.active {
+  opacity: 1;
+}
+
+.bn-center {
+  width: 56px;
+  height: 56px;
+  background: #E23744;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 22px;
+  border: none;
+  position: relative;
+  top: -20px;
+}
