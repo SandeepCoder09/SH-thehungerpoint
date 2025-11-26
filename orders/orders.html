@@ -1,82 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Orders — SH The Hunger Point</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Orders – SH</title>
 
-  <!-- Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
-  <!-- Your firebase config (keeps same path as main app) -->
-  <script src="/home/firebase-config.js" defer></script>
+  <link rel="stylesheet" href="orders.css">
 
-  <link rel="stylesheet" href="/orders/orders.css">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+
 </head>
+
 <body>
 
-  <header class="orders-header">
-    <button class="back-btn" onclick="history.back()">←</button>
-    <h1>Orders</h1>
-    <div class="header-right">
-      <button id="searchToggle" class="icon-btn" title="Search">🔍</button>
-    </div>
+  <header class="top-bar">
+    <a href="../home/index.html" class="back-btn">←</a>
+    <h2>Orders</h2>
+    <span class="search-ico">🔍</span>
   </header>
 
-  <main class="orders-main">
-    <section class="hero">
-      <h2 class="hero-title">Your orders</h2>
-      <p class="hero-sub">Track ongoing orders or reorder past ones.</p>
+  <div class="orders-container">
+    <h3>Your orders</h3>
+    <p class="sub">Track ongoing orders or reorder past ones.</p>
 
-      <div class="search-row hidden" id="searchRow">
-        <input id="ordersSearch" placeholder="Search by item, order id or status" />
-        <button id="searchClear" class="icon-btn">✕</button>
-      </div>
-    </section>
+    <h4>Past orders</h4>
 
-    <!-- ONGOING -->
-    <section id="ongoingContainer" class="card hidden">
-      <div class="ongoing-top">
-        <div>
-          <div class="label">Ongoing order</div>
-          <div id="ongoingId" class="muted small"></div>
-        </div>
-        <div class="status-pill" id="ongoingStatus">Preparing</div>
-      </div>
-
-      <div id="ongoingItems" class="items-list"></div>
-
-      <div class="card-foot">
-        <div class="total">Total: <strong id="ongoingTotal">₹0</strong></div>
-        <div class="foot-actions">
-          <button id="trackBtn" class="btn primary">Track</button>
-          <button id="cancelBtn" class="btn muted">Cancel</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAST ORDERS -->
-    <h3 class="section-title">Past orders</h3>
-    <section id="pastContainer" class="list"></section>
-
-    <!-- Empty state -->
-    <div id="emptyState" class="empty hidden">
-      <p>No orders yet. Tap Menu to start ordering!</p>
-      <a class="btn primary" href="/home/index.html">Open Menu</a>
+    <div id="ordersList" class="order-list">
+      <p class="loading">Loading orders…</p>
     </div>
-  </main>
+  </div>
 
-<button id="createTestOrder" class="test-btn">Create Test Order</button>
+  <!-- TEST BUTTON -->
+  <button id="createTestOrder" class="test-btn">Create Test Order</button>
 
-  <!-- Bottom nav -->
+  <!-- Bottom Navigation same as home -->
   <nav class="bottom-nav">
-    <a class="bn-item" href="/home/index.html">Menu</a>
-    <a class="bn-item" href="/orders/orders.html">Orders</a>
-    <button id="bottomCartBtn" class="bn-center">🛒</button>
-    <a class="bn-item" href="/auth/signup.html">Profile</a>
-    <a class="bn-item" href="#">More</a>
+    <a href="../home/index.html">Menu</a>
+    <a href="orders.html" class="active">Orders</a>
+    <a href="../home/index.html#cart" class="cart-btn">🛒</a>
+    <a href="#">Profile</a>
+    <a href="#">More</a>
   </nav>
 
-  <script src="/orders/orders.js" defer></script>
+  <script src="orders.js"></script>
 </body>
 </html>
