@@ -308,3 +308,20 @@ a {
 	justify-content: center;
 	transform: translateY(-14px)
 }
+
+.test-btn {
+  margin: 20px;
+  padding: 14px 20px;
+  background: #e23744;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  width: calc(100% - 40px);
+  cursor: pointer;
+}
+
+.test-btn:hover {
+  background: #cc1f32;
+}
