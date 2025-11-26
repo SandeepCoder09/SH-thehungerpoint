@@ -162,7 +162,6 @@ body {
 	padding: 14px;
 	max-width: 980px;
 	margin: 0 auto 20px;
-	/* allow scrolling naturally — main/body scroll; cards not fixed height */
 }
 
 /* card */
@@ -175,7 +174,7 @@ body {
 	flex-direction: column;
 	gap: 10px;
 	border: 1px solid rgba(0, 0, 0, 0.03);
-	min-height: 260px;
+	min-height: 240px;
 }
 
 /* image area — cover images fully */
