@@ -293,4 +293,4 @@ function initSwipeToDelete() {
 document.addEventListener("DOMContentLoaded", () => {
   $("#bottomCartBtn")?.addEventListener("click", openModal);
   renderCart();
-});
+}); 
