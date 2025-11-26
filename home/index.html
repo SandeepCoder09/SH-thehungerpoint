@@ -41,127 +41,130 @@
   </header>
 
   <main class="app-shell">
+    <!-- Hero + Search -->
     <section class="hero-box">
       <div class="hero-inner">
         <h1 class="type-h1">Fresh & Fast</h1>
         <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
+
+        <div class="search-row">
+          <input id="menuSearch" class="search-input" type="search" placeholder="Search for dishes, e.g. momo, tea" />
+          <button class="icon-btn search-btn" aria-label="voice or filter">🔍</button>
+        </div>
+
+        <!-- category chips -->
+        <div class="chips" role="tablist" aria-label="Categories">
+          <button class="chip active" data-cat="all">All</button>
+          <button class="chip" data-cat="momos">Momos</button>
+          <button class="chip" data-cat="snacks">Snacks</button>
+          <button class="chip" data-cat="tea">Tea</button>
+          <button class="chip" data-cat="special">Special</button>
+        </div>
       </div>
     </section>
 
-    <nav class="top-tabs" role="tablist">
-      <button class="tab active" data-tab="home" role="tab" aria-selected="true">Home</button>
-      <button class="tab" data-tab="orders" role="tab">My Orders</button>
-      <a href="/auth/signup.html" class="tab" role="tab">Profile</a>
-      <a href="/profile/profile.html" class="tab" role="tab">Offers</a>
-    </nav>
-
+    <!-- GRID MENU -->
     <section id="home" class="page">
-      <section class="menu list-menu">
+      <section class="menu grid-menu">
 
-        <article class="menu-item" data-item="Momo" data-price="10">
-          <div class="menu-media">
-            <div class="menu-img-wrap">
-              <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
-            </div>
+        <!-- card: note class names kept for JS -->
+        <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
+          <div class="card-media">
+            <img src="/home/sh-momo.png" class="menu-img" alt="Momo">
           </div>
 
-          <div class="menu-body">
-            <div class="menu-row">
+          <div class="card-body">
+            <div class="card-row">
               <h3 class="menu-title">Momo</h3>
               <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
             </div>
+
             <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney on the side.</p>
 
-            <div class="menu-actions">
+            <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus" aria-label="Decrease">−</button>
-                <div class="qty-display" aria-live="polite">1</div>
-                <button class="qty-btn plus" aria-label="Increase">+</button>
+                <button class="qty-btn minus">−</button>
+                <div class="qty-display">1</div>
+                <button class="qty-btn plus">+</button>
               </div>
-
-              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+              <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-item="Finger" data-price="10">
-          <div class="menu-media">
-            <div class="menu-img-wrap">
-              <img src="/home/sh-french-fries.png" class="menu-img" alt="Finger">
-            </div>
+        <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
+          <div class="card-media">
+            <img src="/home/sh-french-fries.png" class="menu-img" alt="Finger">
           </div>
 
-          <div class="menu-body">
-            <div class="menu-row">
+          <div class="card-body">
+            <div class="card-row">
               <h3 class="menu-title">Finger</h3>
               <div class="menu-price">₹10 <small>/ plate</small></div>
             </div>
+
             <p class="menu-desc">Crispy fries, double-fried for extra crunch — pair with ketchup.</p>
 
-            <div class="menu-actions">
+            <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus" aria-label="Decrease">−</button>
-                <div class="qty-display" aria-live="polite">1</div>
-                <button class="qty-btn plus" aria-label="Increase">+</button>
+                <button class="qty-btn minus">−</button>
+                <div class="qty-display">1</div>
+                <button class="qty-btn plus">+</button>
               </div>
-
-              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+              <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-item="Tea" data-price="10">
-          <div class="menu-media">
-            <div class="menu-img-wrap">
-              <img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea">
-            </div>
+        <article class="menu-item" data-item="Tea" data-price="10" data-cat="tea">
+          <div class="card-media">
+            <img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea">
           </div>
 
-          <div class="menu-body">
-            <div class="menu-row">
+          <div class="card-body">
+            <div class="card-row">
               <h3 class="menu-title">Hot Tea</h3>
               <div class="menu-price">₹10 <small>/ cup</small></div>
             </div>
+
             <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
 
-            <div class="menu-actions">
+            <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus" aria-label="Decrease">−</button>
-                <div class="qty-display" aria-live="polite">1</div>
-                <button class="qty-btn plus" aria-label="Increase">+</button>
+                <button class="qty-btn minus">−</button>
+                <div class="qty-display">1</div>
+                <button class="qty-btn plus">+</button>
               </div>
-
-              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+              <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
           </div>
         </article>
 
-        <article class="menu-item" data-item="Bread Pakoda" data-price="10">
-          <div class="menu-media">
-            <div class="menu-img-wrap">
-              <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda">
-            </div>
+        <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
+          <div class="card-media">
+            <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda">
           </div>
 
-          <div class="menu-body">
-            <div class="menu-row">
+          <div class="card-body">
+            <div class="card-row">
               <h3 class="menu-title">Bread Pakoda</h3>
               <div class="menu-price">₹10 <small>/ piece</small></div>
             </div>
+
             <p class="menu-desc">Crispy, spiced batter fry — classic chai-time snack.</p>
 
-            <div class="menu-actions">
+            <div class="card-actions">
               <div class="qty-pill">
-                <button class="qty-btn minus" aria-label="Decrease">−</button>
-                <div class="qty-display" aria-live="polite">1</div>
-                <button class="qty-btn plus" aria-label="Increase">+</button>
+                <button class="qty-btn minus">−</button>
+                <div class="qty-display">1</div>
+                <button class="qty-btn plus">+</button>
               </div>
-
-              <button class="add-cart-btn pill" aria-label="Add to cart">Add</button>
+              <button class="add-cart-btn floating" aria-label="Add to cart">Add</button>
             </div>
           </div>
         </article>
 
+        <!-- add more items as needed with same structure -->
       </section>
     </section>
 
@@ -256,6 +259,15 @@
   </div>
 
   <div id="toast-container" class="toast-container"></div>
+
+  <!-- bottom nav (FoodGo style) -->
+  <nav class="bottom-nav" role="navigation" aria-label="Bottom navigation">
+    <button class="bn-item"><span>☰</span><small>Menu</small></button>
+    <button class="bn-item"><span>🧾</span><small>Orders</small></button>
+    <button class="bn-center" aria-label="Open cart">🛒</button>
+    <button class="bn-item"><span>👤</span><small>Profile</small></button>
+    <button class="bn-item"><span>⚙️</span><small>More</small></button>
+  </nav>
 
   <footer class="footer">
     <p>© 2025 SH — The Hunger Point</p>
