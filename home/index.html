@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>SH - The Hunger Point | Fresh & Fast Food</title>
+  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
+
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
+
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <link rel="stylesheet" href="/home/style.css" />
+  <!-- CSS (FORCE RELOAD v=7) -->
+  <link rel="stylesheet" href="/home/style.css?v=7" />
+
+  <!-- Cashfree SDK -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
+
 <body>
 
   <!-- TOP NAV -->
-  <header class="nav" role="banner">
+  <header class="nav">
     <div class="brand">
       <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
       <div class="brand-text">
@@ -20,22 +27,30 @@
         <div class="tag">Family style · Premium · Fast food</div>
       </div>
     </div>
+
     <div class="header-actions">
-      <button class="lang-btn">🌐</button>
+      <div class="lang-wrapper">
+        <button class="lang-btn">🌐</button>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main id="appShell" class="app-shell">
+  <!-- MAIN APP -->
+  <main class="app-shell">
+
+    <!-- HERO -->
     <section class="hero-box">
       <h1 class="type-h1">Fresh & Fast</h1>
       <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
 
+      <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea...)">
-        <button class="search-btn">🔍</button>
+        <input id="menuSearch" class="search-input" type="search"
+          placeholder="Search dishes (momo, tea…)" />
+        <button class="search-icon">🔍</button>
       </div>
 
+      <!-- CATEGORY CHIPS -->
       <div class="chips">
         <button class="chip active" data-cat="all">All</button>
         <button class="chip" data-cat="momos">Momos</button>
@@ -45,21 +60,27 @@
       </div>
     </section>
 
-    <!-- GRID MENU -->
-    <section class="grid-menu" id="menuGrid">
-      <!-- Momo -->
+    <!-- MENU GRID -->
+    <section class="menu grid-menu">
+
+      <!-- ITEM 1 -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-        <div class="card-media"><img src="/home/sh-momo.png" class="menu-img" alt="Momo"></div>
+        <div class="card-media">
+          <img src="/home/sh-momo.png" class="menu-img">
+        </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Momo</h3>
-            <div class="menu-price">₹10 <small>/4 pcs</small></div>
+            <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
           </div>
+
           <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
-              <span class="qty-display">1</span>
+              <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
@@ -67,19 +88,24 @@
         </div>
       </article>
 
-      <!-- Finger -->
+      <!-- ITEM 2 -->
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-        <div class="card-media"><img src="/home/sh-french-fries.png" class="menu-img" alt="Finger"></div>
+        <div class="card-media">
+          <img src="/home/sh-french-fries.png" class="menu-img">
+        </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Finger</h3>
-            <div class="menu-price">₹10 <small>/plate</small></div>
+            <div class="menu-price">₹10 <small>/ plate</small></div>
           </div>
+
           <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
-              <span class="qty-display">1</span>
+              <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
@@ -87,19 +113,24 @@
         </div>
       </article>
 
-      <!-- Hot Tea -->
+      <!-- ITEM 3 -->
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-        <div class="card-media"><img src="/home/sh-hot-tea.png" class="menu-img" alt="Hot Tea"></div>
+        <div class="card-media">
+          <img src="/home/sh-hot-tea.png" class="menu-img">
+        </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Hot Tea</h3>
-            <div class="menu-price">₹10 <small>/cup</small></div>
+            <div class="menu-price">₹10 <small>/ cup</small></div>
           </div>
+
           <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
-              <span class="qty-display">1</span>
+              <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
@@ -107,19 +138,24 @@
         </div>
       </article>
 
-      <!-- Bread Pakoda -->
+      <!-- ITEM 4 -->
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-        <div class="card-media"><img src="/home/sh-bread-pakoda.png" class="menu-img" alt="Bread Pakoda"></div>
+        <div class="card-media">
+          <img src="/home/sh-bread-pakoda.png" class="menu-img">
+        </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Bread Pakoda</h3>
-            <div class="menu-price">₹10 <small>/piece</small></div>
+            <div class="menu-price">₹10 <small>/ piece</small></div>
           </div>
+
           <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
-              <span class="qty-display">1</span>
+              <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
             <button class="add-cart-btn">Add</button>
@@ -130,54 +166,53 @@
     </section>
   </main>
 
-  <!-- BACKDROP (click to close sheet) -->
-  <div id="overlay" class="overlay hidden" aria-hidden="true"></div>
+  <!-- OVERLAY -->
+  <div id="overlay" class="overlay"></div>
 
-  <!-- BOTTOM SHEET (HALF SCREEN) -->
-  <div id="cartSheet" class="cart-sheet hidden" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="sheet-handle" id="sheetHandle" aria-hidden="true"></div>
+  <!-- BOTTOM SHEET CART -->
+  <div id="cartSheet" class="cart-sheet">
 
-    <header class="sheet-head">
-      <div>
-        <h3>Your Cart</h3>
-        <div id="cartCountText" class="muted small">0 items</div>
-      </div>
-      <div class="sheet-controls">
-        <button id="clearCart" class="muted-btn small">Clear</button>
-        <button id="closeSheet" class="close-btn">✕</button>
-      </div>
-    </header>
+    <!-- Drag indicator -->
+    <div class="sheet-handle"></div>
 
-    <div id="sheetContent" class="sheet-content">
-      <div id="cartItems" class="cart-items"></div>
+    <div class="sheet-head">
+      <h3>Your Cart</h3>
+      <button id="closeSheet" class="close-btn">✕</button>
     </div>
 
-    <footer class="sheet-foot">
-      <div class="sheet-total">Total: <strong id="cartTotal">₹0</strong></div>
-      <div class="sheet-actions">
-        <button id="checkoutBtn" class="primary-btn">Checkout</button>
+    <div id="cartItems" class="cart-items">
+      <p class="empty">Cart is empty</p>
+    </div>
+
+    <div class="sheet-footer">
+      <div class="total-row">
+        <span>Total:</span>
+        <strong id="cartTotal">₹0</strong>
       </div>
-    </footer>
+
+      <div class="sheet-actions">
+        <button id="clearCart" class="muted">Clear</button>
+        <button id="checkoutBtn" class="primary">Checkout</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+  <!-- Floating Cart Button -->
+  <nav class="bottom-nav">
+    <button class="bn-item"><span>☰</span><small>Menu</small></button>
+    <button class="bn-item"><span>🧾</span><small>Orders</small></button>
 
-  <!-- Bottom nav (Material-3 style) -->
-  <nav class="bottom-nav" role="navigation" aria-label="Main">
-    <button class="bn-item">☰<small>Menu</small></button>
-    <button class="bn-item">🧾<small>Orders</small></button>
+    <button class="bn-center" id="bottomCartBtn">🛒</button>
 
-    <button id="openCartBtn" class="bn-center" aria-label="Open cart">🛒</button>
-
-    <button class="bn-item">👤<small>Profile</small></button>
-    <button class="bn-item">⚙️<small>More</small></button>
+    <button class="bn-item"><span>👤</span><small>Profile</small></button>
+    <button class="bn-item"><span>⚙️</span><small>More</small></button>
   </nav>
 
-  <!-- Cashfree SDK -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
+  <!-- Toast -->
+  <div id="toast-container" class="toast-container"></div>
 
-  <!-- Main script -->
-  <script src="/home/script.js" defer></script>
+  <!-- MAIN JS -->
+  <script src="/home/script.js?v=7"></script>
+
 </body>
 </html>
