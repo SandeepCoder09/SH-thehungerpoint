@@ -1,59 +1,54 @@
-<!-- rider/index.html -->
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>Rider Dashboard — SH</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./rider.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/rider/rider.css">
 </head>
 <body>
-  <header class="r-top">
-    <div class="left">
-      <button id="btnBack" class="icon" title="Back">←</button>
-      <div class="title">Rider Dashboard</div>
+
+<header class="topbar">
+  <button class="back-btn" onclick="location.href='/home/index.html'">←</button>
+  
+  <div class="profile-box">
+    <img id="riderPhoto" class="avatar" src="/home/SH-Favicon.png">
+    <div class="info">
+      <div id="riderName">Rider</div>
+      <div id="riderEmail" class="subtext"></div>
     </div>
-    <div class="right">
-      <div class="meta">ID: <span id="riderIdSpan">—</span></div>
-      <button id="btnLogout" class="btn ghost">Logout</button>
-    </div>
-  </header>
+  </div>
 
-  <main class="r-body">
-    <section class="panel map-panel">
-      <div id="map" class="map-placeholder">Loading map…</div>
-    </section>
+  <div class="right">
+    <!-- Online / Offline Switch -->
+    <label class="switch">
+      <input type="checkbox" id="onlineToggle">
+      <span class="slider"></span>
+    </label>
+    <span id="onlineStatus">Offline</span>
 
-    <section class="panel status-panel">
-      <div class="row">
-        <div><strong>Connected:</strong> <span id="connStatus">—</span></div>
-        <div><strong>Active Order:</strong> <span id="activeOrder">—</span></div>
-      </div>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </div>
+</header>
 
-      <div class="row controls">
-        <button id="btnAcceptSelected" class="btn ghost">Accept selected</button>
-        <button id="btnStartTrip" class="btn">Start trip</button>
-        <button id="btnDeliver" class="btn">Mark delivered</button>
-      </div>
+<main>
+  <div id="map" class="map">Loading map…</div>
 
-      <div class="row logs">
-        <div id="logArea" class="muted">Logs appear here.</div>
-      </div>
-    </section>
+  <section class="controls">
+    <div>Connected: <span id="conn">No</span></div>
+    <div>Active Order: <span id="activeOrder">—</span></div>
 
-    <section class="panel orders-panel">
-      <h3>Assigned / Available Orders</h3>
-      <div id="ordersList" class="orders">Loading…</div>
-    </section>
-  </main>
+    <button id="btnAccept" class="btn dark">Accept selected</button>
+    <button id="btnStart" class="btn red">Start trip</button>
+    <button id="btnMark" class="btn green">Mark delivered</button>
+  </section>
 
-  <script type="module" src="./firebase.js"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <section class="orders">
+    <h3>Assigned / Available Orders</h3>
+    <div id="ordersList">Loading…</div>
+  </section>
+</main>
 
-  <script type="module" src="./socket-client.js"></script>
-  <script type="module" src="./rider-gps.js"></script>
-  <script type="module" src="./rider.js"></script>
+<script type="module" src="/rider/rider.js"></script>
 </body>
 </html>
