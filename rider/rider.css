@@ -1,177 +1,46 @@
-/* rider/rider.css */
-:root {
-	--bg: #071028;
-	--card: #071726;
-	--accent: #E23744;
-	--muted: #9fb0c8;
-	--text: #e6eef8;
-	--success: #2ecc71;
-}
-
-* {
-	box-sizing: border-box
-}
-
 body {
-	margin: 0;
-	font-family: Inter, system-ui, Arial;
-	background: linear-gradient(180deg, #071028, #05121a);
-	color: var(--text);
-	min-height: 100vh
+  margin: 0;
+  background: #050f1f;
+  font-family: Inter, Arial;
+  color: #fff;
 }
 
 .topbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 12px 16px;
-	background: linear-gradient(90deg, #081a2a, #071726);
-	box-shadow: 0 6px 18px rgba(0, 0, 0, .5)
-}
-
-.topbar .title {
-	font-weight: 700
-}
-
-.topbar .right {
-	display: flex;
-	gap: 12px;
-	align-items: center
-}
-
-.rider-info {
-	display: flex;
-	gap: 10px;
-	align-items: center
+  background: #E23744;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .avatar {
-	width: 56px;
-	height: 56px;
-	border-radius: 999px;
-	border: 2px solid rgba(255, 255, 255, .05);
-	object-fit: cover
-}
-
-.meta {
-	line-height: 1
-}
-
-.name {
-	font-weight: 700
-}
-
-.small {
-	font-size: 13px;
-	color: var(--muted)
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  margin-right: 12px;
 }
 
 .dot {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	border-radius: 999px;
-	margin: 0 6px;
-	vertical-align: middle;
-	background: gray
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
-.btn {
-	padding: 8px 12px;
-	border-radius: 8px;
-	border: none;
-	cursor: pointer;
-	background: rgba(255, 255, 255, 0.04);
-	color: var(--text)
-}
-
-.btn.primary {
-	background: var(--accent);
-	color: #fff
-}
-
-.btn.success {
-	background: var(--success);
-	color: #fff
-}
-
-.btn.ghost {
-	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.04)
-}
-
-.container {
-	padding: 16px;
-	display: grid;
-	grid-template-columns: 1fr 360px;
-	grid-auto-rows: min-content;
-	gap: 16px
-}
-
-@media (max-width:900px) {
-	.container {
-		grid-template-columns: 1fr
-	}
-}
-
-.map-card {
-	background: var(--card);
-	padding: 12px;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
-}
+.dot.on { background: #00ff7b; }
+.dot.off { background: #777; }
 
 .map {
-	height: 360px;
-	border-radius: 10px;
-	overflow: hidden
+  width: 100%;
+  height: 300px;
+  margin-top: 15px;
 }
 
-.controls {
-	background: var(--card);
-	padding: 12px;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
+.actions button {
+  margin: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
 }
 
-.row {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 8px
-}
-
-.actions {
-	display: flex;
-	gap: 8px;
-	margin: 12px 0
-}
-
-.orders-panel {
-	background: var(--card);
-	padding: 12px;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
-}
-
-.orders-list {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	max-height: 360px;
-	overflow: auto;
-	padding-top: 6px
-}
-
-.order-card {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px;
-	border-radius: 8px;
-	background: rgba(255, 255, 255, 0.02)
-}
-
-.order-card .small {
-	color: var(--muted)
-}
+.red { background: #dd3333; }
+.green { background: #28b463; }
