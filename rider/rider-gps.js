@@ -1,67 +1,64 @@
-// rider-gps.js
-import { } from "./firebase.js";
+// rider/rider-gps.js
+// GPS helper — separate module (option A). Exposes window.RIDER_GPS with start/stop/getCurrentPosition/sendOnce
+import { getSocket } from "./socket-client.js";
 
-const riderId = localStorage.getItem("riderId");
+const DEFAULT_INTERVAL = 5000; // ms
 
-function buildLocationPayload(pos) {
-  return {
-    riderId,
-    lat: pos.coords.latitude,
-    lng: pos.coords.longitude,
-    accuracy: pos.coords.accuracy,
-    speed: pos.coords.speed || 0,
-    heading: pos.coords.heading || null,
-    timestamp: Date.now(),
-    orderId: localStorage.getItem("activeOrderId") || null
-  };
-}
+const RIDER_GPS = {
+  watchId: null,
+  timer: null,
+  interval: DEFAULT_INTERVAL,
+  running: false,
 
-function sendLocation(payload) {
-  const API_BASE = window.SH?.API_BASE ?? "";
+  async getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error("Geolocation not supported"));
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
+    });
+  },
 
-  if (window.socket && window.socket.connected) {
-    window.socket.emit("rider:location", payload);
-  } else {
-    fetch(API_BASE + "/track/location", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).catch(() => {});
-  }
-}
+  start(intervalMs = DEFAULT_INTERVAL) {
+    this.interval = intervalMs;
+    if (this.running) return;
+    this.running = true;
 
-let watchId = null;
+    // immediate send
+    this.sendOnce().catch((e) => console.warn("RIDER_GPS immediate send error", e));
 
-function startContinuousTracking() {
-  if (watchId !== null) return;
+    this.timer = setInterval(() => {
+      this.sendOnce().catch((e) => console.warn("RIDER_GPS send error", e));
+    }, this.interval);
+  },
 
-  watchId = navigator.geolocation.watchPosition(
-    (pos) => sendLocation(buildLocationPayload(pos)),
-    () => {},
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
-  );
-}
+  stop() {
+    this.running = false;
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  },
 
-function getSingleLocation() {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => sendLocation(buildLocationPayload(pos)),
-    () => {},
-    { enableHighAccuracy: true, timeout: 8000 }
-  );
-}
-
-function startGPS() {
-  if (!riderId) return;
-  getSingleLocation();
-  startContinuousTracking();
-}
-
-document.addEventListener("socket:connected", startGPS);
-
-window.startGPS = startGPS;
-window.stopGPS = () => {
-  if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
+  async sendOnce() {
+    const socket = getSocket();
+    if (!socket || !socket.connected) {
+      // no socket, skip
+      return;
+    }
+    try {
+      const pos = await this.getCurrentPosition();
+      const payload = {
+        riderId: localStorage.getItem("sh_rider_id"),
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        timestamp: Date.now()
+      };
+      socket.emit("rider:location", payload);
+      return payload;
+    } catch (err) {
+      throw err;
+    }
   }
 };
+
+window.RIDER_GPS = RIDER_GPS;
+export default RIDER_GPS;
