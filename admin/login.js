@@ -1,63 +1,57 @@
-const API = "https://sh-thehungerpoint.onrender.com";
+// admin/login.js
+const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
 
-const form = document.getElementById("loginForm");
-const msg = document.getElementById("loginMsg");
-const btn = document.querySelector(".login-btn");
+const inputEmail = document.getElementById("inputEmail");
+const inputPassword = document.getElementById("inputPassword");
+const btnLogin = document.getElementById("btnLogin");
+const loginMsg = document.getElementById("loginMsg");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+function setMsg(txt) { loginMsg.textContent = txt || ""; }
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+btnLogin.addEventListener("click", async () => {
+  setMsg("");
+  const email = (inputEmail.value || "").trim();
+  const password = (inputPassword.value || "").trim();
 
-  // Disable button + start animation
-  btn.disabled = true;
-  btn.innerHTML = `<div class="loader"></div> Logging in...`;
-  btn.classList.add("loading");
+  if (!email || !password) {
+    setMsg("Enter email & password");
+    return;
+  }
 
-  msg.textContent = "";
-  msg.style.color = "#ffecec";
+  btnLogin.disabled = true;
+  btnLogin.textContent = "Signing in...";
 
   try {
-    const res = await fetch(API + "/admin/login", {
+    const res = await fetch(API_BASE + "/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
-
-    if (!res.ok || !data.ok) {
-      // Failed
-      msg.textContent = data.error || "Invalid email or password";
-      msg.style.color = "#ffb3b3";
-
-      btn.disabled = false;
-      btn.classList.remove("loading");
-      btn.innerHTML = "Sign In";
+    if (!res.ok || data.ok === false) {
+      setMsg(data.error || "Invalid credentials");
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Login";
       return;
     }
 
-    // Success animation
-    msg.textContent = "Login successful!";
-    msg.style.color = "#d4ffd9";
+    // store token
+    const token = data.token;
+    if (!token) {
+      setMsg("No token returned from server");
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Login";
+      return;
+    }
 
-    btn.innerHTML = `✔ Logged in`;
-    btn.style.background = "#2ecc71";
-    btn.style.color = "#fff";
-
-    localStorage.setItem("admin_jwt", data.token);
-
-    setTimeout(() => {
-      window.location.href = "/admin/index.html";
-    }, 900);
-
+    localStorage.setItem("adminToken", token);
+    // redirect to admin dashboard
+    window.location.href = "/admin/index.html";
   } catch (err) {
-    msg.textContent = "Server error. Please try again.";
-    msg.style.color = "#ffb3b3";
-
-    btn.disabled = false;
-    btn.classList.remove("loading");
-    btn.innerHTML = "Sign In";
+    console.error("login error", err);
+    setMsg("Server error");
+    btnLogin.disabled = false;
+    btnLogin.textContent = "Login";
   }
 });
