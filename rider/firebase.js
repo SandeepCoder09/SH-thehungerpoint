@@ -1,6 +1,9 @@
-// /rider/firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+// rider/firebase.js
+// Uses the firebase config you provided earlier.
+// Make sure to include this before any file that uses firebase.
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
@@ -13,4 +16,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+export { db, doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocs };
