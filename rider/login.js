@@ -1,49 +1,33 @@
-// rider/login.js
-const SERVER_BASE = window.SH?.API_BASE || "https://sh-thehungerpoint.onrender.com";
+import { db, doc, getDoc } from "./firebase.js";
 
-const elEmail = document.getElementById("email");
-const elPass = document.getElementById("password");
-const btnLogin = document.getElementById("btnLogin");
-const btnDemo = document.getElementById("btnDemo");
+const emailEl = document.getElementById("email");
+const passEl = document.getElementById("password");
 const msg = document.getElementById("msg");
+const btn = document.getElementById("btnLogin");
 
-btnDemo.addEventListener("click", () => {
-  elEmail.value = "harshharshkumar624@gmail.com";
-  elPass.value = "password"; // fill with demo - replace with actual
-});
+btn.addEventListener("click", login);
 
-btnLogin.addEventListener("click", async () => {
-  const email = (elEmail.value || "").trim();
-  const password = (elPass.value || "").trim();
-  if (!email || !password) {
-    msg.textContent = "Please enter email and password";
-    return;
-  }
+async function login() {
+  const email = emailEl.value.trim();
+  const pass = passEl.value.trim();
+  msg.textContent = "";
 
-  msg.textContent = "Signing in…";
+  if (!email || !pass) return msg.textContent = "Enter email & password";
 
-  try {
-    const res = await fetch(SERVER_BASE + "/rider/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (!data.ok) {
-      msg.textContent = data.error || "Login failed";
-      return;
-    }
+  const riderRef = doc(db, "riders", email);
+  const snap = await getDoc(riderRef);
 
-    // server returns { ok:true, riderId, token }
-    // NOTE: riderId returned here is rider doc id (as server earlier implemented)
-    const docId = data.riderId || email;
-    localStorage.setItem("sh_rider_id", docId);
-    localStorage.setItem("sh_rider_token", data.token || "");
+  if (!snap.exists()) return msg.textContent = "Account not found";
 
-    msg.textContent = "Logged in — redirecting…";
-    setTimeout(() => location.href = "./index.html", 400);
-  } catch (err) {
-    console.error(err);
-    msg.textContent = "Network error";
-  }
-});
+  const r = snap.data();
+
+  if (!r.approved) return msg.textContent = "Not approved by admin";
+  if (pass !== r.passwordHash) return msg.textContent = "Wrong password";
+
+  localStorage.setItem("sh_rider_email", email);
+  localStorage.setItem("sh_rider_id", r.riderId);
+  localStorage.setItem("sh_rider_name", r.name);
+
+  // redirect
+  window.location.href = "./index.html";
+}
