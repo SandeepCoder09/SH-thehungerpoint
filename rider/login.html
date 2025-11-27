@@ -1,50 +1,40 @@
 <!-- rider/login.html -->
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Rider Login — SH</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./login.css" />
 </head>
 <body>
-  <div class="card">
-    <h2>Rider Login</h2>
-    <input id="identifier" placeholder="Email or phone" />
-    <input id="password" placeholder="Password" type="password" />
-    <button id="btnLogin">Sign in</button>
-    <div class="muted">Make sure your rider record exists and is approved in Firestore.</div>
-  </div>
+  <main class="login-shell">
+    <div class="card">
+      <img src="/home/sh-thehungerpoint.png" class="logo" alt="SH" />
+      <h1>Rider sign in</h1>
+      <p class="muted">Use phone number or email + password</p>
 
-  <script>
-    const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
-    const btn = document.getElementById("btnLogin");
-    btn.addEventListener("click", async () => {
-      const identifier = document.getElementById("identifier").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (!identifier || !password) return alert("Enter credentials");
+      <form id="loginForm" class="form" autocomplete="on">
+        <label>
+          Phone or Email
+          <input id="identifier" name="identifier" type="text" inputmode="email" placeholder="phone or email" required />
+        </label>
 
-      btn.textContent = "Signing in...";
-      try {
-        const res = await fetch(`${SERVER_URL}/rider/login`, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({ email: identifier, password, phone: identifier })
-        });
-        const j = await res.json();
-        if (!j.ok) {
-          alert(j.error || "Login failed");
-          btn.textContent = "Sign in";
-          return;
-        }
-        localStorage.setItem("riderToken", j.token);
-        localStorage.setItem("riderId", j.riderId);
-        location.href = "dashboard.html";
-      } catch (e) {
-        console.error(e);
-        alert("Login error");
-        btn.textContent = "Sign in";
-      }
-    });
-  </script>
+        <label>
+          Password
+          <input id="password" name="password" type="password" placeholder="Password" required />
+        </label>
+
+        <div class="actions">
+          <button id="btnLogin" type="submit" class="btn primary">Sign in</button>
+        </div>
+      </form>
+
+      <div id="msg" class="msg" aria-live="polite"></div>
+      <small class="muted">Make sure your rider record exists and is approved in Firestore.</small>
+    </div>
+  </main>
+
+  <script type="module" src="./login.js"></script>
 </body>
 </html>
