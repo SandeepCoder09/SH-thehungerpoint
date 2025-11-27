@@ -6,13 +6,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Leaflet (small preview maps if needed) -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Admin CSS (updated theme) -->
   <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
+  <script>
+    // quick guard — redirect to login if no token
+    (function(){
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        window.location.href = "/admin/login.html";
+      }
+    })();
+  </script>
+
   <div class="topbar">
     <div class="top-left">
       <img src="/home/sh-thehungerpoint.png" class="top-logo" alt="SH" />
@@ -24,6 +33,7 @@
       <div class="card small">Active: <strong id="cardActive">0</strong></div>
       <div class="card small">Delivered: <strong id="cardDelivered">0</strong></div>
       <button id="btnRefresh" class="btn ghost">Refresh</button>
+      <button id="btnLogout" class="btn ghost">Logout</button>
     </div>
   </div>
 
@@ -37,9 +47,7 @@
     <section class="left-col">
       <div class="panel">
         <h3>Orders (live)</h3>
-        <div id="ordersList" class="orders-list">
-          Loading orders…
-        </div>
+        <div id="ordersList" class="orders-list">Loading orders…</div>
       </div>
     </section>
 
@@ -63,7 +71,7 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- admin logic (module) -->
+  <!-- admin logic -->
   <script type="module" src="/admin/admin.js"></script>
 </body>
 </html>
