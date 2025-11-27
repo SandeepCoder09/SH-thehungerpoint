@@ -1,4 +1,3 @@
-// server/cashfree-server.js
 /**
  * SH — Cashfree + Firebase Admin + Rider Login + Socket.IO
  * Hardened / improved version (keeps backwards compatibility)
@@ -13,9 +12,9 @@ import fetch from "node-fetch";
 import http from "http";
 import { Server } from "socket.io";
 
-// -----------------------------
-// Helpers
-// -----------------------------
+/* -----------------------------------
+   Helpers
+----------------------------------- */
 function rebuildPrivateKey(raw) {
   if (!raw) return null;
   return raw.includes("\\n") ? raw.replace(/\\n/g, "\n") : raw;
@@ -42,8 +41,6 @@ const CF_BASE =
     ? "https://sandbox.cashfree.com"
     : "https://api.cashfree.com";
 
-const ADMIN_HELPER_TOKEN = process.env.ADMIN_HELPER_TOKEN || ""; // optional guard for create-test route
-
 const safeJson = (res, status, obj) => res.status(status).json(obj);
 
 function requireAdminToken(req, res, next) {
@@ -58,9 +55,9 @@ function requireAdminToken(req, res, next) {
   }
 }
 
-// -----------------------------
-// Firebase admin init
-// -----------------------------
+/* -----------------------------------
+   Firebase Admin Init
+----------------------------------- */
 let db = null;
 try {
   const serviceAccount = {
@@ -84,19 +81,46 @@ try {
   console.error("🔥 Firebase init failed:", err.message || err);
 }
 
-// -----------------------------
-// Express + Socket setup
-// -----------------------------
+/* -----------------------------------
+   Express + Socket Setup
+----------------------------------- */
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
-// -----------------------------
-// Small utility route: generate bcrypt hash (dev only)
-// NOTE: Keep behind firewall or remove in production
-// -----------------------------
+/* -----------------------------------
+   CREATE TEST ORDER (New Route)
+----------------------------------- */
+app.post("/create-test-order", async (req, res) => {
+  try {
+    if (!db) return res.status(500).json({ ok: false, error: "Firestore not initialized" });
+
+    const ref = await db.collection("orders").add({
+      items: [
+        { name: "Momo", qty: 2, price: 10 },
+        { name: "Tea", qty: 1, price: 10 }
+      ],
+      totalAmount: 30,
+      status: "preparing",
+      riderId: null,
+      createdAt: admin.firestore.Timestamp.now(),
+      updatedAt: admin.firestore.Timestamp.now()
+    });
+
+    await ref.update({ orderId: ref.id });
+
+    return res.json({ ok: true, orderId: ref.id });
+  } catch (error) {
+    console.error("create-test-order error:", error);
+    return res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
+/* -----------------------------------
+   Dev helper: Make bcrypt hash
+----------------------------------- */
 app.get("/__makehash", async (req, res) => {
   try {
     const pw = req.query.pw || "";
@@ -109,13 +133,11 @@ app.get("/__makehash", async (req, res) => {
   }
 });
 
-// -----------------------------
-// Admin login
-// -----------------------------
+/* -----------------------------------
+   Admin login
+----------------------------------- */
 app.post("/admin/login", async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-
     const { email, password } = req.body;
     if (!email || !password) return safeJson(res, 400, { ok: false, error: "Missing inputs" });
 
@@ -128,6 +150,7 @@ app.post("/admin/login", async (req, res) => {
     if (!match) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const token = jwt.sign({ email: adminData.email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
     console.error("Admin login error:", err);
@@ -135,6 +158,9 @@ app.post("/admin/login", async (req, res) => {
   }
 });
 
+/* -----------------------------------
+   Admin verify + approve rider
+----------------------------------- */
 app.get("/admin/verify", requireAdminToken, (req, res) => {
   return safeJson(res, 200, { ok: true, email: req.admin.email });
 });
@@ -145,6 +171,7 @@ app.post("/admin/approve-rider", requireAdminToken, async (req, res) => {
     if (!riderId) return safeJson(res, 400, { ok: false, error: "riderId required" });
 
     await db.collection("riders").doc(riderId).update({ approved: true });
+
     return safeJson(res, 200, { ok: true, message: "Rider approved" });
   } catch (err) {
     console.error("Approve rider error:", err);
@@ -152,52 +179,32 @@ app.post("/admin/approve-rider", requireAdminToken, async (req, res) => {
   }
 });
 
-// -----------------------------
-// Rider helpers: flexible lookup
-// -----------------------------
+/* -----------------------------------
+   Rider Login
+----------------------------------- */
 async function findRiderByEmailOrPhone(identifier) {
   if (!db) return null;
 
-  // try as doc id (email is often the doc id in his repo)
   try {
-    const maybeDoc = await db.collection("riders").doc(identifier).get();
-    if (maybeDoc.exists) return { id: maybeDoc.id, data: maybeDoc.data() };
-  } catch (e) {
-    // ignore
-  }
+    const doc = await db.collection("riders").doc(identifier).get();
+    if (doc.exists) return { id: doc.id, data: doc.data() };
+  } catch {}
 
-  // try by phone field
   try {
     const q = await db.collection("riders").where("phone", "==", identifier).limit(1).get();
-    if (!q.empty) {
-      const d = q.docs[0];
-      return { id: d.id, data: d.data() };
-    }
-  } catch (e) {
-    // ignore
-  }
+    if (!q.empty) return { id: q.docs[0].id, data: q.docs[0].data() };
+  } catch {}
 
-  // try by email field (if doc id not email)
   try {
-    const q2 = await db.collection("riders").where("email", "==", identifier).limit(1).get();
-    if (!q2.empty) {
-      const d = q2.docs[0];
-      return { id: d.id, data: d.data() };
-    }
-  } catch (e) {
-    // ignore
-  }
+    const q = await db.collection("riders").where("email", "==", identifier).limit(1).get();
+    if (!q.empty) return { id: q.docs[0].id, data: q.docs[0].data() };
+  } catch {}
 
   return null;
 }
 
-// -----------------------------
-// Rider login
-// -----------------------------
 app.post("/rider/login", async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-
     const { email, password, phone } = req.body;
     const identifier = (email || phone || "").trim();
     if (!identifier || !password) return safeJson(res, 400, { ok: false, error: "Missing inputs" });
@@ -211,8 +218,6 @@ app.post("/rider/login", async (req, res) => {
     if (!rider.approved) return safeJson(res, 200, { ok: false, error: "Rider not approved yet" });
 
     const storedHash = rider.passwordHash || rider.password;
-    if (!storedHash) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
-
     const match = await bcrypt.compare(password, storedHash);
     if (!match) return safeJson(res, 200, { ok: false, error: "Incorrect password" });
 
@@ -225,10 +230,11 @@ app.post("/rider/login", async (req, res) => {
   }
 });
 
+/* -----------------------------------
+   Rider checks
+----------------------------------- */
 app.get("/rider/check", async (req, res) => {
   try {
-    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
-
     const riderId = req.query.riderId || "";
     if (!riderId) return safeJson(res, 400, { ok: false, error: "riderId required" });
 
@@ -244,51 +250,20 @@ app.get("/rider/check", async (req, res) => {
   }
 });
 
-// -----------------------------
-// Optional helper to create a test rider quickly
-// -----------------------------
-app.post("/rider/create-test", async (req, res) => {
-  try {
-    const token = req.headers["x-admin-helper-token"] || "";
-    if (!ADMIN_HELPER_TOKEN || token !== ADMIN_HELPER_TOKEN) {
-      return safeJson(res, 401, { ok: false, error: "Unauthorized" });
-    }
-
-    const { email, password, name = "Test Rider", phone = "" } = req.body;
-    if (!email || !password) return safeJson(res, 400, { ok: false, error: "email & password required" });
-
-    const hash = await bcrypt.hash(password, 10);
-    const docRef = db.collection("riders").doc(email);
-
-    await docRef.set({
-      email,
-      name,
-      phone,
-      password: hash,
-      approved: true,
-      createdAt: admin.firestore.Timestamp.now()
-    });
-
-    return safeJson(res, 200, { ok: true, message: "Test rider created", email });
-  } catch (err) {
-    console.error("create-test failed:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
-  }
-});
-
-// -----------------------------
-// Cashfree: create order & verify
-// -----------------------------
+/* -----------------------------------
+   Cashfree Payment — Create Order
+----------------------------------- */
 app.post("/create-cashfree-order", async (req, res) => {
   try {
     const { amount, items = [], phone, email } = req.body;
-    if (!amount || Number(amount) <= 0) return safeJson(res, 400, { ok: false, error: "Amount required" });
+    if (!amount || Number(amount) <= 0)
+      return safeJson(res, 400, { ok: false, error: "Amount required" });
 
     const payload = {
       order_amount: Number(amount),
       order_currency: "INR",
       customer_details: {
-        customer_id: phone || (email ? email : "guest"),
+        customer_id: phone || email || "guest",
         customer_phone: phone || undefined,
         customer_email: email || undefined
       }
@@ -306,21 +281,32 @@ app.post("/create-cashfree-order", async (req, res) => {
     });
 
     const data = await cfRes.json();
-    const orderId = data.order_id || data.data?.order_id || data.data?.order?.id;
-    const session = data.payment_session_id || data.data?.payment_session_id || data.data?.session;
+
+    const orderId =
+      data.order_id ||
+      data.data?.order_id ||
+      data.data?.order?.id;
+
+    const session =
+      data.payment_session_id ||
+      data.data?.payment_session_id ||
+      data.data?.session;
 
     if (!orderId || !session) {
-      console.warn("Cashfree create: unexpected response", { status: cfRes.status, body: data });
       return safeJson(res, 500, { ok: false, error: "Cashfree failed", raw: data });
     }
 
     return safeJson(res, 200, { ok: true, orderId, session, raw: data });
+
   } catch (err) {
     console.error("Cashfree create order error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
+/* -----------------------------------
+   Cashfree Payment — Verify Payment
+----------------------------------- */
 app.post("/verify-cashfree-payment", async (req, res) => {
   try {
     const { orderId } = req.body;
@@ -335,37 +321,39 @@ app.post("/verify-cashfree-payment", async (req, res) => {
     });
 
     const data = await resp.json();
-    const status = data.order_status || data.data?.order_status || data.status;
+    const status =
+      data.order_status ||
+      data.data?.order_status ||
+      data.status;
+
     if (String(status).toUpperCase() !== "PAID") {
       return safeJson(res, 200, { ok: false, error: "Payment not completed", raw: data });
     }
 
-    const newOrderId = orderId;
     try {
-      const items = req.body.items || [];
-      const total = items.reduce((s, it) => s + Number(it.price || 0) * Number(it.qty || 1), 0);
-
-      await db.collection("orders").doc(newOrderId).set({
-        items,
-        total,
-        status: "paid",
-        cashfree_order_id: orderId,
-        createdAt: admin.firestore.Timestamp.now()
-      });
-    } catch (e) {
-      console.warn("Warning: failed to persist order to Firestore", e);
+      await db.collection("orders").doc(orderId).set(
+        {
+          status: "paid",
+          cashfree_order_id: orderId,
+          updatedAt: admin.firestore.Timestamp.now()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.warn("Firestore write failed:", err);
     }
 
-    return safeJson(res, 200, { ok: true, orderId: newOrderId, raw: data });
+    return safeJson(res, 200, { ok: true, orderId, raw: data });
+
   } catch (err) {
     console.error("Cashfree verify error:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
 
-// -----------------------------
-// Socket.IO — rider live tracking
-// -----------------------------
+/* -----------------------------------
+   Socket.IO – Rider live tracking
+----------------------------------- */
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: "*" }
@@ -374,7 +362,7 @@ const io = new Server(httpServer, {
 const lastPositions = new Map();
 
 io.on("connection", socket => {
-  console.log("🟢 Socket connected", socket.id);
+  console.log("🟢 Socket connected:", socket.id);
 
   socket.on("rider:join", ({ riderId }) => {
     socket.data.riderId = riderId;
@@ -382,17 +370,14 @@ io.on("connection", socket => {
   });
 
   socket.on("rider:location", (data) => {
-    try {
-      if (!data || !data.riderId) return;
-      lastPositions.set(data.riderId, data);
+    if (!data || !data.riderId) return;
 
-      io.emit("admin:riderLocation", data);
+    lastPositions.set(data.riderId, data);
 
-      if (data.orderId) {
-        io.to("order_" + data.orderId).emit("order:riderLocation", data);
-      }
-    } catch (err) {
-      console.error("rider:location handler error:", err);
+    io.emit("admin:riderLocation", data);
+
+    if (data.orderId) {
+      io.to("order_" + data.orderId).emit("order:riderLocation", data);
     }
   });
 
@@ -409,9 +394,9 @@ io.on("connection", socket => {
   });
 });
 
-// -----------------------------
-// Start server
-// -----------------------------
+/* -----------------------------------
+   Start Server
+----------------------------------- */
 const PORT = process.env.PORT || 10000;
 httpServer.listen(PORT, () => {
   console.log(`🚀 SH Cashfree + Tracking server running on ${PORT} (CF_MODE=${CF_MODE})`);
