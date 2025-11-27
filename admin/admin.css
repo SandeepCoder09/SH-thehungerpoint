@@ -39,7 +39,7 @@ body {
 	border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 	position: sticky;
 	top: 0;
-	z-index: 120;
+	z-index: 120
 }
 
 .top-left {
@@ -67,7 +67,6 @@ body {
 	gap: 10px
 }
 
-/* small cards */
 .card.small {
 	background: var(--panel);
 	padding: 8px 10px;
@@ -75,10 +74,9 @@ body {
 	font-size: 13px;
 	color: var(--text);
 	border: 1px solid var(--glass-border);
-	box-shadow: var(--glass-shadow);
+	box-shadow: var(--glass-shadow)
 }
 
-/* buttons */
 .btn {
 	background: var(--accent);
 	color: #fff;
@@ -86,27 +84,26 @@ body {
 	padding: 8px 12px;
 	border-radius: 10px;
 	cursor: pointer;
-	font-weight: 700;
+	font-weight: 700
 }
 
 .btn.ghost {
 	background: transparent;
 	border: 1px solid rgba(255, 255, 255, 0.05);
-	color: var(--text);
+	color: var(--text)
 }
 
 .btn:active {
 	transform: translateY(1px)
 }
 
-/* admin toolbar (under topbar) */
 .admin-toolbar {
 	display: flex;
 	gap: 12px;
 	align-items: center;
 	padding: 12px 18px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent)
 }
 
 .spacer {
@@ -120,29 +117,26 @@ body {
 	gap: 16px;
 	padding: 18px;
 	max-width: 1200px;
-	margin: 0 auto;
+	margin: 0 auto
 }
 
-/* panels */
 .panel {
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
 	padding: 12px;
 	border-radius: var(--radius);
 	border: 1px solid var(--glass-border);
-	box-shadow: var(--glass-shadow);
+	box-shadow: var(--glass-shadow)
 }
 
-/* orders list */
 .orders-list {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	max-height: var(--max-list-h);
 	overflow: auto;
-	padding: 6px;
+	padding: 6px
 }
 
-/* order row */
 .order-row {
 	display: flex;
 	gap: 12px;
@@ -151,12 +145,12 @@ body {
 	border-radius: 10px;
 	transition: transform .12s ease, box-shadow .12s ease;
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.005));
-	border: 1px solid rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.02)
 }
 
 .order-row:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35)
 }
 
 .order-avatar {
@@ -184,7 +178,6 @@ body {
 	margin-top: 6px
 }
 
-/* actions & status */
 .order-actions {
 	display: flex;
 	gap: 8px;
@@ -195,10 +188,9 @@ body {
 	padding: 6px 10px;
 	border-radius: 999px;
 	font-size: 12px;
-	font-weight: 800;
+	font-weight: 800
 }
 
-/* status colors */
 .status.preparing {
 	background: #f59e0b;
 	color: #111
@@ -229,7 +221,6 @@ body {
 	color: #fff
 }
 
-/* order details */
 .order-details {
 	font-size: 13px;
 	color: var(--muted);
@@ -240,14 +231,12 @@ body {
 	margin-bottom: 10px
 }
 
-/* quick actions */
 .quick-actions {
 	display: flex;
 	gap: 10px;
 	flex-wrap: wrap
 }
 
-/* responsive */
 @media (max-width:1000px) {
 	.layout {
 		grid-template-columns: 1fr;
@@ -271,4 +260,21 @@ body {
 	.top-right {
 		display: none
 	}
+}
+
+.test-order-btn {
+	background: #E23744;
+	color: #fff;
+	border: none;
+	padding: 12px 18px;
+	border-radius: 8px;
+	font-size: 16px;
+	margin: 10px 0;
+	width: 100%;
+	cursor: pointer;
+	box-shadow: 0 4px 12px rgba(226, 55, 68, 0.3)
+}
+
+.test-order-btn:active {
+	transform: scale(0.96)
 }
