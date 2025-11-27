@@ -1,49 +1,59 @@
+<!-- rider/index.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
   <title>Rider Dashboard — SH</title>
-  <link rel="stylesheet" href="/rider/rider.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./rider.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
-
 <body>
-  <div class="topbar">
-    <div class="title">SH — Rider Dashboard</div>
-
-    <div class="right">
-      <span id="riderName">Loading...</span>
-      <span id="riderEmail" style="color:#9fb0c8; font-size:0.85rem;">—</span>
-      <button id="btnLogout">Logout</button>
+  <header class="r-top">
+    <div class="left">
+      <button id="btnBack" class="icon" title="Back">←</button>
+      <div class="title">Rider Dashboard</div>
     </div>
-  </div>
+    <div class="right">
+      <div class="meta">ID: <span id="riderIdSpan">—</span></div>
+      <button id="btnLogout" class="btn ghost">Logout</button>
+    </div>
+  </header>
 
-  <main class="container">
-    <section class="orders">
-      <h3>Active Orders</h3>
-      <div id="orderContainer" class="order-list">No active orders</div>
+  <main class="r-body">
+    <section class="panel map-panel">
+      <div id="map" class="map-placeholder">Loading map…</div>
     </section>
 
-    <section class="map-wrap">
-      <h3>Live Location</h3>
-      <div id="map" class="map">Map will appear here (optional)</div>
+    <section class="panel status-panel">
+      <div class="row">
+        <div><strong>Connected:</strong> <span id="connStatus">—</span></div>
+        <div><strong>Active Order:</strong> <span id="activeOrder">—</span></div>
+      </div>
+
+      <div class="row controls">
+        <button id="btnAcceptSelected" class="btn ghost">Accept selected</button>
+        <button id="btnStartTrip" class="btn">Start trip</button>
+        <button id="btnDeliver" class="btn">Mark delivered</button>
+      </div>
+
+      <div class="row logs">
+        <div id="logArea" class="muted">Logs appear here.</div>
+      </div>
+    </section>
+
+    <section class="panel orders-panel">
+      <h3>Assigned / Available Orders</h3>
+      <div id="ordersList" class="orders">Loading…</div>
     </section>
   </main>
 
-  <!-- socket.io -->
+  <script type="module" src="./firebase.js"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
-    window.SH = window.SH || {};
-    window.SH.API_BASE = "https://sh-thehungerpoint.onrender.com";
-  </script>
-
-  <!-- App Scripts -->
-  <script type="module" src="/rider/firebase.js"></script>
-  <script type="module" src="/rider/socket-client.js" defer></script>
-  <script type="module" src="/rider/rider-gps.js" defer></script>
-  <script type="module" src="/rider/rider.js" defer></script>
-
+  <script type="module" src="./socket-client.js"></script>
+  <script type="module" src="./rider-gps.js"></script>
+  <script type="module" src="./rider.js"></script>
 </body>
 </html>
