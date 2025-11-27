@@ -1,64 +1,87 @@
 // rider/rider-gps.js
-// GPS helper — separate module (option A). Exposes window.RIDER_GPS with start/stop/getCurrentPosition/sendOnce
+// High-accuracy 2-second GPS module for new rider.js + socket system
+
 import { getSocket } from "./socket-client.js";
 
-const DEFAULT_INTERVAL = 5000; // ms
+let gpsTimer = null;
+let activeOrderId = null;
+let lastSent = 0;
 
-const RIDER_GPS = {
-  watchId: null,
-  timer: null,
-  interval: DEFAULT_INTERVAL,
-  running: false,
+const GPS_INTERVAL = 2000; // 2 seconds
 
-  async getCurrentPosition() {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) return reject(new Error("Geolocation not supported"));
-      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
-    });
-  },
+/**
+ * Start GPS tracking for the selected order
+ */
+export function startGPS(orderId, onUpdate) {
+  activeOrderId = orderId;
 
-  start(intervalMs = DEFAULT_INTERVAL) {
-    this.interval = intervalMs;
-    if (this.running) return;
-    this.running = true;
+  if (gpsTimer !== null) {
+    console.log("GPS already running");
+    return;
+  }
 
-    // immediate send
-    this.sendOnce().catch((e) => console.warn("RIDER_GPS immediate send error", e));
+  console.log("🚀 GPS started for order:", orderId);
 
-    this.timer = setInterval(() => {
-      this.sendOnce().catch((e) => console.warn("RIDER_GPS send error", e));
-    }, this.interval);
-  },
+  // Send first update immediately
+  updateGPS(onUpdate);
 
-  stop() {
-    this.running = false;
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
-  },
+  // Then auto-update every 2 seconds
+  gpsTimer = setInterval(() => updateGPS(onUpdate), GPS_INTERVAL);
+}
 
-  async sendOnce() {
-    const socket = getSocket();
-    if (!socket || !socket.connected) {
-      // no socket, skip
-      return;
-    }
-    try {
-      const pos = await this.getCurrentPosition();
+/**
+ * Stop GPS tracking
+ */
+export function stopGPS() {
+  if (gpsTimer !== null) {
+    clearInterval(gpsTimer);
+    gpsTimer = null;
+    console.log("🛑 GPS stopped");
+  }
+  activeOrderId = null;
+}
+
+/**
+ * Internal function — sends one GPS update
+ */
+async function updateGPS(onUpdate) {
+  if (!navigator.geolocation) {
+    console.warn("❌ Geolocation not supported");
+    return;
+  }
+
+  const now = Date.now();
+  if (now - lastSent < GPS_INTERVAL) return;
+  lastSent = now;
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
       const payload = {
         riderId: localStorage.getItem("sh_rider_id"),
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        timestamp: Date.now()
+        orderId: activeOrderId,
+        lat,
+        lng,
+        timestamp: now
       };
-      socket.emit("rider:location", payload);
-      return payload;
-    } catch (err) {
-      throw err;
-    }
-  }
-};
 
-window.RIDER_GPS = RIDER_GPS;
-export default RIDER_GPS;
+      const socket = getSocket();
+      if (socket && socket.connected) {
+        socket.emit("rider:location", payload);
+      }
+
+      // Update rider map marker (callback from rider.js)
+      if (onUpdate) onUpdate(payload);
+    },
+    (err) => {
+      console.warn("GPS ERR:", err);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 10000
+    }
+  );
+}
