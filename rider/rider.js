@@ -1,5 +1,5 @@
 // /rider/rider.js
-// Main Rider Dashboard — uses Firestore, Socket and Rider GPS helper.
+// Main Rider Dashboard (expects rider/firebase.js + rider/socket-client.js + rider/rider-gps.js)
 
 import {
   db,
@@ -17,7 +17,6 @@ import {
 import { connectSocket, getSocket } from "/rider/socket-client.js";
 import RIDER_GPS from "/rider/rider-gps.js";
 
-/* ---------- DOM ---------- */
 const profileImg = document.getElementById("profileImg");
 const riderNameEl = document.getElementById("riderName");
 const riderEmailEl = document.getElementById("riderEmail");
@@ -39,23 +38,22 @@ const photoInput = document.getElementById("photoInput");
 const btnUploadPhoto = document.getElementById("btnUploadPhoto");
 const uploadMsg = document.getElementById("uploadMsg");
 
-/* ---------- Config: use custom doc id (B) ---------- */
-// Use provided rider Firestore document ID: SH_RD_01
-let RIDER_DOC_ID = localStorage.getItem("sh_rider_docid") || "SH_RD_01";
-// Optional readable riderId stored in doc (riderId field). We'll keep both.
-let RIDER_ID_FIELD = localStorage.getItem("sh_rider_id") || null;
-
+// identify rider doc:
+// doc id == email (per your Firestore setup)
+let RIDER_DOC_ID = localStorage.getItem("sh_rider_docid") || null;
+let RIDER_ID_FIELD = localStorage.getItem("sh_rider_id") || null; // readable riderId
 let RIDER_DATA = null;
+
 let socket = null;
 let selectedOrderId = null;
 let sharing = false;
 let riderMarker = null;
 
-/* ---------- Map init ---------- */
+// map
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "" }).addTo(map);
 
-/* ---------- Helpers ---------- */
+// UI helpers
 function setStatusOnline() {
   riderStatusEl.textContent = "Online";
   riderStatusDot.classList.remove("offline");
@@ -66,50 +64,41 @@ function setStatusOffline() {
   riderStatusDot.classList.remove("online");
   riderStatusDot.classList.add("offline");
 }
-function fmtLastSeen(ts) {
-  if (!ts) return "—";
-  const d = new Date(Number(ts));
+function fmtLastSeen(v) {
+  if (!v) return "—";
+  const d = new Date(v);
   return d.toLocaleString();
 }
 
-/* ---------- Load rider doc (by doc id) ---------- */
 async function loadRiderDoc() {
   try {
-    if (!RIDER_DOC_ID) return null;
+    if (!RIDER_DOC_ID) {
+      // If no doc id saved, try redirect to login
+      console.warn("missing doc id -> redirecting to login");
+      window.location.href = "/rider/login.html";
+      return null;
+    }
     const ref = doc(db, "riders", RIDER_DOC_ID);
     const snap = await getDoc(ref);
     if (!snap.exists()) {
-      console.warn("Rider doc not found:", RIDER_DOC_ID);
+      console.warn("rider doc not found -> redirecting to login");
+      window.location.href = "/rider/login.html";
       return null;
     }
-    const data = snap.data();
-    RIDER_DATA = { id: snap.id, ...data };
-    // write readable rider id to localStorage for reuse
-    if (RIDER_DATA.riderId) {
-      RIDER_ID_FIELD = RIDER_DATA.riderId;
-      localStorage.setItem("sh_rider_id", RIDER_ID_FIELD);
-    }
-    localStorage.setItem("sh_rider_docid", RIDER_DOC_ID);
-    return RIDER_DATA;
+    return { id: snap.id, ...snap.data() };
   } catch (err) {
-    console.error("loadRiderDoc error", err);
+    console.error("loadRiderDoc err", err);
     return null;
   }
 }
 
-/* ---------- UI refresh ---------- */
 async function refreshRiderUI() {
   const r = await loadRiderDoc();
-  if (!r) {
-    // redirect to login page (if you have one)
-    console.warn("No rider doc - redirect to login");
-    window.location.href = "./login.html";
-    return;
-  }
+  if (!r) return;
   RIDER_DATA = r;
   riderNameEl.textContent = r.name || "Rider";
   riderEmailEl.textContent = r.email || "";
-  riderIdDisplay.textContent = r.riderId || r.email || r.id || "—";
+  riderIdDisplay.textContent = r.riderId || (r.email || "—");
   if (r.photoURL) profileImg.src = r.photoURL;
   else profileImg.src = "/home/SH-Favicon.png";
 
@@ -118,43 +107,26 @@ async function refreshRiderUI() {
   activeOrderEl.textContent = r.activeOrder || "—";
 }
 
-/* ---------- Socket connect & events ---------- */
 async function connectEverything() {
+  const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
+  const token = localStorage.getItem("sh_rider_token") || "";
   try {
-    const socketIdHint = RIDER_DATA?.riderId || RIDER_DATA?.email || RIDER_DOC_ID;
-    socket = await connectSocket({ riderId: socketIdHint });
+    socket = await connectSocket({ token, riderId: RIDER_DATA?.riderId || RIDER_DATA?.email, url: API_BASE });
     connStatus.textContent = "connected";
     connStatus.style.color = "lightgreen";
 
-    socket.on("connect", () => {
-      connStatus.textContent = "connected";
-      connStatus.style.color = "lightgreen";
-    });
-    socket.on("disconnect", () => {
-      connStatus.textContent = "disconnected";
-      connStatus.style.color = "crimson";
+    socket.on("order:status", (p) => {
+      // order status updates are handled via Firestore snapshot (we leave this lightweight)
     });
 
-    // rider location updates (from server or other clients)
-    socket.on("order:riderLocation", (p) => {
+    socket.on("rider:location", (p) => {
       if (!p) return;
-      if ((RIDER_DATA?.riderId && p.riderId === RIDER_DATA.riderId) || p.riderId === RIDER_DATA.email || p.riderId === RIDER_DOC_ID) {
-        // update own marker
+      if (p.riderId === (RIDER_DATA?.riderId || RIDER_DATA?.email)) {
         if (!riderMarker) {
           riderMarker = L.marker([p.lat, p.lng]).addTo(map);
         } else {
           riderMarker.setLatLng([p.lat, p.lng]);
         }
-      }
-    });
-
-    // generic order status updates
-    socket.on("order:status", (p) => {
-      if (!p || !p.orderId) return;
-      // we'll rely on Firestore snapshot to reflect latest state, but update UI where helpful
-      if (p.orderId === selectedOrderId) {
-        // update active order display
-        activeOrderEl.textContent = p.orderId;
       }
     });
 
@@ -165,7 +137,7 @@ async function connectEverything() {
   }
 }
 
-/* ---------- Orders: show ALL orders like admin ---------- */
+// Orders listener (shows all orders — same as admin)
 const ordersCol = collection(db, "orders");
 onSnapshot(ordersCol, (snap) => {
   const rows = [];
@@ -175,7 +147,7 @@ onSnapshot(ordersCol, (snap) => {
 
 function renderOrders(list) {
   ordersList.innerHTML = "";
-  if (!list || !list.length) {
+  if (!list.length) {
     ordersList.innerHTML = "<div class='small muted'>No orders</div>";
     return;
   }
@@ -183,17 +155,15 @@ function renderOrders(list) {
   for (const o of list) {
     const card = document.createElement("div");
     card.className = "order-card";
-
     const left = document.createElement("div");
     left.innerHTML = `<div style="font-weight:700">${o.orderId}</div>
                       <div class="meta">${(o.items||[]).map(i=>`${i.name}×${i.qty}`).join(", ")}</div>
                       <div class="meta">${o.status||"new"}</div>`;
-
     const right = document.createElement("div");
     right.className = "order-actions";
 
     const badge = document.createElement("div");
-    badge.className = "order-badge " + ((o.status||"").toLowerCase());
+    badge.className = "order-badge " + (o.status || "").toLowerCase();
     badge.textContent = (o.status || "NEW").toUpperCase();
 
     const btnTrack = document.createElement("button");
@@ -240,28 +210,29 @@ function renderOrders(list) {
 }
 
 function showOrderDetails(o) {
-  const txt = `
-Order: ${o.orderId}
-Status: ${o.status||"—"}
-Items: ${(o.items||[]).map(i=>`${i.name}×${i.qty}`).join(", ")}
-Customer: ${o.customerName||o.customerId||"—"}
-`;
+  const txt = [
+    `Order: ${o.orderId}`,
+    `Status: ${o.status||"—"}`,
+    `Items: ${(o.items||[]).map(i=>`${i.name}×${i.qty}`).join(", ")}`,
+    `Customer: ${o.customerName||o.customerId||"—"}`
+  ].join("\n");
   alert(txt);
 }
 
-/* ---------- Assign/accept/start/deliver ---------- */
 async function assignToMe(orderId) {
   if (!orderId) return;
   try {
     await updateDoc(doc(db, "orders", orderId), {
-      riderId: RIDER_DATA.riderId || RIDER_DATA.email || RIDER_DOC_ID,
+      riderId: RIDER_DATA.riderId || RIDER_DATA.email,
       status: "assigned",
       assignedAt: Date.now()
     });
+    const sock = getSocket();
+    if (sock && sock.connected) sock.emit("order:status", { orderId, status: "assigned" });
     alert("Assigned " + orderId);
   } catch (err) {
     console.error("assign failed", err);
-    alert("Assign failed: " + (err.message||err));
+    alert("Assign failed: " + (err.message || err));
   }
 }
 
@@ -276,10 +247,13 @@ btnStartTrip?.addEventListener("click", async () => {
     await updateDoc(doc(db, "orders", selectedOrderId), {
       status: "picked",
       pickedAt: Date.now(),
-      riderId: RIDER_DATA.riderId || RIDER_DATA.email || RIDER_DOC_ID
+      riderId: RIDER_DATA.riderId || RIDER_DATA.email
     });
-    RIDER_GPS.start(); // periodic sends
+    // start GPS sending with orderId
+    RIDER_GPS.start({ riderId: RIDER_DATA.riderId || RIDER_DATA.email, orderId: selectedOrderId, intervalMs: 5000 });
     sharing = true;
+    const sock = getSocket();
+    if (sock && sock.connected) sock.emit("order:status", { orderId: selectedOrderId, status: "picked" });
     alert("Trip started");
   } catch (err) {
     console.error(err);
@@ -293,6 +267,8 @@ btnDeliver?.addEventListener("click", async () => {
     await updateDoc(doc(db, "orders", selectedOrderId), { status: "delivered", deliveredAt: Date.now() });
     RIDER_GPS.stop();
     sharing = false;
+    const sock = getSocket();
+    if (sock && sock.connected) sock.emit("order:status", { orderId: selectedOrderId, status: "delivered" });
     alert("Marked delivered");
   } catch (err) {
     console.error(err);
@@ -300,7 +276,15 @@ btnDeliver?.addEventListener("click", async () => {
   }
 });
 
-/* ---------- Profile photo upload (base64 to Firestore) ---------- */
+btnLogout?.addEventListener("click", async () => {
+  localStorage.removeItem("sh_rider_docid");
+  localStorage.removeItem("sh_rider_id");
+  localStorage.removeItem("sh_rider_token");
+  try { if (auth) await auth.signOut(); } catch(e){}
+  window.location.href = "/rider/login.html";
+});
+
+// Photo upload
 btnUploadPhoto?.addEventListener("click", async () => {
   const f = photoInput.files?.[0];
   if (!f) { uploadMsg.textContent = "Choose file first"; return; }
@@ -320,7 +304,7 @@ btnUploadPhoto?.addEventListener("click", async () => {
   reader.readAsDataURL(f);
 });
 
-/* ---------- Set online/offline and lastSeen ---------- */
+// set online/offline lastSeen
 async function setRiderOnline(flag = true) {
   try {
     const now = Date.now();
@@ -338,36 +322,25 @@ async function setRiderOnline(flag = true) {
   }
 }
 
-/* ---------- Logout ---------- */
-btnLogout?.addEventListener("click", async () => {
-  localStorage.removeItem("sh_rider_docid");
-  localStorage.removeItem("sh_rider_id");
-  try { if (auth) await auth.signOut(); } catch(e){}
-  window.location.href = "./login.html";
-});
-
-/* ---------- Init ---------- */
-(async function init() {
-  // load rider doc and show UI
+async function init() {
+  const r = await loadRiderDoc();
+  if (!r) return;
   await refreshRiderUI();
-
-  // connect socket
   await connectEverything();
-
-  // mark online
   await setRiderOnline(true);
 
-  // on unload set offline
   window.addEventListener("beforeunload", () => {
     try { updateDoc(doc(db, "riders", RIDER_DOC_ID), { status: "offline", lastSeen: Date.now() }); } catch(e){}
   });
 
-  // initialize map with current location if available
+  // current location marker
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((pos) => {
       const lat = pos.coords.latitude, lng = pos.coords.longitude;
       map.setView([lat, lng], 13);
       riderMarker = L.marker([lat, lng]).addTo(map);
-    }, (err) => { /* ignore */ }, { enableHighAccuracy: true });
+    }, (err) => {}, { enableHighAccuracy: true });
   }
-})();
+}
+
+init();
