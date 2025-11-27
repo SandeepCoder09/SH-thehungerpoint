@@ -1,67 +1,75 @@
+<!-- rider/dashboard.html -->
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>Rider Dashboard — SH</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="/rider/rider.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="/home/SH-Favicon.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="./dashboard.css" />
 </head>
-
 <body>
-
-  <!-- TOP PROFILE -->
-  <div class="topbar">
+  <header class="top">
     <div class="left">
-      <img id="avatar" class="avatar">
-      <div>
-        <div id="riderName" class="name">—</div>
-        <div id="riderEmail" class="email">—</div>
-        <div>ID: <span id="riderIdBox">—</span></div>
-      </div>
+      <button id="btnBack" class="ghost">←</button>
+      <h1>Rider Dashboard</h1>
     </div>
-
     <div class="right">
-      <span id="onlineDot" class="dot off"></span>
-      <span id="onlineText">Offline</span>
-      <button id="btnLogout" class="logout">Logout</button>
+      <div class="profile">
+        <img id="riderAvatar" src="/home/SH-Favicon.png" alt="avatar">
+        <div class="meta">
+          <div id="riderName">—</div>
+          <div id="riderEmail" class="small muted">—</div>
+        </div>
+      </div>
+      <button id="btnLogout" class="btn">Logout</button>
     </div>
-  </div>
+  </header>
 
-  <!-- MAP -->
-  <div id="map" class="map"></div>
+  <main class="wrap">
+    <section class="left-col">
+      <div id="mapBox" class="panel map">
+        <div id="map" style="height:100%; width:100%"></div>
+      </div>
 
-  <!-- Info Panel -->
-  <div class="info">
-    Connected: <span id="connStatus">—</span>
-    &nbsp;&nbsp; Last seen: <span id="lastSeen">—</span>
-    &nbsp;&nbsp; Active Order: <span id="activeOrder">—</span>
-  </div>
+      <div class="panel controls">
+        <div class="status-row">
+          <div>Connected: <span id="connStatus" class="muted">—</span></div>
+          <div>Active Order: <span id="activeOrder">—</span></div>
+        </div>
+        <div class="lastseen">Last seen: <span id="lastSeen">—</span></div>
 
-  <!-- Actions -->
-  <div class="actions">
-    <button id="btnAcceptSelected">Accept</button>
-    <button id="btnStartTrip" class="red">Start Trip</button>
-    <button id="btnDeliver" class="green">Mark Delivered</button>
-  </div>
+        <div class="actions">
+          <button id="btnAcceptSelected" class="btn ghost">Accept</button>
+          <button id="btnStartTrip" class="btn danger">Start Trip</button>
+          <button id="btnDeliver" class="btn success">Mark Delivered</button>
+        </div>
+    </section>
 
-  <!-- Upload Photo -->
-  <div class="upload">
-    <label>Upload profile photo</label>
-    <input type="file" id="photoFile">
-    <button id="btnUpload">Upload</button>
-  </div>
+    <section class="right-col">
+      <div class="panel search-panel">
+        <div class="search-row">
+          <input id="searchInput" placeholder="Search orders, items, customer..." />
+          <select id="filterSelect">
+            <option value="all">All</option>
+            <option value="assigned">Assigned</option>
+            <option value="accepted">Accepted</option>
+            <option value="picked">Picked</option>
+            <option value="delivered">Delivered</option>
+            <option value="unassigned">Unassigned</option>
+          </select>
+        </div>
+      </div>
 
-  <!-- Orders -->
-  <div class="orders">
-    <h3>Available / Assigned Orders</h3>
-    <div id="ordersList">Loading…</div>
-  </div>
+      <div id="ordersContainer" class="panel orders-panel">
+        <h3>Available / Assigned Orders</h3>
+        <div id="ordersList" class="orders-list">Loading...</div>
+      </div>
+    </section>
+  </main>
 
-  <!-- SCRIPTS -->
+  <script type="module" src="./dashboard.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-  <script type="module" src="/rider/rider.js"></script>
 </body>
 </html>
