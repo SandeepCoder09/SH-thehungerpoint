@@ -1,130 +1,93 @@
 /* rider/login.css */
 :root {
+	--bg: #071026;
+	--card: #0b2230;
 	--accent: #E23744;
-	--bg: #f7fafc;
-	--muted: #6b7280;
-	--card: #ffffff;
-	--text: #0f172a;
+	--muted: #9fb0c8;
+	--text: #e6eef8;
 }
 
 * {
-	box-sizing: border-box;
+	box-sizing: border-box
 }
 
-html,
 body {
-	height: 100%;
 	margin: 0;
+	background: linear-gradient(180deg, #071028, #05121a);
 	font-family: Inter, system-ui, Arial;
-	background: var(--bg);
 	color: var(--text);
-	-webkit-font-smoothing: antialiased;
-}
-
-.login-shell {
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 20px;
+	padding: 18px
+}
+
+.login-wrap {
+	width: 100%;
+	max-width: 420px
 }
 
 .card {
-	width: 100%;
-	max-width: 420px;
 	background: var(--card);
 	padding: 22px;
 	border-radius: 12px;
-	box-shadow: 0 14px 40px rgba(16, 24, 40, 0.06);
-	text-align: center;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, .6)
 }
 
-.logo {
-	width: 56px;
-	height: 56px;
-	object-fit: contain;
-	border-radius: 10px;
-	margin-bottom: 10px;
+h2 {
+	margin: 0 0 6px
 }
 
-h1 {
-	margin: 6px 0 4px;
-	font-size: 20px;
-	font-weight: 700;
-}
-
-.muted {
-	color: var(--muted);
-	font-size: 13px;
-	margin-bottom: 12px;
-}
-
-.form {
-	margin-top: 12px;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+p {
+	margin: 0 0 14px;
+	color: var(--muted)
 }
 
 label {
-	display: flex;
-	flex-direction: column;
-	text-align: left;
+	display: block;
+	margin-bottom: 10px;
 	font-size: 13px;
-	color: #374151;
-	gap: 8px;
+	color: var(--muted)
 }
 
-input[type="text"],
-input[type="password"] {
+input {
 	width: 100%;
-	padding: 12px 14px;
-	border-radius: 10px;
-	border: 1px solid #e6e9ee;
-	font-size: 15px;
-	outline: none;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, .06);
+	background: rgba(255, 255, 255, 0.02);
+	color: var(--text);
+	outline: none
 }
 
-input:focus {
-	box-shadow: 0 8px 20px rgba(14, 20, 40, 0.06);
-	border-color: rgba(0, 0, 0, 0.06);
-}
-
-.actions {
+.row {
 	display: flex;
-	justify-content: flex-end;
-	margin-top: 6px;
+	gap: 8px;
+	margin-top: 12px
 }
 
 .btn {
+	padding: 10px 12px;
+	border-radius: 8px;
 	border: none;
-	padding: 10px 14px;
-	border-radius: 10px;
-	cursor: pointer;
-	font-weight: 700;
+	cursor: pointer
 }
 
 .btn.primary {
 	background: var(--accent);
-	color: #fff;
-	box-shadow: 0 8px 20px rgba(226, 55, 68, 0.14);
+	color: white;
+	flex: 1
 }
 
-.msg {
+.btn.ghost {
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	flex: 1
+}
+
+.muted {
+	color: var(--muted);
 	margin-top: 12px;
-	color: #b91c1c;
-	min-height: 18px;
-	font-weight: 600;
-	text-align: center;
-}
-
-@media (max-width:420px) {
-	.card {
-		padding: 16px;
-	}
-
-	.logo {
-		width: 48px;
-		height: 48px;
-	}
+	font-size: 13px
 }
