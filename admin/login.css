@@ -1,156 +1,89 @@
-/* Global */
+/* admin/login.css - SH theme */
+:root {
+	--bg-1: #071028;
+	--bg-2: #05121a;
+	--accent: #E23744;
+	--muted: #9fb0c8;
+	--text: #e6eef8;
+}
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Inter, Arial;
+	box-sizing: border-box
 }
 
+html,
 body {
-  background: linear-gradient(135deg, #ff4343, #c8001b);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+	height: 100%;
+	margin: 0;
+	font-family: Inter, system-ui, Arial;
+	background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+	color: var(--text);
+	-webkit-font-smoothing: antialiased
 }
 
-/* Background blur shapes */
-.bg {
-  position: absolute;
-  width: 480px;
-  height: 480px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(40px);
-  border-radius: 50%;
-  top: -90px;
-  right: -120px;
-  animation: float 7s infinite alternate ease-in-out;
+.login-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	padding: 18px
 }
 
-@keyframes float {
-  from { transform: translateY(0px); }
-  to { transform: translateY(30px); }
-}
-
-/* Login Card */
 .login-card {
-  width: 360px;
-  background: rgba(255,255,255,0.2);
-  padding: 40px 32px;
-  border-radius: 18px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.25);
-  text-align: center;
-  color: #fff;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+	width: 100%;
+	max-width: 380px;
+	background: rgba(255, 255, 255, 0.03);
+	padding: 28px;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	text-align: center
 }
 
 .logo {
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 8px;
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
+	border-radius: 10px;
+	margin-bottom: 8px
 }
 
-h1 {
-  font-size: 26px;
-  margin-bottom: 4px;
-  font-weight: 700;
+.login-card h2 {
+	margin: 6px 0 4px;
+	font-size: 22px;
+	font-weight: 800
 }
 
-.subtitle {
-  font-size: 14px;
-  margin-bottom: 24px;
-  opacity: 0.8;
+.tag {
+	color: var(--muted);
+	margin-bottom: 14px
 }
 
-/* Input fields */
-.input-group {
-  position: relative;
-  margin: 20px 0;
+input {
+	width: 100%;
+	padding: 12px;
+	margin: 8px 0;
+	border-radius: 10px;
+	border: none;
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	font-size: 15px
 }
 
-.input-group input {
-  width: 100%;
-  padding: 14px 12px;
-  font-size: 15px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.18);
-  color: #fff;
-  outline: none;
-  transition: 0.25s;
+.btn {
+	width: 100%;
+	padding: 12px;
+	border-radius: 10px;
+	border: none;
+	background: var(--accent);
+	color: #fff;
+	font-weight: 700;
+	cursor: pointer;
+	margin-top: 10px
 }
 
-.input-group label {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  font-size: 15px;
-  color: #eee;
-  pointer-events: none;
-  transition: 0.25s;
-}
-
-/* Floating label effect */
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
-  top: -10px;
-  font-size: 12px;
-  color: #ffdede;
-}
-
-/* Button */
-.login-btn {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  background: #fff;
-  color: #c4001b;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.login-btn:hover {
-  background: #ffefef;
-  transform: translateY(-2px);
-}
-
-/* Message */
 .msg {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #ffe4e4;
-}
-
-/* Loader animation inside button */
-.loader {
-  width: 18px;
-  height: 18px;
-  border: 3px solid transparent;
-  border-top: 3px solid #c4001b;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 8px;
-  animation: spin 0.7s linear infinite;
-  vertical-align: middle;
-}
-
-.loading .loader {
-  border-top-color: #fff;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+	margin-top: 12px;
+	color: #ffb3b3;
+	font-size: 14px
 }
