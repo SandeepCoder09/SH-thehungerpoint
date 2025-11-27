@@ -1,211 +1,177 @@
 /* rider/rider.css */
 :root {
-	--accent: #E23744;
 	--bg: #071028;
-	--panel: #0b1628;
+	--card: #071726;
+	--accent: #E23744;
 	--muted: #9fb0c8;
 	--text: #e6eef8;
-	--success: #12b76a;
+	--success: #2ecc71;
 }
 
 * {
 	box-sizing: border-box
 }
 
-html,
 body {
-	height: 100%;
 	margin: 0;
 	font-family: Inter, system-ui, Arial;
 	background: linear-gradient(180deg, #071028, #05121a);
-	color: var(--text)
+	color: var(--text);
+	min-height: 100vh
 }
 
 .topbar {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
+	justify-content: space-between;
 	padding: 12px 16px;
-	background: linear-gradient(90deg, var(--accent), #c43a3a);
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35)
+	background: linear-gradient(90deg, #081a2a, #071726);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .5)
 }
 
-.topbar .left {
+.topbar .title {
+	font-weight: 700
+}
+
+.topbar .right {
 	display: flex;
 	gap: 12px;
+	align-items: center
+}
+
+.rider-info {
+	display: flex;
+	gap: 10px;
 	align-items: center
 }
 
 .avatar {
 	width: 56px;
 	height: 56px;
-	border-radius: 50%;
-	object-fit: cover;
-	border: 2px solid rgba(255, 255, 255, 0.12)
+	border-radius: 999px;
+	border: 2px solid rgba(255, 255, 255, .05);
+	object-fit: cover
 }
 
-.meta .name {
-	font-weight: 800
+.meta {
+	line-height: 1
 }
 
-.meta .sub {
-	font-size: 13px;
-	opacity: .9
-}
-
-.muted {
-	color: var(--muted)
+.name {
+	font-weight: 700
 }
 
 .small {
-	font-size: 12px
-}
-
-.right {
-	display: flex;
-	gap: 12px;
-	align-items: center
-}
-
-.status {
-	display: flex;
-	align-items: center;
-	gap: 8px
+	font-size: 13px;
+	color: var(--muted)
 }
 
 .dot {
-	width: 12px;
-	height: 12px;
-	border-radius: 50%;
-	display: inline-block
-}
-
-.dot.online {
-	background: var(--success)
-}
-
-.dot.offline {
-	background: #555
-}
-
-.main {
-	display: grid;
-	grid-template-columns: 2fr 360px;
-	gap: 12px;
-	padding: 12px
-}
-
-.panel {
-	background: var(--panel);
-	padding: 12px;
-	border-radius: 10px;
-	border: 1px solid rgba(255, 255, 255, 0.03);
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4)
-}
-
-.map {
-	height: 60vh;
-	border-radius: 8px;
-	overflow: hidden
-}
-
-.controls .row {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	flex-wrap: wrap;
-	margin-bottom: 12px
-}
-
-.buttons {
-	display: flex;
-	gap: 8px;
-	margin-bottom: 12px
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 999px;
+	margin: 0 6px;
+	vertical-align: middle;
+	background: gray
 }
 
 .btn {
-	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.06);
 	padding: 8px 12px;
 	border-radius: 8px;
-	color: var(--text);
-	cursor: pointer
+	border: none;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text)
 }
 
 .btn.primary {
 	background: var(--accent);
-	color: white;
-	border: none
+	color: #fff
 }
 
 .btn.success {
 	background: var(--success);
-	color: white;
-	border: none
+	color: #fff
 }
 
 .btn.ghost {
 	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	color: white
+	border: 1px solid rgba(255, 255, 255, 0.04)
 }
 
-.upload {
+.container {
+	padding: 16px;
+	display: grid;
+	grid-template-columns: 1fr 360px;
+	grid-auto-rows: min-content;
+	gap: 16px
+}
+
+@media (max-width:900px) {
+	.container {
+		grid-template-columns: 1fr
+	}
+}
+
+.map-card {
+	background: var(--card);
+	padding: 12px;
+	border-radius: 12px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
+}
+
+.map {
+	height: 360px;
+	border-radius: 10px;
+	overflow: hidden
+}
+
+.controls {
+	background: var(--card);
+	padding: 12px;
+	border-radius: 12px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
+}
+
+.row {
 	display: flex;
-	flex-direction: column;
-	gap: 8px
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px
 }
 
-.orders {
+.actions {
+	display: flex;
+	gap: 8px;
+	margin: 12px 0
+}
+
+.orders-panel {
+	background: var(--card);
+	padding: 12px;
+	border-radius: 12px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, .5)
+}
+
+.orders-list {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	max-height: 55vh;
-	overflow: auto
+	max-height: 360px;
+	overflow: auto;
+	padding-top: 6px
 }
 
 .order-card {
 	display: flex;
-	gap: 10px;
+	justify-content: space-between;
 	align-items: center;
 	padding: 10px;
-	border-radius: 10px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-	border: 1px solid rgba(255, 255, 255, 0.03);
-	cursor: pointer
-}
-
-.order-card:hover {
-	transform: translateY(-3px);
-	transition: .12s
-}
-
-.toast {
-	position: fixed;
-	left: 50%;
-	transform: translateX(-50%);
-	bottom: 20px;
-	background: #111;
-	padding: 8px 12px;
 	border-radius: 8px;
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3)
+	background: rgba(255, 255, 255, 0.02)
 }
 
-.hidden {
-	display: none
-}
-
-@media(max-width:1000px) {
-	.main {
-		grid-template-columns: 1fr;
-		padding: 10px
-	}
-
-	.map {
-		height: 40vh
-	}
-
-	.orders-list {
-		order: 3
-	}
+.order-card .small {
+	color: var(--muted)
 }
