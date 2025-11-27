@@ -1,93 +1,40 @@
-/* rider/login.css */
-:root {
-	--bg: #071026;
-	--card: #0b2230;
-	--accent: #E23744;
-	--muted: #9fb0c8;
-	--text: #e6eef8;
-}
-
-* {
-	box-sizing: border-box
-}
-
 body {
-	margin: 0;
-	background: linear-gradient(180deg, #071028, #05121a);
-	font-family: Inter, system-ui, Arial;
-	color: var(--text);
-	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 18px
+  margin: 0;
+  background: #071428;
+  font-family: Inter, Arial;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  padding-top: 100px;
 }
 
-.login-wrap {
-	width: 100%;
-	max-width: 420px
+.container {
+  width: 90%;
+  max-width: 350px;
+  padding: 25px;
+  background: #0b1a2a;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.4);
 }
 
-.card {
-	background: var(--card);
-	padding: 22px;
-	border-radius: 12px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, .6)
-}
-
-h2 {
-	margin: 0 0 6px
-}
-
-p {
-	margin: 0 0 14px;
-	color: var(--muted)
-}
-
-label {
-	display: block;
-	margin-bottom: 10px;
-	font-size: 13px;
-	color: var(--muted)
-}
+h2 { margin-bottom: 20px; }
 
 input {
-	width: 100%;
-	padding: 10px 12px;
-	border-radius: 8px;
-	border: 1px solid rgba(255, 255, 255, .06);
-	background: rgba(255, 255, 255, 0.02);
-	color: var(--text);
-	outline: none
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
 }
 
-.row {
-	display: flex;
-	gap: 8px;
-	margin-top: 12px
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: #E23744;
+  color: #fff;
+  border: none;
+  font-size: 16px;
 }
 
-.btn {
-	padding: 10px 12px;
-	border-radius: 8px;
-	border: none;
-	cursor: pointer
-}
-
-.btn.primary {
-	background: var(--accent);
-	color: white;
-	flex: 1
-}
-
-.btn.ghost {
-	background: rgba(255, 255, 255, 0.04);
-	color: var(--text);
-	flex: 1
-}
-
-.muted {
-	color: var(--muted);
-	margin-top: 12px;
-	font-size: 13px
-}
+#msg { margin-top: 15px; color: #f77; }
