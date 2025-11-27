@@ -1,47 +1,65 @@
 // rider/rider.js
-// Main UI + logic. Relies on socket-client.js, rider-gps.js and firebase.js
+// New clean version with:
+// - Rider profile (photo, name, email)
+// - Online / Offline toggle
+// - Order accept / pickup / delivered
+// - Socket + GPS integration (rider-gps.js handles GPS sending)
+// - Firestore live order fetching
 
-import { db, collection, onSnapshot, doc, updateDoc, getDocs } from "./firebase.js";
+import {
+  db,
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  onSnapshot
+} from "./firebase.js";
+
 import { connectSocket, getSocket } from "./socket-client.js";
 
-const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
+// -----------------------------------------
+// BASIC AUTH
+// -----------------------------------------
 const riderId = localStorage.getItem("sh_rider_id");
-const token = localStorage.getItem("sh_rider_token");
+const token   = localStorage.getItem("sh_rider_token");
 
 if (!riderId || !token) {
   window.location.href = "./login.html";
 }
 
-// DOM
-const riderIdSpan = document.getElementById("riderIdSpan");
-const connStatus = document.getElementById("connStatus");
-const logArea = document.getElementById("logArea");
-const ordersList = document.getElementById("ordersList");
-const currentOrderSpan = document.getElementById("activeOrder");
-const btnAcceptSelected = document.getElementById("btnAcceptSelected");
-const btnStartTrip = document.getElementById("btnStartTrip");
-const btnDeliver = document.getElementById("btnDeliver");
-const btnLogout = document.getElementById("btnLogout");
-const btnBack = document.getElementById("btnBack");
+// -----------------------------------------
+// DOM REFERENCES
+// -----------------------------------------
+const riderNameEl   = document.getElementById("riderName");
+const riderEmailEl  = document.getElementById("riderEmail");
+const riderPhotoEl  = document.getElementById("riderPhoto");
+const riderOnlineEl = document.getElementById("onlineToggle");
+const onlineStatus  = document.getElementById("onlineStatus");
 
-riderIdSpan.textContent = riderId;
+const connStatus    = document.getElementById("connStatus");
+const ordersList    = document.getElementById("ordersList");
+const activeOrderEl = document.getElementById("activeOrder");
 
-function log(msg) {
-  const t = new Date().toLocaleTimeString();
-  logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
-}
+const btnAccept     = document.getElementById("btnAccept");
+const btnStartTrip  = document.getElementById("btnStartTrip");
+const btnDelivered  = document.getElementById("btnDeliver");
+const btnLogout     = document.getElementById("btnLogout");
 
-// Map setup
-const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "" }).addTo(map);
+// -----------------------------------------
+// MAP SETUP (Leaflet)
+// -----------------------------------------
+let map = L.map("map").setView([23.1, 82.0], 6);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: ""
+}).addTo(map);
+
 let riderMarker = null;
 let customerMarkers = new Map();
-let selectedOrderId = null;
-let ordersState = {}; // id -> order
 
 function setRiderMarker(lat, lng) {
   if (!riderMarker) {
-    riderMarker = L.marker([lat, lng], { title: "You (rider)" }).addTo(map);
+    riderMarker = L.marker([lat, lng], { title: "You" }).addTo(map);
   } else {
     riderMarker.setLatLng([lat, lng]);
   }
@@ -56,208 +74,227 @@ function setCustomerMarker(orderId, lat, lng) {
   }
 }
 
-function fitBothMarkers(orderId) {
-  const c = customerMarkers.get(orderId);
-  if (!c || !riderMarker) return;
-  const group = new L.featureGroup([riderMarker, c]);
-  map.fitBounds(group.getBounds().pad(0.25));
+// -----------------------------------------
+// LOAD RIDER PROFILE
+// -----------------------------------------
+async function loadRiderProfile() {
+  const ref = doc(db, "riders", riderId);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  riderNameEl.textContent  = data.name || "Rider";
+  riderEmailEl.textContent = data.email || "";
+  riderPhotoEl.src         = data.photoURL || "/home/SH-Favicon.png";
+
+  // Online status
+  riderOnlineEl.checked    = data.online === true;
+  onlineStatus.textContent = data.online ? "Online" : "Offline";
 }
 
-// Socket connect
-let socket = null;
-async function startSocket() {
+// Update Firestore when rider toggles online/offline
+riderOnlineEl.addEventListener("change", async () => {
   try {
-    socket = await connectSocket({ token, riderId });
-    connStatus.textContent = "connected";
+    await updateDoc(doc(db, "riders", riderId), {
+      online: riderOnlineEl.checked
+    });
+
+    onlineStatus.textContent = riderOnlineEl.checked ? "Online" : "Offline";
+
+  } catch (err) {
+    console.error("Failed to update online status", err);
+  }
+});
+
+// -----------------------------------------
+// SOCKET CONNECTION
+// -----------------------------------------
+let socket = null;
+
+async function initSocket() {
+  try {
+    socket = await connectSocket({ riderId, token });
+
+    connStatus.textContent = "Connected";
     connStatus.style.color = "lightgreen";
-    socket.on("order:riderLocation", (p) => {
-      if (!p) return;
-      if (p.riderId === riderId) {
-        setRiderMarker(p.lat, p.lng);
-      }
-      // update UI if relevant
-      if (p.orderId && ordersState[p.orderId] && ordersState[p.orderId].customerLoc) {
-        const c = ordersState[p.orderId].customerLoc;
-        setCustomerMarker(p.orderId, c.lat, c.lng);
-        if (selectedOrderId === p.orderId) fitBothMarkers(p.orderId);
+
+    // Receive rider location updates for current order
+    socket.on("order:riderLocation", (data) => {
+      if (data.riderId === riderId) {
+        setRiderMarker(data.lat, data.lng);
       }
     });
 
-    socket.on("order:status", (p) => {
-      if (!p || !p.orderId) return;
-      ordersState[p.orderId] = ordersState[p.orderId] || {};
-      ordersState[p.orderId].status = p.status;
+    // Order status updates pushed by admin
+    socket.on("order:status", (data) => {
+      if (!data || !data.orderId) return;
+      ordersState[data.orderId] = {
+        ...(ordersState[data.orderId] || {}),
+        status: data.status
+      };
       renderOrders();
-      if (selectedOrderId === p.orderId) showSelectedOrder(p.orderId);
-    });
-
-    socket.on("admin:orderAssigned", (p) => {
-      log("admin assigned order: " + (p.orderId || "unknown"));
-      // rely on Firestore snapshot to refresh
     });
 
   } catch (err) {
-    connStatus.textContent = "disconnected";
+    connStatus.textContent = "Disconnected";
     connStatus.style.color = "crimson";
-    log("socket error: " + (err.message||err));
   }
 }
 
-// Firestore snapshot (listen to orders collection)
-const ordersCol = collection(db, "orders");
-onSnapshot(ordersCol, (snap) => {
-  snap.docChanges().forEach(ch => {
-    const id = ch.doc.id;
-    const data = { orderId: id, ...(ch.doc.data() || {}) };
-    ordersState[id] = data;
+// -----------------------------------------
+// FIRESTORE LIVE ORDER LISTENER
+// -----------------------------------------
+let ordersState = {};
+
+onSnapshot(collection(db, "orders"), (snap) => {
+  snap.forEach((docu) => {
+    const data = docu.data();
+    ordersState[docu.id] = {
+      orderId: docu.id,
+      ...data
+    };
   });
   renderOrders();
 });
 
-// Render order list
+// -----------------------------------------
+// RENDER ORDERS LIST
+// -----------------------------------------
+let selectedOrder = null;
+
 function renderOrders() {
   ordersList.innerHTML = "";
-  const arr = Object.values(ordersState).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-  if (!arr.length) {
-    ordersList.innerHTML = "<div class='small muted'>No orders</div>";
+
+  const list = Object.values(ordersState)
+    .filter(o => !o.riderId || o.riderId === riderId) // show unassigned + assigned to rider
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (!list.length) {
+    ordersList.innerHTML = `<div class="small muted">No orders available</div>`;
     return;
   }
-  for (const o of arr) {
-    // show if assigned to this rider or unassigned/new
-    if (o.riderId && o.riderId !== riderId && o.riderId !== null) continue;
+
+  list.forEach(o => {
     const card = document.createElement("div");
     card.className = "order-card";
-    const itemsText = (o.items || []).map(i => `${i.name}×${i.qty}`).join(", ");
+
+    const items = (o.items || [])
+      .map(i => `${i.name} × ${i.qty}`)
+      .join(", ");
+
     card.innerHTML = `
       <div>
         <div style="font-weight:700">${o.orderId}</div>
         <div class="small">${o.status || "new"}</div>
-        <div class="small">${itemsText}</div>
+        <div class="small">${items}</div>
       </div>
-      <div class="order-actions"></div>
     `;
+
     card.onclick = () => selectOrder(o.orderId);
-
-    const actions = card.querySelector(".order-actions");
-    const btnView = document.createElement("button"); btnView.className = "btn ghost"; btnView.textContent = "View"; btnView.onclick = (ev) => { ev.stopPropagation(); selectOrder(o.orderId); };
-    const btnAccept = document.createElement("button"); btnAccept.className = "btn"; btnAccept.textContent = "Accept"; btnAccept.onclick = (ev) => { ev.stopPropagation(); acceptOrder(o.orderId); };
-    actions.appendChild(btnView); actions.appendChild(btnAccept);
-
     ordersList.appendChild(card);
-  }
+  });
 }
 
-function showSelectedOrder(orderId) {
-  selectedOrderId = orderId;
-  const o = ordersState[orderId] || {};
-  currentOrderSpan.textContent = orderId || "—";
-  if (o.customerLoc) {
+// -----------------------------------------
+// SELECT ORDER
+// -----------------------------------------
+function selectOrder(orderId) {
+  selectedOrder = orderId;
+  activeOrderEl.textContent = orderId;
+
+  const o = ordersState[orderId];
+
+  if (o && o.customerLoc) {
     setCustomerMarker(orderId, o.customerLoc.lat, o.customerLoc.lng);
   }
-  if (riderMarker && o.customerLoc) {
-    fitBothMarkers(orderId);
-  } else if (riderMarker) {
-    map.setView(riderMarker.getLatLng(), 13);
-  }
-  log("Selected order " + orderId);
-}
 
-async function selectOrder(orderId) {
-  showSelectedOrder(orderId);
-}
-
-// Accept order: write riderId & update status in Firestore
-async function acceptOrder(orderId) {
-  if (!orderId) return alert("No order id");
-  try {
-    await updateDoc(doc(db, "orders", orderId), { riderId, status: "accepted", acceptedAt: Date.now() });
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId, status: "accepted" });
-    log("Accepted " + orderId);
-  } catch (err) {
-    console.error(err);
-    alert("Accept failed. Check Firestore rules or network.");
+  if (riderMarker && o && o.customerLoc) {
+    const group = new L.featureGroup([
+      riderMarker,
+      customerMarkers.get(orderId)
+    ]);
+    map.fitBounds(group.getBounds().pad(0.3));
   }
 }
 
-// Start sharing: set status 'picked' and start geolocation watch
-let watchId = null;
-function startSharing() {
-  if (!selectedOrderId) return alert("Select an order first");
-  if (watchId) return alert("Already sharing");
-  // change status to 'picked'
-  updateDoc(doc(db, "orders", selectedOrderId), { status: "picked", pickedAt: Date.now() }).catch(e => console.warn(e));
-  const s = getSocket();
-  if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: "picked" });
+// -----------------------------------------
+// ACCEPT ORDER
+// -----------------------------------------
+btnAccept.addEventListener("click", async () => {
+  if (!selectedOrder) return alert("Select an order first");
 
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
+  await updateDoc(doc(db, "orders", selectedOrder), {
+    riderId,
+    status: "accepted",
+    acceptedAt: Date.now()
+  });
 
-  watchId = navigator.geolocation.watchPosition((pos) => {
-    const lat = pos.coords.latitude, lng = pos.coords.longitude;
-    setRiderMarker(lat, lng);
-    const payload = { riderId, lat, lng, orderId: selectedOrderId, timestamp: Date.now() };
-    const sock = getSocket();
-    if (sock && sock.connected) sock.emit("rider:location", payload);
-  }, (err) => {
-    console.warn("geo err", err);
-    log("GPS error: " + (err.message || err.code));
-  }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
-
-  log("Started sharing location for " + selectedOrderId);
-}
-
-// Stop sharing
-function stopSharing() {
-  if (watchId) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
-    log("Stopped sharing");
-  }
-}
-
-// Mark delivered
-async function markDelivered() {
-  if (!selectedOrderId) return alert("Select an order first");
-  try {
-    await updateDoc(doc(db, "orders", selectedOrderId), { status: "delivered", deliveredAt: Date.now() });
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: "delivered" });
-    stopSharing();
-    log("Marked delivered: " + selectedOrderId);
-  } catch (err) {
-    console.error(err);
-    alert("Deliver failed");
-  }
-}
-
-// helpers to get socket from socket-client module
-import { getSocket } from "./socket-client.js";
-function getSocket() { return getSocket(); } // local wrapper
-
-btnAcceptSelected?.addEventListener("click", () => {
-  if (!selectedOrderId) return alert("Select an order first");
-  acceptOrder(selectedOrderId);
+  socket?.emit("order:status", {
+    orderId: selectedOrder,
+    status: "accepted"
+  });
 });
-btnStartTrip?.addEventListener("click", () => startSharing());
-btnDeliver?.addEventListener("click", () => markDelivered());
-btnLogout?.addEventListener("click", () => {
+
+// -----------------------------------------
+// START TRIP (GPS STARTS IN rider-gps.js AUTOMATICALLY)
+// -----------------------------------------
+btnStartTrip.addEventListener("click", async () => {
+  if (!selectedOrder) return alert("Select an order first");
+
+  await updateDoc(doc(db, "orders", selectedOrder), {
+    status: "picked",
+    pickedAt: Date.now()
+  });
+
+  socket?.emit("order:status", {
+    orderId: selectedOrder,
+    status: "picked"
+  });
+
+  alert("Trip started — GPS tracking active");
+});
+
+// -----------------------------------------
+// MARK DELIVERED
+// -----------------------------------------
+btnDelivered.addEventListener("click", async () => {
+  if (!selectedOrder) return alert("Select an order first");
+
+  await updateDoc(doc(db, "orders", selectedOrder), {
+    status: "delivered",
+    deliveredAt: Date.now()
+  });
+
+  socket?.emit("order:status", {
+    orderId: selectedOrder,
+    status: "delivered"
+  });
+
+  alert("Order marked delivered");
+});
+
+// -----------------------------------------
+// LOGOUT
+// -----------------------------------------
+btnLogout.addEventListener("click", () => {
   localStorage.removeItem("sh_rider_token");
   localStorage.removeItem("sh_rider_id");
   window.location.href = "./login.html";
 });
-btnBack?.addEventListener("click", () => window.history.back());
 
-// init
+// -----------------------------------------
+// INIT
+// -----------------------------------------
 (async function init() {
-  await startSocket();
-  // try get current location to show rider marker
+  await loadRiderProfile();
+  await initSocket();
+
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((p) => {
-      setRiderMarker(p.coords.latitude, p.coords.longitude);
-      map.setView([p.coords.latitude, p.coords.longitude], 13);
-    }, () => {}, { enableHighAccuracy: true });
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setRiderMarker(pos.coords.latitude, pos.coords.longitude);
+      map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+    });
   }
 })();
