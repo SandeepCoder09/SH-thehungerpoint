@@ -1,46 +1,213 @@
+/* rider/dashboard.css - Rider Dashboard styles (responsive) */
+:root {
+	--bg: #071028;
+	--panel: #071726;
+	--accent: #E23744;
+	--muted: #9fb0c8;
+	--card: #0b1a24;
+	--text: #e6eef8;
+	--success: #2ecc71;
+	--danger: #e74c3c;
+}
+
+* {
+	box-sizing: border-box
+}
+
+html,
 body {
-  margin: 0;
-  background: #050f1f;
-  font-family: Inter, Arial;
-  color: #fff;
+	height: 100%;
+	margin: 0;
+	font-family: Inter, system-ui, Arial;
+	background: linear-gradient(180deg, #071028, #05121a);
+	color: var(--text)
 }
 
-.topbar {
-  background: #E23744;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
+.top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 18px;
+	background: linear-gradient(90deg, #081a2a, #071726);
+	box-shadow: 0 3px 10px rgba(0, 0, 0, .4)
 }
 
-.avatar {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  margin-right: 12px;
+.top .left {
+	display: flex;
+	align-items: center;
+	gap: 12px
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
+.top h1 {
+	margin: 0;
+	font-size: 18px
 }
 
-.dot.on { background: #00ff7b; }
-.dot.off { background: #777; }
+.btn {
+	background: var(--accent);
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 8px;
+	cursor: pointer
+}
+
+.btn.ghost {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	color: var(--text)
+}
+
+.btn.danger {
+	background: var(--danger)
+}
+
+.btn.success {
+	background: var(--success)
+}
+
+.ghost {
+	background: transparent;
+	border: 0
+}
+
+.small {
+	font-size: 12px
+}
+
+.muted {
+	color: var(--muted)
+}
+
+.profile {
+	display: flex;
+	align-items: center;
+	gap: 10px
+}
+
+.profile img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid rgba(255, 255, 255, 0.06)
+}
+
+.wrap {
+	display: grid;
+	grid-template-columns: 1fr 420px;
+	gap: 18px;
+	padding: 18px
+}
+
+.panel {
+	background: var(--panel);
+	padding: 14px;
+	border-radius: 12px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+	min-height: 120px
+}
 
 .map {
-  width: 100%;
-  height: 300px;
-  margin-top: 15px;
+	height: 360px;
+	padding: 8px
 }
 
-.actions button {
-  margin: 8px;
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: none;
+.controls .status-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px
 }
 
-.red { background: #dd3333; }
-.green { background: #28b463; }
+.controls .actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 8px
+}
+
+.upload {
+	margin-top: 12px
+}
+
+.search-panel {
+	margin-bottom: 8px
+}
+
+.search-row {
+	display: flex;
+	gap: 8px
+}
+
+.search-row input {
+	flex: 1;
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	background: rgba(255, 255, 255, 0.02);
+	color: var(--text)
+}
+
+.search-row select {
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	background: rgba(255, 255, 255, 0.02);
+	color: var(--text)
+}
+
+.orders-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 10px
+}
+
+.order-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	border-radius: 10px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+	border: 1px solid rgba(255, 255, 255, 0.03)
+}
+
+.order-left {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	min-width: 0
+}
+
+.order-items {
+	font-size: 13px;
+	color: var(--muted)
+}
+
+.order-meta {
+	font-weight: 700
+}
+
+.order-actions button {
+	margin-left: 8px
+}
+
+.order-id {
+	font-size: 13px
+}
+
+@media (max-width:1000px) {
+	.wrap {
+		grid-template-columns: 1fr;
+		padding: 12px
+	}
+
+	.right-col {
+		order: 2
+	}
+
+	.map {
+		height: 280px
+	}
+}
