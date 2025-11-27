@@ -2,38 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
   <title>Admin Login — SH</title>
-  <link rel="stylesheet" href="/admin/login.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+  <link rel="stylesheet" href="/admin/login.css" />
 </head>
 <body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <img src="/home/sh-thehungerpoint.png" class="logo" alt="SH" />
+      <h2>SH — Admin</h2>
+      <p class="tag">Sign in with your admin account</p>
 
-  <div class="bg"></div>
+      <input id="inputEmail" type="email" placeholder="Email" autocomplete="username" />
+      <input id="inputPassword" type="password" placeholder="Password" autocomplete="current-password" />
 
-  <main class="login-card">
-    <div class="logo">SH Admin</div>
+      <button id="btnLogin" class="btn">Login</button>
 
-    <h1>Welcome Back</h1>
-    <p class="subtitle">Sign in to manage orders & riders</p>
-
-    <form id="loginForm" autocomplete="off">
-      <div class="input-group">
-        <input id="email" type="email" required />
-        <label>Email Address</label>
-      </div>
-
-      <div class="input-group">
-        <input id="password" type="password" required />
-        <label>Password</label>
-      </div>
-
-      <button type="submit" class="login-btn">
-        Sign In
-      </button>
-    </form>
-
-    <div id="loginMsg" class="msg"></div>
-  </main>
+      <p id="loginMsg" class="msg"></p>
+    </div>
+  </div>
 
   <script type="module" src="/admin/login.js"></script>
 </body>
