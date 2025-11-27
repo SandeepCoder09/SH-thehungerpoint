@@ -2,63 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Orders – SH</title>
-
+  <title>My Orders – SH</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="orders.css">
 
-  <!-- Firebase Core -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-<!-- Firebase Config (ADD THIS HERE) -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
-    authDomain: "sh-the-hunger-point.firebaseapp.com",
-    projectId: "sh-the-hunger-point",
-    storageBucket: "sh-the-hunger-point.firebasestorage.app",
-    messagingSenderId: "401237282420",
-    appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
-    measurementId: "G-4KP3RJ15E9"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
+      authDomain: "sh-the-hunger-point.firebaseapp.com",
+      projectId: "sh-the-hunger-point",
+      storageBucket: "sh-the-hunger-point.firebasestorage.app",
+      messagingSenderId: "401237282420",
+      appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
+      measurementId: "G-4KP3RJ15E9"
+    };
+  </script>
 
 </head>
-
 <body>
 
-  <header class="top-bar">
-    <a href="../home/index.html" class="back-btn">←</a>
-    <h2>Orders</h2>
-    <span class="search-ico">🔍</span>
+  <header class="topbar">
+    <h2>My Orders</h2>
   </header>
 
-  <div class="orders-container">
-    <h3>Your orders</h3>
-    <p class="sub">Track ongoing orders or reorder past ones.</p>
+  <main class="orders-container">
 
-    <h4>Past orders</h4>
-
-    <div id="ordersList" class="order-list">
-      <p class="loading">Loading orders…</p>
+    <div id="emptyState" class="empty-box">
+      No orders found
     </div>
-  </div>
 
-  <!-- TEST BUTTON -->
-  <button id="createTestOrder" class="test-btn">Create Test Order</button>
+    <div id="ordersList"></div>
 
-  <!-- Bottom Navigation same as home -->
-  <nav class="bottom-nav">
-    <a href="../home/index.html">Menu</a>
-    <a href="orders.html" class="active">Orders</a>
-    <a href="../home/index.html#cart" class="cart-btn">🛒</a>
-    <a href="#">Profile</a>
-    <a href="#">More</a>
-  </nav>
+    <button id="createTestOrder" class="test-btn">
+      ➕ Create Test Order
+    </button>
+
+  </main>
 
   <script src="orders.js"></script>
 </body>
