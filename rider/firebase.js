@@ -1,6 +1,6 @@
-// rider/firebase.js
-// Minimal Firebase modular init for the Rider Dashboard
-// Replace config values if needed (I used the config you provided earlier).
+// /rider/firebase.js
+// Minimal Firebase modular init for the Rider Dashboard.
+// Uses the config you provided.
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
 import {
@@ -47,7 +47,5 @@ export {
   doc,
   getDoc,
   updateDoc,
-  orderBy,
-  signInWithEmailAndPassword,
-  signOut
+  orderBy
 };
