@@ -1,74 +1,69 @@
+<!-- rider/index.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Rider Dashboard — SH</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/rider/rider.css" />
+  <link rel="stylesheet" href="./rider.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
   <header class="topbar">
-    <div class="left">
-      <img id="riderAvatar" class="avatar" src="/home/SH-Favicon.png" alt="avatar" />
-      <div class="meta">
-        <div id="riderName" class="name">Rider</div>
-        <div id="riderEmail" class="sub muted">—</div>
-        <div id="riderId" class="muted small">ID: —</div>
-      </div>
-    </div>
-
+    <button id="btnBack" class="icon">←</button>
+    <div class="title">Rider Dashboard</div>
     <div class="right">
-      <div class="status">
-        <span id="statusDot" class="dot offline"></span>
-        <span id="statusText">Offline</span>
+      <div class="rider-info">
+        <img id="avatarImg" class="avatar" src="/home/SH-Favicon.png" alt="avatar" />
+        <div class="meta">
+          <div id="riderName" class="name">—</div>
+          <div class="small">
+            <span id="riderEmail">—</span>
+            <span class="dot" id="statusDot" title="status"></span>
+            <span id="statusText">—</span>
+          </div>
+          <div class="small">ID: <strong id="riderIdSpan">—</strong></div>
+        </div>
       </div>
       <button id="btnLogout" class="btn ghost">Logout</button>
     </div>
   </header>
 
-  <main class="main">
-    <section class="map-wrap panel">
-      <div id="map" class="map">Loading map…</div>
+  <main class="container">
+    <section class="map-card">
+      <div id="map" class="map"></div>
     </section>
 
-    <section class="panel controls">
+    <section class="controls">
       <div class="row">
-        <div>Connected: <strong id="connStatus">—</strong></div>
+        <div>Connected: <span id="connStatus">—</span></div>
         <div>Active Order: <strong id="activeOrder">—</strong></div>
-        <div>Last seen: <span id="lastSeen">—</span></div>
       </div>
 
-      <div class="buttons">
-        <button id="btnAccept" class="btn">Accept</button>
-        <button id="btnStart" class="btn primary">Start Trip</button>
+      <div class="row small muted">Last seen: <span id="lastSeen">—</span></div>
+
+      <div class="actions">
+        <button id="btnAcceptSelected" class="btn">Accept</button>
+        <button id="btnStartTrip" class="btn primary">Start Trip</button>
         <button id="btnDeliver" class="btn success">Mark Delivered</button>
       </div>
 
-      <hr/>
+      <hr />
 
-      <div class="upload">
-        <label for="fileAvatar">Upload profile photo</label>
-        <input id="fileAvatar" type="file" accept="image/*" />
+      <div>
+        <label class="small">Upload profile photo</label>
+        <input id="avatarFile" type="file" accept="image/*" />
         <button id="btnUploadAvatar" class="btn">Upload</button>
-        <div id="uploadMsg" class="muted small"></div>
       </div>
     </section>
 
-    <section class="panel orders-list">
+    <section class="orders-panel">
       <h3>Available / Assigned Orders</h3>
-      <div id="orders" class="orders">Loading…</div>
+      <div id="ordersList" class="orders-list">Loading...</div>
     </section>
   </main>
 
-  <div id="toast" class="toast hidden"></div>
-
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script type="module" src="./rider.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script type="module" src="./socket-client.js"></script>
-  <script type="module" src="/rider/firebase.js"></script>
-  <script type="module" src="/rider/rider-gps.js"></script>
-  <script type="module" src="/rider/rider.js"></script>
 </body>
 </html>
