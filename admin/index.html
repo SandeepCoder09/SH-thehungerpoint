@@ -6,23 +6,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Leaflet (for small preview maps if you want later) -->
+  <!-- Leaflet (small preview maps if needed) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+  <!-- Admin CSS (updated theme) -->
   <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
   <div class="topbar">
-    <div class="title">SH — Admin Dashboard</div>
-    <div class="right">
+    <div class="top-left">
+      <img src="/home/sh-thehungerpoint.png" class="top-logo" alt="SH" />
+      <div class="title">SH — Admin Dashboard</div>
+    </div>
+
+    <div class="top-right">
       <div class="card small">Socket: <span id="sockStatus">—</span></div>
-      <div class="card small">Active Orders: <strong id="cardActive">0</strong></div>
+      <div class="card small">Active: <strong id="cardActive">0</strong></div>
       <div class="card small">Delivered: <strong id="cardDelivered">0</strong></div>
-      <button id="btnRefresh" class="btn">Refresh</button>
+      <button id="btnRefresh" class="btn ghost">Refresh</button>
     </div>
   </div>
 
-<button id="btnTestOrder" class="btn test-order-btn">➕ Create Test Order</button>
+  <div class="admin-toolbar">
+    <button id="btnTestOrder" class="btn test-order-btn">➕ Create Test Order</button>
+    <div class="spacer"></div>
+    <button id="btnShowMap" class="btn ghost">Open Tracking Map</button>
+  </div>
 
   <main class="layout">
     <section class="left-col">
@@ -42,9 +51,9 @@
 
       <div class="panel">
         <h3>Quick Actions</h3>
-        <div style="display:flex;gap:8px;">
-          <button id="btnCenterAll" class="btn">Center Map</button>
-          <button id="btnShowMap" class="btn">Open Tracking Map</button>
+        <div class="quick-actions">
+          <button id="btnCenterAll" class="btn ghost">Center Map</button>
+          <button id="btnExport" class="btn ghost">Export CSV</button>
         </div>
       </div>
     </section>
@@ -54,6 +63,7 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- admin logic (module) -->
   <script type="module" src="/admin/admin.js"></script>
 </body>
 </html>
