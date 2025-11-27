@@ -2,65 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Rider Dashboard — SH</title>
+  <title>Rider — SH</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  
-  <link rel="stylesheet" href="/rider/rider.css">
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Leaflet (map) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/rider/rider.css" />
 </head>
-
 <body>
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="rider-info">
-      <img id="riderPhoto" class="avatar" src="/home/SH-Favicon.png">
-      <div>
-        <div id="riderName" class="name">Rider</div>
-        <div id="riderEmail" class="email">Email</div>
-        <div id="riderStatus" class="status offline">● Offline</div>
+  <header class="rider-top">
+    <div class="rider-profile">
+      <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
+      <div class="rider-meta">
+        <div id="riderName" class="rider-name">Rider</div>
+        <div id="riderEmail" class="rider-email">Email</div>
+        <div class="small">
+          <span id="riderStatusDot" class="dot offline"></span>
+          <span id="riderStatus">Offline</span>
+        </div>
+        <div class="small">ID: <strong id="riderIdDisplay">—</strong></div>
       </div>
     </div>
-
-    <button id="btnLogout" class="logout-btn">Logout</button>
+    <div class="rider-actions">
+      <button id="btnLogout" class="btn small">Logout</button>
+    </div>
   </header>
 
+  <main class="rider-main">
+    <section class="map-panel">
+      <div id="map" class="map">Loading map...</div>
+    </section>
 
-  <!-- MAP -->
-  <section class="panel">
-    <div id="map" class="map-box">Loading map…</div>
-  </section>
+    <section class="controls-panel">
+      <div class="status-row">
+        <div>Connected: <strong id="connStatus">—</strong></div>
+        <div>Active Order: <strong id="activeOrder">—</strong></div>
+      </div>
 
+      <div class="last-seen">Last seen: <span id="lastSeen">—</span></div>
 
-  <!-- CONTROLS -->
-  <section class="panel">
-    <div class="row">
-      Connected: <span id="connStatus">—</span>
-      &nbsp; • &nbsp;
-      Active Order: <span id="activeOrder">—</span>
-    </div>
+      <div class="buttons-row">
+        <button id="btnAcceptSelected" class="btn">Accept</button>
+        <button id="btnStartTrip" class="btn primary">Start Trip</button>
+        <button id="btnDeliver" class="btn success">Mark Delivered</button>
+      </div>
 
-    <div class="row">
-      Last seen: <span id="lastSeen">—</span>
-    </div>
+      <hr />
 
-    <div class="btn-row">
-      <button id="btnAcceptSelected" class="btn">Accept</button>
-      <button id="btnStartTrip" class="btn red">Start Trip</button>
-      <button id="btnDeliver" class="btn green">Mark Delivered</button>
-    </div>
-  </section>
+      <div class="upload-section">
+        <label>Upload profile photo</label>
+        <input id="photoInput" type="file" accept="image/*" />
+        <button id="btnUploadPhoto" class="btn">Upload</button>
+        <div id="uploadMsg" class="small muted"></div>
+      </div>
+    </section>
 
+    <section class="orders-panel">
+      <h3>All Orders (live)</h3>
+      <div id="ordersList" class="orders-list">Loading...</div>
+    </section>
+  </main>
 
-  <!-- ALL ORDERS -->
-  <section class="panel">
-    <h3>All Orders (live)</h3>
-    <div id="ordersList" class="orders-list">Loading…</div>
-  </section>
+  <footer class="rider-footer muted">Rider dashboard • SH — The Hunger Point</footer>
 
-
+  <!-- libs -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script type="module" src="/rider/rider.js"></script>
 
+  <!-- app modules (must exist) -->
+  <script type="module" src="/rider/rider.js"></script>
 </body>
 </html>
