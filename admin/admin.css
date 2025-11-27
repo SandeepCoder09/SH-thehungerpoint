@@ -180,3 +180,20 @@ body {
         order: 2
     }
 }
+
+.admin-test-btn {
+  background: #E23744;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 15px 0;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(226, 55, 68, 0.3);
+  transition: 0.2s;
+}
+.admin-test-btn:active {
+  transform: scale(0.97);
+}
