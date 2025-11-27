@@ -1,3 +1,4 @@
+/* /rider/rider.css */
 :root {
 	--bg: #071028;
 	--panel: #071726;
@@ -9,7 +10,7 @@
 }
 
 * {
-	box-sizing: border-box;
+	box-sizing: border-box
 }
 
 body {
@@ -21,7 +22,6 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-/* top */
 .rider-top {
 	display: flex;
 	justify-content: space-between;
@@ -34,35 +34,34 @@ body {
 .rider-profile {
 	display: flex;
 	gap: 12px;
-	align-items: center;
+	align-items: center
 }
 
 .rider-profile img {
 	width: 64px;
 	height: 64px;
 	border-radius: 999px;
-	border: 4px solid rgba(255, 255, 255, 0.08);
+	border: 4px solid rgba(255, 255, 255, .08);
 	object-fit: cover;
 	background: #fff;
 }
 
 .rider-meta {
-	line-height: 1.05;
+	line-height: 1.05
 }
 
 .rider-name {
-	font-weight: 700;
-	font-size: 18px;
+	font-weight: 700
 }
 
 .rider-email {
 	font-size: 13px;
-	color: rgba(255, 255, 255, 0.9);
+	color: rgba(255, 255, 255, 0.9)
 }
 
 .small {
 	font-size: 13px;
-	color: var(--muted);
+	color: var(--muted)
 }
 
 .dot {
@@ -70,16 +69,16 @@ body {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	margin-right: 8px;
-	vertical-align: middle;
+	margin-right: 6px;
+	vertical-align: middle
 }
 
 .dot.online {
-	background: #2ecc71;
+	background: #2ecc71
 }
 
 .dot.offline {
-	background: #b94b4b;
+	background: #b94b4b
 }
 
 .btn {
@@ -88,23 +87,23 @@ body {
 	color: var(--text);
 	padding: 8px 12px;
 	border-radius: 10px;
-	cursor: pointer;
+	cursor: pointer
 }
 
 .btn.small {
-	padding: 6px 10px;
+	padding: 6px 10px
 }
 
 .btn.primary {
 	background: var(--accent);
 	color: #fff;
-	border: none;
+	border: none
 }
 
 .btn.success {
 	background: var(--success);
 	color: #fff;
-	border: none;
+	border: none
 }
 
 .rider-main {
@@ -113,7 +112,7 @@ body {
 	grid-template-columns: 1fr;
 	gap: 16px;
 	max-width: 980px;
-	margin: 0 auto;
+	margin: 0 auto
 }
 
 .map-panel .map {
@@ -121,52 +120,52 @@ body {
 	border-radius: 12px;
 	background: var(--panel);
 	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-	overflow: hidden;
+	overflow: hidden
 }
 
 .controls-panel {
 	background: var(--panel);
 	padding: 14px;
 	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5)
 }
 
 .status-row {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 8px;
+	margin-bottom: 8px
 }
 
 .last-seen {
 	color: var(--muted);
-	margin-bottom: 10px;
+	margin-bottom: 10px
 }
 
 .buttons-row {
 	display: flex;
 	gap: 8px;
 	margin-bottom: 12px;
-	flex-wrap: wrap;
+	flex-wrap: wrap
 }
 
 .upload-section {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 8px
 }
 
 .upload-section input[type=file] {
 	padding: 6px;
 	background: transparent;
-	color: var(--text);
+	color: var(--text)
 }
 
 .orders-panel {
 	background: var(--panel);
 	padding: 14px;
 	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5)
 }
 
 .orders-list {
@@ -175,7 +174,7 @@ body {
 	gap: 8px;
 	max-height: 320px;
 	overflow: auto;
-	padding-top: 6px;
+	padding-top: 6px
 }
 
 .order-card {
@@ -185,41 +184,39 @@ body {
 	padding: 10px;
 	border-radius: 12px;
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-	border: 1px solid rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.02)
 }
 
 .order-card .meta {
 	font-size: 13px;
-	color: var(--muted);
-	margin-top: 6px;
+	color: var(--muted)
 }
 
 .order-actions {
 	display: flex;
-	gap: 8px;
-	align-items: center;
+	gap: 8px
 }
 
 .order-badge {
 	padding: 6px 8px;
 	border-radius: 999px;
 	font-weight: 700;
-	font-size: 12px;
+	font-size: 12px
 }
 
 .order-badge.preparing {
 	background: #f7b267;
-	color: #2b1700;
+	color: #2b1700
 }
 
 .order-badge.paid {
 	background: #2ecc71;
-	color: #033010;
+	color: #033010
 }
 
 .order-badge.picked {
 	background: #3aa0ff;
-	color: #021227;
+	color: #021227
 }
 
 .rider-footer {
@@ -231,15 +228,15 @@ body {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.2));
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.2))
 }
 
 @media(min-width:900px) {
 	.rider-main {
-		grid-template-columns: 1fr 420px;
+		grid-template-columns: 1fr 420px
 	}
 
 	.map-panel {
-		grid-column: 1/2;
+		grid-column: 1/2
 	}
 }
