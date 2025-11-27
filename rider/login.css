@@ -1,40 +1,77 @@
+/* /rider/login.css */
+:root {
+	--bg: #071028;
+	--accent: #E23744;
+	--text: #e6eef8;
+	--muted: #9fb0c8;
+}
+
+* {
+	box-sizing: border-box;
+}
+
 body {
-  margin: 0;
-  background: #071428;
-  font-family: Inter, Arial;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  padding-top: 100px;
+	margin: 0;
+	min-height: 100vh;
+	font-family: Inter, system-ui, Arial;
+	background: linear-gradient(180deg, #071028, #05121a);
+	color: var(--text);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
 }
 
-.container {
-  width: 90%;
-  max-width: 350px;
-  padding: 25px;
-  background: #0b1a2a;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,.4);
+.login-root .card {
+	width: 100%;
+	max-width: 420px;
+	background: rgba(255, 255, 255, 0.03);
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
-h2 { margin-bottom: 20px; }
+h2 {
+	margin: 0 0 8px;
+}
+
+label {
+	display: block;
+	margin-top: 12px;
+	font-size: 14px;
+	color: var(--muted);
+}
 
 input {
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
+	width: 100%;
+	padding: 10px 12px;
+	margin-top: 6px;
+	border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	background: transparent;
+	color: var(--text);
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  background: #E23744;
-  color: #fff;
-  border: none;
-  font-size: 16px;
+.btn {
+	display: inline-block;
+	padding: 10px 14px;
+	border-radius: 10px;
+	margin-top: 16px;
+	cursor: pointer;
+	border: none;
 }
 
-#msg { margin-top: 15px; color: #f77; }
+.btn.primary {
+	background: var(--accent);
+	color: #fff;
+}
+
+.muted {
+	color: var(--muted);
+	font-size: 13px;
+	margin-top: 10px;
+}
+
+.small {
+	font-size: 13px;
+}
