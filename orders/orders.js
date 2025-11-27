@@ -1,96 +1,106 @@
-/* ----------------------------
-   Firebase Init
------------------------------ */
+/* =======================================================
+   SH — ORDERS PAGE (FINAL)
+======================================================= */
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
-  authDomain: "sh-the-hunger-point.firebaseapp.com",
-  projectId: "sh-the-hunger-point",
-  storageBucket: "sh-the-hunger-point.firebasestorage.app",
-  messagingSenderId: "401237282420",
-  appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
-  measurementId: "G-4KP3RJ15E9"
-};
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 
-// Init Firebase
+/* INIT FIREBASE */
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+/* DOM */
 const ordersList = document.getElementById("ordersList");
+const emptyState = document.getElementById("emptyState");
 const testBtn = document.getElementById("createTestOrder");
 
-// ---------------------------------------
-// Load Orders
-// ---------------------------------------
+/* LOAD ORDERS */
 async function loadOrders() {
-  ordersList.innerHTML = `<p class="loading">Loading orders…</p>`;
+  try {
+    const snap = await db
+      .collection("orders")
+      .orderBy("createdAt", "desc")
+      .limit(30)
+      .get();
 
-  const snap = await db.collection("orders")
-    .orderBy("createdAt", "desc")
-    .get();
+    ordersList.innerHTML = "";
 
-  if (snap.empty) {
-    ordersList.innerHTML = `<p style="opacity:0.6">No orders yet</p>`;
-    return;
-  }
+    if (snap.empty) {
+      emptyState.style.display = "block";
+      return;
+    }
 
-  ordersList.innerHTML = "";
+    emptyState.style.display = "none";
 
-  snap.forEach(doc => {
-    const o = doc.data();
-    const id = doc.id;
+    snap.forEach((doc) => {
+      const o = doc.data();
+      const id = doc.id;
 
-    let statusClass =
-      o.status === "preparing" ? "st-preparing" :
-      o.status === "out" ? "st-out" :
-      "st-delivered";
+      const itemCount = o.items?.reduce((s, i) => s + i.qty, 0) || 0;
+      const status = o.status || "preparing";
+      const price = o.totalAmount || 0;
 
-    const itemsText = o.items.map(i => `${i.qty} × ${i.name}`).join(", ");
+      const card = document.createElement("div");
+      card.className = "order-card";
+      card.dataset.id = id;
 
-    const card = document.createElement("div");
-    card.className = "order-card";
-    card.innerHTML = `
-      <div class="order-row-1">
-        <span>Order #${id.slice(0,6)}</span>
-        <span class="order-status ${statusClass}">${o.status}</span>
-      </div>
+      card.innerHTML = `
+        <div class="order-row">
+          <div>
+            <div class="order-id">#${id.slice(0, 6)}</div>
+            <div class="order-items">${itemCount} items • ₹${price}</div>
+          </div>
 
-      <div class="order-items">${itemsText}</div>
+          <div class="order-right">
+            <span class="order-status ${status}">
+              ${status}
+            </span>
+            <span class="order-arrow">›</span>
+          </div>
+        </div>
 
-      <button class="track-btn" data-id="${id}">
-        Track Order
-      </button>
-    `;
+        <div class="order-time">
+          ${o.createdAt?.toDate().toLocaleString()}
+        </div>
+      `;
 
-    ordersList.appendChild(card);
-  });
+      card.addEventListener("click", () => {
+        window.location.href = `/track/track-order.html?orderId=${id}`;
+      });
 
-  document.querySelectorAll(".track-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.location.href = `track-order.html?orderId=${id}`;
+      ordersList.appendChild(card);
     });
-  });
+  } catch (err) {
+    console.error("Load Orders Error:", err);
+  }
 }
 
-loadOrders();
+/* CREATE TEST ORDER */
+testBtn?.addEventListener("click", async () => {
+  try {
+    testBtn.disabled = true;
+    testBtn.textContent = "Creating...";
 
-// ---------------------------------------
-// Create Test Order
-// ---------------------------------------
-testBtn.addEventListener("click", async () => {
-  const id = "test_" + Date.now();
+    const res = await fetch(`${SERVER_URL}/create-test-order`, {
+      method: "POST"
+    });
 
-  await db.collection("orders").doc(id).set({
-    items: [
-      { name: "Momo", qty: 1, price: 10 },
-      { name: "Hot Tea", qty: 1, price: 10 }
-    ],
-    total: 20,
-    status: "out",
-    createdAt: firebase.firestore.Timestamp.now()
-  });
+    const data = await res.json();
 
-  alert("Test order created!");
-  loadOrders();
+    if (!data.ok) {
+      alert("Failed: " + data.error);
+    } else {
+      alert("Test Order Created: " + data.orderId);
+      loadOrders();
+    }
+
+  } catch (err) {
+    alert("Server Error: " + err.message);
+  } finally {
+    testBtn.disabled = false;
+    testBtn.textContent = "Create Test Order";
+  }
 });
+
+/* REFRESH EVERY 10s */
+setInterval(loadOrders, 10000);
+loadOrders();
