@@ -8,30 +8,20 @@
   <link rel="stylesheet" href="./login.css" />
 </head>
 <body>
-  <main class="login-shell">
+  <main class="login-wrap">
     <div class="card">
-      <img src="/home/sh-thehungerpoint.png" class="logo" alt="SH" />
-      <h1>Rider sign in</h1>
-      <p class="muted">Use phone number or email + password</p>
+      <h2>Rider Login</h2>
+      <p>Use your registered email and password</p>
 
-      <form id="loginForm" class="form" autocomplete="on">
-        <label>
-          Phone or Email
-          <input id="identifier" name="identifier" type="text" inputmode="email" placeholder="phone or email" required />
-        </label>
+      <label>Email<input id="email" type="email" placeholder="rider@example.com" /></label>
+      <label>Password<input id="password" type="password" placeholder="password" /></label>
 
-        <label>
-          Password
-          <input id="password" name="password" type="password" placeholder="Password" required />
-        </label>
+      <div class="row">
+        <button id="btnLogin" class="btn primary">Sign in</button>
+        <button id="btnDemo" class="btn ghost">Fill demo</button>
+      </div>
 
-        <div class="actions">
-          <button id="btnLogin" type="submit" class="btn primary">Sign in</button>
-        </div>
-      </form>
-
-      <div id="msg" class="msg" aria-live="polite"></div>
-      <small class="muted">Make sure your rider record exists and is approved in Firestore.</small>
+      <div id="msg" class="muted"></div>
     </div>
   </main>
 
