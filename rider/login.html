@@ -1,30 +1,23 @@
-<!-- rider/login.html -->
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
   <title>Rider Login — SH</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./login.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/rider/login.css">
 </head>
+
 <body>
-  <main class="login-wrap">
-    <div class="card">
-      <h2>Rider Login</h2>
-      <p>Use your registered email and password</p>
+  <div class="container">
+    <h2>Rider Login</h2>
 
-      <label>Email<input id="email" type="email" placeholder="rider@example.com" /></label>
-      <label>Password<input id="password" type="password" placeholder="password" /></label>
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
 
-      <div class="row">
-        <button id="btnLogin" class="btn primary">Sign in</button>
-        <button id="btnDemo" class="btn ghost">Fill demo</button>
-      </div>
+    <button id="btnLogin">Login</button>
+    <div id="msg"></div>
+  </div>
 
-      <div id="msg" class="muted"></div>
-    </div>
-  </main>
-
-  <script type="module" src="./login.js"></script>
+  <script type="module" src="/rider/login.js"></script>
 </body>
 </html>
