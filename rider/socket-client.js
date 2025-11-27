@@ -1,24 +1,24 @@
 // rider/socket-client.js
-// Minimal socket helper for rider. Exports connectSocket() and getSocket()
-
 const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
-const SOCKET_URL = API_BASE; // socket.io client will use same origin
+const SOCKET_URL = API_BASE; // same origin where socket.io server runs
 
 let socket = null;
 
-export async function connectSocket({ token, riderId } = {}) {
+/**
+ * connectSocket({ token, riderId })
+ * resolves with socket instance (may be disconnected but created)
+ */
+export function connectSocket({ token, riderId } = {}) {
   return new Promise((resolve, reject) => {
     try {
-      // connect and pass auth via query or auth object
       socket = io(SOCKET_URL, {
         transports: ["websocket"],
         auth: { token: token || null },
         query: { riderId: riderId || "" },
-        reconnectionAttempts: 5
+        reconnectionAttempts: 99
       });
 
       socket.on("connect", () => {
-        // join rider room
         socket.emit("rider:join", { riderId });
         resolve(socket);
       });
@@ -27,15 +27,11 @@ export async function connectSocket({ token, riderId } = {}) {
         console.warn("socket connect_error", err);
       });
 
-      // small timeout: if not connected by 5s, still resolve/reject accordingly
+      // safety: resolve even if connection is slow
       setTimeout(() => {
-        if (!socket || !socket.connected) {
-          // still not connected - but we allow the page to run and will reconnect automatically
-          // resolve with current socket (may be disconnected)
-          resolve(socket);
-        }
-      }, 5000);
-
+        if (!socket) return reject(new Error("socket not created"));
+        resolve(socket);
+      }, 4000);
     } catch (err) {
       reject(err);
     }
