@@ -205,47 +205,77 @@ async function findRiderByEmailOrPhone(identifier) {
 
 app.post("/rider/login", async (req, res) => {
   try {
-    const { email, password, phone } = req.body;
-    const identifier = (email || phone || "").trim();
-    if (!identifier || !password) return safeJson(res, 400, { ok: false, error: "Missing inputs" });
+    if (!db) return safeJson(res, 500, { ok: false, error: "Server error" });
 
-    const found = await findRiderByEmailOrPhone(identifier);
-    if (!found) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+    const { email, password, phone, riderId } = req.body;
+
+    const identifier = (email || phone || riderId || "").trim();
+    if (!identifier || !password)
+      return safeJson(res, 400, { ok: false, error: "Missing inputs" });
+
+    let found = null;
+
+    // 1) Try doc ID
+    try {
+      const docRef = await db.collection("riders").doc(identifier).get();
+      if (docRef.exists) found = { id: docRef.id, data: docRef.data() };
+    } catch {}
+
+    // 2) Try phone
+    if (!found) {
+      const q = await db.collection("riders").where("phone", "==", identifier).limit(1).get();
+      if (!q.empty) {
+        const d = q.docs[0];
+        found = { id: d.id, data: d.data() };
+      }
+    }
+
+    // 3) Try email
+    if (!found) {
+      const q2 = await db.collection("riders").where("email", "==", identifier).limit(1).get();
+      if (!q2.empty) {
+        const d = q2.docs[0];
+        found = { id: d.id, data: d.data() };
+      }
+    }
+
+    // 4) Try riderId  ← *** NEW FIX ***
+    if (!found) {
+      const q3 = await db.collection("riders").where("riderId", "==", identifier).limit(1).get();
+      if (!q3.empty) {
+        const d = q3.docs[0];
+        found = { id: d.id, data: d.data() };
+      }
+    }
+
+    if (!found)
+      return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const rider = found.data;
-    const riderId = found.id;
-
-    if (!rider.approved) return safeJson(res, 200, { ok: false, error: "Rider not approved yet" });
-
     const storedHash = rider.passwordHash || rider.password;
+
     const match = await bcrypt.compare(password, storedHash);
-    if (!match) return safeJson(res, 200, { ok: false, error: "Incorrect password" });
+    if (!match)
+      return safeJson(res, 200, { ok: false, error: "Incorrect password" });
 
-    const token = jwt.sign({ riderId, role: "rider" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    if (!rider.approved)
+      return safeJson(res, 200, { ok: false, error: "Rider not approved yet" });
 
-    return safeJson(res, 200, { ok: true, riderId, token });
+    const token = jwt.sign(
+      { riderId: rider.riderId || found.id, email: rider.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return safeJson(res, 200, {
+      ok: true,
+      token,
+      riderId: rider.riderId,
+      email: rider.email,
+      name: rider.name
+    });
   } catch (err) {
     console.error("Rider login failed:", err);
-    return safeJson(res, 500, { ok: false, error: "Server error" });
-  }
-});
-
-/* -----------------------------------
-   Rider checks
------------------------------------ */
-app.get("/rider/check", async (req, res) => {
-  try {
-    const riderId = req.query.riderId || "";
-    if (!riderId) return safeJson(res, 400, { ok: false, error: "riderId required" });
-
-    const doc = await db.collection("riders").doc(riderId).get();
-    if (!doc.exists) return safeJson(res, 200, { ok: false, error: "Rider not found" });
-
-    if (!doc.data().approved) return safeJson(res, 200, { ok: false, error: "Not approved" });
-
-    return safeJson(res, 200, { ok: true });
-  } catch (err) {
-    console.error("rider check failed:", err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
