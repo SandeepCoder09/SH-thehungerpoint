@@ -1,69 +1,67 @@
-<!-- rider/index.html -->
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>Rider Dashboard — SH</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./rider.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/rider/rider.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
+
 <body>
-  <header class="topbar">
-    <button id="btnBack" class="icon">←</button>
-    <div class="title">Rider Dashboard</div>
-    <div class="right">
-      <div class="rider-info">
-        <img id="avatarImg" class="avatar" src="/home/SH-Favicon.png" alt="avatar" />
-        <div class="meta">
-          <div id="riderName" class="name">—</div>
-          <div class="small">
-            <span id="riderEmail">—</span>
-            <span class="dot" id="statusDot" title="status"></span>
-            <span id="statusText">—</span>
-          </div>
-          <div class="small">ID: <strong id="riderIdSpan">—</strong></div>
-        </div>
-      </div>
-      <button id="btnLogout" class="btn ghost">Logout</button>
-    </div>
-  </header>
 
-  <main class="container">
-    <section class="map-card">
-      <div id="map" class="map"></div>
-    </section>
-
-    <section class="controls">
-      <div class="row">
-        <div>Connected: <span id="connStatus">—</span></div>
-        <div>Active Order: <strong id="activeOrder">—</strong></div>
-      </div>
-
-      <div class="row small muted">Last seen: <span id="lastSeen">—</span></div>
-
-      <div class="actions">
-        <button id="btnAcceptSelected" class="btn">Accept</button>
-        <button id="btnStartTrip" class="btn primary">Start Trip</button>
-        <button id="btnDeliver" class="btn success">Mark Delivered</button>
-      </div>
-
-      <hr />
-
+  <!-- TOP PROFILE -->
+  <div class="topbar">
+    <div class="left">
+      <img id="avatar" class="avatar">
       <div>
-        <label class="small">Upload profile photo</label>
-        <input id="avatarFile" type="file" accept="image/*" />
-        <button id="btnUploadAvatar" class="btn">Upload</button>
+        <div id="riderName" class="name">—</div>
+        <div id="riderEmail" class="email">—</div>
+        <div>ID: <span id="riderIdBox">—</span></div>
       </div>
-    </section>
+    </div>
 
-    <section class="orders-panel">
-      <h3>Available / Assigned Orders</h3>
-      <div id="ordersList" class="orders-list">Loading...</div>
-    </section>
-  </main>
+    <div class="right">
+      <span id="onlineDot" class="dot off"></span>
+      <span id="onlineText">Offline</span>
+      <button id="btnLogout" class="logout">Logout</button>
+    </div>
+  </div>
 
-  <script type="module" src="./rider.js"></script>
+  <!-- MAP -->
+  <div id="map" class="map"></div>
+
+  <!-- Info Panel -->
+  <div class="info">
+    Connected: <span id="connStatus">—</span>
+    &nbsp;&nbsp; Last seen: <span id="lastSeen">—</span>
+    &nbsp;&nbsp; Active Order: <span id="activeOrder">—</span>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button id="btnAcceptSelected">Accept</button>
+    <button id="btnStartTrip" class="red">Start Trip</button>
+    <button id="btnDeliver" class="green">Mark Delivered</button>
+  </div>
+
+  <!-- Upload Photo -->
+  <div class="upload">
+    <label>Upload profile photo</label>
+    <input type="file" id="photoFile">
+    <button id="btnUpload">Upload</button>
+  </div>
+
+  <!-- Orders -->
+  <div class="orders">
+    <h3>Available / Assigned Orders</h3>
+    <div id="ordersList">Loading…</div>
+  </div>
+
+  <!-- SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <script type="module" src="/rider/rider.js"></script>
 </body>
 </html>
