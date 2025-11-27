@@ -1,36 +1,47 @@
 // rider/socket-client.js
-(function () {
-  const API_BASE = window.SH?.API_BASE ?? "";
-  const SOCKET_URL = API_BASE.replace(/^http/, "ws");
+// Minimal socket helper for rider. Exports connectSocket() and getSocket()
 
-  if (!window.io) {
-    console.warn("Socket.io not loaded");
-    return;
-  }
+const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
+const SOCKET_URL = API_BASE; // socket.io client will use same origin
 
-  const token = localStorage.getItem("riderToken");
-  const riderId = localStorage.getItem("riderId");
+let socket = null;
 
-  const socket = io(SOCKET_URL, {
-    transports: ["websocket"],
-    auth: { token: token ? `Bearer ${token}` : null },
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1200
+export async function connectSocket({ token, riderId } = {}) {
+  return new Promise((resolve, reject) => {
+    try {
+      // connect and pass auth via query or auth object
+      socket = io(SOCKET_URL, {
+        transports: ["websocket"],
+        auth: { token: token || null },
+        query: { riderId: riderId || "" },
+        reconnectionAttempts: 5
+      });
+
+      socket.on("connect", () => {
+        // join rider room
+        socket.emit("rider:join", { riderId });
+        resolve(socket);
+      });
+
+      socket.on("connect_error", (err) => {
+        console.warn("socket connect_error", err);
+      });
+
+      // small timeout: if not connected by 5s, still resolve/reject accordingly
+      setTimeout(() => {
+        if (!socket || !socket.connected) {
+          // still not connected - but we allow the page to run and will reconnect automatically
+          // resolve with current socket (may be disconnected)
+          resolve(socket);
+        }
+      }, 5000);
+
+    } catch (err) {
+      reject(err);
+    }
   });
+}
 
-  socket.on("connect", () => {
-    console.log("Socket connected:", socket.id);
-    if (riderId) socket.emit("rider:join", { riderId });
-    document.dispatchEvent(new Event("socket:connected"));
-  });
-
-  socket.on("connect_error", (err) => {
-    console.warn("Socket error:", err.message);
-  });
-
-  socket.on("disconnect", (reason) => {
-    console.warn("Socket disconnected:", reason);
-  });
-
-  window.socket = socket;
-})();
+export function getSocket() {
+  return socket;
+}
