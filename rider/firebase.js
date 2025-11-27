@@ -1,7 +1,4 @@
 // /rider/firebase.js
-// Minimal Firebase modular init for the Rider Dashboard.
-// Uses the config you provided.
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
 import {
   getFirestore,
@@ -24,7 +21,7 @@ import {
 const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
-  projectId: "sh-the-hunger-point",
+  projectId: "sh-thehungerpoint",
   storageBucket: "sh-the-hunger-point.firebasestorage.app",
   messagingSenderId: "401237282420",
   appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
@@ -47,5 +44,7 @@ export {
   doc,
   getDoc,
   updateDoc,
-  orderBy
+  orderBy,
+  signInWithEmailAndPassword,
+  signOut
 };
