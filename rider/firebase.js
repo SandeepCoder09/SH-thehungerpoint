@@ -1,10 +1,23 @@
 // rider/firebase.js
-// Uses the firebase config you provided earlier.
-// Make sure to include this before any file that uses firebase.
+// Modular Firebase v9 client helper (exports firestore helpers used by rider code)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+  orderBy,
+  limit
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+// —— paste your firebaseConfig here (you provided earlier) ——
 const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
@@ -18,4 +31,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export { db, doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot, getDocs };
+export {
+  db,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+  orderBy,
+  limit
+};
