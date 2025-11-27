@@ -29,5 +29,5 @@ async function login() {
   localStorage.setItem("sh_rider_name", r.name);
 
   // redirect
-  window.location.href = "./index.html";
+  window.location.href = "/rider/index.html";
 }
