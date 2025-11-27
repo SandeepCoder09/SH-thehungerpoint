@@ -1,4 +1,6 @@
-// admin/index.js (module)
+// admin/admin.js (module)
+// Merged original admin logic + auth guard + token headers
+
 const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
 const SOCKET_URL = API_BASE.replace(/^http/, "ws");
 
@@ -13,40 +15,38 @@ const cardActive = document.getElementById("cardActive");
 const cardDelivered = document.getElementById("cardDelivered");
 const btnRefresh = document.getElementById("btnRefresh");
 const btnShowMap = document.getElementById("btnShowMap");
-const btnTestOrder = document.getElementById("btnTestOrder"); // NEW
+const btnTestOrder = document.getElementById("btnTestOrder");
+const btnLogout = document.getElementById("btnLogout");
 
 // state
 const orders = {}; // orderId -> order object
 let socket;
 
-// utility
+// util
+function authHeaders() {
+  const token = localStorage.getItem("adminToken");
+  return token ? { Authorization: "Bearer " + token, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+}
+
 function timeAgo(ts) {
   if (!ts) return "";
-  const diff = Math.floor((Date.now() - ts) / 1000);
+  const diff = Math.floor((Date.now() - (ts)) / 1000);
   if (diff < 60) return `${diff}s`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m`;
   return `${Math.floor(diff / 3600)}h`;
 }
 
-/* -----------------------------
-   SUMMARY CARDS
------------------------------ */
+// render summary cards
 function renderCards() {
   const all = Object.keys(orders).length;
-  const delivered = Object.values(orders).filter(
-    o => o.status === "delivered" || o.status === "completed"
-  ).length;
-
+  const delivered = Object.values(orders).filter(o => o.status === "delivered" || o.status === "completed").length;
   cardActive.textContent = String(all);
   cardDelivered.textContent = String(delivered);
 }
 
-/* -----------------------------
-   RENDER ORDERS LIST
------------------------------ */
+// render orders list
 function renderOrdersList() {
-  const arr = Object.values(orders).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-
+  const arr = Object.values(orders).sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
   if (arr.length === 0) {
     ordersListEl.innerHTML = "<div class='muted'>No active orders</div>";
     orderDetailsEl.innerHTML = "<div class='muted'>Select an order to see details</div>";
@@ -55,7 +55,6 @@ function renderOrdersList() {
   }
 
   ordersListEl.innerHTML = "";
-
   for (const o of arr) {
     const row = document.createElement("div");
     row.className = "order-row";
@@ -74,15 +73,8 @@ function renderOrdersList() {
 
     const meta = document.createElement("div");
     meta.className = "order-meta";
-
-    const rpos = o.riderLoc
-      ? `R: ${o.riderLoc.lat.toFixed(5)}, ${o.riderLoc.lng.toFixed(5)}`
-      : "R: —";
-
-    const cpos = o.customerLoc
-      ? `C: ${o.customerLoc.lat.toFixed(5)}, ${o.customerLoc.lng.toFixed(5)}`
-      : "C: —";
-
+    const rpos = o.riderLoc ? `R: ${o.riderLoc.lat.toFixed(5)},${o.riderLoc.lng.toFixed(5)}` : "R: —";
+    const cpos = o.customerLoc ? `C: ${o.customerLoc.lat.toFixed(5)},${o.customerLoc.lng.toFixed(5)}` : "C: —";
     meta.textContent = `${rpos} • ${cpos} • ${o.status || "unknown"} • ${timeAgo(o.updatedAt)}`;
 
     const actions = document.createElement("div");
@@ -113,11 +105,11 @@ function renderOrdersList() {
     row.appendChild(body);
     row.appendChild(statusEl);
     row.appendChild(actions);
-
     actions.appendChild(trackBtn);
     actions.appendChild(detailsBtn);
 
-    row.addEventListener("click", ev => {
+    // click selects
+    row.addEventListener("click", (ev) => {
       if (ev.target === trackBtn || ev.target === detailsBtn) return;
       showOrderDetails(o.orderId);
     });
@@ -128,40 +120,33 @@ function renderOrdersList() {
   renderCards();
 }
 
-/* -----------------------------
-   ORDER DETAILS
------------------------------ */
+// show detailed info
 function showOrderDetails(orderId) {
   const o = orders[orderId];
   if (!o) return;
-
   orderDetailsEl.innerHTML = `
     <div class="row"><strong>Order:</strong> ${o.orderId}</div>
-    <div class="row"><strong>Status:</strong> ${o.status || ""}</div>
-    <div class="row"><strong>Rider:</strong> ${o.riderId || "—"}</div>
-    <div class="row"><strong>Rider Loc:</strong> ${
-      o.riderLoc ? `${o.riderLoc.lat}, ${o.riderLoc.lng}` : "—"
-    }</div>
-    <div class="row"><strong>Customer:</strong> ${o.customerName || o.customerId || "—"}</div>
-    <div class="row"><strong>Customer Loc:</strong> ${
-      o.customerLoc ? `${o.customerLoc.lat}, ${o.customerLoc.lng}` : "—"
-    }</div>
-    <div class="row"><strong>Last updated:</strong> ${
-      o.updatedAt ? new Date(o.updatedAt).toLocaleString() : "—"
-    }</div>
+    <div class="row"><strong>Status:</strong> ${o.status || ''}</div>
+    <div class="row"><strong>Rider:</strong> ${o.riderId || '—'}</div>
+    <div class="row"><strong>Rider Loc:</strong> ${o.riderLoc ? `${o.riderLoc.lat}, ${o.riderLoc.lng}` : '—'}</div>
+    <div class="row"><strong>Customer:</strong> ${o.customerName || o.customerId || '—'}</div>
+    <div class="row"><strong>Customer Loc:</strong> ${o.customerLoc ? `${o.customerLoc.lat}, ${o.customerLoc.lng}` : '—'}</div>
+    <div class="row"><strong>Last updated:</strong> ${o.updatedAt ? new Date(o.updatedAt).toLocaleString() : '—'}</div>
   `;
 }
 
-/* -----------------------------
-   FETCH ACTIVE ORDERS
------------------------------ */
+// fetch active orders (with auth header)
 async function fetchActiveOrders() {
   try {
-    const res = await fetch(API_BASE + "/admin/active-orders");
-    if (!res.ok) return;
-
+    const res = await fetch(API_BASE + "/admin/active-orders", {
+      headers: authHeaders()
+    });
+    if (!res.ok) {
+      console.warn("active-orders API returned", res.status);
+      if (res.status === 401) { handleUnauthorized(); }
+      return;
+    }
     const list = await res.json();
-
     for (const it of list) {
       orders[it.orderId] = orders[it.orderId] || {};
       orders[it.orderId].orderId = it.orderId;
@@ -169,140 +154,161 @@ async function fetchActiveOrders() {
       orders[it.orderId].customerId = it.customerId;
       orders[it.orderId].customerName = it.customerName;
       orders[it.orderId].status = it.status;
-
-      if (it.riderLat && it.riderLng)
-        orders[it.orderId].riderLoc = { lat: it.riderLat, lng: it.riderLng };
-
-      if (it.customerLat && it.customerLng)
-        orders[it.orderId].customerLoc = { lat: it.customerLat, lng: it.customerLng };
-
+      orders[it.orderId].riderLoc = it.riderLat && it.riderLng ? { lat: it.riderLat, lng: it.riderLng } : orders[it.orderId].riderLoc || null;
+      orders[it.orderId].customerLoc = it.customerLat && it.customerLng ? { lat: it.customerLat, lng: it.customerLng } : orders[it.orderId].customerLoc || null;
       orders[it.orderId].updatedAt = Date.now();
     }
-
     renderOrdersList();
   } catch (e) {
     console.error("fetchActiveOrders error", e);
   }
 }
 
-/* -----------------------------
-   SOCKET REALTIME UPDATES
------------------------------ */
+// SOCKET: realtime updates
 function connectSocket() {
-  socket = io(SOCKET_URL, {
-    transports: ["websocket"],
-    reconnectionAttempts: 99
-  });
+  socket = io(SOCKET_URL, { transports: ["websocket"], reconnectionAttempts: 99 });
 
   socket.on("connect", () => {
     sockStatusEl.textContent = "connected";
     sockStatusEl.style.color = "lightgreen";
   });
-
   socket.on("disconnect", () => {
     sockStatusEl.textContent = "disconnected";
     sockStatusEl.style.color = "crimson";
   });
-
-  socket.on("connect_error", err => {
+  socket.on("connect_error", (err) => {
     sockStatusEl.textContent = "error";
     sockStatusEl.style.color = "orange";
+    console.warn("socket error", err);
   });
 
-  socket.on("rider:location", p => {
+  socket.on("rider:location", (p) => {
     if (!p || !p.orderId) return;
-
     const o = orders[p.orderId] = orders[p.orderId] || { orderId: p.orderId };
     o.riderId = p.riderId || o.riderId;
     o.riderLoc = { lat: p.lat, lng: p.lng };
     o.updatedAt = p.timestamp || Date.now();
-
     renderOrdersList();
   });
 
-  socket.on("order:location", p => {
+  socket.on("order:location", (p) => {
     if (!p) return;
-
     const o = orders[p.orderId] = orders[p.orderId] || { orderId: p.orderId };
     o.customerLoc = { lat: p.lat, lng: p.lng };
     o.updatedAt = p.timestamp || Date.now();
-
     renderOrdersList();
   });
 
-  socket.on("order:status", p => {
+  socket.on("order:status", (p) => {
     if (!p) return;
-
     const o = orders[p.orderId] = orders[p.orderId] || { orderId: p.orderId };
     o.status = p.status;
     o.updatedAt = Date.now();
-
     renderOrdersList();
   });
 }
 
+// handle unauthorized
+function handleUnauthorized() {
+  // token invalid/expired: clear and goto login
+  localStorage.removeItem("adminToken");
+  alert("Session expired. Redirecting to login.");
+  window.location.href = "/admin/login.html";
+}
+
 /* ------------------------------------------
-   ADMIN PANEL — CREATE TEST ORDER (NEW)
+   ADMIN PANEL — CREATE TEST ORDER
+   (calls server route with auth header)
 ------------------------------------------ */
 async function createTestOrder() {
   try {
+    if (!btnTestOrder) return;
     btnTestOrder.disabled = true;
     btnTestOrder.textContent = "Creating...";
 
     const res = await fetch(API_BASE + "/create-test-order", {
       method: "POST",
-      headers: { "Content-Type": "application/json" }
+      headers: authHeaders()
     });
 
     const data = await res.json();
-
-    if (!data.ok) {
-      alert("Error creating test order");
+    if (!res.ok || data.ok === false) {
+      alert("Failed to create test order: " + (data.error || res.status));
+      if (res.status === 401) handleUnauthorized();
       btnTestOrder.disabled = false;
       btnTestOrder.textContent = "➕ Create Test Order";
       return;
     }
 
     const orderId = data.orderId;
-
     alert("Test Order Created!\nOrder ID: " + orderId);
 
-    // Add to UI instantly
     orders[orderId] = {
       orderId,
       status: "preparing",
       customerName: "Test User",
       updatedAt: Date.now()
     };
-
     renderOrdersList();
 
     btnTestOrder.disabled = false;
     btnTestOrder.textContent = "➕ Create Test Order";
-
   } catch (err) {
-    console.error(err);
-    alert("Failed to create test order");
+    console.error("Test order error:", err);
+    alert("Error creating test order");
     btnTestOrder.disabled = false;
     btnTestOrder.textContent = "➕ Create Test Order";
   }
 }
 
+// attach event
 btnTestOrder?.addEventListener("click", createTestOrder);
 
-/* -----------------------------
+/* ------------------------------------------
+   LOGOUT
+------------------------------------------ */
+btnLogout?.addEventListener("click", () => {
+  localStorage.removeItem("adminToken");
+  window.location.href = "/admin/login.html";
+});
+
+/* ------------------------------------------
    UI BUTTONS
------------------------------ */
+------------------------------------------ */
 btnRefresh?.addEventListener("click", () => fetchActiveOrders());
-btnShowMap?.addEventListener("click", () =>
-  window.open("/admin/track-rider.html", "_blank")
-);
+btnShowMap?.addEventListener("click", () => window.open("/admin/track-rider.html", "_blank"));
+
+/* ------------------------------------------
+   VERIFY TOKEN (on init) -> then start
+------------------------------------------ */
+async function verifyTokenAndStart() {
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    window.location.href = "/admin/login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch(API_BASE + "/admin/verify", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    const data = await res.json();
+    if (!res.ok || data.ok === false) {
+      handleUnauthorized();
+      return;
+    }
+
+    // token valid: start
+    renderOrdersList();
+    await fetchActiveOrders();
+    connectSocket();
+  } catch (err) {
+    console.error("verify token error", err);
+    handleUnauthorized();
+  }
+}
 
 /* -----------------------------
    INIT
 ----------------------------- */
-(async function init() {
-  renderOrdersList();
-  await fetchActiveOrders();
-  connectSocket();
-})();
+verifyTokenAndStart();
