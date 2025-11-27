@@ -1,52 +1,48 @@
-const API_BASE = "https://sh-thehungerpoint.onrender.com";  // your server
+// /rider/login.js
+const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
 
-const emailEl = document.getElementById("email");
-const passEl = document.getElementById("password");
-const msg = document.getElementById("msg");
-const btn = document.getElementById("btnLogin");
+const $ = (s) => document.querySelector(s);
+const emailEl = $("#email");
+const passEl = $("#password");
+const btn = $("#btnSignIn");
+const msg = $("#msg");
 
-btn.addEventListener("click", login);
+btn.addEventListener("click", async () => {
+  const email = (emailEl.value || "").trim();
+  const password = (passEl.value || "").trim();
+  if (!email || !password) return (msg.textContent = "Provide email and password");
 
-async function login() {
-  const identifier = emailEl.value.trim();
-  const password = passEl.value.trim();
-
-  msg.textContent = "";
-
-  if (!identifier || !password) {
-    msg.textContent = "Enter email & password";
-    return;
-  }
-
+  msg.textContent = "Signing in...";
   try {
-    const res = await fetch(`${API_BASE}/rider/login`, {
+    const res = await fetch(API_BASE + "/rider/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: identifier,
-        phone: identifier,
-        riderId: identifier,
-        password
-      })
+      body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
-
     if (!data.ok) {
       msg.textContent = data.error || "Login failed";
       return;
     }
 
-    // save session
-    localStorage.setItem("sh_rider_id", data.riderId);
-    localStorage.setItem("sh_rider_email", data.email);
-    localStorage.setItem("sh_rider_name", data.name);
-    localStorage.setItem("sh_rider_token", data.token);
+    // server returns riderId and token
+    const riderId = data.riderId || data.rider?.riderId || email;
+    const token = data.token || "";
 
-    window.location.href = "/rider/index.html";
+    localStorage.setItem("sh_rider_docid", email); // doc id is email
+    localStorage.setItem("sh_rider_id", riderId);
+    localStorage.setItem("sh_rider_token", token);
+    localStorage.setItem("sh_rider_email", email);
 
+    msg.textContent = "Logged in — redirecting…";
+    setTimeout(() => (window.location.href = "/rider/index.html"), 300);
   } catch (err) {
     console.error(err);
     msg.textContent = "Network error";
   }
-}
+});
+
+// allow enter key
+passEl.addEventListener("keydown", (e) => { if (e.key === "Enter") btn.click(); });
+emailEl.addEventListener("keydown", (e) => { if (e.key === "Enter") passEl.focus(); });
