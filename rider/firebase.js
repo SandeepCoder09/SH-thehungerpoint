@@ -1,7 +1,7 @@
 // /rider/firebase.js
-// Direct Firebase CDN imports (works everywhere)
+// FINAL WORKING VERSION — USE THIS EXACT FILE
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getFirestore,
   collection,
@@ -13,15 +13,14 @@ import {
   getDoc,
   updateDoc,
   orderBy
-} from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 import {
   getAuth,
   signInWithEmailAndPassword,
   signOut
-} from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// your config
 const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
@@ -32,12 +31,10 @@ const firebaseConfig = {
   measurementId: "G-4KP3RJ15E9"
 };
 
-// init
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// export
 export {
   app,
   db,
