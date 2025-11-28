@@ -10,15 +10,18 @@ export async function connectSocket(opts = {}) {
   // opts: { riderId?, token? }
   if (socket && socket.connected) return socket;
 
-  // lazy-load socket.io client (script is already included on pages usually).
+  // ensure socket.io client present
   if (typeof io === "undefined") {
     throw new Error("socket.io client (io) is missing. Include CDN script before modules.");
   }
 
-  // build auth payload (optional)
+  // prefer token/riderId from args, else fallback to localStorage
+  const token = opts.token || localStorage.getItem("sh_rider_token") || null;
+  const riderId = opts.riderId || localStorage.getItem("sh_rider_id") || localStorage.getItem("sh_rider_docid") || null;
+
   const auth = {};
-  if (opts.token) auth.token = opts.token;
-  if (opts.riderId) auth.riderId = opts.riderId;
+  if (token) auth.token = token;
+  if (riderId) auth.riderId = riderId;
 
   socket = io(SOCKET_URL, {
     transports: ["websocket"],
