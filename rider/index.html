@@ -19,13 +19,13 @@
   <header class="rider-top">
     <div class="rider-profile">
 
-      <!-- WRAPPER to place pencil button -->
+      <!-- WRAPPER for profile & pencil -->
       <div class="profile-img-wrapper">
         <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
 
-        <!-- Pencil Edit Button (SVG) -->
+        <!-- Pencil Button (smaller, optimized SVG) -->
         <button id="editPhotoBtn" class="edit-photo-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 20h9" />
             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -51,8 +51,9 @@
     </div>
   </header>
 
-  <!-- Upload Under Profile -->
+  <!-- Profile Upload Panel -->
   <section class="profile-upload-panel">
+    <!-- Hidden input so pencil can trigger it -->
     <input id="photoInput" type="file" accept="image/*" hidden />
     <button id="btnUploadPhoto" class="btn small">Upload Photo</button>
     <div id="uploadMsg" class="small muted"></div>
