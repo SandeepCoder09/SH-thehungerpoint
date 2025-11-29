@@ -261,6 +261,38 @@ async function createTestOrder() {
   }
 }
 
+// =============================================================
+// SH — Sort Orders New → Old by Time
+// Automatically re-sorts whenever orders update
+// =============================================================
+
+function sortOrdersByTime() {
+  const list = document.getElementById("ordersList");
+  if (!list) return;
+
+  // Convert NodeList to array
+  const rows = Array.from(list.querySelectorAll(".order-row"));
+
+  rows.sort((a, b) => {
+    const ta = new Date(a.dataset.time).getTime();   // stored order time
+    const tb = new Date(b.dataset.time).getTime();
+
+    // NEW → OLD (latest first)
+    return tb - ta;
+  });
+
+  // Re-append rows in sorted order
+  rows.forEach(row => list.appendChild(row));
+}
+
+// -------------------------------------------------------------
+// Call this function whenever orders load or update
+// -------------------------------------------------------------
+document.addEventListener("orders-updated", sortOrdersByTime);
+
+// Optional: Auto-sort every 2 seconds (in case live updates push items)
+setInterval(sortOrdersByTime, 2000);
+
 // attach event
 btnTestOrder?.addEventListener("click", createTestOrder);
 
