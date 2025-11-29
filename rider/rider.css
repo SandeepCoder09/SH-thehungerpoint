@@ -371,21 +371,19 @@ body {
   .edit-photo-btn {
   width: 15px;
   height: 15px;
-}
-.edit-photo-btn svg {
-  width: 10px;
-  height: 10px;
-}
-
   border: none;
   border-radius: 50%;
   background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-
   box-shadow: 0 2px 6px var(--shadow);
   cursor: pointer;
+}
+
+.edit-photo-btn svg {
+  width: 10px;
+  height: 10px;
 }
 
 .edit-photo-btn:hover {
