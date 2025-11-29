@@ -1,4 +1,5 @@
-// /rider/login.js — Backend-only auth (NO Firebase Session)
+// /rider/login.js
+import { auth, signInWithEmailAndPassword } from "/rider/firebase.js";
 
 const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
 
@@ -17,9 +18,13 @@ btn.addEventListener("click", async () => {
     return;
   }
 
-  msg.textContent = "Checking account...";
+  msg.textContent = "Signing in...";
 
   try {
+    // 1. Firebase Auth Login (required for Firestore rules)
+    const fbUser = await signInWithEmailAndPassword(auth, email, password);
+
+    // 2. Backend login (to get riderId + token)
     const res = await fetch(API_BASE + "/rider/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -27,25 +32,26 @@ btn.addEventListener("click", async () => {
     });
 
     const data = await res.json();
-
     if (!data.ok) {
       msg.textContent = data.error || "Login failed";
       return;
     }
 
-    // Save backend session (NOT Firebase)
+    const riderId = data.riderId || email;
+
+    // Save session
+    localStorage.setItem("sh_rider_docid", email);
+    localStorage.setItem("sh_rider_id", riderId);
     localStorage.setItem("sh_rider_email", email);
-    localStorage.setItem("sh_rider_id", data.riderId);
-    localStorage.setItem("sh_rider_token", data.token);
+    localStorage.setItem("sh_rider_token", data.token || "");
 
     msg.textContent = "Login successful! Redirecting...";
 
     setTimeout(() => {
       window.location.href = "/rider/index.html";
     }, 500);
-
   } catch (err) {
     console.error(err);
-    msg.textContent = "Error: Invalid email or password";
+    msg.textContent = "Invalid email or password";
   }
 });
