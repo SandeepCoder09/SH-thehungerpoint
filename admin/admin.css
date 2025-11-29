@@ -306,3 +306,76 @@ html, body {
     width: 90px !important;
   }
 }
+
+/* ============================================================
+   FIX 1 — MOVE TRACK + DETAILS TO RIGHT SIDE BELOW STATUS
+===========================================================*/
+
+.order-row {
+  display: grid !important;
+  grid-template-columns: 60px 1fr auto !important;
+  gap: 16px !important;
+  align-items: start !important;
+}
+
+/* Left */
+.order-avatar { grid-column: 1; }
+.order-body { grid-column: 2; }
+
+/* Right column — vertical stack */
+.order-actions {
+  grid-column: 3;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+}
+
+
+/* ============================================================
+   FIX 2 — SMALL STATUS BADGE HEIGHT
+===========================================================*/
+
+.order-actions .status {
+  padding: 4px 10px !important;
+  min-width: 85px !important;
+  height: auto !important;
+  font-size: 11px !important;
+  border-radius: 999px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+
+/* ============================================================
+   BUTTON SIZE FIX — MAKE THEM MATCH STATUS
+===========================================================*/
+
+.order-actions .btn {
+  width: 90px !important;
+  height: 32px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+
+/* ============================================================
+   MOBILE FIX — KEEP EVERYTHING ON RIGHT SIDE
+===========================================================*/
+
+@media (max-width: 480px) {
+  .order-row {
+    grid-template-columns: 50px 1fr auto !important;
+  }
+
+  .order-actions .btn,
+  .order-actions .status {
+    width: 80px !important;
+    font-size: 11px !important;
+  }
+}
