@@ -51,25 +51,43 @@ let selectedOrderId = null;
 let sharing = false;
 let riderMarker = null;
 
-// local lock to avoid multiple clicks / concurrent requests per order
+// local lock to avoid multiple clicks
 const processingOrders = new Set();
 
-// Allowed assign statuses (match your real system)
+// Allowed assign statuses (your DB uses lowercase)
 const ASSIGNABLE_STATUSES = new Set(["preparing", "new", "pending"]);
 
-// Status strings (your DB uses lowercase)
+// Lowercase (your database format)
 const STATUS_ASSIGNED = "assigned";
 const STATUS_PICKED = "picked";
 const STATUS_DELIVERED = "delivered";
 
 // MAP
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "" }).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: ""
+}).addTo(map);
 
 
-// ------------------------------------
-// UI helpers
-// ------------------------------------
+/* -------------------------------------------------------
+   MOBILE-SAFE TOAST (REPLACES ALL ALERTS)
+------------------------------------------------------- */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  if (!t) return console.warn("Toast missing in HTML");
+
+  t.textContent = msg;
+  t.classList.add("show");
+
+  setTimeout(() => {
+    t.classList.remove("show");
+  }, 2200);
+}
+
+
+/* -------------------------------------------------------
+   UI helpers
+------------------------------------------------------- */
 function setStatusOnline() {
   riderStatusEl.textContent = "Online";
   riderStatusDot.classList.remove("offline");
@@ -91,9 +109,9 @@ function fmtLastSeen(v) {
 }
 
 
-// ------------------------------------
-// Load rider doc
-// ------------------------------------
+/* -------------------------------------------------------
+   Load rider doc
+------------------------------------------------------- */
 async function loadRiderDoc() {
   try {
     const docId =
@@ -102,12 +120,11 @@ async function loadRiderDoc() {
       localStorage.getItem("sh_rider_email") ||
       localStorage.getItem("sh_rider_id");
 
-    if (!docId) {
-      return null;
-    }
+    if (!docId) return null;
 
     const ref = doc(db, "riders", docId);
     const snap = await getDoc(ref);
+
     if (snap.exists()) {
       RIDER_DOC_ID = docId;
       localStorage.setItem("sh_rider_docid", docId);
@@ -123,17 +140,19 @@ async function loadRiderDoc() {
 }
 
 
-// ------------------------------------
-// Refresh Rider UI
-// ------------------------------------
+/* -------------------------------------------------------
+   Refresh Rider UI
+------------------------------------------------------- */
 async function refreshRiderUI() {
   const r = await loadRiderDoc();
   if (!r) {
+    showToast("Login again");
     window.location.href = "./login.html";
     return;
   }
 
   RIDER_DATA = r;
+
   riderNameEl.textContent = r.name || "Rider";
   riderEmailEl.textContent = r.email || "";
   riderIdDisplay.textContent =
@@ -149,12 +168,13 @@ async function refreshRiderUI() {
 }
 
 
-// ------------------------------------
-// Socket connection
-// ------------------------------------
+/* -------------------------------------------------------
+   Socket connection
+------------------------------------------------------- */
 async function connectEverything() {
   try {
     const token = localStorage.getItem("sh_rider_token") || null;
+
     const riderIdForSocket =
       RIDER_DATA?.riderId ||
       RIDER_DATA?.email ||
@@ -165,8 +185,9 @@ async function connectEverything() {
     connStatus.textContent = "connected";
     connStatus.style.color = "lightgreen";
 
-      socket.on("rider:location", (p) => {
+    socket.on("rider:location", (p) => {
       if (!p) return;
+
       if (
         p.riderId ===
         (RIDER_DATA?.riderId ||
@@ -182,20 +203,15 @@ async function connectEverything() {
     });
 
     socket.on("order:status", (p) => {
-      if (p && p.orderId && p.status) {
-        if (selectedOrderId === p.orderId) {
-          activeOrderEl.textContent = p.orderId;
-        }
+      if (!p) return;
+      if (selectedOrderId === p.orderId) {
+        activeOrderEl.textContent = p.orderId;
       }
     });
 
     socket.on("disconnect", () => {
       connStatus.textContent = "disconnected";
       connStatus.style.color = "crimson";
-    });
-
-    socket.on("connect_error", (err) => {
-      console.warn("socket connect_error:", err);
     });
   } catch (err) {
     console.warn("connectEverything error:", err);
@@ -205,10 +221,11 @@ async function connectEverything() {
 }
 
 
-// ------------------------------------
-// Orders Live Snapshot
-// ------------------------------------
+/* -------------------------------------------------------
+   Orders Snapshot
+------------------------------------------------------- */
 const ordersCol = collection(db, "orders");
+
 onSnapshot(
   ordersCol,
   (snap) => {
@@ -219,20 +236,20 @@ onSnapshot(
     } catch (err) {
       console.error("orders snapshot error:", err);
       ordersList.innerHTML =
-        "<div class='small muted'>Unable to load orders (check Firestore rules)</div>";
+        "<div class='small muted'>Unable to load orders</div>";
     }
   },
   (err) => {
-    console.error("orders onSnapshot failed:", err);
+    console.error("Snapshot failed:", err);
     ordersList.innerHTML =
-      "<div class='small muted'>Orders listener failed (check rules)</div>";
+      "<div class='small muted'>Orders listener failed</div>";
   }
 );
 
 
-// ------------------------------------
-// Render Orders
-// ------------------------------------
+/* -------------------------------------------------------
+   Render Orders
+------------------------------------------------------- */
 function renderOrders(list) {
   ordersList.innerHTML = "";
 
@@ -246,7 +263,6 @@ function renderOrders(list) {
   for (const o of list) {
     const card = document.createElement("div");
 
-    // 🟦 ADD BACKGROUND COLOR CLASS
     const stClass = (o.status || "").toLowerCase();
     card.className = "order-card " + stClass;
 
@@ -272,7 +288,7 @@ function renderOrders(list) {
     btnTrack.textContent = "Track";
     btnTrack.onclick = (ev) => {
       ev.stopPropagation();
-      if (!o.customerLoc) return alert("Customer location missing");
+      if (!o.customerLoc) return showToast("Customer location missing");
       map.setView([o.customerLoc.lat, o.customerLoc.lng], 14);
       L.marker([o.customerLoc.lat, o.customerLoc.lng])
         .addTo(map)
@@ -297,9 +313,7 @@ function renderOrders(list) {
     };
 
     const st = (o.status || "").toLowerCase();
-    if (!ASSIGNABLE_STATUSES.has(st)) {
-      btnAssign.disabled = true;
-    }
+    if (!ASSIGNABLE_STATUSES.has(st)) btnAssign.disabled = true;
 
     right.appendChild(badge);
     right.appendChild(btnTrack);
@@ -328,21 +342,21 @@ function renderOrders(list) {
 }
 
 function showOrderDetails(o) {
-  const txt = [
-    `Order: ${o.orderId}`,
-    `Status: ${o.status || "—"}`,
+  const msg =
+    `Order: ${o.orderId}\n` +
+    `Status: ${o.status}\n` +
     `Items: ${(o.items || [])
       .map((i) => `${i.name}×${i.qty}`)
-      .join(", ")}`,
-    `Customer: ${o.customerName || o.customerId || "—"}`
-  ].join("\n");
-  alert(txt);
+      .join(", ")}\n` +
+    `Customer: ${o.customerName || o.customerId || "—"}`;
+
+  showToast(msg);
 }
 
 
-// ------------------------------------
-// Update header action buttons
-// ------------------------------------
+/* -------------------------------------------------------
+   Update action buttons
+------------------------------------------------------- */
 function updateActionButtons(order) {
   btnStartTrip.disabled = true;
   btnDeliver.disabled = true;
@@ -353,26 +367,22 @@ function updateActionButtons(order) {
   const status = (order.status || "").toLowerCase();
   const orderRiderId = order.riderId || "";
 
-  if (ASSIGNABLE_STATUSES.has(status)) {
-    btnAcceptSelected.disabled = false;
-  }
+  if (ASSIGNABLE_STATUSES.has(status)) btnAcceptSelected.disabled = false;
 
-  if (status === STATUS_ASSIGNED && orderRiderId === RIDER_DATA.riderId) {
+  if (status === STATUS_ASSIGNED && orderRiderId === RIDER_DATA.riderId)
     btnStartTrip.disabled = false;
-  }
 
-  if (status === STATUS_PICKED && orderRiderId === RIDER_DATA.riderId) {
+  if (status === STATUS_PICKED && orderRiderId === RIDER_DATA.riderId)
     btnDeliver.disabled = false;
-  }
 }
 
 
-// ------------------------------------
-// Assign to Me
-// ------------------------------------
+/* -------------------------------------------------------
+   Assign to Me
+------------------------------------------------------- */
 async function assignToMe(orderId) {
   if (!orderId) return;
-  if (!RIDER_DATA) return alert("Rider data not loaded");
+  if (!RIDER_DATA) return showToast("Rider data not loaded");
   if (processingOrders.has(orderId)) return;
 
   processingOrders.add(orderId);
@@ -380,45 +390,42 @@ async function assignToMe(orderId) {
   try {
     const ref = doc(db, "orders", orderId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return alert("Order not found");
+
+    if (!snap.exists()) return showToast("Order not found");
 
     const od = snap.data() || {};
     const status = (od.status || "").toLowerCase();
     const currentRider = od.riderId || "";
 
-    if (!ASSIGNABLE_STATUSES.has(status)) {
-      alert("Order already assigned or processed");
-      return;
-    }
+    if (!ASSIGNABLE_STATUSES.has(status))
+      return showToast("Already assigned or processed");
 
-    if (currentRider && currentRider !== RIDER_DATA.riderId) {
-      alert("Order already assigned to another rider");
-      return;
-    }
+    if (currentRider && currentRider !== RIDER_DATA.riderId)
+      return showToast("Assigned to another rider");
 
     await updateDoc(ref, {
       riderId: RIDER_DATA.riderId,
-      status: "assigned",
+      status: STATUS_ASSIGNED,
       assignedAt: Date.now()
     });
 
     const s = getSocket();
     if (s && s.connected)
-      s.emit("order:status", { orderId, status: "assigned" });
+      s.emit("order:status", { orderId, status: STATUS_ASSIGNED });
 
-    alert("Order assigned");
+    showToast("Order assigned");
   } finally {
     processingOrders.delete(orderId);
   }
 }
 
 
-// ------------------------------------
-// Start Trip
-// ------------------------------------
+/* -------------------------------------------------------
+   Start Trip
+------------------------------------------------------- */
 btnStartTrip.addEventListener("click", async () => {
-  if (!selectedOrderId) return alert("Select order first");
-  if (!RIDER_DATA) return alert("Rider data not ready");
+  if (!selectedOrderId) return showToast("Select order first");
+  if (!RIDER_DATA) return showToast("Rider data missing");
   const orderId = selectedOrderId;
 
   if (processingOrders.has(orderId)) return;
@@ -429,52 +436,46 @@ btnStartTrip.addEventListener("click", async () => {
   try {
     const ref = doc(db, "orders", orderId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return alert("Order not found");
+
+    if (!snap.exists()) return showToast("Order not found");
 
     const od = snap.data() || {};
     const status = (od.status || "").toLowerCase();
-    const currentRider = od.riderId || "";
 
-    if (status !== STATUS_ASSIGNED) {
-      alert("Cannot start trip: order is not ASSIGNED");
-      return;
-    }
+    if (status !== STATUS_ASSIGNED)
+      return showToast("Order not assigned");
 
-    if (currentRider !== RIDER_DATA.riderId) {
-      alert("Cannot start trip: order belongs to another rider");
-      return;
-    }
+    if (od.riderId !== RIDER_DATA.riderId)
+      return showToast("Wrong rider");
 
     await updateDoc(ref, {
-      status: "picked",
+      status: STATUS_PICKED,
       pickedAt: Date.now(),
       riderId: RIDER_DATA.riderId
     });
 
     const s = getSocket();
     if (s && s.connected)
-      s.emit("order:status", { orderId, status: "picked" });
+      s.emit("order:status", { orderId, status: STATUS_PICKED });
 
     RIDER_GPS.start();
     sharing = true;
 
     btnDeliver.disabled = false;
 
-    alert("Trip started");
-  } catch (err) {
-    console.error("Start trip failed", err);
-    alert("Failed to start trip");
+    showToast("Trip started");
   } finally {
     processingOrders.delete(orderId);
   }
 });
 
 
-// ------------------------------------
-// Mark Delivered
-// ------------------------------------
+/* -------------------------------------------------------
+   Mark Delivered
+------------------------------------------------------- */
 btnDeliver.addEventListener("click", async () => {
-  if (!selectedOrderId) return alert("Select order first");
+  if (!selectedOrderId) return showToast("Select order first");
+
   const orderId = selectedOrderId;
 
   if (processingOrders.has(orderId)) return;
@@ -485,47 +486,40 @@ btnDeliver.addEventListener("click", async () => {
   try {
     const ref = doc(db, "orders", orderId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return alert("Order not found");
+
+    if (!snap.exists()) return showToast("Order not found");
 
     const od = snap.data() || {};
     const status = (od.status || "").toLowerCase();
-    const currentRider = od.riderId || "";
 
-    if (status !== STATUS_PICKED) {
-      alert("Cannot mark delivered: order is not PICKED");
-      return;
-    }
+    if (status !== STATUS_PICKED)
+      return showToast("Order not picked");
 
-    if (currentRider !== RIDER_DATA.riderId) {
-      alert("Cannot deliver: order belongs to another rider");
-      return;
-    }
+    if (od.riderId !== RIDER_DATA.riderId)
+      return showToast("Wrong rider");
 
     await updateDoc(ref, {
-      status: "delivered",
+      status: STATUS_DELIVERED,
       deliveredAt: Date.now()
     });
 
     const s = getSocket();
     if (s && s.connected)
-      s.emit("order:status", { orderId, status: "delivered" });
+      s.emit("order:status", { orderId, status: STATUS_DELIVERED });
 
     RIDER_GPS.stop();
     sharing = false;
 
-    alert("Delivered");
-  } catch (err) {
-    console.error("Deliver failed", err);
-    alert("Failed to mark delivered");
+    showToast("Delivered");
   } finally {
     processingOrders.delete(orderId);
   }
 });
 
 
-// ------------------------------------
-// Logout
-// ------------------------------------
+/* -------------------------------------------------------
+   Logout
+------------------------------------------------------- */
 btnLogout.addEventListener("click", async () => {
   localStorage.removeItem("sh_rider_docid");
   localStorage.removeItem("sh_rider_id");
@@ -540,35 +534,42 @@ btnLogout.addEventListener("click", async () => {
 });
 
 
-// ------------------------------------
-// Upload profile photo
-// ------------------------------------
+/* -------------------------------------------------------
+   Upload Photo
+------------------------------------------------------- */
 btnUploadPhoto.addEventListener("click", async () => {
   const f = photoInput.files?.[0];
-  if (!f) return (uploadMsg.textContent = "Choose file first");
-  if (!RIDER_DOC_ID)
-    return (uploadMsg.textContent = "Rider document not found");
+  if (!f) return showToast("Choose file first");
+  if (!RIDER_DOC_ID) return showToast("Rider document missing");
 
   uploadMsg.textContent = "Uploading…";
+
   const reader = new FileReader();
   reader.onload = async () => {
     const dataUrl = reader.result;
+
     try {
-      await updateDoc(doc(db, "riders", RIDER_DOC_ID), { photoURL: dataUrl });
+      await updateDoc(doc(db, "riders", RIDER_DOC_ID), {
+        photoURL: dataUrl
+      });
+
       profileImg.src = dataUrl;
       uploadMsg.textContent = "Uploaded";
+      showToast("Photo updated");
     } catch (err) {
       console.error("photo upload failed:", err);
       uploadMsg.textContent = "Upload failed";
+      showToast("Upload failed");
     }
   };
+
   reader.readAsDataURL(f);
 });
 
 
-// ------------------------------------
-// Set rider online/offline status
-// ------------------------------------
+/* -------------------------------------------------------
+   Online / Offline
+------------------------------------------------------- */
 async function setRiderOnline(flag = true) {
   if (!RIDER_DOC_ID) return;
 
@@ -590,9 +591,9 @@ async function setRiderOnline(flag = true) {
 }
 
 
-// ------------------------------------
-// INIT
-// ------------------------------------
+/* -------------------------------------------------------
+   INIT
+------------------------------------------------------- */
 (async function init() {
   btnStartTrip.disabled = true;
   btnDeliver.disabled = true;
@@ -616,6 +617,7 @@ async function setRiderOnline(flag = true) {
       (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+
         riderMarker = L.marker([lat, lng]).addTo(map);
         map.setView([lat, lng], 13);
       },
