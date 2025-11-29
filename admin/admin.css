@@ -37,21 +37,45 @@
 
 /* -------------------- GLOBAL BACKGROUND -------------------- */
 
+/* =============================================================
+   ANIMATED COLORFUL BACKGROUND (INFINITE)
+   Smooth premium motion behind glass cards
+==============================================================*/
+
 html, body {
   margin: 0;
-  font-family: Inter, system-ui, Arial;
+  padding: 0;
   height: 100%;
-  color: var(--text);
   overflow-x: hidden;
+  font-family: Inter, system-ui, Arial;
 
-  /* Soft colorful blurred gradient background */
-  background: radial-gradient(circle at 20% 20%, #ff7ba5 0%, #ff4e80 20%, transparent 60%),
-              radial-gradient(circle at 80% 30%, #6fc6ff 0%, #3b9fff 20%, transparent 60%),
-              radial-gradient(circle at 50% 80%, #b07bff 0%, #9356ff 25%, transparent 70%),
-              #0d1220;
+  /* Static fallback background (in case animation fails) */
+  background: #0d1220;
 
-  background-size: cover;
-  background-attachment: fixed;
+  /* The gradient layer */
+  background-image:
+    radial-gradient(circle at 20% 20%, #ff7ba5 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, #6fc6ff 0%, transparent 60%),
+    radial-gradient(circle at 50% 80%, #b07bff 0%, transparent 70%);
+
+  background-size: 200% 200%;
+  animation: bgMove 18s ease-in-out infinite alternate;
+}
+
+/* Smooth infinite animation */
+@keyframes bgMove {
+  0% {
+    background-position: 0% 0%;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(20deg);
+  }
+  100% {
+    background-position: 50% 100%;
+    filter: hue-rotate(-20deg);
+  }
 }
 
 /* -------------------- GLASS TOPBAR -------------------- */
