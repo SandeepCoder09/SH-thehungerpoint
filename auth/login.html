@@ -3,30 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
   <title>Login — SH The Hunger Point</title>
 
-  <!-- Firebase SDKs (must load first) -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Firebase SDKs (must load before firebase-config.js) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <!-- CSS -->
   <link rel="stylesheet" href="/auth/login.css" />
-  <link rel="icon" href="/home/sh-favicon.png" />
 </head>
 
 <body>
   <main class="auth-page">
     <div class="card">
+
+      <!-- HEADER -->
       <header class="card-head">
         <div class="logo-box">
-          <img src="/home/sh-thehungerpoint.png" />
+          <img src="/home/sh-thehungerpoint.png" alt="SH logo" />
         </div>
-        <div class="title">Sign In</div>
+        <div class="title">Welcome Back</div>
       </header>
 
       <section class="card-body">
         <form id="loginForm">
+
           <label>Email</label>
           <input id="email" type="email" required placeholder="you@example.com">
 
@@ -37,12 +43,24 @@
 
           <div class="divider">or</div>
 
-          <button type="button" id="googleLogin" class="btn google">Continue with Google</button>
+          <!-- GOOGLE LOGIN WITH ICON -->
+          <button type="button" id="googleLogin" class="btn google">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                 width="20" height="20" 
+                 style="margin-right: 8px;">
+            Continue with Google
+          </button>
 
           <p class="muted small">
-            Don’t have an account?
+            Don't have an account?
             <a href="/auth/signup.html">Create one</a>
           </p>
+
+          <p class="muted small">
+            Forgot password?
+            <a href="/auth/forgot.html">Reset password</a>
+          </p>
+
         </form>
       </section>
     </div>
@@ -50,7 +68,7 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase config must load BEFORE login.js -->
+  <!-- Firebase Config must load BEFORE login.js -->
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/login.js"></script>
 </body>
