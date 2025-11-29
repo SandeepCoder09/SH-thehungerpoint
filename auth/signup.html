@@ -3,22 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
   <title>Create Account — SH The Hunger Point</title>
 
-  <!-- Firebase MUST load before firebase-config.js -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Firebase Core (Must load first) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase config MUST load before signup.js -->
+  <!-- Firebase Config -->
   <script src="/auth/firebase-config.js"></script>
 
-  <!-- Signup JS loads last -->
+  <!-- Signup JS -->
   <script src="/auth/signup.js" defer></script>
 
+  <!-- CSS -->
   <link rel="stylesheet" href="/auth/signup.css" />
-  <link rel="icon" href="/home/sh-favicon.png" />
 </head>
 
 <body>
@@ -28,119 +31,113 @@
       <!-- HEADER -->
       <header class="new-head">
         <div class="left-wrap">
-          <img src="/home/sh-thehungerpoint.png" class="header-logo">
+          <img src="/home/sh-thehungerpoint.png" class="header-logo" alt="SH Logo">
           <span class="brand-text">The Hunger Point</span>
         </div>
       </header>
 
-      <!-- TITLE BELOW HEADER -->
+      <!-- TITLE -->
       <h2 class="page-title">Create Account</h2>
 
-      <!-- BODY -->
+      <!-- FORM BODY -->
       <section class="card-body">
         <form id="signupForm">
 
-  <!-- NAME -->
-  <div class="input-group icon-input">
-    <span class="input-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-      </svg>
-    </span>
-    <input id="name" type="text" required>
-    <label for="name">Name</label>
-  </div>
+          <!-- NAME -->
+          <div class="input-group icon-input">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+              </svg>
+            </span>
+            <input id="name" type="text" required>
+            <label for="name">Name</label>
+          </div>
 
-  <!-- EMAIL -->
-  <div class="input-group icon-input">
-    <span class="input-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M2 4h20v16H2V4zm10 7L3.5 6.5h17L12 11z"/>
-      </svg>
-    </span>
-    <input id="email" type="email" required>
-    <label for="email">Email</label>
-  </div>
+          <!-- EMAIL -->
+          <div class="input-group icon-input">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M2 4h20v16H2V4zm10 7L3.5 6.5h17L12 11z"/>
+              </svg>
+            </span>
+            <input id="email" type="email" required>
+            <label for="email">Email</label>
+          </div>
 
-  <!-- PASSWORD -->
-  <div class="input-group pass-group icon-input">
-    <span class="input-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
-      </svg>
-    </span>
+          <!-- PASSWORD -->
+          <div class="input-group pass-group icon-input" id="passwordGroup">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
+              </svg>
+            </span>
 
-    <input id="password" type="password" required>
-    <label for="password">Password</label>
+            <input id="password" type="password" required>
+            <label for="password">Password</label>
 
-    <!-- Your eye icons remain same -->
-    <span class="toggle" id="togglePass">
-      <svg class="eye eye-open" viewBox="0 0 24 24">
-        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-          fill="none" stroke="#333" stroke-width="2" />
-        <circle cx="12" cy="12" r="3"
-          fill="none" stroke="#333" stroke-width="2" />
-      </svg>
+            <span class="toggle">
+              <svg class="eye eye-open" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" fill="none" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="none" stroke="#333" stroke-width="2" />
+              </svg>
 
-      <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
-        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-          fill="none" stroke="#333" stroke-width="2" />
-        <circle cx="12" cy="12" r="3"
-          fill="none" stroke="#333" stroke-width="2" />
-        <line x1="4" y1="20" x2="20" y2="4"
-          stroke="#333" stroke-width="2" />
-      </svg>
-    </span>
-  </div>
+              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" fill="none" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="none" stroke="#333" stroke-width="2"/>
+                <line x1="4" y1="20" x2="20" y2="4" stroke="#333" stroke-width="2" />
+              </svg>
+            </span>
+          </div>
 
-  <!-- CONFIRM PASSWORD -->
-  <div class="input-group pass-group icon-input">
-    <span class="input-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
-      </svg>
-    </span>
+          <!-- CONFIRM PASSWORD -->
+          <div class="input-group pass-group icon-input" id="confirmGroup">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 9h-1V7a4 4 0 00-8 0v2H7a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2v-9a2 2 0 00-2-2zm-6 0V7a2 2 0 114 0v2h-4z"/>
+              </svg>
+            </span>
 
-    <input id="confirm" type="password" required>
-    <label for="confirm">Confirm Password</label>
+            <input id="confirm" type="password" required>
+            <label for="confirm">Confirm Password</label>
 
-    <!-- Your eye icons remain same -->
-    <span class="toggle" id="toggleConfirm">
-      <svg class="eye eye-open" viewBox="0 0 24 24">
-        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-          fill="none" stroke="#333" stroke-width="2" />
-        <circle cx="12" cy="12" r="3"
-          fill="none" stroke="#333" stroke-width="2" />
-      </svg>
+            <span class="toggle">
+              <svg class="eye eye-open" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" fill="none" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="none" stroke="#333" stroke-width="2" />
+              </svg>
 
-      <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
-        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
-          fill="none" stroke="#333" stroke-width="2" />
-        <circle cx="12" cy="12" r="3"
-          fill="none" stroke="#333" stroke-width="2" />
-        <line x1="4" y1="20" x2="20" y2="4"
-          stroke="#333" stroke-width="2" />
-      </svg>
-    </span>
-  </div>
+              <svg class="eye eye-slash hidden" viewBox="0 0 24 24">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" fill="none" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="none" stroke="#333" stroke-width="2"/>
+                <line x1="4" y1="20" x2="20" y2="4" stroke="#333" stroke-width="2" />
+              </svg>
+            </span>
+          </div>
 
-  <!-- Rest unchanged -->
-  <label class="legal">
-    <input type="checkbox" id="legalCheck">
-    <span>I accept all terms.</span>
-  </label>
+          <!-- AGREEMENT -->
+          <label class="legal">
+            <input type="checkbox" id="legalCheck">
+            <span>I accept all terms.</span>
+          </label>
 
-  <button type="submit" class="btn primary">Create Account</button>
-  <div class="divider">or</div>
-  <button type="button" id="googleSignup" class="btn google">Continue with Google</button>
+          <!-- CREATE ACCOUNT BUTTON -->
+          <button type="submit" class="btn primary">Create Account</button>
 
-</form>
+          <div class="divider">or</div>
+
+          <!-- GOOGLE SIGNUP BUTTON (WITH ICON) -->
+          <button type="button" id="googleSignup" class="btn google">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                 alt="G" width="20" height="20">
+            Continue with Google
+          </button>
+
+        </form>
       </section>
-
     </div>
 
     <div id="toast" class="toast" hidden></div>
   </main>
-
 </body>
 </html>
