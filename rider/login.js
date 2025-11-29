@@ -18,13 +18,23 @@ btn.addEventListener("click", async () => {
     return;
   }
 
-  msg.textContent = "Signing in...";
+  msg.textContent = "Checking rider account...";
 
   try {
-    // 1. Firebase Auth Login (required for Firestore rules)
-    const fbUser = await signInWithEmailAndPassword(auth, email, password);
+    // 🚫 IMPORTANT FIX:
+    // DO NOT auto-create Firebase user for riders.
+    // We try sign-in, but if rider doesn't exist in Firebase Auth,
+    // we DO NOT create them.
 
-    // 2. Backend login (to get riderId + token)
+    const fbUser = await signInWithEmailAndPassword(auth, email, password)
+      .catch(() => null); // Prevent Firebase error from breaking flow
+
+    if (!fbUser) {
+      msg.textContent = "Invalid credentials (Firebase auth)";
+      return;
+    }
+
+    // 2️⃣ Backend login (MAIN AUTHENTICATION)
     const res = await fetch(API_BASE + "/rider/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,11 +47,12 @@ btn.addEventListener("click", async () => {
       return;
     }
 
-    const riderId = data.riderId || email;
+    // 3️⃣ Rider MUST exist in Firestore /riders
+    const riderDoc = data.riderId || email;
 
-    // Save session
+    // Save rider session
     localStorage.setItem("sh_rider_docid", email);
-    localStorage.setItem("sh_rider_id", riderId);
+    localStorage.setItem("sh_rider_id", riderDoc);
     localStorage.setItem("sh_rider_email", email);
     localStorage.setItem("sh_rider_token", data.token || "");
 
@@ -49,7 +60,8 @@ btn.addEventListener("click", async () => {
 
     setTimeout(() => {
       window.location.href = "/rider/index.html";
-    }, 500);
+    }, 600);
+
   } catch (err) {
     console.error(err);
     msg.textContent = "Invalid email or password";
