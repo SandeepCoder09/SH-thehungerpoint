@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Profile — The Hunger Point</title>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="/profile/profile.css" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+
+  <main class="profile-shell">
+
+    <!-- HEADER -->
+    <header class="profile-head">
+      <button onclick="history.back()" class="back-btn">← Back</button>
+      <h1>Profile</h1>
+    </header>
+
+    <!-- CARD -->
+    <section class="profile-card">
+      <div class="avatar">
+        <div class="avatar-placeholder">👤</div>
+      </div>
+
+      <div class="info-row">
+        <label>Full name</label>
+        <input id="name" type="text" placeholder="Your name">
+      </div>
+
+      <div class="info-row">
+        <label>Email address</label>
+        <input id="email" type="email" disabled>
+      </div>
+
+      <div class="actions">
+        <button id="saveBtn" class="btn primary">Save Changes</button>
+        <button id="resetPassBtn" class="btn outline">Send Password Reset Email</button>
+        <button id="logoutBtn" class="btn danger">Logout</button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" hidden></div>
+
+  </main>
+
+  <!-- Firebase Config + Protect -->
+  <script src="/auth/firebase-config.js"></script>
+  <script src="/auth/protect.js"></script>
+
+  <!-- Profile Script -->
+  <script src="/profile/profile.js"></script>
+
+</body>
+</html>
