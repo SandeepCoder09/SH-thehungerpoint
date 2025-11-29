@@ -359,3 +359,132 @@ html, body {
     justify-content: flex-start;
   }
 }
+
+/* ============================================================
+   SH — TIME SORTING UI (CSS ONLY)
+   Clean • Old SH Theme • Small Table Beauty
+===============================================================*/
+
+/* --- Sorting header wrapper --- */
+.orders-sort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur));
+}
+
+/* Label on left */
+.sort-label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Sort button (light, ghost) */
+.sort-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  cursor: pointer;
+  transition: 0.15s ease;
+  backdrop-filter: blur(var(--blur));
+}
+
+.sort-btn:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+/* --- Make orders list look like table block --- */
+.orders-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  background: var(--panel);
+  backdrop-filter: blur(calc(var(--blur) - 2px));
+}
+
+/* --- Clean table borders for rows --- */
+.order-row {
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  border-left: 3px solid var(--accent);  /* SH red left border */
+  border-radius: 8px;
+  background: var(--panel);
+  backdrop-filter: blur(var(--blur));
+}
+
+.order-row:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Compact table-style spacing --- */
+.order-row {
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+/* --- Avatar smaller --- */
+.order-avatar {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 10px;
+}
+
+/* --- Title + meta compact --- */
+.order-title {
+  font-size: 13px !important;
+  font-weight: 700;
+}
+
+.order-meta {
+  font-size: 11px !important;
+  opacity: 0.75;
+}
+
+/* --- Status badge smaller --- */
+.status {
+  padding: 4px 8px !important;
+  font-size: 10px !important;
+  border-radius: 999px;
+}
+
+/* --- Buttons smaller inside rows --- */
+.order-actions .btn {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+}
+
+/* --- Mobile responsive compact mode --- */
+@media (max-width: 600px) {
+  .order-row {
+    grid-template-columns: 42px 1fr;
+    grid-template-areas:
+      "avatar title"
+      "avatar meta"
+      "buttons buttons";
+  }
+
+  .order-avatar { grid-area: avatar; }
+  .order-title { grid-area: title; }
+  .order-meta { grid-area: meta; }
+
+  .order-actions {
+    grid-area: buttons;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
