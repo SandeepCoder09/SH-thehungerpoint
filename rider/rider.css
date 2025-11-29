@@ -41,7 +41,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding-bottom: 80px; /* prevent footer overlap */
+  padding-bottom: 80px;
 }
 
 /* ---------- HEADER ---------- */
@@ -191,7 +191,7 @@ body {
   padding-right: 4px;
 }
 
-/* Beautiful scroll */
+/* Scroll */
 .orders-list::-webkit-scrollbar {
   width: 8px;
 }
@@ -200,6 +200,7 @@ body {
   border-radius: 8px;
 }
 
+/* ---------- ORDER CARD ---------- */
 .order-card {
   display: flex;
   justify-content: space-between;
@@ -219,7 +220,7 @@ body {
   color: var(--text-muted);
 }
 
-/* Status badge */
+/* Status badging */
 .order-badge {
   padding: 6px 10px;
   border-radius: 999px;
@@ -231,6 +232,11 @@ body {
 .order-badge.preparing { background: #f7b267; color: #2b1700; }
 .order-badge.paid      { background: #2ecc71; color: #033010; }
 .order-badge.picked    { background: #3aa0ff; color: #021227; }
+
+/* Background highlight for states */
+.order-card.assigned   { background: #e3f2fd !important; }
+.order-card.picked     { background: #fff3cd !important; }
+.order-card.delivered  { background: #e8f5e9! important; }
 
 /* ---------- FOOTER ---------- */
 .rider-footer {
@@ -245,6 +251,23 @@ body {
   box-shadow: 0 -2px 10px var(--shadow);
 }
 
-.order-card.assigned { background: #e3f2fd !important; }
-.order-card.picked { background: #fff3cd !important; }
-.order-card.delivered { background: #e8f5e9 !important; }
+/* ---------- MOBILE-SAFE TOAST ---------- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+}
