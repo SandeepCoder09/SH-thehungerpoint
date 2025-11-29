@@ -1,444 +1,473 @@
 /* ============================================================
-   SH Admin Panel — Premium Glass Dim Gray UI (20–25px Blur)
-   Clean • Modern • No animations • Soft blur cards everywhere
+   SH Admin — White + Pastel Tints (Clean, Premium, No Blur)
+   Full replacement CSS — Layout A (Vertical right actions)
+   No HTML changes required
 ===============================================================*/
 
 /* -------------------- THEME VARIABLES -------------------- */
 :root {
-	--accent: #E23744;
-	--radius: 16px;
-	--blur: 24px;
-
-	/* Text */
-	--text: #ffffff;
-	--muted: rgba(255, 255, 255, 0.75);
-
-	/* Panels */
-	--panel: rgba(255, 255, 255, 0.18);
-	--panel-hover: rgba(255, 255, 255, 0.25);
-	--border: rgba(255, 255, 255, 0.30);
-
-	/* Shadows */
-	--shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.45);
-	--shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.25);
-
-	--background: #0f0f14;
+	--accent: #e23744;
+	/* SH red */
+	--radius: 14px;
+	--card-gap: 18px;
+	--shadow-soft: 0 8px 20px rgba(18, 24, 32, 0.08);
+	--shadow-strong: 0 20px 50px rgba(18, 24, 32, 0.10);
+	--text: #0f1720;
+	--muted: #556070;
+	--bg: #f6f7fb;
+	/* page background */
+	--panel-bg: #ffffff;
+	/* card background */
+	--panel-border: rgba(15, 20, 25, 0.06);
+	--status-preparing: #f6ad55;
+	--status-assigned: #bfe3ff;
+	--status-picked: #fb923c;
+	--status-out: #6ee7f9;
+	--status-delivered: #7dd3a6;
+	--status-cancelled: #f87171;
+	--btn-ghost-bg: rgba(15, 20, 25, 0.06);
+	--btn-radius: 10px;
+	--spacing: 14px;
 }
 
-/* -------------------- GLOBAL BACKGROUND -------------------- */
+/* Light-mode adjustments (if user already using light) */
+@media (prefers-color-scheme: light) {
+	:root {
+		--bg: #f7f9fb;
+		--panel-bg: #ffffff;
+		--panel-border: rgba(15, 20, 25, 0.06);
+		--shadow-soft: 0 6px 18px rgba(18, 24, 32, 0.06);
+		--shadow-strong: 0 18px 40px rgba(18, 24, 32, 0.06);
+	}
+}
+
+/* -------------------- Global Reset -------------------- */
+* {
+	box-sizing: border-box
+}
 
 html,
 body {
-	margin: 0;
 	height: 100%;
-	font-family: Inter, system-ui, Arial;
+	margin: 0;
+	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 	color: var(--text);
-	background: var(--background);
-	/* simple dim gray background */
-	overflow-x: hidden;
+	background: var(--bg);
+	-webkit-font-smoothing: antialiased
 }
 
-/* -------------------- TOPBAR -------------------- */
+a {
+	color: inherit
+}
 
+/* -------------------- Topbar -------------------- */
 .topbar {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	padding: 16px 22px;
-
-	background: var(--panel);
-	border-bottom: 1px solid var(--border);
+	justify-content: space-between;
+	gap: 16px;
+	padding: 16px 20px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 252, 0.98));
 	border-radius: 0 0 var(--radius) var(--radius);
-	backdrop-filter: blur(var(--blur));
 	box-shadow: var(--shadow-soft);
-
+	border: 1px solid var(--panel-border);
 	position: sticky;
 	top: 0;
-	z-index: 100;
+	z-index: 80;
 }
 
 .top-left {
 	display: flex;
-	gap: 14px;
 	align-items: center;
+	gap: 12px
 }
 
 .top-logo {
 	width: 46px;
 	height: 46px;
-	border-radius: 14px;
-	border: 1px solid var(--border);
+	border-radius: 12px;
 	object-fit: contain;
+	border: 1px solid var(--panel-border);
+	background: linear-gradient(180deg, #fff, #fff)
 }
 
 .title {
-	font-size: 18px;
 	font-weight: 800;
+	font-size: 18px
 }
 
 .top-right {
 	display: flex;
 	gap: 10px;
+	align-items: center
 }
 
+/* small stat cards in topbar */
 .card.small {
+	background: var(--panel-bg);
 	padding: 8px 12px;
-	border-radius: var(--radius);
-	background: var(--panel);
-	border: 1px solid var(--border);
-	font-size: 13px;
-	backdrop-filter: blur(var(--blur));
-}
-
-/* -------------------- BUTTONS -------------------- */
-
-.btn {
-	padding: 10px 16px;
-	border-radius: var(--radius);
-	cursor: pointer;
-	font-weight: 700;
-	transition: 0.15s ease;
-	border: none;
-}
-
-.btn:not(.ghost) {
-	background: var(--accent);
-	color: #fff;
+	border-radius: 12px;
+	border: 1px solid var(--panel-border);
 	box-shadow: var(--shadow-soft);
+	font-size: 13px;
+	color: var(--muted)
 }
 
-.btn.ghost {
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid var(--border);
-	color: var(--text);
+/* -------------------- Buttons (global) -------------------- */
+.btn {
+	cursor: pointer;
+	border: none;
+	padding: 10px 14px;
+	border-radius: var(--btn-radius);
+	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
 }
 
 .btn:active {
-	transform: scale(0.95);
+	transform: translateY(1px) scale(.995)
 }
 
-/* -------------------- TOOLBAR -------------------- */
+/* Primary (red) */
+.btn:not(.ghost) {
+	background: var(--accent);
+	color: #fff;
+	box-shadow: 0 6px 18px rgba(226, 55, 68, 0.12)
+}
 
+/* Ghost / neutral */
+.btn.ghost {
+	background: var(--btn-ghost-bg);
+	color: var(--text);
+	border: 1px solid var(--panel-border)
+}
+
+/* -------------------- Admin toolbar -------------------- */
 .admin-toolbar {
 	display: flex;
-	gap: 14px;
 	align-items: center;
-	padding: 12px 22px;
-	background: var(--panel);
-	backdrop-filter: blur(var(--blur));
-	border-bottom: 1px solid var(--border);
-	border-radius: var(--radius);
-	margin: 16px;
+	gap: 12px;
+	padding: 14px 20px;
+	margin: 18px;
+	border-radius: 12px;
+	background: var(--panel-bg);
+	border: 1px solid var(--panel-border);
 	box-shadow: var(--shadow-soft);
 }
 
-.spacer {
-	flex: 1;
-}
-
-/* -------------------- MAIN LAYOUT -------------------- */
-
+/* -------------------- Layout -------------------- */
 .layout {
 	display: grid;
-	grid-template-columns: 400px 1fr;
-	gap: 20px;
-	padding: 20px;
-	max-width: 1500px;
-	margin: auto;
+	grid-template-columns: 380px 1fr;
+	gap: 22px;
+	max-width: 1320px;
+	margin: 20px auto;
+	padding: 0 16px 60px;
 }
 
-/* -------------------- GLASS PANELS -------------------- */
+/* Make left/right named areas (keeps consistency) */
+.left-col {
+	display: block
+}
 
+.right-col {
+	display: block
+}
+
+/* -------------------- Panels (cards) -------------------- */
 .panel {
-	background: var(--panel);
-	border-radius: var(--radius);
-	border: 1px solid var(--border);
-	backdrop-filter: blur(var(--blur));
-	padding: 16px;
+	background: var(--panel-bg);
+	border-radius: 14px;
+	border: 1px solid var(--panel-border);
 	box-shadow: var(--shadow-strong);
-	transition: 0.2s ease;
+	padding: 18px;
 }
 
-.panel:hover {
-	background: var(--panel-hover);
+/* headings inside panels */
+.panel h3 {
+	margin: 0 0 12px;
+	font-size: 20px;
+	color: var(--text)
 }
 
-/* -------------------- ORDER LIST -------------------- */
-
+/* -------------------- Orders list container -------------------- */
 .orders-list {
-	padding: 12px;
-	border-radius: var(--radius);
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid var(--border);
-	backdrop-filter: blur(calc(var(--blur) + 4px));
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
-	max-height: calc(100vh - 260px);
-	overflow-y: auto;
+	gap: var(--card-gap);
+	padding: 8px;
+	background: transparent;
+	max-height: calc(100vh - 320px);
+	overflow: auto;
 }
 
-/* -------------------- ORDER ROW -------------------- */
+/* center cards inside panel to make them look neat */
+.panel.orders-panel .orders-list {
+	padding: 8px 6px
+}
 
+/* -------------------- Order Row (compact card) -------------------- */
 .order-row {
-	display: grid !important;
-	grid-template-columns: 60px 1fr auto !important;
-	align-items: start;
+	display: grid;
+	grid-template-columns: 60px 1fr 120px;
+	/* left avatar, middle content, right actions */
 	gap: 14px;
+	align-items: start;
 	padding: 16px;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.18);
-	border: 1px solid rgba(255, 255, 255, 0.28);
-	backdrop-filter: blur(var(--blur));
+	border-radius: 14px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 252, 0.98));
+	/* very light tint */
+	border: 1px solid var(--panel-border);
 	box-shadow: var(--shadow-soft);
-	transition: 0.25s ease;
+	transition: transform .12s ease, box-shadow .12s ease;
 }
 
-.order-row:hover {
-	background: rgba(255, 255, 255, 0.28);
-	transform: translateY(-3px);
+/* slightly different pastel tints per item (alternating subtle) */
+.orders-list .order-row:nth-child(3n+1) {
+	background: linear-gradient(180deg, #fff, #fff)
 }
+
+.orders-list .order-row:nth-child(3n+2) {
+	background: linear-gradient(180deg, #fbfbff, #fff)
+}
+
+.orders-list .order-row:nth-child(3n+3) {
+	background: linear-gradient(180deg, #fffafc, #fff)
+}
+
+/* reduce inner card size on mobile using media query later */
 
 /* Avatar */
 .order-avatar {
 	width: 56px;
 	height: 56px;
-	border-radius: 14px;
-	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-radius: 12px;
+	background: linear-gradient(180deg, #fff, #fff);
+	border: 1px solid var(--panel-border);
+	display: block;
 	object-fit: cover;
 }
 
-/* Text section */
+/* Body (title + meta) */
+.order-body {
+	display: flex;
+	flex-direction: column;
+	gap: 6px
+}
+
 .order-title {
+	font-weight: 800;
 	font-size: 15px;
-	font-weight: 700;
+	color: var(--text);
+	line-height: 1.1
 }
 
 .order-meta {
-	font-size: 12px;
-	opacity: 0.85;
+	font-size: 13px;
+	color: var(--muted);
+	margin-top: 4px
 }
 
-/* -------------------- RIGHT SIDE (VERTICAL) -------------------- */
-
+/* -------------------- Right actions (VERTICAL) -------------------- */
 .order-actions {
-	display: flex !important;
-	flex-direction: column !important;
-	align-items: flex-end !important;
-	gap: 8px !important;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 10px;
 }
 
-/* Status at top */
-.order-actions .status {
-	min-width: 110px;
-	height: 34px;
-	border-radius: 10px;
-	padding: 0 14px !important;
-	display: flex;
+/* status pill (solid color, readable) */
+.status {
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 12px !important;
-	font-weight: 700;
-	color: #fff !important;
+	padding: 6px 14px;
+	border-radius: 999px;
+	font-weight: 800;
+	font-size: 12px;
+	color: #fff;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
-/* Buttons below status */
-.order-actions .btn {
-	width: 110px !important;
-	height: 34px !important;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 10px !important;
-	font-size: 13px !important;
-}
-
-/* -------------------- STATUS COLORS -------------------- */
-
+/* status color mapping (solid) */
 .status.preparing {
-	background: #fbbf24 !important;
-	color: #111 !important;
+	background: var(--status-preparing);
+	color: #1f1a07
 }
 
 .status.assigned {
-	background: #264653 !important;
-	color: #d4f1ff !important;
+	background: #a7e0ff;
+	color: #08314b
 }
 
 .status.picked {
-	background: #fb923c !important;
-	color: #351800 !important;
+	background: var(--status-picked);
+	color: #351800
 }
 
 .status.out_for_delivery {
-	background: #06b6d4 !important;
-	color: #042f36 !important;
+	background: var(--status-out);
+	color: #05303a
 }
 
 .status.delivered {
-	background: #10b981 !important;
-	color: #052d15 !important;
+	background: var(--status-delivered);
+	color: #02381b
 }
 
 .status.cancelled {
-	background: #ef4444 !important;
-	color: #fff !important;
+	background: var(--status-cancelled);
+	color: #fff
 }
 
-/* -------------------- RESPONSIVE -------------------- */
+/* Buttons under status (vertical) */
+.order-actions .btn {
+	width: 110px;
+	height: 36px;
+	border-radius: 10px;
+	padding: 0 12px;
+	font-size: 14px;
+	font-weight: 700;
+}
 
-@media (max-width: 1000px) {
+/* style for secondary (details) button */
+.order-actions .btn.details {
+	background: #3d3d3d;
+	color: #fff;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06)
+}
+
+.order-actions .btn.track {
+	background: var(--accent);
+	color: #fff
+}
+
+/* small subtle text under title (like time) */
+.order-time {
+	font-size: 12px;
+	color: var(--muted)
+}
+
+/* -------------------- Compact mode (narrow cards) -------------------- */
+/* center the list and limit card width to be compact on mobile and desktop */
+.panel .orders-list {
+	align-items: center
+}
+
+.order-row {
+	width: 100%;
+	max-width: 720px;
+	margin: 0 auto
+}
+
+/* make cards narrower on phone */
+@media (max-width:900px) {
 	.layout {
 		grid-template-columns: 1fr;
+		padding: 0 14px 40px
 	}
 
-	.top-right {
-		display: none;
-	}
-}
-
-@media (max-width: 650px) {
 	.order-row {
-		grid-template-columns: 50px 1fr auto !important;
-		align-items: start;
+		grid-template-columns: 54px 1fr 100px;
+		padding: 14px;
+		max-width: 680px
 	}
 
-	.order-actions {
-		align-items: flex-end;
+	.order-actions .btn {
+		width: 96px;
+		height: 34px;
+		font-size: 13px
+	}
+
+	.order-row {
+		border-radius: 12px
 	}
 }
 
-/* ============================================================
-   PURE CSS — LAYOUT A — RIGHT SIDE VERTICAL ACTIONS
-   (No HTML change required)
-===========================================================*/
+/* mobile small */
+@media (max-width:480px) {
+	.order-row {
+		grid-template-columns: 48px 1fr 96px;
+		gap: 10px;
+		padding: 12px;
+		max-width: 420px
+	}
 
-/* MAKE ORDER ROW A 3-COLUMN GRID */
-.order-row {
-  display: grid !important;
-  grid-template-columns: 60px 1fr auto !important;
-  align-items: start !important;
-  gap: 16px !important;
+	.order-avatar {
+		width: 48px;
+		height: 48px;
+		border-radius: 10px
+	}
+
+	.order-title {
+		font-size: 14px
+	}
+
+	.order-meta {
+		font-size: 12px
+	}
+
+	.order-actions .btn {
+		width: 88px;
+		height: 34px;
+		font-size: 13px
+	}
+
+	.status {
+		padding: 5px 10px;
+		font-size: 11px
+	}
 }
 
-/* LEFT SIDE: AVATAR + TEXT stay as is */
-.order-avatar { grid-column: 1; }
-.order-body { grid-column: 2; }
-
-/* RIGHT SIDE: STATUS + TRACK + DETAILS (VERTICAL) */
-.order-actions {
-  grid-column: 3;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  justify-content: flex-start !important;
-  gap: 8px !important;
+/* -------------------- Order details panel (right side) -------------------- */
+.panel.order-details {
+	margin-top: 6px;
 }
 
-/* STATUS BADGE SIZE */
-.order-actions .status {
-  min-width: 110px;
-  height: 34px;
-  font-size: 12px !important;
-  border-radius: 8px !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* quick actions panel */
+.quick-actions {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap
 }
 
-/* BUTTON SIZE */
-.order-actions .btn {
-  width: 110px !important;
-  height: 34px !important;
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px !important;
-  font-size: 13px !important;
+/* -------------------- Utilities: small spacing helpers -------------------- */
+.mt-8 {
+	margin-top: 8px
 }
 
-/* ------------------ MOBILE FIX ------------------ */
-@media (max-width: 600px) {
-
-  .order-row {
-    grid-template-columns: 55px 1fr auto !important;
-    align-items: start !important;
-  }
-
-  /* Keep actions on right side even on mobile */
-  .order-actions {
-    align-items: flex-end !important;
-    gap: 6px !important;
-  }
-
-  .order-actions .btn {
-    width: 100px !important;
-  }
-
-  .order-actions .status {
-    width: 100px !important;
-  }
+.mb-8 {
+	margin-bottom: 8px
 }
 
-/* ============================================================
-   MAKE ORDER CARDS SMALLER + CENTER THEM
-============================================================*/
-
-/* Center the whole order list */
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;      /* <-- center cards */
-  gap: 20px;
+/* -------------------- Footer and other elements -------------------- */
+footer {
+	padding: 18px;
+	text-align: center;
+	color: var(--muted);
+	font-size: 14px
 }
 
-/* Make each order row smaller */
-.order-row {
-  width: 92%;               /* reduce width */
-  max-width: 650px;         /* tighter card size */
-  margin: 0 auto;           /* center horizontally */
-  border-radius: 20px !important;
-  padding: 18px !important;
+/* -------------------- Accessibility & focus states -------------------- */
+.btn:focus {
+	outline: 3px solid rgba(226, 55, 68, 0.12);
+	outline-offset: 2px
 }
 
-/* On desktop make card even smaller */
-@media (min-width: 900px) {
-  .order-row {
-    width: 80%;
-    max-width: 720px;
-  }
+.order-row:focus-within {
+	box-shadow: 0 18px 40px rgba(18, 24, 32, 0.06);
+	transform: translateY(-2px)
 }
 
-/* On large screens center entire left column also */
-.left-col {
-  display: flex;
-  justify-content: center;
+/* -------------------- Small polish: hover lift for cards and buttons -------------------- */
+.order-row:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-strong)
 }
 
-/* ============================================================
-   MAKE ORDER CARDS MORE COMPACT (NARROW WIDTH)
-===========================================================*/
-
-.order-row {
-  width: 90% !important;
-  max-width: 500px !important;   /* <-- reduce width */
-  margin: 0 auto !important;     /* center the card */
-  border-radius: 20px !important;
-  padding: 18px !important;
-}
-
-/* Center order list itself */
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;     /* center all cards */
-  gap: 20px;
-}
-
-/* On larger screens keep it compact */
-@media (min-width: 900px) {
-  .order-row {
-    width: 75% !important;
-    max-width: 600px !important;  /* still compact */
-  }
+.btn:hover {
+	transform: translateY(-2px)
 }
