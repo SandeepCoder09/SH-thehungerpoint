@@ -1,21 +1,23 @@
 /* ============================================================
-   SH Admin — Classic Old Theme + Simple Blur Panels
-   Clean • Professional • No Neon • No Glow • No Effects
+   SH Admin Panel — Classic Theme + Blur Glass UI
+   Clean • Minimal • No neon • No glow
+   Blur Panels + Blur Orders Table (Style #3)
 ===============================================================*/
+
+/* -------------------- THEME VARIABLES -------------------- */
 
 :root {
   --accent: #E23744;
-  --radius: 12px;
-  --blur: 10px;
+  --radius: 14px;
+  --blur: 14px;
 
-  /* Dark Mode (default) */
+  /* DARK MODE (default) */
   --bg-1: #060d17;
   --bg-2: #0a1626;
 
-  /* Classic SH muted colors */
   --panel: rgba(255, 255, 255, 0.05);
   --panel-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.10);
 
   --text: #e9eef7;
   --muted: #8ea1c3;
@@ -23,28 +25,26 @@
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
-/* DAY MODE (simple) */
+/* LIGHT MODE */
 @media (prefers-color-scheme: light) {
   :root {
     --bg-1: #f4f6fb;
     --bg-2: #ffffff;
 
     --panel: rgba(255, 255, 255, 0.55);
-    --panel-hover: rgba(255, 255, 255, 0.7);
+    --panel-hover: rgba(255, 255, 255, 0.75);
     --border: rgba(0, 0, 0, 0.10);
 
-    --text: #141414;
+    --text: #191919;
     --muted: #4a5567;
 
-    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   }
 }
 
 /* -------------------- GLOBAL -------------------- */
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -62,10 +62,12 @@ html, body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 18px;
+
   background: var(--panel);
-  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(var(--blur));
+  border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow);
+
   position: sticky;
   top: 0;
   z-index: 100;
@@ -92,8 +94,8 @@ html, body {
 
 .top-right {
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
 }
 
 .card.small {
@@ -112,7 +114,7 @@ html, body {
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 700;
-  transition: 0.15s ease;
+  transition: 0.2s ease;
 }
 
 .btn:active {
@@ -122,7 +124,6 @@ html, body {
 .btn:not(.ghost) {
   background: var(--accent);
   color: #fff;
-  border: none;
 }
 
 .btn.ghost {
@@ -135,12 +136,12 @@ html, body {
 
 .admin-toolbar {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
   padding: 12px 18px;
   background: var(--panel);
-  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(var(--blur));
+  border-bottom: 1px solid var(--border);
 }
 
 .spacer { flex: 1; }
@@ -170,9 +171,16 @@ html, body {
   background: var(--panel-hover);
 }
 
-/* -------------------- ORDERS LIST -------------------- */
+/* ============================================================
+   BLUR GLASS TABLE (YOUR SELECTED STYLE #3)
+===============================================================*/
 
 .orders-list {
+  padding: 10px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -181,34 +189,36 @@ html, body {
 }
 
 .order-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
   gap: 12px;
   align-items: center;
-  padding: 12px;
-  border-radius: var(--radius);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(var(--blur));
-  transition: 0.2s ease;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition: 0.25s ease;
 }
 
 .order-row:hover {
-  background: var(--panel-hover);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
 }
 
+/* Avatar */
 .order-avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: var(--radius);
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   object-fit: cover;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.order-body {
-  flex: 1;
-  min-width: 0;
-}
-
+/* Text section */
 .order-title {
   font-size: 14px;
   font-weight: 700;
@@ -216,26 +226,29 @@ html, body {
 
 .order-meta {
   font-size: 12px;
-  color: var(--muted);
+  opacity: 0.85;
   margin-top: 4px;
 }
 
-/* -------------------- STATUS TAGS -------------------- */
-
-.status {
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
+/* Actions column */
+.order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* original colors */
-.status.preparing { background: #f59e0b; color: #111; }
-.status.assigned { background: #264653; color: #bfe3ff; }
-.status.picked { background: #f7b267; color: #3a2300; }
-.status.out_for_delivery { background: #06b6d4; color: #042029; }
-.status.delivered { background: #10b981; color: #052d15; }
-.status.cancelled { background: #ef4444; color: #fff; }
+.order-actions .btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+/* Status badge */
+.status {
+  padding: 5px 10px;
+  font-size: 11px;
+  border-radius: 10px;
+}
 
 /* -------------------- RESPONSIVE -------------------- */
 
@@ -243,238 +256,25 @@ html, body {
   .layout {
     grid-template-columns: 1fr;
   }
-  .top-right { display: none; }
+  .top-right {
+    display: none;
+  }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .topbar {
     flex-direction: column;
     text-align: center;
   }
-  .order-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* -------------------- TEST ORDER BUTTON -------------------- */
-
-.test-order-btn {
-  margin-top: 10px;
-  width: 100%;
-  font-size: 16px;
-  padding: 12px;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: #fff;
-  border: none;
-}
-
-/* ============================================================
-   SH — SMALL TABLE-STYLE COMPACT ORDERS BOX
-   (No HTML changes required)
-===============================================================*/
-
-/* Reduce padding and height for smaller appearance */
-.orders-list {
-  gap: 6px !important;
-  padding: 4px !important;
-}
-
-/* Make every order row look like a small table box */
-.order-row {
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
-  display: grid !important;
-  grid-template-columns: 48px 1fr auto;
-  align-items: center;
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--border);
-  transition: 0.2s ease;
-}
-
-/* Smaller avatar */
-.order-avatar {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 10px;
-}
-
-/* Title + meta compact */
-.order-body {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.order-title {
-  font-size: 13px !important;
-  font-weight: 700;
-}
-
-.order-meta {
-  font-size: 11px !important;
-  opacity: 0.8;
-}
-
-/* Status and action buttons aligned right */
-.order-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Smaller status badge */
-.status {
-  padding: 4px 8px !important;
-  font-size: 10px !important;
-}
-
-/* Smaller buttons inside rows */
-.order-actions .btn {
-  padding: 4px 8px !important;
-  font-size: 11px !important;
-  border-radius: 6px !important;
-}
-
-/* ---------- Mobile Compact Mode ---------- */
-@media (max-width: 600px) {
 
   .order-row {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 44px 1fr;
     grid-template-areas:
       "avatar title"
       "avatar meta"
       "buttons buttons";
-    gap: 6px;
-  }
 
-  .order-avatar { grid-area: avatar; }
-  .order-title { grid-area: title; }
-  .order-meta { grid-area: meta; }
-  .order-actions { 
-    grid-area: buttons;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-}
-
-/* ============================================================
-   SH — TIME SORTING UI (CSS ONLY)
-   Clean • Old SH Theme • Small Table Beauty
-===============================================================*/
-
-/* --- Sorting header wrapper --- */
-.orders-sort-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 10px;
-  margin-bottom: 6px;
-  font-size: 13px;
-  color: var(--muted);
-  background: var(--panel);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(var(--blur));
-}
-
-/* Label on left */
-.sort-label {
-  font-weight: 600;
-  opacity: 0.8;
-}
-
-/* Sort button (light, ghost) */
-.sort-btn {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
-  color: var(--text);
-  cursor: pointer;
-  transition: 0.15s ease;
-  backdrop-filter: blur(var(--blur));
-}
-
-.sort-btn:hover {
-  background: rgba(255,255,255,0.07);
-}
-
-/* --- Make orders list look like table block --- */
-.orders-list {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px;
-  background: var(--panel);
-  backdrop-filter: blur(calc(var(--blur) - 2px));
-}
-
-/* --- Clean table borders for rows --- */
-.order-row {
-  border: 1px solid var(--border);
-  margin-bottom: 6px;
-  border-left: 3px solid var(--accent);  /* SH red left border */
-  border-radius: 8px;
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-}
-
-.order-row:last-child {
-  margin-bottom: 0;
-}
-
-/* --- Compact table-style spacing --- */
-.order-row {
-  padding: 10px 12px;
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
-  gap: 10px;
-  align-items: center;
-}
-
-/* --- Avatar smaller --- */
-.order-avatar {
-  width: 46px !important;
-  height: 46px !important;
-  border-radius: 10px;
-}
-
-/* --- Title + meta compact --- */
-.order-title {
-  font-size: 13px !important;
-  font-weight: 700;
-}
-
-.order-meta {
-  font-size: 11px !important;
-  opacity: 0.75;
-}
-
-/* --- Status badge smaller --- */
-.status {
-  padding: 4px 8px !important;
-  font-size: 10px !important;
-  border-radius: 999px;
-}
-
-/* --- Buttons smaller inside rows --- */
-.order-actions .btn {
-  padding: 4px 8px !important;
-  font-size: 11px !important;
-  border-radius: 6px !important;
-}
-
-/* --- Mobile responsive compact mode --- */
-@media (max-width: 600px) {
-  .order-row {
-    grid-template-columns: 42px 1fr;
-    grid-template-areas:
-      "avatar title"
-      "avatar meta"
-      "buttons buttons";
+    padding: 10px 12px;
   }
 
   .order-avatar { grid-area: avatar; }
@@ -483,8 +283,20 @@ html, body {
 
   .order-actions {
     grid-area: buttons;
-    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
   }
+}
+
+/* -------------------- TEST ORDER BUTTON -------------------- */
+
+.test-order-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  border: none;
 }
