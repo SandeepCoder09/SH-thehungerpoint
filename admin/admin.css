@@ -1,72 +1,58 @@
 /* ============================================================
-   SH Admin Panel — FULL BLUR GLASSMORPHISM (MEDIUM BLUR)
-   Day Mode = White Glass • Night Mode = Dark Glass
-   Responsive + Premium Animations — CSS ONLY
+   SH Admin — Classic Old Theme + Simple Blur Panels
+   Clean • Professional • No Neon • No Glow • No Effects
 ===============================================================*/
-
-/* -------------------- THEME VARIABLES -------------------- */
 
 :root {
   --accent: #E23744;
-  --radius: 16px;
-  --blur: 18px;
-  --transition: 0.25s ease;
+  --radius: 12px;
+  --blur: 10px;
 
-  /* NIGHT (default) */
-  --bg-1: rgba(5, 10, 20, 0.7);
-  --bg-2: rgba(8, 16, 32, 0.6);
-  --panel: rgba(12, 20, 35, 0.45);
-  --panel-hover: rgba(20, 30, 50, 0.55);
-  --border: rgba(255, 255, 255, 0.12);
-  --text: #e4e9f4;
-  --muted: #aab4c9;
+  /* Dark Mode (default) */
+  --bg-1: #060d17;
+  --bg-2: #0a1626;
 
-  --shadow-big: 0 25px 45px rgba(0, 0, 0, 0.35);
-  --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.25);
+  /* Classic SH muted colors */
+  --panel: rgba(255, 255, 255, 0.05);
+  --panel-hover: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+
+  --text: #e9eef7;
+  --muted: #8ea1c3;
+
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
-/* -------------------- DAY MODE -------------------- */
+/* DAY MODE (simple) */
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-1: rgba(255, 255, 255, 0.7);
-    --bg-2: rgba(245, 247, 250, 0.65);
+    --bg-1: #f4f6fb;
+    --bg-2: #ffffff;
 
     --panel: rgba(255, 255, 255, 0.55);
-    --panel-hover: rgba(255, 255, 255, 0.65);
+    --panel-hover: rgba(255, 255, 255, 0.7);
+    --border: rgba(0, 0, 0, 0.10);
 
-    --border: rgba(0, 0, 0, 0.12);
-    --text: #0a0a0a;
-    --muted: #5a6270;
+    --text: #141414;
+    --muted: #4a5567;
 
-    --shadow-big: 0 25px 45px rgba(0, 0, 0, 0.12);
-    --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   }
 }
 
 /* -------------------- GLOBAL -------------------- */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
   height: 100%;
   font-family: Inter, system-ui, Arial;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
   color: var(--text);
-  background: linear-gradient(160deg, var(--bg-1), var(--bg-2)), url('/admin/bg-blur.jpg');
-  background-size: cover;
-  backdrop-filter: blur(40px);
   -webkit-font-smoothing: antialiased;
-  transition: var(--transition);
-}
-
-/* Page fade animation */
-body {
-  opacity: 0;
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
 }
 
 /* -------------------- TOPBAR -------------------- */
@@ -75,138 +61,109 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 22px;
-  gap: 16px;
-
+  padding: 12px 18px;
   background: var(--panel);
-  backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--border);
-  border-radius: 0 0 var(--radius) var(--radius);
-
-  box-shadow: var(--shadow-small);
+  backdrop-filter: blur(var(--blur));
+  box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
-  animation: slideDown 0.6s ease;
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-14px); opacity: 0; }
 }
 
 .top-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .top-logo {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius);
   object-fit: contain;
   border: 1px solid var(--border);
-  transition: transform 0.25s ease;
 }
 
-.top-logo:hover { transform: scale(1.08); }
-
-.title { font-weight: 800; font-size: 18px; }
-
-/* -------------------- TOP RIGHT CARDS -------------------- */
+.title {
+  font-size: 16px;
+  font-weight: 800;
+}
 
 .top-right {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
 }
 
 .card.small {
   background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   font-size: 13px;
-  box-shadow: var(--shadow-small);
-  transition: var(--transition);
-}
-
-.card.small:hover {
-  background: var(--panel-hover);
+  backdrop-filter: blur(var(--blur));
 }
 
 /* -------------------- BUTTONS -------------------- */
 
 .btn {
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 700;
-  transition: 0.2s ease;
+  transition: 0.15s ease;
 }
 
-.btn:hover { transform: translateY(-2px); }
+.btn:active {
+  transform: scale(0.95);
+}
 
-.btn:active { transform: scale(0.94); }
-
-/* Red Button */
 .btn:not(.ghost) {
   background: var(--accent);
   color: #fff;
-  box-shadow: var(--shadow-small);
+  border: none;
 }
 
-/* Ghost Button */
 .btn.ghost {
-  background: var(--panel);
-  color: var(--text);
+  background: transparent;
   border: 1px solid var(--border);
-  backdrop-filter: blur(var(--blur));
+  color: var(--text);
 }
 
 /* -------------------- TOOLBAR -------------------- */
 
 .admin-toolbar {
   display: flex;
-  gap: 14px;
-  padding: 12px 20px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 18px;
   background: var(--panel);
-  border-radius: var(--radius);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--border);
-  margin: 14px;
-  box-shadow: var(--shadow-small);
-  animation: fadeUp 0.5s ease;
 }
 
 .spacer { flex: 1; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-}
-
-/* -------------------- MAIN GRID -------------------- */
+/* -------------------- MAIN LAYOUT -------------------- */
 
 .layout {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 18px;
-  padding: 20px;
-  max-width: 1500px;
+  grid-template-columns: 380px 1fr;
+  gap: 16px;
+  padding: 18px;
+  max-width: 1300px;
   margin: auto;
 }
 
-/* -------------------- PANELS -------------------- */
-
 .panel {
   background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--border);
+  padding: 14px;
   border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow-big);
-  transition: var(--transition);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur));
+  box-shadow: var(--shadow);
+  transition: background 0.2s ease;
 }
 
 .panel:hover {
@@ -218,69 +175,61 @@ body {
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: calc(100vh - 250px);
+  gap: 10px;
+  max-height: calc(100vh - 240px);
   overflow-y: auto;
-  padding-right: 6px;
-  animation: fadeUp 0.6s ease;
 }
 
 .order-row {
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  padding: 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
   display: flex;
   gap: 12px;
   align-items: center;
-  transition: 0.25s ease;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur));
+  transition: 0.2s ease;
 }
 
 .order-row:hover {
   background: var(--panel-hover);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-big);
 }
 
 .order-avatar {
-  width: 60px;
-  height: 60px;
+  width: 54px;
+  height: 54px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
   object-fit: cover;
+  border: 1px solid var(--border);
 }
 
-.order-body { flex: 1; min-width: 0; }
+.order-body {
+  flex: 1;
+  min-width: 0;
+}
 
 .order-title {
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .order-meta {
-  margin-top: 4px;
   font-size: 12px;
   color: var(--muted);
-}
-
-/* -------------------- QUICK ACTIONS -------------------- */
-
-.order-actions {
-  display: flex;
-  gap: 8px;
+  margin-top: 4px;
 }
 
 /* -------------------- STATUS TAGS -------------------- */
 
 .status {
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
 }
 
-/* Colors unchanged */
+/* original colors */
 .status.preparing { background: #f59e0b; color: #111; }
 .status.assigned { background: #264653; color: #bfe3ff; }
 .status.picked { background: #f7b267; color: #3a2300; }
@@ -290,274 +239,33 @@ body {
 
 /* -------------------- RESPONSIVE -------------------- */
 
-@media (max-width: 1100px) {
-  .layout { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 700px) {
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
   .top-right { display: none; }
 }
 
-@media (max-width: 550px) {
-  .topbar { flex-direction: column; text-align: center; }
-  .order-row { flex-direction: column; align-items: flex-start; }
+@media (max-width: 600px) {
+  .topbar {
+    flex-direction: column;
+    text-align: center;
+  }
+  .order-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* -------------------- TEST ORDER BUTTON -------------------- */
 
 .test-order-btn {
-  width: 100%;
-  padding: 14px;
   margin-top: 10px;
-  border-radius: var(--radius);
+  width: 100%;
   font-size: 16px;
+  padding: 12px;
+  border-radius: var(--radius);
   background: var(--accent);
   color: #fff;
   border: none;
-  transition: 0.2s ease;
-  box-shadow: var(--shadow-small);
-}
-
-.test-order-btn:hover { transform: translateY(-3px); }
-.test-order-btn:active { transform: scale(0.95); }
-
-/* ============================================================
-   SH — NEON RED GLOW EFFECT (Add-on)
-   Adds glowing borders, hover glows & active highlights
-===============================================================*/
-
-/* ---------- Neon Glow Variables ---------- */
-:root {
-  --neon-red: #ff1e2d;
-  --neon-red-soft: rgba(255, 0, 40, 0.45);
-  --neon-red-glow: 0 0 18px rgba(255, 30, 46, 0.75),
-                   0 0 32px rgba(255, 30, 46, 0.55),
-                   0 0 60px rgba(255, 30, 46, 0.35);
-}
-
-/* ---------- Neon Glow on Buttons ---------- */
-
-.btn:not(.ghost) {
-  box-shadow: 0 0 12px var(--neon-red-soft);
-  transition: 0.25s ease;
-}
-
-.btn:not(.ghost):hover {
-  box-shadow: var(--neon-red-glow);
-  background: var(--neon-red);
-}
-
-/* Ghost buttons - subtle glow */
-.btn.ghost:hover {
-  border-color: var(--neon-red);
-  box-shadow: 0 0 14px var(--neon-red-soft);
-}
-
-/* ---------- Neon Glow on Test Order Button ---------- */
-
-.test-order-btn {
-  box-shadow: 0 0 18px var(--neon-red-soft);
-}
-
-.test-order-btn:hover {
-  box-shadow: var(--neon-red-glow);
-  background: var(--neon-red);
-}
-
-/* ---------- Neon Glow on Active Items ---------- */
-
-.order-row:hover {
-  border-color: var(--neon-red);
-  box-shadow: var(--neon-red-glow);
-}
-
-/* ---------- Neon Glow on Topbar Logo ---------- */
-
-.top-logo:hover {
-  filter: drop-shadow(0 0 14px var(--neon-red));
-}
-
-/* ---------- Neon Glow Border Accent ---------- */
-
-.panel:hover {
-  border-color: var(--neon-red);
-  box-shadow: var(--neon-red-glow);
-}
-
-/* ---------- Neon Glow for "Status: preparing" etc (Optional) ---------- */
-
-.status.preparing:hover,
-.status.assigned:hover,
-.status.picked:hover,
-.status.out_for_delivery:hover,
-.status.delivered:hover,
-.status.cancelled:hover {
-  box-shadow: 0 0 12px rgba(255, 30, 46, 0.5);
-  transform: scale(1.05);
-}
-
-/* ---------- Neon Flicker Animation (subtle) ---------- */
-@keyframes neonPulse {
-  0% { box-shadow: 0 0 10px rgba(255, 30, 46, 0.4); }
-  50% { box-shadow: 0 0 16px rgba(255, 30, 46, 0.8); }
-  100% { box-shadow: 0 0 10px rgba(255, 30, 46, 0.4); }
-}
-
-/* Apply flicker to key UI elements */
-.btn:not(.ghost),
-.test-order-btn {
-  animation: neonPulse 2.4s infinite ease-in-out;
-}
-
-/* ============================================================
-   SH — NEON PRO PACK (Add-on 2)
-   Advanced neon + animated effects • NO HTML changes
-===============================================================*/
-
-/* ---------- Animated Neon Underline for Titles ---------- */
-
-.panel h3 {
-  position: relative;
-  padding-bottom: 6px;
-}
-
-.panel h3::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 3px;
-  background: linear-gradient(90deg, #ff001a, #ff4d60, transparent);
-  box-shadow: 0 0 12px rgba(255, 30, 46, 0.8);
-  border-radius: 4px;
-  transition: 0.4s ease;
-}
-
-.panel:hover h3::after {
-  width: 100%;
-}
-
-/* ---------- Neon Focus Ring (Buttons) ---------- */
-
-.btn:focus,
-.test-order-btn:focus {
-  outline: none;
-  box-shadow:
-    0 0 10px rgba(255, 20, 46, 0.8),
-    0 0 18px rgba(255, 20, 46, 0.6),
-    inset 0 0 8px rgba(255, 20, 46, 0.7);
-}
-
-/* ---------- Order Row Active Neon Highlight ---------- */
-
-.order-row.active,
-.order-row:active {
-  border: 1px solid #ff1e2d;
-  box-shadow:
-    0 0 22px rgba(255, 0, 40, 0.9),
-    0 0 48px rgba(255, 0, 40, 0.6);
-  transform: scale(1.02);
-}
-
-/* Auto-activate when hovered long */
-.order-row:hover {
-  transition-delay: 0.15s;
-}
-
-/* ---------- Neon Gradient Border for Panels ---------- */
-
-.panel {
-  position: relative;
-  overflow: hidden;
-}
-
-.panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 2px;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg,
-    rgba(255, 20, 46, 0.8),
-    rgba(255, 20, 46, 0.3),
-    rgba(255, 20, 46, 0)
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* ---------- Glowing Neon Beam at Topbar ---------- */
-
-.topbar::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg,
-    rgba(255, 0, 30, 0.9),
-    rgba(255, 0, 30, 0.4),
-    transparent,
-    rgba(255, 0, 30, 0.4),
-    rgba(255, 0, 30, 0.9)
-  );
-  filter: blur(2px);
-  animation: glowBeam 4s infinite linear;
-}
-
-@keyframes glowBeam {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
-}
-
-/* ---------- Floating Neon Particles (NO HTML needed) ---------- */
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  top: 0; left: 0;
-  width: 120%;
-  height: 120%;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle, rgba(255,40,60,0.55) 0%, transparent 60%),
-    radial-gradient(circle, rgba(255,20,40,0.45) 0%, transparent 70%),
-    radial-gradient(circle, rgba(255,0,40,0.35) 0%, transparent 80%);
-  background-size: 240px 240px;
-  animation: floatingNeon 18s infinite linear alternate;
-  mix-blend-mode: overlay;
-  filter: blur(40px);
-}
-
-body::after {
-  animation-duration: 22s;
-  opacity: 0.5;
-}
-
-@keyframes floatingNeon {
-  0% { transform: translate(-10%, -10%) scale(1); }
-  50% { transform: translate(10%, 15%) scale(1.1); }
-  100% { transform: translate(-5%, -12%) scale(1.05); }
-}
-
-/* ---------- Neon Glow on Hover Cards ---------- */
-
-.card.small:hover {
-  border-color: #ff1e2d;
-  box-shadow: 0 0 16px rgba(255, 0, 40, 0.8);
-}
-
-/* ---------- Neon Title Glow (subtle) ---------- */
-
-.title {
-  text-shadow: 0 0 10px rgba(255, 30, 46, 0.6);
 }
