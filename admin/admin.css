@@ -1,473 +1,251 @@
 /* ============================================================
-   SH Admin — White + Pastel Tints (Clean, Premium, No Blur)
-   Full replacement CSS — Layout A (Vertical right actions)
-   No HTML changes required
-===============================================================*/
+   SH Admin — FINAL RESPONSIVE CLEAN UI (Pastel + No Blur)
+   Fully responsive • Compact cards • Vertical right actions
+   NO HTML CHANGES REQUIRED
+==============================================================*/
 
-/* -------------------- THEME VARIABLES -------------------- */
+/* -------------------- GLOBAL THEME -------------------- */
+
 :root {
-	--accent: #e23744;
-	/* SH red */
-	--radius: 14px;
-	--card-gap: 18px;
-	--shadow-soft: 0 8px 20px rgba(18, 24, 32, 0.08);
-	--shadow-strong: 0 20px 50px rgba(18, 24, 32, 0.10);
-	--text: #0f1720;
-	--muted: #556070;
-	--bg: #f6f7fb;
-	/* page background */
-	--panel-bg: #ffffff;
-	/* card background */
-	--panel-border: rgba(15, 20, 25, 0.06);
-	--status-preparing: #f6ad55;
-	--status-assigned: #bfe3ff;
-	--status-picked: #fb923c;
-	--status-out: #6ee7f9;
-	--status-delivered: #7dd3a6;
-	--status-cancelled: #f87171;
-	--btn-ghost-bg: rgba(15, 20, 25, 0.06);
-	--btn-radius: 10px;
-	--spacing: 14px;
+  --accent: #e23744;
+  --radius: 14px;
+  --shadow: 0 6px 18px rgba(18, 24, 32, 0.08);
+  --shadow-strong: 0 16px 40px rgba(18, 24, 32, 0.10);
+  --bg: #f4f5f8;
+  --panel: #ffffff;
+  --border: rgba(0,0,0,0.08);
+
+  /* status */
+  --preparing: #fbbf24;
+  --assigned: #bfdbfe;
+  --picked: #fb923c;
+  --ofd: #67e8f9;
+  --delivered: #34d399;
+  --cancelled: #ef4444;
 }
 
-/* Light-mode adjustments (if user already using light) */
-@media (prefers-color-scheme: light) {
-	:root {
-		--bg: #f7f9fb;
-		--panel-bg: #ffffff;
-		--panel-border: rgba(15, 20, 25, 0.06);
-		--shadow-soft: 0 6px 18px rgba(18, 24, 32, 0.06);
-		--shadow-strong: 0 18px 40px rgba(18, 24, 32, 0.06);
-	}
+/* -------------------- GLOBAL RESET -------------------- */
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: Inter, system-ui, Arial;
+  background: var(--bg);
+  color: #111;
 }
 
-/* -------------------- Global Reset -------------------- */
-* {
-	box-sizing: border-box
-}
+/* -------------------- TOPBAR -------------------- */
 
-html,
-body {
-	height: 100%;
-	margin: 0;
-	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-	color: var(--text);
-	background: var(--bg);
-	-webkit-font-smoothing: antialiased
-}
-
-a {
-	color: inherit
-}
-
-/* -------------------- Topbar -------------------- */
 .topbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	padding: 16px 20px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 252, 0.98));
-	border-radius: 0 0 var(--radius) var(--radius);
-	box-shadow: var(--shadow-soft);
-	border: 1px solid var(--panel-border);
-	position: sticky;
-	top: 0;
-	z-index: 80;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
-.top-left {
-	display: flex;
-	align-items: center;
-	gap: 12px
-}
-
+.top-left { display: flex; gap: 12px; align-items: center; }
 .top-logo {
-	width: 46px;
-	height: 46px;
-	border-radius: 12px;
-	object-fit: contain;
-	border: 1px solid var(--panel-border);
-	background: linear-gradient(180deg, #fff, #fff)
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
 }
 
-.title {
-	font-weight: 800;
-	font-size: 18px
-}
+.title { font-size: 18px; font-weight: 800; }
 
 .top-right {
-	display: flex;
-	gap: 10px;
-	align-items: center
+  display: flex;
+  gap: 10px;
 }
 
-/* small stat cards in topbar */
 .card.small {
-	background: var(--panel-bg);
-	padding: 8px 12px;
-	border-radius: 12px;
-	border: 1px solid var(--panel-border);
-	box-shadow: var(--shadow-soft);
-	font-size: 13px;
-	color: var(--muted)
+  padding: 8px 12px;
+  background: var(--panel);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-size: 13px;
 }
 
-/* -------------------- Buttons (global) -------------------- */
+/* -------------------- BUTTONS -------------------- */
+
 .btn {
-	cursor: pointer;
-	border: none;
-	padding: 10px 14px;
-	border-radius: var(--btn-radius);
-	font-weight: 700;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.btn:active {
-	transform: translateY(1px) scale(.995)
-}
-
-/* Primary (red) */
 .btn:not(.ghost) {
-	background: var(--accent);
-	color: #fff;
-	box-shadow: 0 6px 18px rgba(226, 55, 68, 0.12)
+  background: var(--accent);
+  color: #fff;
 }
 
-/* Ghost / neutral */
 .btn.ghost {
-	background: var(--btn-ghost-bg);
-	color: var(--text);
-	border: 1px solid var(--panel-border)
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid var(--border);
 }
 
-/* -------------------- Admin toolbar -------------------- */
+/* -------------------- TOOLBAR -------------------- */
+
 .admin-toolbar {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 14px 20px;
-	margin: 18px;
-	border-radius: 12px;
-	background: var(--panel-bg);
-	border: 1px solid var(--panel-border);
-	box-shadow: var(--shadow-soft);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  margin: 20px;
 }
 
-/* -------------------- Layout -------------------- */
+.spacer { flex: 1; }
+
+/* -------------------- LAYOUT -------------------- */
+
 .layout {
-	display: grid;
-	grid-template-columns: 380px 1fr;
-	gap: 22px;
-	max-width: 1320px;
-	margin: 20px auto;
-	padding: 0 16px 60px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+  max-width: 1400px;
 }
 
-/* Make left/right named areas (keeps consistency) */
-.left-col {
-	display: block
+/* Responsive layout */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
 }
 
-.right-col {
-	display: block
-}
+/* -------------------- PANELS -------------------- */
 
-/* -------------------- Panels (cards) -------------------- */
 .panel {
-	background: var(--panel-bg);
-	border-radius: 14px;
-	border: 1px solid var(--panel-border);
-	box-shadow: var(--shadow-strong);
-	padding: 18px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 
-/* headings inside panels */
 .panel h3 {
-	margin: 0 0 12px;
-	font-size: 20px;
-	color: var(--text)
+  margin: 0 0 12px;
+  font-size: 20px;
 }
 
-/* -------------------- Orders list container -------------------- */
+/* -------------------- ORDERS LIST -------------------- */
+
 .orders-list {
-	display: flex;
-	flex-direction: column;
-	gap: var(--card-gap);
-	padding: 8px;
-	background: transparent;
-	max-height: calc(100vh - 320px);
-	overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-/* center cards inside panel to make them look neat */
-.panel.orders-panel .orders-list {
-	padding: 8px 6px
-}
+/* -------------------- ORDER CARD -------------------- */
 
-/* -------------------- Order Row (compact card) -------------------- */
 .order-row {
-	display: grid;
-	grid-template-columns: 60px 1fr 120px;
-	/* left avatar, middle content, right actions */
-	gap: 14px;
-	align-items: start;
-	padding: 16px;
-	border-radius: 14px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 252, 0.98));
-	/* very light tint */
-	border: 1px solid var(--panel-border);
-	box-shadow: var(--shadow-soft);
-	transition: transform .12s ease, box-shadow .12s ease;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 60px 1fr 120px;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* slightly different pastel tints per item (alternating subtle) */
-.orders-list .order-row:nth-child(3n+1) {
-	background: linear-gradient(180deg, #fff, #fff)
+/* MOBILE compact */
+@media (max-width: 480px) {
+  .order-row {
+    grid-template-columns: 50px 1fr 90px;
+    padding: 12px;
+    gap: 12px;
+  }
 }
-
-.orders-list .order-row:nth-child(3n+2) {
-	background: linear-gradient(180deg, #fbfbff, #fff)
-}
-
-.orders-list .order-row:nth-child(3n+3) {
-	background: linear-gradient(180deg, #fffafc, #fff)
-}
-
-/* reduce inner card size on mobile using media query later */
 
 /* Avatar */
 .order-avatar {
-	width: 56px;
-	height: 56px;
-	border-radius: 12px;
-	background: linear-gradient(180deg, #fff, #fff);
-	border: 1px solid var(--panel-border);
-	display: block;
-	object-fit: cover;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--border);
 }
 
-/* Body (title + meta) */
-.order-body {
-	display: flex;
-	flex-direction: column;
-	gap: 6px
-}
-
+/* Middle text */
 .order-title {
-	font-weight: 800;
-	font-size: 15px;
-	color: var(--text);
-	line-height: 1.1
+  font-weight: 800;
+  font-size: 15px;
 }
 
 .order-meta {
-	font-size: 13px;
-	color: var(--muted);
-	margin-top: 4px
+  margin-top: 6px;
+  font-size: 12px;
+  color: #555;
 }
 
-/* -------------------- Right actions (VERTICAL) -------------------- */
+/* -------------------- RIGHT SIDE VERTICAL ACTIONS -------------------- */
+
 .order-actions {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
-/* status pill (solid color, readable) */
+/* Status pill */
 .status {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 6px 14px;
-	border-radius: 999px;
-	font-weight: 800;
-	font-size: 12px;
-	color: #fff;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  min-width: 100px;
 }
 
-/* status color mapping (solid) */
-.status.preparing {
-	background: var(--status-preparing);
-	color: #1f1a07
-}
+/* Status colors */
+.status.preparing { background: var(--preparing); color:#222; }
+.status.assigned { background: var(--assigned); color:#0a3850; }
+.status.picked { background: var(--picked); color:#351800; }
+.status.out_for_delivery { background: var(--ofd); color:#03353d; }
+.status.delivered { background: var(--delivered); color:#0d3b1f; }
+.status.cancelled { background: var(--cancelled); }
 
-.status.assigned {
-	background: #a7e0ff;
-	color: #08314b
-}
-
-.status.picked {
-	background: var(--status-picked);
-	color: #351800
-}
-
-.status.out_for_delivery {
-	background: var(--status-out);
-	color: #05303a
-}
-
-.status.delivered {
-	background: var(--status-delivered);
-	color: #02381b
-}
-
-.status.cancelled {
-	background: var(--status-cancelled);
-	color: #fff
-}
-
-/* Buttons under status (vertical) */
+/* Buttons under status */
 .order-actions .btn {
-	width: 110px;
-	height: 36px;
-	border-radius: 10px;
-	padding: 0 12px;
-	font-size: 14px;
-	font-weight: 700;
+  width: 100px;
+  height: 36px;
+  padding: 0;
 }
 
-/* style for secondary (details) button */
-.order-actions .btn.details {
-	background: #3d3d3d;
-	color: #fff;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06)
+/* -------------------- ORDER DETAILS PANEL -------------------- */
+
+.order-details {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
 }
 
-.order-actions .btn.track {
-	background: var(--accent);
-	color: #fff
-}
+/* -------------------- QUICK ACTIONS -------------------- */
 
-/* small subtle text under title (like time) */
-.order-time {
-	font-size: 12px;
-	color: var(--muted)
-}
-
-/* -------------------- Compact mode (narrow cards) -------------------- */
-/* center the list and limit card width to be compact on mobile and desktop */
-.panel .orders-list {
-	align-items: center
-}
-
-.order-row {
-	width: 100%;
-	max-width: 720px;
-	margin: 0 auto
-}
-
-/* make cards narrower on phone */
-@media (max-width:900px) {
-	.layout {
-		grid-template-columns: 1fr;
-		padding: 0 14px 40px
-	}
-
-	.order-row {
-		grid-template-columns: 54px 1fr 100px;
-		padding: 14px;
-		max-width: 680px
-	}
-
-	.order-actions .btn {
-		width: 96px;
-		height: 34px;
-		font-size: 13px
-	}
-
-	.order-row {
-		border-radius: 12px
-	}
-}
-
-/* mobile small */
-@media (max-width:480px) {
-	.order-row {
-		grid-template-columns: 48px 1fr 96px;
-		gap: 10px;
-		padding: 12px;
-		max-width: 420px
-	}
-
-	.order-avatar {
-		width: 48px;
-		height: 48px;
-		border-radius: 10px
-	}
-
-	.order-title {
-		font-size: 14px
-	}
-
-	.order-meta {
-		font-size: 12px
-	}
-
-	.order-actions .btn {
-		width: 88px;
-		height: 34px;
-		font-size: 13px
-	}
-
-	.status {
-		padding: 5px 10px;
-		font-size: 11px
-	}
-}
-
-/* -------------------- Order details panel (right side) -------------------- */
-.panel.order-details {
-	margin-top: 6px;
-}
-
-/* quick actions panel */
 .quick-actions {
-	display: flex;
-	gap: 12px;
-	flex-wrap: wrap
-}
-
-/* -------------------- Utilities: small spacing helpers -------------------- */
-.mt-8 {
-	margin-top: 8px
-}
-
-.mb-8 {
-	margin-bottom: 8px
-}
-
-/* -------------------- Footer and other elements -------------------- */
-footer {
-	padding: 18px;
-	text-align: center;
-	color: var(--muted);
-	font-size: 14px
-}
-
-/* -------------------- Accessibility & focus states -------------------- */
-.btn:focus {
-	outline: 3px solid rgba(226, 55, 68, 0.12);
-	outline-offset: 2px
-}
-
-.order-row:focus-within {
-	box-shadow: 0 18px 40px rgba(18, 24, 32, 0.06);
-	transform: translateY(-2px)
-}
-
-/* -------------------- Small polish: hover lift for cards and buttons -------------------- */
-.order-row:hover {
-	transform: translateY(-4px);
-	box-shadow: var(--shadow-strong)
-}
-
-.btn:hover {
-	transform: translateY(-2px)
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
