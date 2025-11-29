@@ -1,77 +1,167 @@
-/* /rider/login.css */
+/* ==========================================================
+   SH – Rider Login Page (Auto Light/Dark Mode)
+   Premium Glassmorphism UI
+   ========================================================== */
+
 :root {
-	--bg: #071028;
-	--accent: #E23744;
-	--text: #e6eef8;
-	--muted: #9fb0c8;
+  --accent: #E23744;
+  --accent-dark: #C52B37;
+  --radius: 16px;
+
+  /* Light mode */
+  --bg1: #f4f7fa;
+  --bg2: #e9eef5;
+
+  --text: #0f1b2d;
+  --muted: #68778f;
+
+  --glass: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(0, 0, 0, 0.1);
+
+  --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 18px 45px rgba(0, 0, 0, 0.18);
+
+  --input-bg: rgba(255, 255, 255, 0.85);
+  --input-border: rgba(0, 0, 0, 0.18);
+}
+
+/* -------------------- DARK MODE AUTO -------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg1: #071028;
+    --bg2: #05121a;
+
+    --text: #e6eef8;
+    --muted: #9fb0c8;
+
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.15);
+
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+    --shadow-hover: 0 16px 50px rgba(0, 0, 0, 0.65);
+
+    --input-bg: rgba(255, 255, 255, 0.08);
+    --input-border: rgba(255, 255, 255, 0.12);
+  }
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  transition: 0.28s ease;
 }
 
 body {
-	margin: 0;
-	min-height: 100vh;
-	font-family: Inter, system-ui, Arial;
-	background: linear-gradient(180deg, #071028, #05121a);
-	color: var(--text);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, system-ui, Arial;
+
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: var(--text);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
 }
 
+/* ==========================================================
+   LOGIN CARD
+   ========================================================== */
 .login-root .card {
-	width: 100%;
-	max-width: 420px;
-	background: rgba(255, 255, 255, 0.03);
-	padding: 20px;
-	border-radius: 12px;
-	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 430px;
+
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+
+  padding: 28px;
+  border-radius: var(--radius);
+
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+
+  transform: translateY(0);
+}
+.login-root .card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
 }
 
+/* -------------------- HEADINGS -------------------- */
 h2 {
-	margin: 0 0 8px;
-}
-
-label {
-	display: block;
-	margin-top: 12px;
-	font-size: 14px;
-	color: var(--muted);
-}
-
-input {
-	width: 100%;
-	padding: 10px 12px;
-	margin-top: 6px;
-	border-radius: 8px;
-	border: 1px solid rgba(255, 255, 255, 0.04);
-	background: transparent;
-	color: var(--text);
-}
-
-.btn {
-	display: inline-block;
-	padding: 10px 14px;
-	border-radius: 10px;
-	margin-top: 16px;
-	cursor: pointer;
-	border: none;
-}
-
-.btn.primary {
-	background: var(--accent);
-	color: #fff;
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .muted {
-	color: var(--muted);
-	font-size: 13px;
-	margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 6px;
 }
 
+/* -------------------- LABELS -------------------- */
+label {
+  display: block;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+/* -------------------- INPUTS -------------------- */
+input {
+  width: 100%;
+  padding: 12px 14px;
+
+  margin-top: 6px;
+
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+
+  background: var(--input-bg);
+  color: var(--text);
+
+  font-size: 15px;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.25);
+}
+
+/* -------------------- BUTTON -------------------- */
+.btn {
+  display: inline-block;
+  padding: 12px 16px;
+
+  border-radius: 12px;
+  margin-top: 20px;
+
+  cursor: pointer;
+  border: none;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(226, 55, 68, 0.45);
+}
+
+.btn.primary:hover {
+  background: var(--accent-dark);
+  transform: translateY(-3px);
+}
+
+/* -------------------- SMALL TEXT -------------------- */
 .small {
-	font-size: 13px;
+  font-size: 13px;
+  margin-top: 10px;
+  color: var(--muted);
 }
