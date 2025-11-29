@@ -28,16 +28,12 @@ const connStatus = document.getElementById("connStatus");
 const lastSeenEl = document.getElementById("lastSeen");
 const activeOrderEl = document.getElementById("activeOrder");
 
-// Accept button removed from HTML; keep a safe ref (may be null)
-const btnAcceptSelected = document.getElementById("btnAcceptSelected");
-
 const btnStartTrip = document.getElementById("btnStartTrip");
 const btnDeliver = document.getElementById("btnDeliver");
 const btnLogout = document.getElementById("btnLogout");
 
-// New top action buttons (Track & Details) — added to HTML as requested
-const btnTrackOrder = document.getElementById("btnTrackOrder");
-const btnOrderDetails = document.getElementById("btnOrderDetails");
+const btnTrack = document.getElementById("btnTrack");
+const btnDetails = document.getElementById("btnDetails");
 
 const ordersList = document.getElementById("ordersList");
 
@@ -49,7 +45,7 @@ const editPhotoBtn = document.getElementById("editPhotoBtn");
 const uploadPanel = document.querySelector(".profile-upload-panel");
 
 /* -------------------------------------------------------
-   Initial upload panel state (hidden)
+   Initial upload panel state
 ------------------------------------------------------- */
 if (uploadPanel) uploadPanel.style.display = "none";
 
@@ -75,7 +71,7 @@ photoInput.addEventListener("change", () => {
     uploadMsg.textContent = "Profile photo uploading…";
     btnUploadPhoto.textContent = "Update Profile Photo";
     btnUploadPhoto.style.display = "block";
-    if (uploadPanel) uploadPanel.style.display = "block";
+    uploadPanel.style.display = "block";
   }
 });
 
@@ -86,9 +82,9 @@ let RIDER_DOC_ID = localStorage.getItem("sh_rider_docid") || null;
 let RIDER_DATA = null;
 let socket = null;
 let selectedOrderId = null;
+let CURRENT_ORDER_DATA = null;
 let riderMarker = null;
 
-/* To prevent double actions */
 const processingOrders = new Set();
 
 const ASSIGNABLE_STATUSES = new Set(["preparing", "new", "pending"]);
@@ -97,7 +93,7 @@ const STATUS_PICKED = "picked";
 const STATUS_DELIVERED = "delivered";
 
 /* -------------------------------------------------------
-   Map
+   Map setup
 ------------------------------------------------------- */
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -105,15 +101,11 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 /* -------------------------------------------------------
-   Toast (replaces alerts)
+   Toast
 ------------------------------------------------------- */
 function showToast(msg) {
   const t = document.getElementById("toast");
-  if (!t) {
-    // fallback
-    console.log("toast:", msg);
-    return;
-  }
+  if (!t) return;
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2000);
@@ -123,19 +115,15 @@ function showToast(msg) {
    Status helpers
 ------------------------------------------------------- */
 function setStatusOnline() {
-  if (riderStatusEl) riderStatusEl.textContent = "Online";
-  if (riderStatusDot) {
-    riderStatusDot.classList.add("online");
-    riderStatusDot.classList.remove("offline");
-  }
+  riderStatusEl.textContent = "Online";
+  riderStatusDot.classList.add("online");
+  riderStatusDot.classList.remove("offline");
 }
 
 function setStatusOffline() {
-  if (riderStatusEl) riderStatusEl.textContent = "Offline";
-  if (riderStatusDot) {
-    riderStatusDot.classList.add("offline");
-    riderStatusDot.classList.remove("online");
-  }
+  riderStatusEl.textContent = "Offline";
+  riderStatusDot.classList.add("offline");
+  riderStatusDot.classList.remove("online");
 }
 
 function fmtLastSeen(v) {
@@ -158,20 +146,19 @@ async function loadRiderDoc() {
     if (!docId) return null;
 
     const snap = await getDoc(doc(db, "riders", docId));
-    if (snap && snap.exists && snap.exists()) {
+    if (snap.exists()) {
       RIDER_DOC_ID = docId;
       localStorage.setItem("sh_rider_docid", docId);
       return (RIDER_DATA = { id: snap.id, ...snap.data() });
     }
     return null;
   } catch (err) {
-    console.error("loadRiderDoc error:", err);
     return null;
   }
 }
 
 /* -------------------------------------------------------
-   Refresh Rider UI
+   Refresh UI
 ------------------------------------------------------- */
 async function refreshRiderUI() {
   const r = await loadRiderDoc();
@@ -194,7 +181,7 @@ async function refreshRiderUI() {
 }
 
 /* -------------------------------------------------------
-   Connect Socket
+   Socket
 ------------------------------------------------------- */
 async function connectEverything() {
   try {
@@ -214,21 +201,10 @@ async function connectEverything() {
       if (p.riderId === riderIdForSocket) {
         if (!riderMarker)
           riderMarker = L.marker([p.lat, p.lng]).addTo(map);
-        else
-          riderMarker.setLatLng([p.lat, p.lng]);
+        else riderMarker.setLatLng([p.lat, p.lng]);
       }
     });
-
-    // Optional: update UI when order status events arrive
-    socket.on("order:status", (p) => {
-      // if current selected order changed status, refresh the activeOrder text
-      if (p && p.orderId && selectedOrderId === p.orderId) {
-        activeOrderEl.textContent = p.orderId;
-      }
-    });
-
-  } catch (err) {
-    console.warn("connectEverything error:", err);
+  } catch {
     connStatus.textContent = "disconnected";
     connStatus.style.color = "crimson";
   }
@@ -245,19 +221,18 @@ onSnapshot(collection(db, "orders"), (snap) => {
 
 /* -------------------------------------------------------
    Render Orders
-   (Assign remains inside card; Track/Details were moved to top row)
 ------------------------------------------------------- */
 function renderOrders(list) {
   ordersList.innerHTML = "";
 
-  if (!list || !list.length) {
+  if (!list.length) {
     ordersList.innerHTML = "<div class='small muted'>No orders</div>";
     return;
   }
 
   list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-  for (const o of list) {
+  list.forEach((o) => {
     const stClass = (o.status || "").toLowerCase();
 
     const card = document.createElement("div");
@@ -277,6 +252,7 @@ function renderOrders(list) {
     badge.className = "order-badge " + stClass;
     badge.textContent = (o.status || "NEW").toUpperCase();
 
+    // Keep Assign to me button as-is
     const btnAssign = document.createElement("button");
     btnAssign.className = "btn small";
     btnAssign.textContent = "Assign to me";
@@ -291,86 +267,75 @@ function renderOrders(list) {
 
     card.onclick = () => {
       selectedOrderId = o.orderId;
+      CURRENT_ORDER_DATA = o;
       activeOrderEl.textContent = o.orderId;
       updateActionButtons(o);
     };
 
     ordersList.appendChild(card);
-  }
+  });
 }
 
 /* -------------------------------------------------------
-   Show order details in toast (used by top Details button)
-   We'll create a helper to fetch order & then display
-------------------------------------------------------- */
-function showOrderDetailsFromObj(o) {
-  const msg =
-    `Order: ${o.orderId}\n` +
-    `Status: ${o.status || "—"}\n` +
-    `Items: ${(o.items || []).map(i => `${i.name}×${i.qty}`).join(", ")}` +
-    (o.customerName ? `\nCustomer: ${o.customerName}` : "");
-  showToast(msg);
-}
-
-async function fetchOrderObj(orderId) {
-  if (!orderId) return null;
-  try {
-    const snap = await getDoc(doc(db, "orders", orderId));
-    if (!snap.exists()) return null;
-    return { orderId: snap.id, ...(snap.data() || {}) };
-  } catch (err) {
-    console.error("fetchOrderObj failed:", err);
-    return null;
-  }
-}
-
-/* -------------------------------------------------------
-   Action Button Control
-   (Start / Deliver / Track / Details enable/disable)
+   Button State Control
 ------------------------------------------------------- */
 function updateActionButtons(order) {
-  // default - disable all top action buttons
-  if (btnStartTrip) btnStartTrip.disabled = true;
-  if (btnDeliver) btnDeliver.disabled = true;
-  if (btnTrackOrder) btnTrackOrder.disabled = true;
-  if (btnOrderDetails) btnOrderDetails.disabled = true;
-  if (btnAcceptSelected) {
-    try { btnAcceptSelected.disabled = true; } catch(e) {}
-  }
+  btnStartTrip.disabled = true;
+  btnDeliver.disabled = true;
+  btnTrack.disabled = true;
+  btnDetails.disabled = true;
 
   if (!order || !RIDER_DATA) return;
 
   const status = (order.status || "").toLowerCase();
   const orderRiderId = order.riderId || "";
 
-  // Accept button removed from UI; keep guard in JS (no-op if missing)
-  if (ASSIGNABLE_STATUSES.has(status) && btnAcceptSelected) {
-    try { btnAcceptSelected.disabled = false; } catch(e) {}
-  }
+  if (status === STATUS_ASSIGNED && orderRiderId === RIDER_DATA.riderId)
+    btnStartTrip.disabled = false;
 
-  // Enable Start Trip if assigned to this rider
-  if (status === STATUS_ASSIGNED && orderRiderId === RIDER_DATA.riderId) {
-    if (btnStartTrip) btnStartTrip.disabled = false;
-  }
+  if (status === STATUS_PICKED && orderRiderId === RIDER_DATA.riderId)
+    btnDeliver.disabled = false;
 
-  // Enable Deliver if picked by this rider
-  if (status === STATUS_PICKED && orderRiderId === RIDER_DATA.riderId) {
-    if (btnDeliver) btnDeliver.disabled = false;
-  }
-
-  // Track and Details should be available for any selected order
-  if (btnTrackOrder) btnTrackOrder.disabled = false;
-  if (btnOrderDetails) btnOrderDetails.disabled = false;
+  // Always allow Track + Details when order is selected
+  btnTrack.disabled = false;
+  btnDetails.disabled = false;
 }
 
 /* -------------------------------------------------------
-   Assign to Me (unchanged)
+   Track Button
+------------------------------------------------------- */
+btnTrack.addEventListener("click", () => {
+  if (!CURRENT_ORDER_DATA) return showToast("Select order first");
+
+  const loc = CURRENT_ORDER_DATA.customerLoc;
+  if (!loc) return showToast("Customer location missing");
+
+  map.setView([loc.lat, loc.lng], 14);
+  L.marker([loc.lat, loc.lng]).addTo(map)
+    .bindPopup("Customer")
+    .openPopup();
+});
+
+/* -------------------------------------------------------
+   Details Button
+------------------------------------------------------- */
+btnDetails.addEventListener("click", () => {
+  if (!CURRENT_ORDER_DATA) return showToast("Select order first");
+
+  showToast(
+    `Order: ${CURRENT_ORDER_DATA.orderId}\nStatus: ${CURRENT_ORDER_DATA.status}\nItems: ${(CURRENT_ORDER_DATA.items || [])
+      .map(i => `${i.name}×${i.qty}`)
+      .join(", ")}`
+  );
+});
+
+/* -------------------------------------------------------
+   Assign to Me
 ------------------------------------------------------- */
 async function assignToMe(orderId) {
   if (!RIDER_DATA) return showToast("Rider data missing");
-  if (!orderId) return;
-
   if (processingOrders.has(orderId)) return;
+
   processingOrders.add(orderId);
 
   try {
@@ -381,7 +346,8 @@ async function assignToMe(orderId) {
     const od = snap.data();
     const status = (od.status || "").toLowerCase();
 
-    if (!ASSIGNABLE_STATUSES.has(status)) return showToast("Already assigned");
+    if (!ASSIGNABLE_STATUSES.has(status))
+      return showToast("Already assigned");
 
     if (od.riderId && od.riderId !== RIDER_DATA.riderId)
       return showToast("Assigned to another rider");
@@ -392,13 +358,12 @@ async function assignToMe(orderId) {
       assignedAt: Date.now()
     });
 
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId, status: STATUS_ASSIGNED });
+    getSocket()?.emit("order:status", {
+      orderId,
+      status: STATUS_ASSIGNED
+    });
 
     showToast("Order assigned");
-  } catch (err) {
-    console.error("assignToMe failed:", err);
-    showToast("Assign failed");
   } finally {
     processingOrders.delete(orderId);
   }
@@ -407,157 +372,105 @@ async function assignToMe(orderId) {
 /* -------------------------------------------------------
    Start Trip
 ------------------------------------------------------- */
-if (btnStartTrip) {
-  btnStartTrip.addEventListener("click", async () => {
-    if (!selectedOrderId) return showToast("Select order first");
-    try {
-      const ref = doc(db, "orders", selectedOrderId);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return showToast("Order not found");
+btnStartTrip.addEventListener("click", async () => {
+  if (!selectedOrderId) return showToast("Select order first");
 
-      const od = snap.data();
-      if ((od.status || "").toLowerCase() !== STATUS_ASSIGNED) return showToast("Not assigned");
-      if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
+  const ref = doc(db, "orders", selectedOrderId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return showToast("Order not found");
 
-      await updateDoc(ref, {
-        status: STATUS_PICKED,
-        pickedAt: Date.now()
-      });
+  const od = snap.data();
 
-      const s = getSocket();
-      if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: STATUS_PICKED });
+  if (od.status !== STATUS_ASSIGNED) return showToast("Not assigned");
+  if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
 
-      RIDER_GPS.start();
-      if (btnDeliver) btnDeliver.disabled = false;
-      showToast("Trip started");
-    } catch (err) {
-      console.error("Start trip failed:", err);
-      showToast("Start failed");
-    }
+  await updateDoc(ref, {
+    status: STATUS_PICKED,
+    pickedAt: Date.now()
   });
-}
+
+  getSocket()?.emit("order:status", {
+    orderId: selectedOrderId,
+    status: STATUS_PICKED
+  });
+
+  RIDER_GPS.start();
+  btnDeliver.disabled = false;
+  showToast("Trip started");
+});
 
 /* -------------------------------------------------------
    Mark Delivered
 ------------------------------------------------------- */
-if (btnDeliver) {
-  btnDeliver.addEventListener("click", async () => {
-    if (!selectedOrderId) return showToast("Select order first");
+btnDeliver.addEventListener("click", async () => {
+  if (!selectedOrderId) return showToast("Select order first");
+
+  const ref = doc(db, "orders", selectedOrderId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return showToast("Order not found");
+
+  const od = snap.data();
+  if (od.status !== STATUS_PICKED) return showToast("Not picked");
+  if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
+
+  await updateDoc(ref, {
+    status: STATUS_DELIVERED,
+    deliveredAt: Date.now()
+  });
+
+  getSocket()?.emit("order:status", {
+    orderId: selectedOrderId,
+    status: STATUS_DELIVERED
+  });
+
+  RIDER_GPS.stop();
+  showToast("Delivered");
+});
+
+/* -------------------------------------------------------
+   Upload Photo
+------------------------------------------------------- */
+btnUploadPhoto.addEventListener("click", async () => {
+  const f = photoInput.files?.[0];
+  if (!f) return showToast("Choose a photo first");
+  if (!RIDER_DOC_ID) return showToast("Rider not found");
+
+  uploadMsg.textContent = "Profile photo uploading…";
+  btnUploadPhoto.style.display = "none";
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const dataUrl = reader.result;
+
     try {
-      const ref = doc(db, "orders", selectedOrderId);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return showToast("Order not found");
-
-      const od = snap.data();
-      if ((od.status || "").toLowerCase() !== STATUS_PICKED) return showToast("Not picked");
-      if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
-
-      await updateDoc(ref, {
-        status: STATUS_DELIVERED,
-        deliveredAt: Date.now()
+      await updateDoc(doc(db, "riders", RIDER_DOC_ID), {
+        photoURL: dataUrl
       });
 
-      const s = getSocket();
-      if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: STATUS_DELIVERED });
+      profileImg.src = dataUrl;
+      uploadMsg.textContent = "Profile photo uploaded";
 
-      RIDER_GPS.stop();
-      showToast("Delivered");
+      setTimeout(() => {
+        uploadPanel.style.display = "none";
+        uploadMsg.textContent = "";
+      }, 1000);
+
+      showToast("Photo uploaded");
     } catch (err) {
-      console.error("Deliver failed:", err);
-      showToast("Deliver failed");
+      uploadMsg.textContent = "Upload failed";
+      btnUploadPhoto.style.display = "none";
+
+      setTimeout(() => {
+        uploadPanel.style.display = "none";
+        uploadMsg.textContent = "";
+      }, 1000);
+
+      showToast("Upload failed");
     }
-  });
-}
+  };
 
-/* -------------------------------------------------------
-   Track selected order (top button)
-------------------------------------------------------- */
-if (btnTrackOrder) {
-  btnTrackOrder.addEventListener("click", async () => {
-    if (!selectedOrderId) return showToast("Select order first");
-    try {
-      const order = await fetchOrderObj(selectedOrderId);
-      if (!order) return showToast("Order not found");
-      if (!order.customerLoc || !order.customerLoc.lat || !order.customerLoc.lng)
-        return showToast("Customer location missing");
-
-      map.setView([order.customerLoc.lat, order.customerLoc.lng], 14);
-      L.marker([order.customerLoc.lat, order.customerLoc.lng])
-        .addTo(map)
-        .bindPopup("Customer")
-        .openPopup();
-    } catch (err) {
-      console.error("Track failed:", err);
-      showToast("Track failed");
-    }
-  });
-}
-
-/* -------------------------------------------------------
-   Show details for selected order (top button)
-------------------------------------------------------- */
-if (btnOrderDetails) {
-  btnOrderDetails.addEventListener("click", async () => {
-    if (!selectedOrderId) return showToast("Select order first");
-    try {
-      const order = await fetchOrderObj(selectedOrderId);
-      if (!order) return showToast("Order not found");
-      showOrderDetailsFromObj(order);
-    } catch (err) {
-      console.error("Details failed:", err);
-      showToast("Details failed");
-    }
-  });
-}
-
-/* -------------------------------------------------------
-   PROFILE PHOTO UPLOAD
-   (uploadPanel is shown only when file selected; auto-hide after success)
-------------------------------------------------------- */
-if (btnUploadPhoto) {
-  btnUploadPhoto.addEventListener("click", async () => {
-    const f = photoInput.files?.[0];
-    if (!f) return showToast("Choose a photo first");
-    if (!RIDER_DOC_ID) return showToast("Rider not found");
-
-    uploadMsg.textContent = "Profile photo uploading…";
-    btnUploadPhoto.style.display = "none";
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUrl = reader.result;
-
-      try {
-        await updateDoc(doc(db, "riders", RIDER_DOC_ID), { photoURL: dataUrl });
-
-        profileImg.src = dataUrl;
-        uploadMsg.textContent = "Profile photo uploaded";
-
-        // AUTO-HIDE PANEL AFTER 1 SECOND (as requested)
-        setTimeout(() => {
-          if (uploadPanel) uploadPanel.style.display = "none";
-          uploadMsg.textContent = "";
-        }, 1000);
-
-        showToast("Photo uploaded");
-      } catch (err) {
-        console.error("photo upload failed:", err);
-        uploadMsg.textContent = "Upload failed";
-        btnUploadPhoto.style.display = "none";
-
-        // Hide after fail
-        setTimeout(() => {
-          if (uploadPanel) uploadPanel.style.display = "none";
-          uploadMsg.textContent = "";
-        }, 1000);
-
-        showToast("Upload failed");
-      }
-    };
-
-    reader.readAsDataURL(f);
-  });
-}
+  reader.readAsDataURL(f);
+});
 
 /* -------------------------------------------------------
    Online / Offline
@@ -566,14 +479,10 @@ async function setRiderOnline(flag = true) {
   if (!RIDER_DOC_ID) return;
   const now = Date.now();
 
-  try {
-    await updateDoc(doc(db, "riders", RIDER_DOC_ID), {
-      status: flag ? "online" : "offline",
-      lastSeen: now
-    });
-  } catch (err) {
-    console.warn("setRiderOnline update failed:", err);
-  }
+  await updateDoc(doc(db, "riders", RIDER_DOC_ID), {
+    status: flag ? "online" : "offline",
+    lastSeen: now
+  });
 
   flag ? setStatusOnline() : setStatusOffline();
   lastSeenEl.textContent = fmtLastSeen(now);
@@ -583,27 +492,20 @@ async function setRiderOnline(flag = true) {
    INIT
 ------------------------------------------------------- */
 (async function init() {
-  // Ensure top action buttons disabled until order selected
-  if (btnStartTrip) btnStartTrip.disabled = true;
-  if (btnDeliver) btnDeliver.disabled = true;
-  if (btnTrackOrder) btnTrackOrder.disabled = true;
-  if (btnOrderDetails) btnOrderDetails.disabled = true;
-  if (btnAcceptSelected) {
-    try { btnAcceptSelected.disabled = true; } catch(e) {}
-  }
+  btnStartTrip.disabled = true;
+  btnDeliver.disabled = true;
+  btnTrack.disabled = true;
+  btnDetails.disabled = true;
 
   await refreshRiderUI();
   await connectEverything();
   await setRiderOnline(true);
 
-  // mark offline when closing (best effort)
   window.addEventListener("beforeunload", () => {
-    try {
-      updateDoc(doc(db, "riders", RIDER_DOC_ID), {
-        status: "offline",
-        lastSeen: Date.now()
-      });
-    } catch (e) { /* ignore */ }
+    updateDoc(doc(db, "riders", RIDER_DOC_ID), {
+      status: "offline",
+      lastSeen: Date.now()
+    });
   });
 
   if (navigator.geolocation) {
@@ -613,4 +515,10 @@ async function setRiderOnline(flag = true) {
         const lng = pos.coords.longitude;
 
         riderMarker = L.marker([lat, lng]).addTo(map);
-        
+        map.setView([lat, lng], 13);
+      },
+      () => {},
+      { enableHighAccuracy: true }
+    );
+  }
+})();
