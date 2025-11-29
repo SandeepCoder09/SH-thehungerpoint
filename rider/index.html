@@ -4,36 +4,47 @@
   <meta charset="utf-8" />
   <title>Rider — SH</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Leaflet (map) -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="/rider/rider.css" />
 </head>
+
 <body>
+
+  <!-- TOP BAR -->
   <header class="rider-top">
     <div class="rider-profile">
       <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
       <div class="rider-meta">
         <div id="riderName" class="rider-name">Rider</div>
         <div id="riderEmail" class="rider-email">Email</div>
+
         <div class="small">
           <span id="riderStatusDot" class="dot offline"></span>
           <span id="riderStatus">Offline</span>
         </div>
+
         <div class="small">ID: <strong id="riderIdDisplay">—</strong></div>
       </div>
     </div>
+
     <div class="rider-actions">
       <button id="btnLogout" class="btn small">Logout</button>
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="rider-main">
+
+    <!-- MAP PANEL -->
     <section class="map-panel">
       <div id="map" class="map">Loading map...</div>
     </section>
 
+    <!-- CONTROLS -->
     <section class="controls-panel">
       <div class="status-row">
         <div>Connected: <strong id="connStatus">—</strong></div>
@@ -58,83 +69,26 @@
       </div>
     </section>
 
+    <!-- ORDERS LIST -->
     <section class="orders-panel">
       <h3>All Orders (live)</h3>
-      <div id="ordersList" class="orders-list">Loading...</div>
+      <div id="ordersList" class="orders-list">Loading…</div>
     </section>
   </main>
 
-  <footer class="rider-footer muted">Rider dashboard • SH — The Hunger Point</footer>
+  <footer class="rider-footer muted">
+    Rider dashboard • SH — The Hunger Point
+  </footer>
 
-  <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Rider — SH</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-
-  <!-- Leaflet (map) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="/rider/rider.css" />
-</head>
-<body>
-  <header class="rider-top">
-    <div class="rider-profile">
-      <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
-      <div class="rider-meta">
-        <div id="riderName" class="rider-name">Rider</div>
-        <div id="riderEmail" class="rider-email">Email</div>
-        <div class="small">
-          <span id="riderStatusDot" class="dot offline"></span>
-          <span id="riderStatus">Offline</span>
-        </div>
-        <div class="small">ID: <strong id="riderIdDisplay">—</strong></div>
-      </div>
-    </div>
-    <div class="rider-actions">
-      <button id="btnLogout" class="btn small">Logout</button>
-    </div>
-  </header>
-
-  <main class="rider-main">
-    <section class="map-panel">
-      <div id="map" class="map">Loading map...</div>
-    </section>
-
-    <section class="controls-panel">
-      <div class="status-row">
-        <div>Connected: <strong id="connStatus">—</strong></div>
-        <div>Active Order: <strong id="activeOrder">—</strong></div>
-      </div>
-
-      <div class="last-seen">Last seen: <span id="lastSeen">—</span></div>
-
-      <div class="buttons-row">
-        <button id="btnAcceptSelected" class="btn">Accept</button>
-        <button id="btnStartTrip" class="btn primary">Start Trip</button>
-        <button id="btnDeliver" class="btn success">Mark Delivered</button>
-      </div>
-    </section>
-    
-    <hr>
-    
-    <section class="orders-panel">
-      <h3>All Orders (live)</h3>
-      <div id="ordersList" class="orders-list">Loading...</div>
-    </section>
-  </main>
-  
-    <!-- libs -->
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- socket -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-  <!-- Firebase MUST load BEFORE rider.js -->
+  <!-- Firebase MUST load before rider.js -->
   <script type="module" src="/rider/firebase.js"></script>
 
-  <!-- Main Rider App -->
+  <!-- Main app -->
   <script type="module" src="/rider/rider.js"></script>
+
 </body>
 </html>
