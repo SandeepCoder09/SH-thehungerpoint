@@ -379,3 +379,38 @@ body {
     width: 100px !important;
   }
 }
+
+/* ============================================================
+   MAKE ORDER CARDS SMALLER + CENTER THEM
+============================================================*/
+
+/* Center the whole order list */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* <-- center cards */
+  gap: 20px;
+}
+
+/* Make each order row smaller */
+.order-row {
+  width: 92%;               /* reduce width */
+  max-width: 650px;         /* tighter card size */
+  margin: 0 auto;           /* center horizontally */
+  border-radius: 20px !important;
+  padding: 18px !important;
+}
+
+/* On desktop make card even smaller */
+@media (min-width: 900px) {
+  .order-row {
+    width: 80%;
+    max-width: 720px;
+  }
+}
+
+/* On large screens center entire left column also */
+.left-col {
+  display: flex;
+  justify-content: center;
+}
