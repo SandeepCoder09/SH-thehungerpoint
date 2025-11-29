@@ -1,123 +1,113 @@
-// signup.js — SH The Hunger Point (2025 FINAL VERSION)
+// signup.js — SH The Hunger Point (FULLY FIXED & UPDATED)
 
-async function waitForFirebase() {
+// ------------------------------
+// WAIT FOR FIREBASE TO INITIALIZE
+// ------------------------------
+async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
-      if (window.auth && window.db) resolve();
-      else setTimeout(check, 50);
+      if (window.auth && window.db) {
+        resolve();
+      } else {
+        setTimeout(check, 50);
+      }
     };
     check();
   });
 }
 
 (async () => {
+  await waitForAuth();
+  console.log("Firebase Ready ✔");
 
-  await waitForFirebase();
-  console.log("%cFirebase Ready (signup.js)", "color: green;");
+  // ------------------------------
+  // FLOATING LABEL INPUTS
+  // ------------------------------
+  document.querySelectorAll(".input-group input").forEach(input => {
+    const group = input.parentElement;
+    const update = () => {
+      if (input.value.trim() !== "") group.classList.add("filled");
+      else group.classList.remove("filled");
+    };
+    input.addEventListener("input", update);
+    update();
+  });
 
-  /* ----------------------------------------------
-     FLOATING LABELS + AUTO-FILL FIX
-  ---------------------------------------------- */
-  function updateFloatingLabels() {
-    document.querySelectorAll(".input-group input").forEach(input => {
-      const group = input.parentElement;
-      input.value.trim() !== ""
-        ? group.classList.add("filled")
-        : group.classList.remove("filled");
-    });
-  }
-
-  document.addEventListener("input", updateFloatingLabels);
-  window.addEventListener("DOMContentLoaded", updateFloatingLabels);
-
-
-  /* ----------------------------------------------
-     PASSWORD TOGGLE
-  ---------------------------------------------- */
-  function setupToggle(id) {
-    const group = document.getElementById(id);
-    if (!group) return;
-
+  // ------------------------------
+  // PASSWORD TOGGLE
+  // ------------------------------
+  function setupPasswordToggle(group) {
     const input = group.querySelector("input");
-    const openEye = group.querySelector(".eye-open");
-    const slashEye = group.querySelector(".eye-slash");
-    const btn = group.querySelector(".toggle");
+    const openIcon = group.querySelector(".eye-open");
+    const slashIcon = group.querySelector(".eye-slash");
+    const toggleBtn = group.querySelector(".toggle");
 
-    btn.addEventListener("click", () => {
-      const show = input.type === "password";
-      input.type = show ? "text" : "password";
-      openEye.classList.toggle("hidden", !show);
-      slashEye.classList.toggle("hidden", show);
+    toggleBtn.addEventListener("click", () => {
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+
+      openIcon.classList.toggle("hidden", !showing);
+      slashIcon.classList.toggle("hidden", showing);
     });
   }
 
-  setupToggle("passwordGroup");
-  setupToggle("confirmGroup");
+  setupPasswordToggle(document.getElementById("passwordGroup"));
+  setupPasswordToggle(document.getElementById("confirmGroup"));
 
-
-  /* ----------------------------------------------
-     TOAST
-  ---------------------------------------------- */
-  function toast(msg) {
+  // ------------------------------
+  // TOAST SYSTEM
+  // ------------------------------
+  function showToast(message) {
     const t = document.getElementById("toast");
-    t.textContent = msg;
+    t.textContent = message;
     t.hidden = false;
-    setTimeout(() => (t.hidden = true), 2600);
+    setTimeout(() => (t.hidden = true), 2500);
   }
 
-
-  /* ----------------------------------------------
-     SIGNUP FORM
-  ---------------------------------------------- */
+  // ------------------------------
+  // SIGNUP FORM
+  // ------------------------------
   const form = document.getElementById("signupForm");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = nameEl.value.trim();
-    const email = emailEl.value.trim();
-    const pass = passEl.value;
-    const confirm = confirmEl.value;
-    const terms = legalCheck.checked;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirm = document.getElementById("confirm").value;
+    const legal = document.getElementById("legalCheck").checked;
 
-    if (!email.includes("@") || !email.includes(".")) {
-      return toast("Enter a valid email address.");
-    }
-
-    if (pass.length < 6) {
-      return toast("Password must be at least 6 characters.");
-    }
-
-    if (pass !== confirm) {
-      return toast("Passwords do not match.");
-    }
-
-    if (!terms) {
-      return toast("Please accept the terms.");
-    }
+    if (!legal) return showToast("Please accept all terms.");
+    if (password !== confirm) return showToast("Passwords do not match.");
 
     try {
-      const userCred = await auth.createUserWithEmailAndPassword(email, pass);
+      console.log("Creating user...");
 
-      await db.collection("users").doc(userCred.user.uid).set({
+      const userCred = await auth.createUserWithEmailAndPassword(email, password);
+      const uid = userCred.user.uid;
+
+      await db.collection("users").doc(uid).set({
         name,
         email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: new Date(),
       });
 
-      toast("Account created!");
-      setTimeout(() => window.location.href = "/home/index.html", 1000);
+      showToast("Account created!");
+
+      setTimeout(() => {
+        window.location.href = "/home/index.html";
+      }, 700);
 
     } catch (err) {
-      console.error(err);
-      toast(err.message);
+      console.error("Signup Error:", err);
+      showToast(err.message);
     }
   });
 
-
-  /* ----------------------------------------------
-     GOOGLE SIGNUP
-  ---------------------------------------------- */
+  // ------------------------------
+  // GOOGLE SIGN-IN
+  // ------------------------------
   document.getElementById("googleSignup").addEventListener("click", async () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -127,16 +117,15 @@ async function waitForFirebase() {
         await db.collection("users").doc(res.user.uid).set({
           name: res.user.displayName,
           email: res.user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          createdAt: new Date()
         });
       }
 
       window.location.href = "/home/index.html";
 
     } catch (err) {
-      console.error(err);
-      toast(err.message);
+      console.error("Google Signup Error:", err);
+      showToast(err.message);
     }
   });
-
 })();
