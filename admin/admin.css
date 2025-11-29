@@ -404,3 +404,73 @@ html, body {
   background: #ef4444 !important;
   color: #fff !important;
 }
+
+/* ============================================================
+   FIX: Move Track + Details to Right • Match Status Height
+===========================================================*/
+
+/* Make all row buttons equal size */
+.order-actions .btn {
+  min-width: 80px;               /* equal width */
+  height: 32px;                  /* equal height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+  margin: 0;
+  border-radius: 10px;
+  font-size: 13px !important;
+  font-weight: 600;
+}
+
+/* Align buttons vertically stacked on right side */
+.order-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Match status pill height */
+.status {
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+}
+
+/* Make entire right area aligned properly */
+.order-row {
+  grid-template-columns: 58px 1fr 120px !important;
+}
+
+/* -------- MOBILE FIX -------- */
+@media (max-width: 650px) {
+
+  .order-row {
+    grid-template-columns: 48px 1fr;
+    grid-template-areas:
+      "avatar title"
+      "avatar meta"
+      "buttons buttons";
+  }
+
+  .order-actions {
+    grid-area: buttons;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .order-actions .btn {
+    width: 48%;
+    height: 34px;
+  }
+
+  .status {
+    margin-bottom: 6px;
+  }
+}
