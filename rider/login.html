@@ -1,30 +1,26 @@
-<!-- /rider/login.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Rider Login — SH</title>
+  <meta charset="UTF-8" />
+  <title>Rider Login — The Hunger Point</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="/rider/login.css" />
 </head>
+
 <body>
-  <main class="login-root">
-    <div class="card">
-      <h2>Rider Sign in</h2>
-      <div class="muted">Use your registered email and password</div>
 
-      <label>Email</label>
-      <input id="email" type="email" placeholder="you@example.com" />
+  <div class="login-box">
+    <h2>Rider Login</h2>
 
-      <label>Password</label>
-      <input id="password" type="password" placeholder="••••••••" />
+    <input id="email" type="email" placeholder="Enter rider email" />
+    <input id="password" type="password" placeholder="Enter password" />
 
-      <button id="btnSignIn" class="btn primary">Sign in</button>
+    <button id="btnSignIn">Login</button>
 
-      <div id="msg" class="muted small"></div>
-    </div>
-  </main>
+    <p id="msg" class="msg"></p>
+  </div>
 
-  <script type="module" src="/rider/login.js"></script>
+  <script src="/rider/login.js"></script>
+
 </body>
 </html>
