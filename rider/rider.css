@@ -1,242 +1,246 @@
-/* /rider/rider.css */
+/* ==========================================================
+   SH – Rider Dashboard
+   Ultra-Responsive + Auto Dark/Light Mode
+   ========================================================== */
+
+/* ---------- THEME VARIABLES ---------- */
 :root {
-	--bg: #071028;
-	--panel: #071726;
-	--accent: #E23744;
-	--muted: #9fb0c8;
-	--text: #e6eef8;
-	--card: #0b2130;
-	--success: #2ecc71;
+  --accent: #E23744;
+  --success: #2ecc71;
+  --radius: 12px;
+
+  /* Light mode default */
+  --bg: #ffffff;
+  --panel: #f5f6f8;
+  --text: #111;
+  --text-muted: #555;
+  --panel-dark: #e6e6e6;
+  --shadow: rgba(0,0,0,0.08);
+}
+
+/* Auto Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #071028;
+    --panel: #071726;
+    --text: #e6eef8;
+    --text-muted: #9fb0c8;
+    --panel-dark: #0b2130;
+    --shadow: rgba(0,0,0,0.6);
+  }
 }
 
 * {
-	box-sizing: border-box
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-	margin: 0;
-	font-family: Inter, system-ui, Arial;
-	background: linear-gradient(180deg, #071028, #05121a);
-	color: var(--text);
-	min-height: 100vh;
-	-webkit-font-smoothing: antialiased;
+  margin: 0;
+  font-family: Inter, system-ui, Arial;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px; /* prevent footer overlap */
 }
 
+/* ---------- HEADER ---------- */
 .rider-top {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 14px;
-	background: linear-gradient(90deg, #E23744, rgba(226, 55, 68, 0.85));
-	gap: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: linear-gradient(90deg, var(--accent), rgba(226, 55, 68, 0.85));
+  color: #fff;
+  gap: 12px;
 }
 
 .rider-profile {
-	display: flex;
-	gap: 12px;
-	align-items: center
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .rider-profile img {
-	width: 64px;
-	height: 64px;
-	border-radius: 999px;
-	border: 4px solid rgba(255, 255, 255, .08);
-	object-fit: cover;
-	background: #fff;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255,255,255,0.25);
 }
 
-.rider-meta {
-	line-height: 1.05
+.rider-meta .small {
+  font-size: 13px;
+  opacity: 0.85;
 }
 
-.rider-name {
-	font-weight: 700
-}
-
-.rider-email {
-	font-size: 13px;
-	color: rgba(255, 255, 255, 0.9)
-}
-
-.small {
-	font-size: 13px;
-	color: var(--muted)
-}
-
+/* Online/offline dot */
 .dot {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	margin-right: 6px;
-	vertical-align: middle
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
 }
+.dot.online { background: var(--success); }
+.dot.offline { background: #b94b4b; }
 
-.dot.online {
-	background: #2ecc71
-}
-
-.dot.offline {
-	background: #b94b4b
-}
-
+/* ---------- BUTTONS ---------- */
 .btn {
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.03);
-	color: var(--text);
-	padding: 8px 12px;
-	border-radius: 10px;
-	cursor: pointer
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  background: var(--panel-dark);
+  color: var(--text);
+  box-shadow: 0 2px 6px var(--shadow);
+  transition: 0.15s;
+  font-size: 14px;
 }
 
-.btn.small {
-	padding: 6px 10px
+.btn:hover {
+  transform: translateY(-2px);
 }
 
-.btn.primary {
-	background: var(--accent);
-	color: #fff;
-	border: none
-}
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.success { background: var(--success); color: #fff; }
+.btn.small { padding: 6px 10px; font-size: 13px; }
 
-.btn.success {
-	background: var(--success);
-	color: #fff;
-	border: none
-}
-
+/* ---------- MAIN GRID ---------- */
 .rider-main {
-	padding: 16px;
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 16px;
-	max-width: 980px;
-	margin: 0 auto
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+@media (min-width: 900px) {
+  .rider-main {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+/* ---------- MAP PANEL ---------- */
 .map-panel .map {
-	height: 320px;
-	border-radius: 12px;
-	background: var(--panel);
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-	overflow: hidden
+  height: 340px;
+  width: 100%;
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: 0 6px 24px var(--shadow);
+  overflow: hidden;
 }
 
+/* ---------- CONTROL PANEL ---------- */
 .controls-panel {
-	background: var(--panel);
-	padding: 14px;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5)
+  background: var(--panel);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px var(--shadow);
 }
 
 .status-row {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 8px
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
 .last-seen {
-	color: var(--muted);
-	margin-bottom: 10px
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
 }
 
 .buttons-row {
-	display: flex;
-	gap: 8px;
-	margin-bottom: 12px;
-	flex-wrap: wrap
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
+/* ---------- UPLOAD SECTION ---------- */
 .upload-section {
-	display: flex;
-	flex-direction: column;
-	gap: 8px
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .upload-section input[type=file] {
-	padding: 6px;
-	background: transparent;
-	color: var(--text)
+  padding: 6px;
+  border: 1px solid var(--panel-dark);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
 }
 
+/* ---------- ORDERS PANEL ---------- */
 .orders-panel {
-	background: var(--panel);
-	padding: 14px;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5)
+  background: var(--panel);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px var(--shadow);
 }
 
 .orders-list {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	max-height: 320px;
-	overflow: auto;
-	padding-top: 6px
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Beautiful scroll */
+.orders-list::-webkit-scrollbar {
+  width: 8px;
+}
+.orders-list::-webkit-scrollbar-thumb {
+  background: var(--panel-dark);
+  border-radius: 8px;
 }
 
 .order-card {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px;
-	border-radius: 12px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-	border: 1px solid rgba(255, 255, 255, 0.02)
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--panel-dark);
+  transition: 0.15s;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
 }
 
 .order-card .meta {
-	font-size: 13px;
-	color: var(--muted)
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
-.order-actions {
-	display: flex;
-	gap: 8px
-}
-
+/* Status badge */
 .order-badge {
-	padding: 6px 8px;
-	border-radius: 999px;
-	font-weight: 700;
-	font-size: 12px
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.order-badge.preparing {
-	background: #f7b267;
-	color: #2b1700
-}
+.order-badge.preparing { background: #f7b267; color: #2b1700; }
+.order-badge.paid      { background: #2ecc71; color: #033010; }
+.order-badge.picked    { background: #3aa0ff; color: #021227; }
 
-.order-badge.paid {
-	background: #2ecc71;
-	color: #033010
-}
-
-.order-badge.picked {
-	background: #3aa0ff;
-	color: #021227
-}
-
+/* ---------- FOOTER ---------- */
 .rider-footer {
-	padding: 14px;
-	text-align: center;
-	color: var(--muted);
-	font-size: 13px;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.2))
-}
-
-@media(min-width:900px) {
-	.rider-main {
-		grid-template-columns: 1fr 420px
-	}
-
-	.map-panel {
-		grid-column: 1/2
-	}
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  text-align: center;
+  padding: 12px;
+  font-size: 13px;
+  background: var(--panel);
+  color: var(--text-muted);
+  box-shadow: 0 -2px 10px var(--shadow);
 }
