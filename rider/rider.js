@@ -51,6 +51,9 @@ let selectedOrderId = null;
 let sharing = false;
 let riderMarker = null;
 
+// small local lock to avoid multiple clicks / concurrent requests per order
+const processingOrders = new Set();
+
 // MAP
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "" }).addTo(map);
@@ -191,6 +194,7 @@ async function connectEverything() {
         // if current selected order changed status, show it
         if (selectedOrderId === p.orderId) {
           activeOrderEl.textContent = p.orderId;
+          // optionally we could refresh action buttons by fetching latest doc; keep minimal
         }
       }
     });
@@ -290,6 +294,12 @@ function renderOrders(list) {
       assignToMe(o.orderId);
     };
 
+    // Disable assign button when order already assigned/picked/delivered
+    const st = (o.status || "").toLowerCase();
+    if (st && st !== "new" && st !== "pending") {
+      btnAssign.disabled = true;
+    }
+
     right.appendChild(badge);
     right.appendChild(btnTrack);
     right.appendChild(btnDetails);
@@ -301,6 +311,8 @@ function renderOrders(list) {
     card.onclick = () => {
       selectedOrderId = o.orderId;
       activeOrderEl.textContent = o.orderId;
+      // update header buttons based on this order's state and ownership
+      updateActionButtons(o);
       if (o.customerLoc) {
         map.setView([o.customerLoc.lat, o.customerLoc.lng], 13);
         L.marker([o.customerLoc.lat, o.customerLoc.lng]).addTo(map).bindPopup("Customer").openPopup();
@@ -323,26 +335,86 @@ function showOrderDetails(o) {
 
 
 // ------------------------------------
+// Action button state helper
+// ------------------------------------
+function updateActionButtons(order) {
+  // default - disable
+  btnStartTrip.disabled = true;
+  btnDeliver.disabled = true;
+  btnAcceptSelected.disabled = true;
+
+  if (!order || !RIDER_DATA) return;
+
+  const status = (order.status || "").toLowerCase();
+  const orderRiderId = order.riderId || "";
+
+  // Assign button in list handles assignment; header btnAcceptSelected may be used similarly
+  // Enable "Start Trip" only if order is assigned to this rider
+  if (status === "assigned" && (orderRiderId === RIDER_DATA.riderId || orderRiderId === RIDER_DATA.email || orderRiderId === localStorage.getItem("sh_rider_id"))) {
+    btnStartTrip.disabled = false;
+  }
+
+  // Enable "Deliver" only if order is picked by this rider
+  if (status === "picked" && (orderRiderId === RIDER_DATA.riderId || orderRiderId === RIDER_DATA.email || orderRiderId === localStorage.getItem("sh_rider_id"))) {
+    btnDeliver.disabled = false;
+  }
+
+  // Optionally allow Accept/Assign from header if order is not assigned
+  if (!status || status === "" || status === "new" || status === "pending") {
+    btnAcceptSelected.disabled = false;
+  }
+}
+
+
+// ------------------------------------
 // Accept / Assign Order
 // ------------------------------------
 async function assignToMe(orderId) {
   if (!orderId) return;
   if (!RIDER_DATA) return alert("Rider data not loaded");
+
+  if (processingOrders.has(orderId)) return; // already processing
+  processingOrders.add(orderId);
+
   try {
-    await updateDoc(doc(db, "orders", orderId), {
-      riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"),
-      status: "assigned",
-      assignedAt: Date.now()
-    });
+    const orderRef = doc(db, "orders", orderId);
+    const snap = await getDoc(orderRef);
+    if (!snap.exists()) {
+      alert("Order not found");
+      return;
+    }
+    const od = snap.data() || {};
+    const currentStatus = (od.status || "").toLowerCase();
+    const currentRider = od.riderId || "";
 
-    // notify server via socket if available
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId, status: "assigned" });
+    // block if already assigned / processed
+    if (currentStatus && currentStatus !== "new" && currentStatus !== "pending") {
+      return alert("Order already processed or assigned");
+    }
 
-    alert("Order assigned");
-  } catch (err) {
-    console.error("assignToMe failed:", err);
-    alert("Assign failed (check Firestore rules/permissions)");
+    if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
+      return alert("Order already assigned to another rider");
+    }
+
+    // UI lock (prevent double clicks)
+    // Note: if you prefer to disable the specific button in the list, we could find it and disable it; keep minimal
+    try {
+      await updateDoc(orderRef, {
+        riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"),
+        status: "assigned",
+        assignedAt: Date.now()
+      });
+
+      const s = getSocket();
+      if (s && s.connected) s.emit("order:status", { orderId, status: "assigned" });
+
+      alert("Order assigned");
+    } catch (err) {
+      console.error("assignToMe failed:", err);
+      alert("Assign failed (check Firestore rules/permissions)");
+    }
+  } finally {
+    processingOrders.delete(orderId);
   }
 }
 
@@ -354,24 +426,60 @@ btnStartTrip.addEventListener("click", async () => {
   if (!selectedOrderId) return alert("Select order first");
   if (!RIDER_DATA) return alert("Rider data not ready");
 
+  const orderId = selectedOrderId;
+  if (processingOrders.has(orderId)) return;
+  processingOrders.add(orderId);
+
+  // disable UI button immediately to prevent multiple clicks
+  btnStartTrip.disabled = true;
+
   try {
-    await updateDoc(doc(db, "orders", selectedOrderId), {
-      status: "picked",
-      pickedAt: Date.now(),
-      riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id")
-    });
+    const orderRef = doc(db, "orders", orderId);
+    const snap = await getDoc(orderRef);
+    if (!snap.exists()) {
+      alert("Order not found");
+      return;
+    }
+    const od = snap.data() || {};
+    const currentStatus = (od.status || "").toLowerCase();
+    const currentRider = od.riderId || "";
 
-    // notify backend via socket
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: "picked" });
+    // only allow start if currently assigned to this rider
+    if (currentStatus !== "assigned") {
+      return alert("Cannot start trip: order is not in 'assigned' status");
+    }
+    if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
+      return alert("Cannot start trip: order assigned to another rider");
+    }
 
-    // start GPS sends
-    RIDER_GPS.start();
-    sharing = true;
-    alert("Trip started");
-  } catch (err) {
-    console.error("Start trip failed:", err);
-    alert("Failed to start trip (check permissions)");
+    try {
+      await updateDoc(orderRef, {
+        status: "picked",
+        pickedAt: Date.now(),
+        riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id")
+      });
+
+      // notify backend via socket
+      const s = getSocket();
+      if (s && s.connected) s.emit("order:status", { orderId: orderId, status: "picked" });
+
+      // start GPS sends
+      RIDER_GPS.start();
+      sharing = true;
+
+      // after success update action buttons (we might not have full order object, so fetch simple status)
+      btnStartTrip.disabled = true;
+      btnDeliver.disabled = false;
+
+      alert("Trip started");
+    } catch (err) {
+      console.error("Start trip failed:", err);
+      alert("Failed to start trip (check permissions)");
+    }
+  } finally {
+    processingOrders.delete(orderId);
+    // ensure buttons reflect current selection: try to refresh selected order UI by fetching live snapshot will come from onSnapshot
+    // but to be safe, keep start button disabled now (it was)
   }
 });
 
@@ -381,21 +489,54 @@ btnStartTrip.addEventListener("click", async () => {
 // ------------------------------------
 btnDeliver.addEventListener("click", async () => {
   if (!selectedOrderId) return alert("Select order first");
+  const orderId = selectedOrderId;
+
+  if (processingOrders.has(orderId)) return;
+  processingOrders.add(orderId);
+
+  // disable UI button immediately to prevent multiple clicks
+  btnDeliver.disabled = true;
+
   try {
-    await updateDoc(doc(db, "orders", selectedOrderId), {
-      status: "delivered",
-      deliveredAt: Date.now()
-    });
+    const orderRef = doc(db, "orders", orderId);
+    const snap = await getDoc(orderRef);
+    if (!snap.exists()) {
+      alert("Order not found");
+      return;
+    }
+    const od = snap.data() || {};
+    const currentStatus = (od.status || "").toLowerCase();
+    const currentRider = od.riderId || "";
 
-    const s = getSocket();
-    if (s && s.connected) s.emit("order:status", { orderId: selectedOrderId, status: "delivered" });
+    // only allow deliver if currently picked by this rider
+    if (currentStatus !== "picked") {
+      return alert("Cannot mark delivered: order is not in 'picked' status");
+    }
+    if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
+      return alert("Cannot mark delivered: order assigned to another rider");
+    }
 
-    RIDER_GPS.stop();
-    sharing = false;
-    alert("Delivered");
-  } catch (err) {
-    console.error("Mark delivered failed:", err);
-    alert("Deliver failed (check Firestore rules)");
+    try {
+      await updateDoc(orderRef, {
+        status: "delivered",
+        deliveredAt: Date.now()
+      });
+
+      const s = getSocket();
+      if (s && s.connected) s.emit("order:status", { orderId: orderId, status: "delivered" });
+
+      RIDER_GPS.stop();
+      sharing = false;
+
+      // keep deliver disabled to prevent repeat
+      btnDeliver.disabled = true;
+      alert("Delivered");
+    } catch (err) {
+      console.error("Mark delivered failed:", err);
+      alert("Deliver failed (check Firestore rules)");
+    }
+  } finally {
+    processingOrders.delete(orderId);
   }
 });
 
@@ -468,6 +609,11 @@ async function setRiderOnline(flag = true) {
 // INIT
 // ------------------------------------
 (async function init() {
+  // start with header action buttons disabled until a selection is made
+  btnStartTrip.disabled = true;
+  btnDeliver.disabled = true;
+  btnAcceptSelected.disabled = true;
+
   await refreshRiderUI();          // load rider doc & render header
   await connectEverything();      // socket
   await setRiderOnline(true);     // mark online in Firestore (best effort)
