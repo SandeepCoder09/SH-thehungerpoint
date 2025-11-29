@@ -1,12 +1,9 @@
-// login.js — SH The Hunger Point (2025 Final Version)
+// login.js — Prevent rider auto-login into user homepage
 
-// -----------------------------------------------------
-// WAIT FOR FIREBASE AUTH TO LOAD
-// -----------------------------------------------------
 async function waitForAuth() {
   return new Promise(resolve => {
     const check = () => {
-      if (window.auth) resolve();
+      if (window.auth && window.db) resolve();
       else setTimeout(check, 50);
     };
     check();
@@ -15,82 +12,59 @@ async function waitForAuth() {
 
 (async () => {
   await waitForAuth();
-  console.log("Firebase Auth Loaded ✔");
 
   const form = document.getElementById("loginForm");
   const googleBtn = document.getElementById("googleLogin");
   const toast = document.getElementById("toast");
 
-  // -----------------------------------------------------
-  // TOAST MESSAGE SYSTEM
-  // -----------------------------------------------------
   function showToast(msg) {
     toast.textContent = msg;
     toast.hidden = false;
-    setTimeout(() => (toast.hidden = true), 2500);
+    setTimeout(() => toast.hidden = true, 2500);
   }
 
-  // -----------------------------------------------------
-  // EMAIL + PASSWORD LOGIN
-  // -----------------------------------------------------
+  // Email + Password Login
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const pass = document.getElementById("password").value;
 
-    // Basic validation
-    if (!email || !email.includes("@")) {
-      return showToast("Enter a valid email address.");
-    }
-
-    if (!pass) {
-      return showToast("Password cannot be empty.");
-    }
-
     try {
-      // Firebase Auth Login
-      await auth.signInWithEmailAndPassword(email, pass);
+      const cred = await auth.signInWithEmailAndPassword(email, pass);
+      const uid = cred.user.uid;
 
-      showToast("Login successful!");
+      // -------------------------------------
+      // 1) Check if this login is for RIDER
+      // -------------------------------------
+      const riderRef = await db.collection("riders").doc(email).get();
 
-      // Handle protected redirect (example: "?next=/cart")
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/home/index.html";
+      if (riderRef.exists) {
+        window.location.href = "/rider/index.html";
+        return;
+      }
 
-      setTimeout(() => {
-        window.location.href = next;
-      }, 700);
+      // -------------------------------------
+      // 2) Check if this login is for USER
+      // -------------------------------------
+      const userRef = await db.collection("users").doc(uid).get();
+
+      if (userRef.exists) {
+        window.location.href = "/home/index.html";
+        return;
+      }
+
+      // -------------------------------------
+      // 3) If not found in any → create as USER
+      // -------------------------------------
+      await db.collection("users").doc(uid).set({
+        email,
+        createdAt: new Date(),
+      });
+
+      window.location.href = "/home/index.html";
 
     } catch (err) {
-      console.error("Login error:", err);
-
-      // Friendlier error messages
-      let msg = err.message;
-
-      if (err.code === "auth/user-not-found") msg = "No account found with this email.";
-      if (err.code === "auth/wrong-password") msg = "Incorrect password.";
-      if (err.code === "auth/invalid-email") msg = "Invalid email format.";
-
-      showToast(msg);
-    }
-  });
-
-  // -----------------------------------------------------
-  // GOOGLE LOGIN
-  // -----------------------------------------------------
-  googleBtn.addEventListener("click", async () => {
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      await auth.signInWithPopup(provider);
-
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/home/index.html";
-
-      window.location.href = next;
-
-    } catch (err) {
-      console.error("Google login error:", err);
       showToast(err.message);
     }
   });
