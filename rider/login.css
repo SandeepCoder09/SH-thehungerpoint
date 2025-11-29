@@ -1,167 +1,77 @@
-/* ==========================================================
-   SH – Rider Login Page (Auto Light/Dark Mode)
-   Premium Glassmorphism UI
-   ========================================================== */
-
-:root {
-  --accent: #E23744;
-  --accent-dark: #C52B37;
-  --radius: 16px;
-
-  /* Light mode */
-  --bg1: #f4f7fa;
-  --bg2: #e9eef5;
-
-  --text: #0f1b2d;
-  --muted: #68778f;
-
-  --glass: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(0, 0, 0, 0.1);
-
-  --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  --shadow-hover: 0 18px 45px rgba(0, 0, 0, 0.18);
-
-  --input-bg: rgba(255, 255, 255, 0.85);
-  --input-border: rgba(0, 0, 0, 0.18);
-}
-
-/* -------------------- DARK MODE AUTO -------------------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg1: #071028;
-    --bg2: #05121a;
-
-    --text: #e6eef8;
-    --muted: #9fb0c8;
-
-    --glass: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.15);
-
-    --shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
-    --shadow-hover: 0 16px 50px rgba(0, 0, 0, 0.65);
-
-    --input-bg: rgba(255, 255, 255, 0.08);
-    --input-border: rgba(255, 255, 255, 0.12);
-  }
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  transition: 0.28s ease;
-}
+/* rider/login.css — Original Restored Version */
 
 body {
   margin: 0;
-  min-height: 100vh;
-  font-family: Inter, system-ui, Arial;
-
-  background: linear-gradient(180deg, var(--bg1), var(--bg2));
-  color: var(--text);
-
+  padding: 0;
+  background: #f5f5f5;
+  font-family: Arial, sans-serif;
   display: flex;
-  align-items: center;
   justify-content: center;
-
-  padding: 24px;
+  align-items: center;
+  height: 100vh;
 }
 
-/* ==========================================================
-   LOGIN CARD
-   ========================================================== */
-.login-root .card {
-  width: 100%;
-  max-width: 430px;
-
-  background: var(--glass);
-  backdrop-filter: blur(18px);
-
-  padding: 28px;
-  border-radius: var(--radius);
-
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-
-  transform: translateY(0);
-}
-.login-root .card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
+.login-box {
+  width: 320px;
+  background: #fff;
+  padding: 25px 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
-/* -------------------- HEADINGS -------------------- */
-h2 {
-  margin: 0 0 10px;
-  font-size: 24px;
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  color: #e23744;
+  font-size: 22px;
   font-weight: 700;
 }
 
-.muted {
-  color: var(--muted);
-  font-size: 14px;
-  margin-top: 6px;
-}
-
-/* -------------------- LABELS -------------------- */
 label {
   display: block;
-  margin-top: 18px;
   font-size: 14px;
-  color: var(--muted);
-  letter-spacing: 0.3px;
-}
-
-/* -------------------- INPUTS -------------------- */
-input {
-  width: 100%;
-  padding: 12px 14px;
-
-  margin-top: 6px;
-
-  border-radius: 10px;
-  border: 1px solid var(--input-border);
-
-  background: var(--input-bg);
-  color: var(--text);
-
-  font-size: 15px;
-  outline: none;
-}
-
-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.25);
-}
-
-/* -------------------- BUTTON -------------------- */
-.btn {
-  display: inline-block;
-  padding: 12px 16px;
-
-  border-radius: 12px;
-  margin-top: 20px;
-
-  cursor: pointer;
-  border: none;
-
-  font-size: 15px;
+  margin-top: 14px;
+  color: #444;
   font-weight: 600;
 }
 
-.btn.primary {
-  background: var(--accent);
+input {
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 6px;
+  border: 1.5px solid #dcdcdc;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: 0.2s ease;
+}
+
+input:focus {
+  border-color: #e23744;
+  box-shadow: 0 0 0 2px rgba(226,55,68,0.18);
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background: #e23744;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(226, 55, 68, 0.45);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-.btn.primary:hover {
-  background: var(--accent-dark);
-  transform: translateY(-3px);
+button:hover {
+  background: #c91f32;
 }
 
-/* -------------------- SMALL TEXT -------------------- */
-.small {
-  font-size: 13px;
-  margin-top: 10px;
-  color: var(--muted);
+.msg {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #c91f32;
 }
