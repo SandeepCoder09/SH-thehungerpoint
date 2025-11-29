@@ -23,7 +23,7 @@
       <div class="profile-img-wrapper">
         <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
 
-        <!-- Pencil Button (smaller, optimized SVG) -->
+        <!-- Pencil Button (smaller) -->
         <button id="editPhotoBtn" class="edit-photo-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -53,7 +53,6 @@
 
   <!-- Profile Upload Panel -->
   <section class="profile-upload-panel">
-    <!-- Hidden input so pencil can trigger it -->
     <input id="photoInput" type="file" accept="image/*" hidden />
     <button id="btnUploadPhoto" class="btn small">Upload Photo</button>
     <div id="uploadMsg" class="small muted"></div>
@@ -76,10 +75,25 @@
 
       <div class="last-seen">Last seen: <span id="lastSeen">—</span></div>
 
+      <!-- UPDATED BUTTON ROW (Accept removed, Track & Details added) -->
       <div class="buttons-row">
-        <button id="btnAcceptSelected" class="btn">Accept</button>
-        <button id="btnStartTrip" class="btn primary">Start Trip</button>
-        <button id="btnDeliver" class="btn success">Mark Delivered</button>
+
+        <button id="btnStartTrip" class="btn primary" disabled>
+          Start Trip
+        </button>
+
+        <button id="btnDeliver" class="btn success" disabled>
+          Mark Delivered
+        </button>
+
+        <button id="btnTrackOrder" class="btn" disabled>
+          Track
+        </button>
+
+        <button id="btnOrderDetails" class="btn" disabled>
+          Details
+        </button>
+
       </div>
 
       <hr />
