@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <title>Rider — SH</title>
@@ -17,7 +18,21 @@
   <!-- TOP BAR -->
   <header class="rider-top">
     <div class="rider-profile">
-      <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
+
+      <!-- WRAPPER to place pencil button -->
+      <div class="profile-img-wrapper">
+        <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
+
+        <!-- Pencil Edit Button (SVG) -->
+        <button id="editPhotoBtn" class="edit-photo-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+        </button>
+      </div>
+
       <div class="rider-meta">
         <div id="riderName" class="rider-name">Rider</div>
         <div id="riderEmail" class="rider-email">Email</div>
@@ -35,6 +50,13 @@
       <button id="btnLogout" class="btn small">Logout</button>
     </div>
   </header>
+
+  <!-- Upload Under Profile -->
+  <section class="profile-upload-panel">
+    <input id="photoInput" type="file" accept="image/*" hidden />
+    <button id="btnUploadPhoto" class="btn small">Upload Photo</button>
+    <div id="uploadMsg" class="small muted"></div>
+  </section>
 
   <!-- MAIN -->
   <main class="rider-main">
@@ -60,13 +82,6 @@
       </div>
 
       <hr />
-      
-      <div class="upload-section">
-        <label>Upload profile photo</label>
-        <input id="photoInput" type="file" accept="image/*" />
-        <button id="btnUploadPhoto" class="btn">Upload</button>
-        <div id="uploadMsg" class="small muted"></div>
-      </div>
     </section>
 
     <!-- ORDERS LIST -->
@@ -80,15 +95,13 @@
     Rider dashboard • SH — The Hunger Point
   </footer>
 
-  <!-- MOBILE-SAFE TOAST -->
   <div id="toast" class="toast"></div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
   <script type="module" src="/rider/firebase.js"></script>
   <script type="module" src="/rider/rider.js"></script>
-
 </body>
+
 </html>
