@@ -408,3 +408,156 @@ body {
 .test-order-btn {
   animation: neonPulse 2.4s infinite ease-in-out;
 }
+
+/* ============================================================
+   SH — NEON PRO PACK (Add-on 2)
+   Advanced neon + animated effects • NO HTML changes
+===============================================================*/
+
+/* ---------- Animated Neon Underline for Titles ---------- */
+
+.panel h3 {
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.panel h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff001a, #ff4d60, transparent);
+  box-shadow: 0 0 12px rgba(255, 30, 46, 0.8);
+  border-radius: 4px;
+  transition: 0.4s ease;
+}
+
+.panel:hover h3::after {
+  width: 100%;
+}
+
+/* ---------- Neon Focus Ring (Buttons) ---------- */
+
+.btn:focus,
+.test-order-btn:focus {
+  outline: none;
+  box-shadow:
+    0 0 10px rgba(255, 20, 46, 0.8),
+    0 0 18px rgba(255, 20, 46, 0.6),
+    inset 0 0 8px rgba(255, 20, 46, 0.7);
+}
+
+/* ---------- Order Row Active Neon Highlight ---------- */
+
+.order-row.active,
+.order-row:active {
+  border: 1px solid #ff1e2d;
+  box-shadow:
+    0 0 22px rgba(255, 0, 40, 0.9),
+    0 0 48px rgba(255, 0, 40, 0.6);
+  transform: scale(1.02);
+}
+
+/* Auto-activate when hovered long */
+.order-row:hover {
+  transition-delay: 0.15s;
+}
+
+/* ---------- Neon Gradient Border for Panels ---------- */
+
+.panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg,
+    rgba(255, 20, 46, 0.8),
+    rgba(255, 20, 46, 0.3),
+    rgba(255, 20, 46, 0)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ---------- Glowing Neon Beam at Topbar ---------- */
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg,
+    rgba(255, 0, 30, 0.9),
+    rgba(255, 0, 30, 0.4),
+    transparent,
+    rgba(255, 0, 30, 0.4),
+    rgba(255, 0, 30, 0.9)
+  );
+  filter: blur(2px);
+  animation: glowBeam 4s infinite linear;
+}
+
+@keyframes glowBeam {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* ---------- Floating Neon Particles (NO HTML needed) ---------- */
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,40,60,0.55) 0%, transparent 60%),
+    radial-gradient(circle, rgba(255,20,40,0.45) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255,0,40,0.35) 0%, transparent 80%);
+  background-size: 240px 240px;
+  animation: floatingNeon 18s infinite linear alternate;
+  mix-blend-mode: overlay;
+  filter: blur(40px);
+}
+
+body::after {
+  animation-duration: 22s;
+  opacity: 0.5;
+}
+
+@keyframes floatingNeon {
+  0% { transform: translate(-10%, -10%) scale(1); }
+  50% { transform: translate(10%, 15%) scale(1.1); }
+  100% { transform: translate(-5%, -12%) scale(1.05); }
+}
+
+/* ---------- Neon Glow on Hover Cards ---------- */
+
+.card.small:hover {
+  border-color: #ff1e2d;
+  box-shadow: 0 0 16px rgba(255, 0, 40, 0.8);
+}
+
+/* ---------- Neon Title Glow (subtle) ---------- */
+
+.title {
+  text-shadow: 0 0 10px rgba(255, 30, 46, 0.6);
+}
