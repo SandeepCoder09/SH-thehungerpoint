@@ -8,16 +8,15 @@ import {
   onSnapshot,
   doc,
   getDoc,
-  updateDoc,
-  getDocs,
-  query,
-  orderBy
+  updateDoc
 } from "/rider/firebase.js";
 
 import { connectSocket, getSocket } from "/rider/socket-client.js";
 import RIDER_GPS from "/rider/rider-gps.js";
 
-// DOM refs
+/* -------------------------------------------------------
+   DOM Elements
+------------------------------------------------------- */
 const profileImg = document.getElementById("profileImg");
 const riderNameEl = document.getElementById("riderName");
 const riderEmailEl = document.getElementById("riderEmail");
@@ -36,59 +35,82 @@ const btnLogout = document.getElementById("btnLogout");
 
 const ordersList = document.getElementById("ordersList");
 
+// Upload elements
 const photoInput = document.getElementById("photoInput");
 const btnUploadPhoto = document.getElementById("btnUploadPhoto");
 const uploadMsg = document.getElementById("uploadMsg");
-
-// ⭐ NEW SAFE FIX (required)
 const editPhotoBtn = document.getElementById("editPhotoBtn");
+const uploadPanel = document.querySelector(".profile-upload-panel");
+
+/* -------------------------------------------------------
+   Initial upload panel state (hidden)
+------------------------------------------------------- */
+if (uploadPanel) uploadPanel.style.display = "none";
+
+/* -------------------------------------------------------
+   Pencil icon → open file selector
+------------------------------------------------------- */
 if (editPhotoBtn) {
-  editPhotoBtn.addEventListener("click", () => photoInput.click());
+  editPhotoBtn.addEventListener("click", () => {
+    uploadMsg.textContent = "";
+    btnUploadPhoto.textContent = "Upload Photo";
+    btnUploadPhoto.style.display = "none";
+
+    photoInput.value = "";
+    photoInput.click();
+  });
 }
 
-let RIDER_DOC_ID = localStorage.getItem("sh_rider_docid") || null;
-let RIDER_EMAIL = localStorage.getItem("sh_rider_email") || null;
-let RIDER_ID = localStorage.getItem("sh_rider_id") || null;
-let RIDER_DATA = null;
+/* -------------------------------------------------------
+   When user selects a photo → show upload panel
+------------------------------------------------------- */
+photoInput.addEventListener("change", () => {
+  if (photoInput.files?.length > 0) {
+    uploadMsg.textContent = "Profile photo uploading…";
+    btnUploadPhoto.textContent = "Update Profile Photo";
+    btnUploadPhoto.style.display = "block";
+    uploadPanel.style.display = "block";
+  }
+});
 
+/* -------------------------------------------------------
+   Local variables
+------------------------------------------------------- */
+let RIDER_DOC_ID = localStorage.getItem("sh_rider_docid") || null;
+let RIDER_DATA = null;
 let socket = null;
 let selectedOrderId = null;
-
-let sharing = false;
 let riderMarker = null;
 
-// local lock to avoid multiple clicks
+/* To prevent double actions */
 const processingOrders = new Set();
 
-// Allowed assign statuses (your DB uses lowercase)
 const ASSIGNABLE_STATUSES = new Set(["preparing", "new", "pending"]);
-
 const STATUS_ASSIGNED = "assigned";
 const STATUS_PICKED = "picked";
 const STATUS_DELIVERED = "delivered";
 
-// MAP
+/* -------------------------------------------------------
+   Map
+------------------------------------------------------- */
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: ""
 }).addTo(map);
 
-
 /* -------------------------------------------------------
-   MOBILE TOAST (replaces alerts)
+   Toast (replaces alerts)
 ------------------------------------------------------- */
 function showToast(msg) {
   const t = document.getElementById("toast");
-  if (!t) return console.warn("Toast missing in HTML");
-
+  if (!t) return;
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2200);
+  setTimeout(() => t.classList.remove("show"), 2000);
 }
 
-
 /* -------------------------------------------------------
-   UI helpers
+   Status helpers
 ------------------------------------------------------- */
 function setStatusOnline() {
   riderStatusEl.textContent = "Online";
@@ -105,13 +127,11 @@ function setStatusOffline() {
 function fmtLastSeen(v) {
   if (!v) return "—";
   const t = Number(v) || Date.parse(v);
-  if (!t) return "Invalid Date";
-  return new Date(t).toLocaleString();
+  return t ? new Date(t).toLocaleString() : "—";
 }
 
-
 /* -------------------------------------------------------
-   Load rider doc
+   Load Rider Document
 ------------------------------------------------------- */
 async function loadRiderDoc() {
   try {
@@ -123,25 +143,20 @@ async function loadRiderDoc() {
 
     if (!docId) return null;
 
-    const ref = doc(db, "riders", docId);
-    const snap = await getDoc(ref);
-
+    const snap = await getDoc(doc(db, "riders", docId));
     if (snap.exists()) {
       RIDER_DOC_ID = docId;
       localStorage.setItem("sh_rider_docid", docId);
       return (RIDER_DATA = { id: snap.id, ...snap.data() });
     }
-
     return null;
   } catch (err) {
-    console.error("loadRiderDoc error:", err);
     return null;
   }
 }
 
-
 /* -------------------------------------------------------
-   Refresh UI
+   Refresh Rider UI
 ------------------------------------------------------- */
 async function refreshRiderUI() {
   const r = await loadRiderDoc();
@@ -159,14 +174,12 @@ async function refreshRiderUI() {
   profileImg.src = r.photoURL || "/home/SH-Favicon.png";
 
   r.status === "online" ? setStatusOnline() : setStatusOffline();
-
   lastSeenEl.textContent = fmtLastSeen(r.lastSeen);
   activeOrderEl.textContent = r.activeOrder || "—";
 }
 
-
 /* -------------------------------------------------------
-   Socket
+   Connect Socket
 ------------------------------------------------------- */
 async function connectEverything() {
   try {
@@ -184,35 +197,27 @@ async function connectEverything() {
     socket.on("rider:location", (p) => {
       if (!p) return;
       if (p.riderId === riderIdForSocket) {
-        if (!riderMarker) riderMarker = L.marker([p.lat, p.lng]).addTo(map);
-        else riderMarker.setLatLng([p.lat, p.lng]);
+        if (!riderMarker)
+          riderMarker = L.marker([p.lat, p.lng]).addTo(map);
+        else
+          riderMarker.setLatLng([p.lat, p.lng]);
       }
     });
 
-    socket.on("order:status", (p) => {
-      if (p.orderId === selectedOrderId) activeOrderEl.textContent = p.orderId;
-    });
-
-    socket.on("disconnect", () => {
-      connStatus.textContent = "disconnected";
-      connStatus.style.color = "crimson";
-    });
-  } catch (err) {
+  } catch {
     connStatus.textContent = "disconnected";
     connStatus.style.color = "crimson";
   }
 }
 
-
 /* -------------------------------------------------------
-   Order Snapshot
+   Orders Snapshot
 ------------------------------------------------------- */
 onSnapshot(collection(db, "orders"), (snap) => {
   const rows = [];
   snap.forEach((d) => rows.push({ orderId: d.id, ...(d.data() || {}) }));
   renderOrders(rows);
 });
-
 
 /* -------------------------------------------------------
    Render Orders
@@ -227,10 +232,10 @@ function renderOrders(list) {
 
   list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-  for (const o of list) {
-    const card = document.createElement("div");
+  list.forEach((o) => {
     const stClass = (o.status || "").toLowerCase();
 
+    const card = document.createElement("div");
     card.className = "order-card " + stClass;
 
     const left = document.createElement("div");
@@ -247,38 +252,16 @@ function renderOrders(list) {
     badge.className = "order-badge " + stClass;
     badge.textContent = (o.status || "NEW").toUpperCase();
 
-    const btnTrack = document.createElement("button");
-    btnTrack.className = "btn small";
-    btnTrack.textContent = "Track";
-    btnTrack.onclick = (ev) => {
-      ev.stopPropagation();
-      if (!o.customerLoc) return showToast("Customer location missing");
-      map.setView([o.customerLoc.lat, o.customerLoc.lng], 14);
-      L.marker([o.customerLoc.lat, o.customerLoc.lng])
-        .addTo(map)
-        .bindPopup("Customer")
-        .openPopup();
-    };
-
-    const btnDetails = document.createElement("button");
-    btnDetails.className = "btn small";
-    btnDetails.textContent = "Details";
-    btnDetails.onclick = (ev) => {
-      ev.stopPropagation();
-      showOrderDetails(o);
-    };
-
     const btnAssign = document.createElement("button");
     btnAssign.className = "btn small";
     btnAssign.textContent = "Assign to me";
+    btnAssign.disabled = !ASSIGNABLE_STATUSES.has(stClass);
     btnAssign.onclick = (ev) => {
       ev.stopPropagation();
       assignToMe(o.orderId);
     };
 
-    if (!ASSIGNABLE_STATUSES.has(stClass)) btnAssign.disabled = true;
-
-    right.append(badge, btnTrack, btnDetails, btnAssign);
+    right.append(badge, btnAssign);
     card.append(left, right);
 
     card.onclick = () => {
@@ -288,24 +271,11 @@ function renderOrders(list) {
     };
 
     ordersList.appendChild(card);
-  }
+  });
 }
 
-
 /* -------------------------------------------------------
-   Details
-------------------------------------------------------- */
-function showOrderDetails(o) {
-  showToast(
-    `Order: ${o.orderId}\nStatus: ${o.status}\nItems: ${(o.items || [])
-      .map(i => `${i.name}×${i.qty}`)
-      .join(", ")}`
-  );
-}
-
-
-/* -------------------------------------------------------
-   Action buttons
+   Action Button Control
 ------------------------------------------------------- */
 function updateActionButtons(order) {
   btnStartTrip.disabled = true;
@@ -317,7 +287,8 @@ function updateActionButtons(order) {
   const status = (order.status || "").toLowerCase();
   const orderRiderId = order.riderId || "";
 
-  if (ASSIGNABLE_STATUSES.has(status)) btnAcceptSelected.disabled = false;
+  if (ASSIGNABLE_STATUSES.has(status))
+    btnAcceptSelected.disabled = false;
 
   if (status === STATUS_ASSIGNED && orderRiderId === RIDER_DATA.riderId)
     btnStartTrip.disabled = false;
@@ -325,7 +296,6 @@ function updateActionButtons(order) {
   if (status === STATUS_PICKED && orderRiderId === RIDER_DATA.riderId)
     btnDeliver.disabled = false;
 }
-
 
 /* -------------------------------------------------------
    Assign to Me
@@ -367,7 +337,6 @@ async function assignToMe(orderId) {
   }
 }
 
-
 /* -------------------------------------------------------
    Start Trip
 ------------------------------------------------------- */
@@ -376,11 +345,9 @@ btnStartTrip.addEventListener("click", async () => {
 
   const ref = doc(db, "orders", selectedOrderId);
   const snap = await getDoc(ref);
-
   if (!snap.exists()) return showToast("Order not found");
 
   const od = snap.data();
-
   if (od.status !== STATUS_ASSIGNED) return showToast("Not assigned");
   if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
 
@@ -396,10 +363,8 @@ btnStartTrip.addEventListener("click", async () => {
 
   RIDER_GPS.start();
   btnDeliver.disabled = false;
-
   showToast("Trip started");
 });
-
 
 /* -------------------------------------------------------
    Mark Delivered
@@ -409,11 +374,9 @@ btnDeliver.addEventListener("click", async () => {
 
   const ref = doc(db, "orders", selectedOrderId);
   const snap = await getDoc(ref);
-
   if (!snap.exists()) return showToast("Order not found");
 
   const od = snap.data();
-
   if (od.status !== STATUS_PICKED) return showToast("Not picked");
   if (od.riderId !== RIDER_DATA.riderId) return showToast("Wrong rider");
 
@@ -431,16 +394,16 @@ btnDeliver.addEventListener("click", async () => {
   showToast("Delivered");
 });
 
-
 /* -------------------------------------------------------
-   Upload Photo (Upload Button)
+   PROFILE PHOTO UPLOAD
 ------------------------------------------------------- */
 btnUploadPhoto.addEventListener("click", async () => {
   const f = photoInput.files?.[0];
   if (!f) return showToast("Choose a photo first");
   if (!RIDER_DOC_ID) return showToast("Rider not found");
 
-  uploadMsg.textContent = "Uploading…";
+  uploadMsg.textContent = "Profile photo uploading…";
+  btnUploadPhoto.style.display = "none";
 
   const reader = new FileReader();
   reader.onload = async () => {
@@ -452,10 +415,26 @@ btnUploadPhoto.addEventListener("click", async () => {
       });
 
       profileImg.src = dataUrl;
-      uploadMsg.textContent = "Uploaded";
-      showToast("Photo updated");
+      uploadMsg.textContent = "Profile photo uploaded";
+
+      // AUTO-HIDE PANEL AFTER 1 SECOND
+      setTimeout(() => {
+        uploadPanel.style.display = "none";
+        uploadMsg.textContent = "";
+      }, 1000);
+
+      showToast("Photo uploaded");
+
     } catch (err) {
       uploadMsg.textContent = "Upload failed";
+      btnUploadPhoto.style.display = "none";
+
+      // Hide after fail
+      setTimeout(() => {
+        uploadPanel.style.display = "none";
+        uploadMsg.textContent = "";
+      }, 1000);
+
       showToast("Upload failed");
     }
   };
@@ -463,14 +442,13 @@ btnUploadPhoto.addEventListener("click", async () => {
   reader.readAsDataURL(f);
 });
 
-
 /* -------------------------------------------------------
    Online / Offline
 ------------------------------------------------------- */
 async function setRiderOnline(flag = true) {
   if (!RIDER_DOC_ID) return;
-
   const now = Date.now();
+
   await updateDoc(doc(db, "riders", RIDER_DOC_ID), {
     status: flag ? "online" : "offline",
     lastSeen: now
@@ -479,7 +457,6 @@ async function setRiderOnline(flag = true) {
   flag ? setStatusOnline() : setStatusOffline();
   lastSeenEl.textContent = fmtLastSeen(now);
 }
-
 
 /* -------------------------------------------------------
    INIT
