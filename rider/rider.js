@@ -51,8 +51,15 @@ let selectedOrderId = null;
 let sharing = false;
 let riderMarker = null;
 
-// small local lock to avoid multiple clicks / concurrent requests per order
+// local lock to avoid multiple clicks / concurrent requests per order
 const processingOrders = new Set();
+
+// Allowed assign statuses (match your real system)
+const ASSIGNABLE_STATUSES = new Set(["PREPARING", "NEW", "PENDING"]);
+// Status strings we'll check against (normalized to uppercase)
+const STATUS_ASSIGNED = "ASSIGNED";
+const STATUS_PICKED = "PICKED";
+const STATUS_DELIVERED = "DELIVERED";
 
 // MAP
 const map = L.map("map", { zoomControl: true }).setView([23.0, 82.0], 6);
@@ -76,7 +83,6 @@ function setStatusOffline() {
 
 function fmtLastSeen(v) {
   if (!v) return "—";
-  // some docs store "null" as string — handle that
   if (typeof v === "string" && v.toLowerCase() === "null") return "—";
   const t = Number(v) || Date.parse(v);
   if (!t) return "Invalid Date";
@@ -89,13 +95,13 @@ function fmtLastSeen(v) {
 // ------------------------------------
 async function loadRiderDoc() {
   try {
-    // prefer explicit docid in localStorage, else fallback to email
     const docId = RIDER_DOC_ID || localStorage.getItem("sh_rider_docid") || localStorage.getItem("sh_rider_email") || localStorage.getItem("sh_rider_id");
     if (!docId) {
       console.warn("No rider identifier in localStorage - redirecting to login");
       return null;
     }
-    // your Firestore uses email as document id — try that first
+
+    // try by doc id/email directly
     const ref = doc(db, "riders", docId);
     try {
       const snap = await getDoc(ref);
@@ -109,7 +115,7 @@ async function loadRiderDoc() {
       console.warn("getDoc error (try docId):", err);
     }
 
-    // fallback: scan all riders and match by email if needed (safer but slower)
+    // fallback: scan all riders and match by email if needed
     const email = localStorage.getItem("sh_rider_email") || docId;
     if (email) {
       try {
@@ -148,7 +154,6 @@ async function refreshRiderUI() {
   }
 
   RIDER_DATA = r;
-
   riderNameEl.textContent = r.name || "Rider";
   riderEmailEl.textContent = r.email || "";
   riderIdDisplay.textContent = r.riderId || r.email || (localStorage.getItem("sh_rider_id") || "—");
@@ -156,7 +161,7 @@ async function refreshRiderUI() {
   if (r.photoURL) profileImg.src = r.photoURL;
   else profileImg.src = "/home/SH-Favicon.png";
 
-  if (r.status === "online") setStatusOnline();
+  if (r.status && String(r.status).toLowerCase() === "online") setStatusOnline();
   else setStatusOffline();
 
   lastSeenEl.textContent = fmtLastSeen(r.lastSeen);
@@ -189,12 +194,9 @@ async function connectEverything() {
     });
 
     socket.on("order:status", (p) => {
-      // optionally update UI when order status updates arrive via socket.
       if (p && p.orderId && p.status) {
-        // if current selected order changed status, show it
         if (selectedOrderId === p.orderId) {
           activeOrderEl.textContent = p.orderId;
-          // optionally we could refresh action buttons by fetching latest doc; keep minimal
         }
       }
     });
@@ -226,7 +228,6 @@ onSnapshot(ordersCol, (snap) => {
     snap.forEach((d) => rows.push({ orderId: d.id, ...(d.data() || {}) }));
     renderOrders(rows);
   } catch (err) {
-    // permission error can happen — show message and log
     console.error("orders snapshot error:", err);
     ordersList.innerHTML = "<div class='small muted'>Unable to load orders (check Firestore rules)</div>";
   }
@@ -265,8 +266,9 @@ function renderOrders(list) {
     right.className = "order-actions";
 
     const badge = document.createElement("div");
-    badge.className = "order-badge " + ((o.status||"").toLowerCase());
-    badge.textContent = (o.status || "NEW").toUpperCase();
+    const statusText = (o.status || "NEW").toString();
+    badge.className = "order-badge " + statusText.toLowerCase();
+    badge.textContent = statusText.toUpperCase();
 
     const btnTrack = document.createElement("button");
     btnTrack.className = "btn small";
@@ -294,9 +296,9 @@ function renderOrders(list) {
       assignToMe(o.orderId);
     };
 
-    // Disable assign button when order already assigned/picked/delivered
-    const st = (o.status || "").toLowerCase();
-    if (st && st !== "new" && st !== "pending") {
+    // Determine whether assign button should be enabled
+    const st = (o.status || "").toString().toUpperCase();
+    if (!ASSIGNABLE_STATUSES.has(st)) {
       btnAssign.disabled = true;
     }
 
@@ -311,7 +313,6 @@ function renderOrders(list) {
     card.onclick = () => {
       selectedOrderId = o.orderId;
       activeOrderEl.textContent = o.orderId;
-      // update header buttons based on this order's state and ownership
       updateActionButtons(o);
       if (o.customerLoc) {
         map.setView([o.customerLoc.lat, o.customerLoc.lng], 13);
@@ -345,23 +346,22 @@ function updateActionButtons(order) {
 
   if (!order || !RIDER_DATA) return;
 
-  const status = (order.status || "").toLowerCase();
+  const status = (order.status || "").toString().toUpperCase();
   const orderRiderId = order.riderId || "";
 
-  // Assign button in list handles assignment; header btnAcceptSelected may be used similarly
+  // Assign: header accept (btnAcceptSelected) enabled if order is assignable
+  if (ASSIGNABLE_STATUSES.has(status)) {
+    btnAcceptSelected.disabled = false;
+  }
+
   // Enable "Start Trip" only if order is assigned to this rider
-  if (status === "assigned" && (orderRiderId === RIDER_DATA.riderId || orderRiderId === RIDER_DATA.email || orderRiderId === localStorage.getItem("sh_rider_id"))) {
+  if (status === STATUS_ASSIGNED && (orderRiderId === (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id")))) {
     btnStartTrip.disabled = false;
   }
 
   // Enable "Deliver" only if order is picked by this rider
-  if (status === "picked" && (orderRiderId === RIDER_DATA.riderId || orderRiderId === RIDER_DATA.email || orderRiderId === localStorage.getItem("sh_rider_id"))) {
+  if (status === STATUS_PICKED && (orderRiderId === (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id")))) {
     btnDeliver.disabled = false;
-  }
-
-  // Optionally allow Accept/Assign from header if order is not assigned
-  if (!status || status === "" || status === "new" || status === "pending") {
-    btnAcceptSelected.disabled = false;
   }
 }
 
@@ -384,24 +384,26 @@ async function assignToMe(orderId) {
       return;
     }
     const od = snap.data() || {};
-    const currentStatus = (od.status || "").toLowerCase();
+    const currentStatus = (od.status || "").toString().toUpperCase();
     const currentRider = od.riderId || "";
 
-    // block if already assigned / processed
-    if (currentStatus && currentStatus !== "new" && currentStatus !== "pending") {
-      return alert("Order already processed or assigned");
+    // block if already assigned/picked/delivered
+    if (!ASSIGNABLE_STATUSES.has(currentStatus)) {
+      alert("Order already processed or assigned");
+      return;
     }
 
     if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
-      return alert("Order already assigned to another rider");
+      alert("Order already assigned to another rider");
+      return;
     }
 
-    // UI lock (prevent double clicks)
-    // Note: if you prefer to disable the specific button in the list, we could find it and disable it; keep minimal
+    // UI lock (optimistic)
+    // Perform update
     try {
       await updateDoc(orderRef, {
         riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"),
-        status: "assigned",
+        status: STATUS_ASSIGNED.toLowerCase(), // keep stored value in same form as your DB prefers; we send lowercase to match previous pattern
         assignedAt: Date.now()
       });
 
@@ -441,25 +443,26 @@ btnStartTrip.addEventListener("click", async () => {
       return;
     }
     const od = snap.data() || {};
-    const currentStatus = (od.status || "").toLowerCase();
+    const currentStatus = (od.status || "").toString().toUpperCase();
     const currentRider = od.riderId || "";
 
     // only allow start if currently assigned to this rider
-    if (currentStatus !== "assigned") {
-      return alert("Cannot start trip: order is not in 'assigned' status");
+    if (currentStatus !== STATUS_ASSIGNED) {
+      alert("Cannot start trip: order is not in 'assigned' status");
+      return;
     }
     if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
-      return alert("Cannot start trip: order assigned to another rider");
+      alert("Cannot start trip: order assigned to another rider");
+      return;
     }
 
     try {
       await updateDoc(orderRef, {
-        status: "picked",
+        status: STATUS_PICKED.toLowerCase(), // storing lower-case like prior pattern; change if your DB uses uppercase
         pickedAt: Date.now(),
         riderId: RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id")
       });
 
-      // notify backend via socket
       const s = getSocket();
       if (s && s.connected) s.emit("order:status", { orderId: orderId, status: "picked" });
 
@@ -467,7 +470,7 @@ btnStartTrip.addEventListener("click", async () => {
       RIDER_GPS.start();
       sharing = true;
 
-      // after success update action buttons (we might not have full order object, so fetch simple status)
+      // after success update action buttons
       btnStartTrip.disabled = true;
       btnDeliver.disabled = false;
 
@@ -478,8 +481,6 @@ btnStartTrip.addEventListener("click", async () => {
     }
   } finally {
     processingOrders.delete(orderId);
-    // ensure buttons reflect current selection: try to refresh selected order UI by fetching live snapshot will come from onSnapshot
-    // but to be safe, keep start button disabled now (it was)
   }
 });
 
@@ -505,20 +506,22 @@ btnDeliver.addEventListener("click", async () => {
       return;
     }
     const od = snap.data() || {};
-    const currentStatus = (od.status || "").toLowerCase();
+    const currentStatus = (od.status || "").toString().toUpperCase();
     const currentRider = od.riderId || "";
 
     // only allow deliver if currently picked by this rider
-    if (currentStatus !== "picked") {
-      return alert("Cannot mark delivered: order is not in 'picked' status");
+    if (currentStatus !== STATUS_PICKED) {
+      alert("Cannot mark delivered: order is not in 'picked' status");
+      return;
     }
     if (currentRider && currentRider !== (RIDER_DATA.riderId || RIDER_DATA.email || localStorage.getItem("sh_rider_id"))) {
-      return alert("Cannot mark delivered: order assigned to another rider");
+      alert("Cannot mark delivered: order assigned to another rider");
+      return;
     }
 
     try {
       await updateDoc(orderRef, {
-        status: "delivered",
+        status: STATUS_DELIVERED.toLowerCase(),
         deliveredAt: Date.now()
       });
 
@@ -528,7 +531,6 @@ btnDeliver.addEventListener("click", async () => {
       RIDER_GPS.stop();
       sharing = false;
 
-      // keep deliver disabled to prevent repeat
       btnDeliver.disabled = true;
       alert("Delivered");
     } catch (err) {
@@ -610,9 +612,11 @@ async function setRiderOnline(flag = true) {
 // ------------------------------------
 (async function init() {
   // start with header action buttons disabled until a selection is made
-  btnStartTrip.disabled = true;
-  btnDeliver.disabled = true;
-  btnAcceptSelected.disabled = true;
+  try {
+    btnStartTrip.disabled = true;
+    btnDeliver.disabled = true;
+    btnAcceptSelected.disabled = true;
+  } catch (e) { /* ignore if elements not present yet */ }
 
   await refreshRiderUI();          // load rider doc & render header
   await connectEverything();      // socket
