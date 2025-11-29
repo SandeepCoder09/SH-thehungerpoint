@@ -5,6 +5,10 @@
     { "src": "/home/?", "dest": "home/index.html" },
 
     { "src": "/admin", "dest": "admin/index.html" },
-    { "src": "/admin/(.*)", "dest": "admin/$1" }
+    { "src": "/admin/(.*)", "dest": "admin/$1" },
+
+    { "src": "/rider", "dest": "rider/index.html" },
+    { "src": "/rider/", "dest": "rider/index.html" },
+    { "src": "/rider/(.*)", "dest": "rider/$1" }
   ]
 }
