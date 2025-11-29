@@ -307,3 +307,75 @@ body {
 		align-items: flex-end;
 	}
 }
+
+/* ============================================================
+   PURE CSS — LAYOUT A — RIGHT SIDE VERTICAL ACTIONS
+   (No HTML change required)
+===========================================================*/
+
+/* MAKE ORDER ROW A 3-COLUMN GRID */
+.order-row {
+  display: grid !important;
+  grid-template-columns: 60px 1fr auto !important;
+  align-items: start !important;
+  gap: 16px !important;
+}
+
+/* LEFT SIDE: AVATAR + TEXT stay as is */
+.order-avatar { grid-column: 1; }
+.order-body { grid-column: 2; }
+
+/* RIGHT SIDE: STATUS + TRACK + DETAILS (VERTICAL) */
+.order-actions {
+  grid-column: 3;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+/* STATUS BADGE SIZE */
+.order-actions .status {
+  min-width: 110px;
+  height: 34px;
+  font-size: 12px !important;
+  border-radius: 8px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* BUTTON SIZE */
+.order-actions .btn {
+  width: 110px !important;
+  height: 34px !important;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+/* ------------------ MOBILE FIX ------------------ */
+@media (max-width: 600px) {
+
+  .order-row {
+    grid-template-columns: 55px 1fr auto !important;
+    align-items: start !important;
+  }
+
+  /* Keep actions on right side even on mobile */
+  .order-actions {
+    align-items: flex-end !important;
+    gap: 6px !important;
+  }
+
+  .order-actions .btn {
+    width: 100px !important;
+  }
+
+  .order-actions .status {
+    width: 100px !important;
+  }
+}
