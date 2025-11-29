@@ -19,11 +19,11 @@
   <header class="rider-top">
     <div class="rider-profile">
 
-      <!-- WRAPPER for profile & pencil -->
+      <!-- Profile + Pencil wrapper -->
       <div class="profile-img-wrapper">
         <img id="profileImg" src="/home/SH-Favicon.png" alt="avatar" />
 
-        <!-- Pencil Button (smaller) -->
+        <!-- Pencil Edit Button -->
         <button id="editPhotoBtn" class="edit-photo-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,7 +42,9 @@
           <span id="riderStatus">Offline</span>
         </div>
 
-        <div class="small">ID: <strong id="riderIdDisplay">—</strong></div>
+        <div class="small">
+          ID: <strong id="riderIdDisplay">—</strong>
+        </div>
       </div>
     </div>
 
@@ -75,24 +77,16 @@
 
       <div class="last-seen">Last seen: <span id="lastSeen">—</span></div>
 
-      <!-- UPDATED BUTTON ROW (Accept removed, Track & Details added) -->
+      <!-- ⭐ FIXED BUTTONS WITH CORRECT IDs ⭐ -->
       <div class="buttons-row">
 
-        <button id="btnStartTrip" class="btn primary" disabled>
-          Start Trip
-        </button>
+        <button id="btnStartTrip" class="btn primary">Start Trip</button>
 
-        <button id="btnDeliver" class="btn success" disabled>
-          Mark Delivered
-        </button>
+        <button id="btnDeliver" class="btn success">Mark Delivered</button>
 
-        <button id="btnTrackOrder" class="btn" disabled>
-          Track
-        </button>
+        <button id="btnTrack" class="btn">Track</button>
 
-        <button id="btnOrderDetails" class="btn" disabled>
-          Details
-        </button>
+        <button id="btnDetails" class="btn">Details</button>
 
       </div>
 
@@ -104,6 +98,7 @@
       <h3>All Orders (live)</h3>
       <div id="ordersList" class="orders-list">Loading…</div>
     </section>
+
   </main>
 
   <footer class="rider-footer muted">
