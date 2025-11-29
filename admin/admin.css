@@ -1,73 +1,72 @@
 /* ============================================================
-   SH Admin Panel — Classic Theme + Blur Glass UI
-   Clean • Minimal • No neon • No glow
-   Blur Panels + Blur Orders Table (Style #3)
+   SH Admin Panel — Premium Glass UI (25px Blur)
+   Soft Colorful Background • Strong Glass Cards • Modern UI
 ===============================================================*/
 
 /* -------------------- THEME VARIABLES -------------------- */
-
 :root {
   --accent: #E23744;
-  --radius: 14px;
-  --blur: 14px;
+  --radius: 16px;
+  --blur: 25px;
 
-  /* DARK MODE (default) */
-  --bg-1: #060d17;
-  --bg-2: #0a1626;
+  /* Text */
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.75);
 
-  --panel: rgba(255, 255, 255, 0.05);
-  --panel-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.10);
+  /* Borders & Panels */
+  --panel: rgba(255, 255, 255, 0.20);
+  --panel-hover: rgba(255, 255, 255, 0.28);
+  --border: rgba(255, 255, 255, 0.35);
 
-  --text: #e9eef7;
-  --muted: #8ea1c3;
-
-  --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  /* Shadows */
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
-/* LIGHT MODE */
-@media (prefers-color-scheme: light) {
+/* Support Dark Mode (stronger contrast) */
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg-1: #f4f6fb;
-    --bg-2: #ffffff;
+    --text: #f1f4fa;
+    --muted: rgba(220, 229, 245, 0.75);
 
-    --panel: rgba(255, 255, 255, 0.55);
-    --panel-hover: rgba(255, 255, 255, 0.75);
-    --border: rgba(0, 0, 0, 0.10);
-
-    --text: #191919;
-    --muted: #4a5567;
-
-    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --panel: rgba(15, 20, 30, 0.45);
+    --panel-hover: rgba(15, 20, 30, 0.55);
+    --border: rgba(255, 255, 255, 0.15);
   }
 }
 
-/* -------------------- GLOBAL -------------------- */
-
-* { box-sizing: border-box; }
+/* -------------------- GLOBAL BACKGROUND -------------------- */
 
 html, body {
   margin: 0;
-  height: 100%;
   font-family: Inter, system-ui, Arial;
-  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  height: 100%;
   color: var(--text);
-  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+
+  /* Soft colorful blurred gradient background */
+  background: radial-gradient(circle at 20% 20%, #ff7ba5 0%, #ff4e80 20%, transparent 60%),
+              radial-gradient(circle at 80% 30%, #6fc6ff 0%, #3b9fff 20%, transparent 60%),
+              radial-gradient(circle at 50% 80%, #b07bff 0%, #9356ff 25%, transparent 70%),
+              #0d1220;
+
+  background-size: cover;
+  background-attachment: fixed;
 }
 
-/* -------------------- TOPBAR -------------------- */
+/* -------------------- GLASS TOPBAR -------------------- */
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 18px;
+  padding: 14px 22px;
 
   background: var(--panel);
   backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow);
-
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: var(--shadow-soft);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -75,61 +74,63 @@ html, body {
 
 .top-left {
   display: flex;
+  gap: 14px;
   align-items: center;
-  gap: 12px;
 }
 
 .top-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius);
-  object-fit: contain;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   border: 1px solid var(--border);
+  object-fit: contain;
 }
 
 .title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
 }
 
 .top-right {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
+/* Small cards in topbar */
 .card.small {
-  background: var(--panel);
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: var(--radius);
+  background: var(--panel);
+  backdrop-filter: blur(var(--blur));
   border: 1px solid var(--border);
   font-size: 13px;
-  backdrop-filter: blur(var(--blur));
 }
 
 /* -------------------- BUTTONS -------------------- */
 
 .btn {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 700;
   transition: 0.2s ease;
-}
-
-.btn:active {
-  transform: scale(0.95);
+  border: none;
 }
 
 .btn:not(.ghost) {
   background: var(--accent);
   color: #fff;
+  box-shadow: var(--shadow-soft);
 }
 
 .btn.ghost {
-  background: transparent;
+  background: rgba(255,255,255,0.15);
   border: 1px solid var(--border);
   color: var(--text);
+}
+
+.btn:active {
+  transform: scale(0.95);
 }
 
 /* -------------------- TOOLBAR -------------------- */
@@ -137,11 +138,14 @@ html, body {
 .admin-toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
+  gap: 14px;
+  padding: 12px 22px;
   background: var(--panel);
-  backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius);
+  margin: 16px;
+  box-shadow: var(--shadow-soft);
 }
 
 .spacer { flex: 1; }
@@ -150,21 +154,23 @@ html, body {
 
 .layout {
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 16px;
-  padding: 18px;
-  max-width: 1300px;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1500px;
   margin: auto;
 }
 
+/* -------------------- GLASS PANELS -------------------- */
+
 .panel {
   background: var(--panel);
-  padding: 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
   backdrop-filter: blur(var(--blur));
-  box-shadow: var(--shadow);
-  transition: background 0.2s ease;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-strong);
+  transition: 0.2s ease;
 }
 
 .panel:hover {
@@ -172,53 +178,54 @@ html, body {
 }
 
 /* ============================================================
-   BLUR GLASS TABLE (YOUR SELECTED STYLE #3)
+   STRONG GLASS ORDERS TABLE (25px BLUR) — YOUR SELECTION
 ===============================================================*/
 
 .orders-list {
-  padding: 10px;
+  padding: 12px;
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(calc(var(--blur) + 4px));
   border: 1px solid var(--border);
-  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: calc(100vh - 240px);
+  gap: 12px;
+  max-height: calc(100vh - 260px);
   overflow-y: auto;
 }
 
 .order-row {
   display: grid;
-  grid-template-columns: 52px 1fr auto;
-  gap: 12px;
+  grid-template-columns: 58px 1fr auto;
   align-items: center;
+  gap: 14px;
 
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 14px;
+  border-radius: 18px;
 
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.32);
 
+  box-shadow: var(--shadow-soft);
   transition: 0.25s ease;
 }
 
 .order-row:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.33);
+  transform: translateY(-4px);
 }
 
 /* Avatar */
 .order-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.4);
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Text section */
+/* Order text */
 .order-title {
   font-size: 14px;
   font-weight: 700;
@@ -226,28 +233,28 @@ html, body {
 
 .order-meta {
   font-size: 12px;
-  opacity: 0.85;
-  margin-top: 4px;
+  opacity: 0.8;
+  margin-top: 5px;
 }
 
-/* Actions column */
+/* Actions */
 .order-actions {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .order-actions .btn {
-  padding: 6px 10px;
+  padding: 6px 12px;
   font-size: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 /* Status badge */
 .status {
-  padding: 5px 10px;
+  padding: 6px 12px;
   font-size: 11px;
-  border-radius: 10px;
+  border-radius: 999px;
 }
 
 /* -------------------- RESPONSIVE -------------------- */
@@ -268,13 +275,12 @@ html, body {
   }
 
   .order-row {
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: 46px 1fr;
     grid-template-areas:
       "avatar title"
       "avatar meta"
       "buttons buttons";
-
-    padding: 10px 12px;
+    padding: 12px;
   }
 
   .order-avatar { grid-area: avatar; }
@@ -285,7 +291,6 @@ html, body {
     grid-area: buttons;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 6px;
   }
 }
 
@@ -293,10 +298,11 @@ html, body {
 
 .test-order-btn {
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
+  padding: 14px;
   border-radius: var(--radius);
   background: var(--accent);
   color: #fff;
   border: none;
+  margin-top: 12px;
+  font-size: 16px;
 }
