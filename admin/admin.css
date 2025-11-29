@@ -269,3 +269,93 @@ html, body {
   color: #fff;
   border: none;
 }
+
+/* ============================================================
+   SH — SMALL TABLE-STYLE COMPACT ORDERS BOX
+   (No HTML changes required)
+===============================================================*/
+
+/* Reduce padding and height for smaller appearance */
+.orders-list {
+  gap: 6px !important;
+  padding: 4px !important;
+}
+
+/* Make every order row look like a small table box */
+.order-row {
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  display: grid !important;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  background: var(--panel);
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border);
+  transition: 0.2s ease;
+}
+
+/* Smaller avatar */
+.order-avatar {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 10px;
+}
+
+/* Title + meta compact */
+.order-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.order-title {
+  font-size: 13px !important;
+  font-weight: 700;
+}
+
+.order-meta {
+  font-size: 11px !important;
+  opacity: 0.8;
+}
+
+/* Status and action buttons aligned right */
+.order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Smaller status badge */
+.status {
+  padding: 4px 8px !important;
+  font-size: 10px !important;
+}
+
+/* Smaller buttons inside rows */
+.order-actions .btn {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+}
+
+/* ---------- Mobile Compact Mode ---------- */
+@media (max-width: 600px) {
+
+  .order-row {
+    grid-template-columns: 42px 1fr;
+    grid-template-areas:
+      "avatar title"
+      "avatar meta"
+      "buttons buttons";
+    gap: 6px;
+  }
+
+  .order-avatar { grid-area: avatar; }
+  .order-title { grid-area: title; }
+  .order-meta { grid-area: meta; }
+  .order-actions { 
+    grid-area: buttons;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+}
