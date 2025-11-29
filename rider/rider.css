@@ -244,3 +244,7 @@ body {
   color: var(--text-muted);
   box-shadow: 0 -2px 10px var(--shadow);
 }
+
+.order-card.assigned { background: #e3f2fd !important; }
+.order-card.picked { background: #fff3cd !important; }
+.order-card.delivered { background: #e8f5e9 !important; }
