@@ -352,3 +352,55 @@ html, body {
     margin-bottom: 32px !important;
   }
 }
+
+/* ============================================================
+   FIX: Visible Status Badges (Deliverd, Preparing, Picked etc.)
+   Strong backgrounds (not blurred, not transparent)
+===========================================================*/
+
+.status {
+  display: inline-block;
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  border-radius: 12px;
+  color: #fff !important;
+  backdrop-filter: none !important;     /* prevent blur override */
+  background: rgba(0,0,0,0.25);         /* fallback */
+}
+
+/* PREPARING — Yellow */
+.status.preparing {
+  background: #fbbf24 !important;  /* solid warm yellow */
+  color: #111 !important;
+}
+
+/* ASSIGNED — Dark teal */
+.status.assigned {
+  background: #264653 !important;
+  color: #d4f1ff !important;
+}
+
+/* PICKED — Soft orange */
+.status.picked {
+  background: #fb923c !important;
+  color: #351800 !important;
+}
+
+/* OUT FOR DELIVERY — Cyan */
+.status.out_for_delivery {
+  background: #06b6d4 !important;
+  color: #042f36 !important;
+}
+
+/* DELIVERED — Green */
+.status.delivered {
+  background: #10b981 !important;
+  color: #052d15 !important;
+}
+
+/* CANCELLED — Red */
+.status.cancelled {
+  background: #ef4444 !important;
+  color: #fff !important;
+}
