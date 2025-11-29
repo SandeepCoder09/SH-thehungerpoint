@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Reset Password — SH The Hunger Point</title>
+
+  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/auth/forgot.css" />
+</head>
+
+<body>
+  <main class="auth-page">
+    <div class="card">
+
+      <!-- HEADER -->
+      <header class="card-head">
+        <div class="logo-box">
+          <img src="/home/sh-thehungerpoint.png" alt="Logo">
+        </div>
+        <div class="title">Reset Password</div>
+      </header>
+
+      <!-- FORM -->
+      <section class="card-body">
+        <form id="forgotForm">
+
+          <label>Email Address</label>
+          <input id="email" type="email" required placeholder="you@example.com">
+
+          <button type="submit" class="btn primary">Send Reset Link</button>
+
+          <p class="muted small">
+            Remember password?
+            <a href="/auth/login.html">Back to login</a>
+          </p>
+
+        </form>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+  </main>
+
+  <!-- Firebase Config & Script -->
+  <script src="/auth/firebase-config.js"></script>
+  <script src="/auth/forgot.js"></script>
+
+</body>
+</html>
