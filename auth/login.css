@@ -1,4 +1,4 @@
-/* login.css — SH Theme (Style A) */
+/* login.css — Matching Signup UI */
 
 :root {
   --primary: #E23744;
@@ -11,14 +11,10 @@
   --muted: #666;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: Poppins, system-ui, -apple-system;
   background: var(--bg);
   padding: 30px;
   display: flex;
@@ -38,12 +34,12 @@ body {
   overflow: hidden;
 }
 
-/* Header */
+/* HEADER */
 .card-head {
   background: linear-gradient(90deg, var(--primary), var(--primary-dark));
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 18px 20px;
   color: #fff;
 }
@@ -63,34 +59,33 @@ body {
 .logo-box img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
 }
 
 .card-body {
-  padding: 22px;
+  padding: 24px;
 }
 
 label {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
-  margin-top: 12px;
   display: block;
+  margin-top: 12px;
+  color: #333;
 }
 
 input {
   width: 100%;
   padding: 12px 14px;
   border-radius: var(--input-radius);
-  border: 1px solid #e2e2e2;
+  border: 1px solid #ddd;
   margin-top: 6px;
   font-size: 15px;
-  transition: 0.2s;
+  transition: .25s;
 }
 
 input:focus {
@@ -99,15 +94,15 @@ input:focus {
   outline: none;
 }
 
-/* Buttons */
+/* BUTTONS */
 .btn {
   width: 100%;
   padding: 12px;
-  margin-top: 16px;
+  margin-top: 18px;
   font-weight: 700;
   border-radius: var(--input-radius);
-  border: none;
   cursor: pointer;
+  border: none;
 }
 
 .btn.primary {
@@ -119,21 +114,22 @@ input:focus {
 .btn.google {
   background: #fff;
   border: 1px solid #ddd;
-  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .divider {
   text-align: center;
   margin: 14px 0;
   color: #999;
-  font-size: 14px;
 }
 
 .muted.small {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
   text-align: center;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .muted.small a {
@@ -141,7 +137,7 @@ input:focus {
   font-weight: 600;
 }
 
-/* Toast */
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 28px;
