@@ -8,15 +8,17 @@
 
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (Correct order – App → Auth → Firestore) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/auth/forgot.css" />
 </head>
 
 <body>
+
   <main class="auth-page">
     <div class="card">
 
@@ -44,12 +46,13 @@
 
         </form>
       </section>
+
     </div>
 
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase Config & Script -->
+  <!-- Firebase Config + Forgot Script -->
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/forgot.js"></script>
 
