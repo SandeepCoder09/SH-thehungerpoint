@@ -185,15 +185,14 @@
     </div>
 
     <div class="cart-footer">
-  <div class="cart-total-text">
-    Total: <span id="cartTotal">₹0</span>
-  </div>
+      <div class="cart-total-text">
+        Total: <span id="cartTotal">₹0</span>
+      </div>
 
-  <div class="cart-footer-btns">
-    <button id="clearCart" class="btn-clear">Clear</button>
-    <button id="checkoutBtn" class="btn-checkout">Checkout</button>
-  </div>
-</div>
+      <div class="cart-footer-btns">
+        <button id="clearCart" class="btn-clear">Clear</button>
+        <button id="checkoutBtn" class="btn-checkout">Checkout</button>
+      </div>
     </div>
   </div>
 
@@ -210,6 +209,17 @@
 
   <!-- Toast -->
   <div id="toast-container" class="toast-container"></div>
+
+  <!-- 🔥 Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- 🔥 Firebase Config -->
+  <script src="/auth/firebase-config.js"></script>
+
+  <!-- 🔥 Protect Page -->
+  <script src="/auth/protect.js"></script>
 
   <!-- MAIN JS -->
   <script src="/home/script.js?v=7"></script>
