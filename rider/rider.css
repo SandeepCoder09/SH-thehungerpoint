@@ -1,353 +1,388 @@
 /* ==========================================================
-   SH – Rider Dashboard (Premium SH Theme)
-   Ultra-Responsive + Auto Dark/Light Mode
+   SH – Rider Dashboard (Premium Ultra UI Upgrade)
+   Glassmorphism + Soft Shadows + Smooth Transitions
    ========================================================== */
 
 /* ---------- THEME VARIABLES ---------- */
 :root {
-        --accent: #E23744;
-        /* SH Primary Red */
-        --accent-dark: #C52B37;
-        /* SH Darker Red */
-        --success: #2ecc71;
-        --warning: #f7b267;
-        --blue: #3aa0ff;
+  --accent: #E23744;
+  --accent-dark: #C12C37;
+  --success: #2ecc71;
+  --warning: #f7b267;
+  --blue: #3aa0ff;
 
-        --radius: 14px;
+  --radius: 18px;
 
-        /* Light mode */
-        --bg: #ffffff;
-        --panel: #f8f9fb;
-        --panel-dark: #eceff3;
-        --text: #111;
-        --text-muted: #666;
-        --shadow: rgba(0, 0, 0, 0.08);
+  --bg: #f3f5f8;
+  --panel: rgba(255, 255, 255, 0.76);
+  --panel-dark: rgba(240, 240, 240, 0.65);
+
+  --text: #111;
+  --text-muted: #666;
+
+  /* Glassmorphism shadow */
+  --shadow-small: 0 2px 5px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 14px rgba(0, 0, 0, 0.12);
+  --shadow-large: 0 8px 28px rgba(0, 0, 0, 0.18);
+
+  backdrop-filter: blur(12px);
 }
 
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
-        :root {
-                --bg: #050d19;
-                --panel: #0a1627;
-                --panel-dark: #0f1f32;
-                --text: #e6eef8;
-                --text-muted: #8fa4bf;
-                --shadow: rgba(0, 0, 0, 0.6);
-        }
+  :root {
+    --bg: #050d19;
+    --panel: rgba(16, 28, 45, 0.55);
+    --panel-dark: rgba(11, 21, 36, 0.65);
+
+    --text: #e6eef8;
+    --text-muted: #8fa4bf;
+
+    --shadow-small: 0 2px 6px rgba(0, 0, 0, 0.5);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.55);
+    --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.65);
+
+    backdrop-filter: blur(20px);
+  }
 }
 
 * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  transition: 0.25s ease;
 }
 
 body {
-        margin: 0;
-        font-family: Inter, system-ui, Arial;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        padding-bottom: 80px;
+  margin: 0;
+  font-family: Inter, system-ui, Arial;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 90px;
 }
 
 /* ==========================================================
-   HEADER (SH Gradient Style)
+   HEADER – Glass Bar with Glow
    ========================================================== */
 .rider-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-        background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px 20px;
 
-        gap: 12px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  box-shadow: var(--shadow-large);
+
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
 }
 
 .rider-profile {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
+/* Profile Image + Glow */
 .rider-profile img {
-        width: 58px;
-        height: 58px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid rgba(255, 255, 255, 0.5);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
 }
 
+/* Pencil Icon Button */
+.profile-img-wrapper {
+  position: relative;
+  width: fit-content;
+}
+
+.edit-photo-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  background: var(--accent);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: var(--shadow-medium);
+  transition: 0.2s ease-in-out;
+}
+
+.edit-photo-btn:hover {
+  background: var(--accent-dark);
+  transform: scale(1.1);
+}
+
+/* ID + Email styles */
 .rider-meta .small {
-        font-size: 13px;
-        opacity: 0.85;
+  font-size: 13px;
+  opacity: 0.9;
 }
-
-/* Online/offline dot */
-.dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 6px;
-}
-
-.dot.online { background: var(--success); }
-.dot.offline { background: #b94b4b; }
 
 /* ==========================================================
-   BUTTONS (SH Styled)
+   BUTTONS – Animated, Soft Shadow, Modern
    ========================================================== */
 .btn {
-        padding: 9px 16px;
-        border-radius: var(--radius);
-        border: none;
-        cursor: pointer;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: none;
 
-        background: var(--panel-dark);
-        color: var(--text);
-        box-shadow: 0 2px 6px var(--shadow);
-        transition: 0.15s ease;
-        font-size: 14px;
-        font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  background: var(--panel-dark);
+  color: var(--text);
+
+  box-shadow: var(--shadow-small);
 }
 
 .btn:hover {
-        transform: translateY(-2px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
 }
 
-.btn.primary { background: var(--accent); color: #fff; }
-.btn.success { background: var(--success); color: #fff; }
-.btn.small   { padding: 6px 12px; font-size: 13px; }
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
 
-.btn.ghost {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        color: #fff;
+.btn.primary:hover {
+  background: var(--accent-dark);
+}
+
+.btn.success {
+  background: var(--success);
+  color: #fff;
+}
+
+.btn.small {
+  padding: 8px 12px;
+  font-size: 13px;
 }
 
 /* ==========================================================
    MAIN GRID
    ========================================================== */
 .rider-main {
-        display: grid;
-        gap: 18px;
-        padding: 16px;
-        max-width: 1100px;
-        margin: 0 auto;
+  display: grid;
+  gap: 20px;
+  padding: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 @media (min-width: 900px) {
-        .rider-main {
-                grid-template-columns: 1fr 380px;
-        }
+  .rider-main {
+    grid-template-columns: 1fr 380px;
+  }
 }
 
 /* ==========================================================
-   MAP PANEL
+   MAP PANEL – Glass Card
    ========================================================== */
 .map-panel .map {
-        height: 350px;
-        width: 100%;
-        border-radius: var(--radius);
-        background: var(--panel);
-        box-shadow: 0 8px 24px var(--shadow);
-        overflow: hidden;
+  height: 360px;
+  width: 100%;
+  border-radius: var(--radius);
+
+  background: var(--panel);
+  box-shadow: var(--shadow-large);
+
+  overflow: hidden;
 }
 
 /* ==========================================================
-   CONTROL PANEL
+   CONTROL PANEL – Frosted Glass
    ========================================================== */
 .controls-panel {
-        background: var(--panel);
-        padding: 18px;
-        border-radius: var(--radius);
-        box-shadow: 0 6px 20px var(--shadow);
+  background: var(--panel);
+  padding: 18px;
+
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-medium);
+
+  backdrop-filter: blur(16px);
 }
 
 .status-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .last-seen {
-        font-size: 13px;
-        color: var(--text-muted);
-        margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
 }
 
 .buttons-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 /* ==========================================================
-   UPLOAD SECTION
+   PROFILE UPLOAD PANEL – Glass Box
    ========================================================== */
-.upload-section {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+.profile-upload-panel {
+  padding: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow-medium);
+
+  border-radius: var(--radius);
+  margin: 14px;
+
+  text-align: center;
+  backdrop-filter: blur(14px);
 }
 
-.upload-section input[type=file] {
-        padding: 8px;
-        border: 1px solid var(--panel-dark);
-        border-radius: 10px;
-        background: transparent;
-        color: var(--text);
+.profile-upload-panel button {
+  width: 100%;
 }
 
 /* ==========================================================
    ORDERS PANEL
    ========================================================== */
 .orders-panel {
-        background: var(--panel);
-        padding: 18px;
-        border-radius: var(--radius);
-        box-shadow: 0 6px 20px var(--shadow);
+  background: var(--panel);
+  padding: 20px;
+
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-large);
+
+  backdrop-filter: blur(14px);
 }
 
+/* Orders scroll list */
 .orders-list {
-        margin-top: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-height: 360px;
-        overflow-y: auto;
-        padding-right: 6px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.orders-list::-webkit-scrollbar { width: 8px; }
+.orders-list::-webkit-scrollbar {
+  width: 8px;
+}
+
 .orders-list::-webkit-scrollbar-thumb {
-        background: var(--panel-dark);
-        border-radius: 8px;
+  background: var(--panel-dark);
+  border-radius: 8px;
 }
 
 /* ==========================================================
-   ORDER CARD
+   ORDER CARD – Hover Lift + Glow
    ========================================================== */
 .order-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-        padding: 14px;
-        border-radius: var(--radius);
-        background: var(--panel-dark);
+  padding: 16px;
+  border-radius: var(--radius);
 
-        transition: 0.18s ease;
-        box-shadow: 0 3px 12px var(--shadow);
+  background: var(--panel-dark);
+  box-shadow: var(--shadow-small);
+
+  transition: 0.25s ease;
 }
 
 .order-card:hover {
-        transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-large);
 }
 
 .order-card .meta {
-        font-size: 13px;
-        color: var(--text-muted);
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
+/* Status Badge */
 .order-badge {
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
+/* Status Colors */
 .order-badge.preparing { background: #f7b267; color: #2b1700; }
 .order-badge.assigned  { background: #cfe4ff; color: #052747; }
 .order-badge.picked    { background: #fff3cd; color: #443800; }
 .order-badge.delivered { background: #d9f7e4; color: #003d1e; }
 
-.order-card.assigned  { background: #e3f2fd !important; }
-.order-card.picked    { background: #fff3cd !important; }
-.order-card.delivered { background: #e8f5e9 !important; }
+/* Background Highlights */
+.order-card.assigned  { background: rgba(207, 228, 255, 0.7); }
+.order-card.picked    { background: rgba(255, 243, 205, 0.75); }
+.order-card.delivered { background: rgba(217, 247, 228, 0.8); }
 
 /* ==========================================================
    FOOTER
    ========================================================== */
 .rider-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
-        text-align: center;
-        padding: 14px;
-        font-size: 13px;
+  background: var(--panel);
+  color: var(--text-muted);
 
-        background: var(--panel);
-        color: var(--text-muted);
-        box-shadow: 0 -2px 10px var(--shadow);
+  padding: 14px;
+  text-align: center;
+
+  box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15);
 }
 
 /* ==========================================================
-   MOBILE-SAFE TOAST
+   TOAST
    ========================================================== */
 .toast {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #222;
-        color: #fff;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-size: 14px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity .3s;
-        z-index: 9999;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: rgba(20, 20, 20, 0.8);
+  color: #fff;
+
+  padding: 10px 18px;
+  border-radius: 12px;
+
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 0.35s ease;
+  z-index: 9999;
 }
 
-.toast.show { opacity: 1; }
-
-/* ==========================================================
-   PROFILE EDIT BUTTON + UPLOAD PANEL (Safe Additions)
-   ========================================================== */
-
-/* Wrapper for placing the pencil button */
-.profile-img-wrapper {
-  position: relative;
-  width: fit-content;
+.toast.show {
+  opacity: 1;
 }
 
-/* Pencil icon button */
-.edit-photo-btn {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border: none;
-  border-radius: 50%;
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px var(--shadow);
-  cursor: pointer;
-}
-
-.edit-photo-btn:hover {
-  background: var(--accent-dark);
-  transform: scale(1.05);
-}
-
-/* Upload panel under profile */
-.profile-upload-panel {
-  padding: 14px 20px;
-  background: var(--panel);
-  box-shadow: 0 4px 14px var(--shadow);
-  border-radius: var(--radius);
-  margin: 12px;
-  text-align: center;
-}
+/* END */
