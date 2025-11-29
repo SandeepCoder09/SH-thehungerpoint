@@ -1,46 +1,50 @@
 /* ============================================================
-   SH Admin Panel — GLASS WHITE DAY + DARK GLASS NIGHT
-   Responsive + Animations — CSS ONLY
+   SH Admin Panel — FULL BLUR GLASSMORPHISM (MEDIUM BLUR)
+   Day Mode = White Glass • Night Mode = Dark Glass
+   Responsive + Premium Animations — CSS ONLY
 ===============================================================*/
 
-/* ---------- Base theme variables (fallback = dark) ---------- */
+/* -------------------- THEME VARIABLES -------------------- */
+
 :root {
   --accent: #E23744;
-  --radius: 14px;
+  --radius: 16px;
+  --blur: 18px;
   --transition: 0.25s ease;
-  --shadow-big: 0 20px 40px rgba(0, 0, 0, 0.15);
-  --shadow-small: 0 6px 16px rgba(0, 0, 0, 0.12);
 
-  /* NIGHT MODE (default) */
-  --bg-1: #040a14;
-  --bg-2: #0a1626;
-  --panel: rgba(255, 255, 255, 0.05);
-  --text: #e6eef8;
-  --muted: #8ea1c3;
-  --border: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(10px);
+  /* NIGHT (default) */
+  --bg-1: rgba(5, 10, 20, 0.7);
+  --bg-2: rgba(8, 16, 32, 0.6);
+  --panel: rgba(12, 20, 35, 0.45);
+  --panel-hover: rgba(20, 30, 50, 0.55);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #e4e9f4;
+  --muted: #aab4c9;
+
+  --shadow-big: 0 25px 45px rgba(0, 0, 0, 0.35);
+  --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* ---------- DAY MODE (system auto) ---------- */
+/* -------------------- DAY MODE -------------------- */
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-1: #f7f9fc;
-    --bg-2: #ffffff;
+    --bg-1: rgba(255, 255, 255, 0.7);
+    --bg-2: rgba(245, 247, 250, 0.65);
 
-    /* White GLASS day mode panels */
-    --panel: rgba(255, 255, 255, 0.65);
-    --glass-blur: blur(14px);
+    --panel: rgba(255, 255, 255, 0.55);
+    --panel-hover: rgba(255, 255, 255, 0.65);
 
-    --text: #0d0d0e;
-    --muted: #444e62;
-    --border: rgba(0, 0, 0, 0.08);
+    --border: rgba(0, 0, 0, 0.12);
+    --text: #0a0a0a;
+    --muted: #5a6270;
 
-    --shadow-big: 0 20px 40px rgba(0, 0, 0, 0.08);
-    --shadow-small: 0 6px 16px rgba(0, 0, 0, 0.06);
+    --shadow-big: 0 25px 45px rgba(0, 0, 0, 0.12);
+    --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.08);
   }
 }
 
-/* ---------- Global ---------- */
+/* -------------------- GLOBAL -------------------- */
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -48,62 +52,69 @@ html, body {
   height: 100%;
   font-family: Inter, system-ui, Arial;
   color: var(--text);
-  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  background: linear-gradient(160deg, var(--bg-1), var(--bg-2)), url('/admin/bg-blur.jpg');
+  background-size: cover;
+  backdrop-filter: blur(40px);
   -webkit-font-smoothing: antialiased;
-  transition: background var(--transition), color var(--transition);
+  transition: var(--transition);
 }
 
-/* ---------- Smooth page fade ---------- */
+/* Page fade animation */
 body {
   opacity: 0;
-  animation: fadeInPage 0.45s ease forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
-@keyframes fadeInPage {
+@keyframes fadeIn {
   to { opacity: 1; }
 }
 
-/* ------------------------------------------------------------
-   TOPBAR
-------------------------------------------------------------- */
+/* -------------------- TOPBAR -------------------- */
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  padding: 14px 20px;
+  padding: 14px 22px;
+  gap: 16px;
+
   background: var(--panel);
-  backdrop-filter: var(--glass-blur);
+  backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+
   box-shadow: var(--shadow-small);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-radius: 0 0 var(--radius) var(--radius);
+  animation: slideDown 0.6s ease;
 }
 
-.top-left { display: flex; align-items: center; gap: 12px; }
+@keyframes slideDown {
+  from { transform: translateY(-14px); opacity: 0; }
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
 .top-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
   object-fit: contain;
-  transition: transform var(--transition);
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease;
 }
 
-.top-logo:hover {
-  transform: scale(1.06);
-}
+.top-logo:hover { transform: scale(1.08); }
 
-.title {
-  font-size: 18px;
-  font-weight: 800;
-}
+.title { font-weight: 800; font-size: 18px; }
 
-/* Right stats */
+/* -------------------- TOP RIGHT CARDS -------------------- */
+
 .top-right {
   display: flex;
   align-items: center;
@@ -112,165 +123,164 @@ body {
 
 .card.small {
   background: var(--panel);
+  backdrop-filter: blur(var(--blur));
   padding: 8px 12px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   font-size: 13px;
   box-shadow: var(--shadow-small);
-  backdrop-filter: var(--glass-blur);
+  transition: var(--transition);
 }
 
-/* ------------------------------------------------------------
-   BUTTONS
-------------------------------------------------------------- */
+.card.small:hover {
+  background: var(--panel-hover);
+}
+
+/* -------------------- BUTTONS -------------------- */
 
 .btn {
-  padding: 9px 14px;
+  padding: 8px 14px;
   border-radius: var(--radius);
-  border: none;
   cursor: pointer;
   font-weight: 700;
-  transition: transform 0.15s ease, background var(--transition);
+  transition: 0.2s ease;
 }
 
-.btn:hover {
-  transform: translateY(-2px);
-}
+.btn:hover { transform: translateY(-2px); }
 
-.btn:active {
-  transform: translateY(0px) scale(0.96);
-}
+.btn:active { transform: scale(0.94); }
 
-/* Primary Red */
+/* Red Button */
 .btn:not(.ghost) {
   background: var(--accent);
   color: #fff;
+  box-shadow: var(--shadow-small);
 }
 
-/* Ghost */
+/* Ghost Button */
 .btn.ghost {
-  background: transparent;
-  border: 1px solid var(--border);
+  background: var(--panel);
   color: var(--text);
-  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(var(--blur));
 }
 
-/* ------------------------------------------------------------
-   TOOLBAR
-------------------------------------------------------------- */
+/* -------------------- TOOLBAR -------------------- */
 
 .admin-toolbar {
   display: flex;
-  gap: 12px;
-  align-items: center;
+  gap: 14px;
   padding: 12px 20px;
   background: var(--panel);
-  backdrop-filter: var(--glass-blur);
-  border-bottom: 1px solid var(--border);
   border-radius: var(--radius);
-  margin: 12px;
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border);
+  margin: 14px;
   box-shadow: var(--shadow-small);
-  animation: fadeUp 0.4s ease;
+  animation: fadeUp 0.5s ease;
 }
+
+.spacer { flex: 1; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
 }
 
-/* ------------------------------------------------------------
-   MAIN LAYOUT
-------------------------------------------------------------- */
+/* -------------------- MAIN GRID -------------------- */
 
 .layout {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 400px 1fr;
   gap: 18px;
-  padding: 18px 20px;
+  padding: 20px;
   max-width: 1500px;
-  margin: 0 auto;
+  margin: auto;
 }
 
-/* Panels */
+/* -------------------- PANELS -------------------- */
+
 .panel {
   background: var(--panel);
-  backdrop-filter: var(--glass-blur);
+  backdrop-filter: blur(var(--blur));
   border: 1px solid var(--border);
-  padding: 14px;
   border-radius: var(--radius);
+  padding: 16px;
   box-shadow: var(--shadow-big);
-  animation: fadeUp 0.45s ease;
-  transition: background var(--transition), color var(--transition);
+  transition: var(--transition);
 }
 
-/* ------------------------------------------------------------
-   ORDERS LIST
-------------------------------------------------------------- */
+.panel:hover {
+  background: var(--panel-hover);
+}
+
+/* -------------------- ORDERS LIST -------------------- */
 
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: calc(100vh - 240px);
-  overflow: auto;
-  padding-right: 4px;
+  gap: 12px;
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
+  padding-right: 6px;
+  animation: fadeUp 0.6s ease;
 }
 
 .order-row {
+  background: var(--panel);
+  backdrop-filter: blur(var(--blur));
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
   display: flex;
   gap: 12px;
-  padding: 12px;
-  border-radius: var(--radius);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  backdrop-filter: var(--glass-blur);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
+  transition: 0.25s ease;
 }
 
 .order-row:hover {
+  background: var(--panel-hover);
   transform: translateY(-4px);
   box-shadow: var(--shadow-big);
 }
 
 .order-avatar {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--radius);
-  object-fit: cover;
   border: 1px solid var(--border);
+  object-fit: cover;
 }
 
 .order-body { flex: 1; min-width: 0; }
 
 .order-title {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .order-meta {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 12px;
   color: var(--muted);
 }
 
-/* Action buttons */
+/* -------------------- QUICK ACTIONS -------------------- */
+
 .order-actions {
   display: flex;
   gap: 8px;
-  align-items: center;
 }
 
-/* ------------------------------------------------------------
-   STATUS TAGS
-------------------------------------------------------------- */
+/* -------------------- STATUS TAGS -------------------- */
 
 .status {
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
-/* Colors remain same both themes */
+/* Colors unchanged */
 .status.preparing { background: #f59e0b; color: #111; }
 .status.assigned { background: #264653; color: #bfe3ff; }
 .status.picked { background: #f7b267; color: #3a2300; }
@@ -278,76 +288,123 @@ body {
 .status.delivered { background: #10b981; color: #052d15; }
 .status.cancelled { background: #ef4444; color: #fff; }
 
-/* ------------------------------------------------------------
-   DETAILS PANEL
-------------------------------------------------------------- */
+/* -------------------- RESPONSIVE -------------------- */
 
-.order-details {
-  font-size: 14px;
-  color: var(--muted);
-  min-height: 220px;
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr; }
 }
 
-.order-details .row {
-  margin-bottom: 10px;
-}
-
-/* ------------------------------------------------------------
-   ADAPTIVE RESPONSIVE
-------------------------------------------------------------- */
-
-@media (max-width: 1200px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .top-right { display: none; }
 }
 
-@media (max-width: 600px) {
-
-  .topbar {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-
-  .layout {
-    padding: 12px;
-  }
-
-  .order-row {
-    flex-direction: column;
-  }
-
-  .order-actions {
-    margin-top: 10px;
-  }
+@media (max-width: 550px) {
+  .topbar { flex-direction: column; text-align: center; }
+  .order-row { flex-direction: column; align-items: flex-start; }
 }
 
-/* ------------------------------------------------------------
-   TEST ORDER BUTTON
-------------------------------------------------------------- */
+/* -------------------- TEST ORDER BUTTON -------------------- */
 
 .test-order-btn {
   width: 100%;
   padding: 14px;
-  font-size: 16px;
+  margin-top: 10px;
   border-radius: var(--radius);
-  border: none;
+  font-size: 16px;
   background: var(--accent);
   color: #fff;
-  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
   box-shadow: var(--shadow-small);
-  transition: var(--transition);
+}
+
+.test-order-btn:hover { transform: translateY(-3px); }
+.test-order-btn:active { transform: scale(0.95); }
+
+/* ============================================================
+   SH — NEON RED GLOW EFFECT (Add-on)
+   Adds glowing borders, hover glows & active highlights
+===============================================================*/
+
+/* ---------- Neon Glow Variables ---------- */
+:root {
+  --neon-red: #ff1e2d;
+  --neon-red-soft: rgba(255, 0, 40, 0.45);
+  --neon-red-glow: 0 0 18px rgba(255, 30, 46, 0.75),
+                   0 0 32px rgba(255, 30, 46, 0.55),
+                   0 0 60px rgba(255, 30, 46, 0.35);
+}
+
+/* ---------- Neon Glow on Buttons ---------- */
+
+.btn:not(.ghost) {
+  box-shadow: 0 0 12px var(--neon-red-soft);
+  transition: 0.25s ease;
+}
+
+.btn:not(.ghost):hover {
+  box-shadow: var(--neon-red-glow);
+  background: var(--neon-red);
+}
+
+/* Ghost buttons - subtle glow */
+.btn.ghost:hover {
+  border-color: var(--neon-red);
+  box-shadow: 0 0 14px var(--neon-red-soft);
+}
+
+/* ---------- Neon Glow on Test Order Button ---------- */
+
+.test-order-btn {
+  box-shadow: 0 0 18px var(--neon-red-soft);
 }
 
 .test-order-btn:hover {
-  transform: translateY(-3px);
+  box-shadow: var(--neon-red-glow);
+  background: var(--neon-red);
 }
 
-.test-order-btn:active {
-  transform: scale(0.94);
+/* ---------- Neon Glow on Active Items ---------- */
+
+.order-row:hover {
+  border-color: var(--neon-red);
+  box-shadow: var(--neon-red-glow);
+}
+
+/* ---------- Neon Glow on Topbar Logo ---------- */
+
+.top-logo:hover {
+  filter: drop-shadow(0 0 14px var(--neon-red));
+}
+
+/* ---------- Neon Glow Border Accent ---------- */
+
+.panel:hover {
+  border-color: var(--neon-red);
+  box-shadow: var(--neon-red-glow);
+}
+
+/* ---------- Neon Glow for "Status: preparing" etc (Optional) ---------- */
+
+.status.preparing:hover,
+.status.assigned:hover,
+.status.picked:hover,
+.status.out_for_delivery:hover,
+.status.delivered:hover,
+.status.cancelled:hover {
+  box-shadow: 0 0 12px rgba(255, 30, 46, 0.5);
+  transform: scale(1.05);
+}
+
+/* ---------- Neon Flicker Animation (subtle) ---------- */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 10px rgba(255, 30, 46, 0.4); }
+  50% { box-shadow: 0 0 16px rgba(255, 30, 46, 0.8); }
+  100% { box-shadow: 0 0 10px rgba(255, 30, 46, 0.4); }
+}
+
+/* Apply flicker to key UI elements */
+.btn:not(.ghost),
+.test-order-btn {
+  animation: neonPulse 2.4s infinite ease-in-out;
 }
