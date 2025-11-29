@@ -249,3 +249,60 @@ html, body {
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* ============================================================
+   FINAL RESPONSIVE FIX — Desktop & Mobile Layout
+===========================================================*/
+
+/* -------------- MAKE DESKTOP LAYOUT LOOK NORMAL -------------- */
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr 350px !important;
+    align-items: start;
+  }
+
+  /* Left column (orders) full height */
+  .left-col {
+    width: 100%;
+  }
+
+  /* Right column fixed width */
+  .right-col {
+    width: 100%;
+  }
+}
+
+/* -------------- ORDER CARD WIDTH (DIFFERENT FOR DESKTOP) -------------- */
+
+/* MOBILE = compact */
+.order-row {
+  max-width: 600px;
+}
+
+/* DESKTOP = wider cards */
+@media (min-width: 900px) {
+  .order-row {
+    max-width: 750px !important;
+    width: 100% !important;
+  }
+}
+
+/* -------------- FIX ORDER LIST SCROLL AREA -------------- */
+.orders-list {
+  max-height: calc(100vh - 260px) !important;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Prevent right column from shrinking */
+.right-col .panel {
+  width: 100%;
+}
+
+/* -------------- FIX FOR BUTTON WRAP ON SMALL DEVICES -------------- */
+@media (max-width: 360px) {
+  .order-actions .btn,
+  .order-actions .status {
+    width: 90px !important;
+  }
+}
