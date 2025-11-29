@@ -1,476 +1,309 @@
 /* ============================================================
-   SH Admin Panel — Premium Glass UI (25px Blur)
-   Soft Colorful Background • Strong Glass Cards • Modern UI
+   SH Admin Panel — Premium Glass Dim Gray UI (20–25px Blur)
+   Clean • Modern • No animations • Soft blur cards everywhere
 ===============================================================*/
 
 /* -------------------- THEME VARIABLES -------------------- */
 :root {
-  --accent: #E23744;
-  --radius: 16px;
-  --blur: 25px;
+	--accent: #E23744;
+	--radius: 16px;
+	--blur: 24px;
 
-  /* Text */
-  --text: #ffffff;
-  --muted: rgba(255, 255, 255, 0.75);
+	/* Text */
+	--text: #ffffff;
+	--muted: rgba(255, 255, 255, 0.75);
 
-  /* Borders & Panels */
-  --panel: rgba(255, 255, 255, 0.20);
-  --panel-hover: rgba(255, 255, 255, 0.28);
-  --border: rgba(255, 255, 255, 0.35);
+	/* Panels */
+	--panel: rgba(255, 255, 255, 0.18);
+	--panel-hover: rgba(255, 255, 255, 0.25);
+	--border: rgba(255, 255, 255, 0.30);
 
-  /* Shadows */
-  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.35);
-  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
-}
+	/* Shadows */
+	--shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.45);
+	--shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.25);
 
-/* Support Dark Mode (stronger contrast) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #f1f4fa;
-    --muted: rgba(220, 229, 245, 0.75);
-
-    --panel: rgba(15, 20, 30, 0.45);
-    --panel-hover: rgba(15, 20, 30, 0.55);
-    --border: rgba(255, 255, 255, 0.15);
-  }
+	--background: #0f0f14;
 }
 
 /* -------------------- GLOBAL BACKGROUND -------------------- */
 
-/* =============================================================
-   ANIMATED COLORFUL BACKGROUND (INFINITE)
-   Smooth premium motion behind glass cards
-==============================================================*/
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow-x: hidden;
-  font-family: Inter, system-ui, Arial;
-
-  /* Static fallback background (in case animation fails) */
-  background: #0d1220;
-
-  /* The gradient layer */
-  background-image:
-    radial-gradient(circle at 20% 20%, #ff7ba5 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, #6fc6ff 0%, transparent 60%),
-    radial-gradient(circle at 50% 80%, #b07bff 0%, transparent 70%);
-
-  background-size: 200% 200%;
-  animation: bgMove 18s ease-in-out infinite alternate;
+html,
+body {
+	margin: 0;
+	height: 100%;
+	font-family: Inter, system-ui, Arial;
+	color: var(--text);
+	background: var(--background);
+	/* simple dim gray background */
+	overflow-x: hidden;
 }
 
-/* Smooth infinite animation */
-@keyframes bgMove {
-  0% {
-    background-position: 0% 0%;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(20deg);
-  }
-  100% {
-    background-position: 50% 100%;
-    filter: hue-rotate(-20deg);
-  }
-}
-
-/* -------------------- GLASS TOPBAR -------------------- */
+/* -------------------- TOPBAR -------------------- */
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 22px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 22px;
 
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  border-bottom: 1px solid var(--border);
-  border-radius: 0 0 var(--radius) var(--radius);
-  box-shadow: var(--shadow-soft);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+	background: var(--panel);
+	border-bottom: 1px solid var(--border);
+	border-radius: 0 0 var(--radius) var(--radius);
+	backdrop-filter: blur(var(--blur));
+	box-shadow: var(--shadow-soft);
+
+	position: sticky;
+	top: 0;
+	z-index: 100;
 }
 
 .top-left {
-  display: flex;
-  gap: 14px;
-  align-items: center;
+	display: flex;
+	gap: 14px;
+	align-items: center;
 }
 
 .top-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  object-fit: contain;
+	width: 46px;
+	height: 46px;
+	border-radius: 14px;
+	border: 1px solid var(--border);
+	object-fit: contain;
 }
 
 .title {
-  font-size: 18px;
-  font-weight: 800;
+	font-size: 18px;
+	font-weight: 800;
 }
 
 .top-right {
-  display: flex;
-  gap: 10px;
+	display: flex;
+	gap: 10px;
 }
 
-/* Small cards in topbar */
 .card.small {
-  padding: 8px 12px;
-  border-radius: var(--radius);
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--border);
-  font-size: 13px;
+	padding: 8px 12px;
+	border-radius: var(--radius);
+	background: var(--panel);
+	border: 1px solid var(--border);
+	font-size: 13px;
+	backdrop-filter: blur(var(--blur));
 }
 
 /* -------------------- BUTTONS -------------------- */
 
 .btn {
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 700;
-  transition: 0.2s ease;
-  border: none;
+	padding: 10px 16px;
+	border-radius: var(--radius);
+	cursor: pointer;
+	font-weight: 700;
+	transition: 0.15s ease;
+	border: none;
 }
 
 .btn:not(.ghost) {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: var(--shadow-soft);
+	background: var(--accent);
+	color: #fff;
+	box-shadow: var(--shadow-soft);
 }
 
 .btn.ghost {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid var(--border);
-  color: var(--text);
+	background: rgba(255, 255, 255, 0.15);
+	border: 1px solid var(--border);
+	color: var(--text);
 }
 
 .btn:active {
-  transform: scale(0.95);
+	transform: scale(0.95);
 }
 
 /* -------------------- TOOLBAR -------------------- */
 
 .admin-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 22px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(var(--blur));
-  border-radius: var(--radius);
-  margin: 16px;
-  box-shadow: var(--shadow-soft);
+	display: flex;
+	gap: 14px;
+	align-items: center;
+	padding: 12px 22px;
+	background: var(--panel);
+	backdrop-filter: blur(var(--blur));
+	border-bottom: 1px solid var(--border);
+	border-radius: var(--radius);
+	margin: 16px;
+	box-shadow: var(--shadow-soft);
 }
 
-.spacer { flex: 1; }
+.spacer {
+	flex: 1;
+}
 
 /* -------------------- MAIN LAYOUT -------------------- */
 
 .layout {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 20px;
-  padding: 20px;
-  max-width: 1500px;
-  margin: auto;
+	display: grid;
+	grid-template-columns: 400px 1fr;
+	gap: 20px;
+	padding: 20px;
+	max-width: 1500px;
+	margin: auto;
 }
 
 /* -------------------- GLASS PANELS -------------------- */
 
 .panel {
-  background: var(--panel);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow-strong);
-  transition: 0.2s ease;
+	background: var(--panel);
+	border-radius: var(--radius);
+	border: 1px solid var(--border);
+	backdrop-filter: blur(var(--blur));
+	padding: 16px;
+	box-shadow: var(--shadow-strong);
+	transition: 0.2s ease;
 }
 
 .panel:hover {
-  background: var(--panel-hover);
+	background: var(--panel-hover);
 }
 
-/* ============================================================
-   STRONG GLASS ORDERS TABLE (25px BLUR) — YOUR SELECTION
-===============================================================*/
+/* -------------------- ORDER LIST -------------------- */
 
 .orders-list {
-  padding: 12px;
-  border-radius: var(--radius);
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(calc(var(--blur) + 4px));
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: calc(100vh - 260px);
-  overflow-y: auto;
+	padding: 12px;
+	border-radius: var(--radius);
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid var(--border);
+	backdrop-filter: blur(calc(var(--blur) + 4px));
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	max-height: calc(100vh - 260px);
+	overflow-y: auto;
 }
 
+/* -------------------- ORDER ROW -------------------- */
+
 .order-row {
-  display: grid;
-  grid-template-columns: 58px 1fr auto;
-  align-items: center;
-  gap: 14px;
-
-  padding: 14px;
-  border-radius: 18px;
-
-  background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid rgba(255, 255, 255, 0.32);
-
-  box-shadow: var(--shadow-soft);
-  transition: 0.25s ease;
+	display: grid !important;
+	grid-template-columns: 60px 1fr auto !important;
+	align-items: start;
+	gap: 14px;
+	padding: 16px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.18);
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	backdrop-filter: blur(var(--blur));
+	box-shadow: var(--shadow-soft);
+	transition: 0.25s ease;
 }
 
 .order-row:hover {
-  background: rgba(255, 255, 255, 0.33);
-  transform: translateY(-4px);
+	background: rgba(255, 255, 255, 0.28);
+	transform: translateY(-3px);
 }
 
 /* Avatar */
 .order-avatar {
-  width: 58px;
-  height: 58px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.4);
-  object-fit: cover;
+	width: 56px;
+	height: 56px;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	object-fit: cover;
 }
 
-/* Order text */
+/* Text section */
 .order-title {
-  font-size: 14px;
-  font-weight: 700;
+	font-size: 15px;
+	font-weight: 700;
 }
 
 .order-meta {
-  font-size: 12px;
-  opacity: 0.8;
-  margin-top: 5px;
+	font-size: 12px;
+	opacity: 0.85;
 }
 
-/* Actions */
+/* -------------------- RIGHT SIDE (VERTICAL) -------------------- */
+
 .order-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: flex-end !important;
+	gap: 8px !important;
 }
 
+/* Status at top */
+.order-actions .status {
+	min-width: 110px;
+	height: 34px;
+	border-radius: 10px;
+	padding: 0 14px !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px !important;
+	font-weight: 700;
+	color: #fff !important;
+}
+
+/* Buttons below status */
 .order-actions .btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: 10px;
+	width: 110px !important;
+	height: 34px !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px !important;
+	font-size: 13px !important;
 }
 
-/* Status badge */
-.status {
-  padding: 6px 12px;
-  font-size: 11px;
-  border-radius: 999px;
+/* -------------------- STATUS COLORS -------------------- */
+
+.status.preparing {
+	background: #fbbf24 !important;
+	color: #111 !important;
+}
+
+.status.assigned {
+	background: #264653 !important;
+	color: #d4f1ff !important;
+}
+
+.status.picked {
+	background: #fb923c !important;
+	color: #351800 !important;
+}
+
+.status.out_for_delivery {
+	background: #06b6d4 !important;
+	color: #042f36 !important;
+}
+
+.status.delivered {
+	background: #10b981 !important;
+	color: #052d15 !important;
+}
+
+.status.cancelled {
+	background: #ef4444 !important;
+	color: #fff !important;
 }
 
 /* -------------------- RESPONSIVE -------------------- */
 
 @media (max-width: 1000px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-  .top-right {
-    display: none;
-  }
+	.layout {
+		grid-template-columns: 1fr;
+	}
+
+	.top-right {
+		display: none;
+	}
 }
 
 @media (max-width: 650px) {
-  .topbar {
-    flex-direction: column;
-    text-align: center;
-  }
+	.order-row {
+		grid-template-columns: 50px 1fr auto !important;
+		align-items: start;
+	}
 
-  .order-row {
-    grid-template-columns: 46px 1fr;
-    grid-template-areas:
-      "avatar title"
-      "avatar meta"
-      "buttons buttons";
-    padding: 12px;
-  }
-
-  .order-avatar { grid-area: avatar; }
-  .order-title { grid-area: title; }
-  .order-meta { grid-area: meta; }
-
-  .order-actions {
-    grid-area: buttons;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-}
-
-/* -------------------- TEST ORDER BUTTON -------------------- */
-
-.test-order-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  margin-top: 12px;
-  font-size: 16px;
-}
-
-/* ============================================================
-   FIX: Add clean spacing between bottom glass panels
-===========================================================*/
-
-.panel {
-  margin-bottom: 24px !important;   /* adds nice gap between panels */
-}
-
-/* Extra spacing for the very last panel */
-.layout > .panel:last-child,
-.right-col .panel:last-child,
-.left-col .panel:last-child {
-  margin-bottom: 40px !important;
-}
-
-/* For mobile view (bigger spacing) */
-@media (max-width: 600px) {
-  .panel {
-    margin-bottom: 32px !important;
-  }
-}
-
-/* ============================================================
-   FIX: Visible Status Badges (Deliverd, Preparing, Picked etc.)
-   Strong backgrounds (not blurred, not transparent)
-===========================================================*/
-
-.status {
-  display: inline-block;
-  padding: 6px 12px !important;
-  font-size: 11px !important;
-  font-weight: 700;
-  border-radius: 12px;
-  color: #fff !important;
-  backdrop-filter: none !important;     /* prevent blur override */
-  background: rgba(0,0,0,0.25);         /* fallback */
-}
-
-/* PREPARING — Yellow */
-.status.preparing {
-  background: #fbbf24 !important;  /* solid warm yellow */
-  color: #111 !important;
-}
-
-/* ASSIGNED — Dark teal */
-.status.assigned {
-  background: #264653 !important;
-  color: #d4f1ff !important;
-}
-
-/* PICKED — Soft orange */
-.status.picked {
-  background: #fb923c !important;
-  color: #351800 !important;
-}
-
-/* OUT FOR DELIVERY — Cyan */
-.status.out_for_delivery {
-  background: #06b6d4 !important;
-  color: #042f36 !important;
-}
-
-/* DELIVERED — Green */
-.status.delivered {
-  background: #10b981 !important;
-  color: #052d15 !important;
-}
-
-/* CANCELLED — Red */
-.status.cancelled {
-  background: #ef4444 !important;
-  color: #fff !important;
-}
-
-/* ============================================================
-   FIX: Move Track + Details to Right • Match Status Height
-===========================================================*/
-
-/* Make all row buttons equal size */
-.order-actions .btn {
-  min-width: 80px;               /* equal width */
-  height: 32px;                  /* equal height */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 !important;
-  margin: 0;
-  border-radius: 10px;
-  font-size: 13px !important;
-  font-weight: 600;
-}
-
-/* Align buttons vertically stacked on right side */
-.order-actions {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 6px;
-}
-
-/* Match status pill height */
-.status {
-  height: 32px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 0 12px !important;
-  font-size: 12px !important;
-  border-radius: 10px !important;
-}
-
-/* Make entire right area aligned properly */
-.order-row {
-  grid-template-columns: 58px 1fr 120px !important;
-}
-
-/* -------- MOBILE FIX -------- */
-@media (max-width: 650px) {
-
-  .order-row {
-    grid-template-columns: 48px 1fr;
-    grid-template-areas:
-      "avatar title"
-      "avatar meta"
-      "buttons buttons";
-  }
-
-  .order-actions {
-    grid-area: buttons;
-    flex-direction: row !important;
-    justify-content: flex-start !important;
-    gap: 10px !important;
-  }
-
-  .order-actions .btn {
-    width: 48%;
-    height: 34px;
-  }
-
-  .status {
-    margin-bottom: 6px;
-  }
+	.order-actions {
+		align-items: flex-end;
+	}
 }
