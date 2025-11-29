@@ -1,5 +1,4 @@
-// /rider/login.js
-import { auth, signInWithEmailAndPassword } from "/rider/firebase.js";
+// /rider/login.js — Backend-only auth (NO Firebase Session)
 
 const API_BASE = window.SH?.API_BASE ?? "https://sh-thehungerpoint.onrender.com";
 
@@ -18,23 +17,9 @@ btn.addEventListener("click", async () => {
     return;
   }
 
-  msg.textContent = "Checking rider account...";
+  msg.textContent = "Checking account...";
 
   try {
-    // 🚫 IMPORTANT FIX:
-    // DO NOT auto-create Firebase user for riders.
-    // We try sign-in, but if rider doesn't exist in Firebase Auth,
-    // we DO NOT create them.
-
-    const fbUser = await signInWithEmailAndPassword(auth, email, password)
-      .catch(() => null); // Prevent Firebase error from breaking flow
-
-    if (!fbUser) {
-      msg.textContent = "Invalid credentials (Firebase auth)";
-      return;
-    }
-
-    // 2️⃣ Backend login (MAIN AUTHENTICATION)
     const res = await fetch(API_BASE + "/rider/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,28 +27,25 @@ btn.addEventListener("click", async () => {
     });
 
     const data = await res.json();
+
     if (!data.ok) {
       msg.textContent = data.error || "Login failed";
       return;
     }
 
-    // 3️⃣ Rider MUST exist in Firestore /riders
-    const riderDoc = data.riderId || email;
-
-    // Save rider session
-    localStorage.setItem("sh_rider_docid", email);
-    localStorage.setItem("sh_rider_id", riderDoc);
+    // Save backend session (NOT Firebase)
     localStorage.setItem("sh_rider_email", email);
-    localStorage.setItem("sh_rider_token", data.token || "");
+    localStorage.setItem("sh_rider_id", data.riderId);
+    localStorage.setItem("sh_rider_token", data.token);
 
     msg.textContent = "Login successful! Redirecting...";
 
     setTimeout(() => {
       window.location.href = "/rider/index.html";
-    }, 600);
+    }, 500);
 
   } catch (err) {
     console.error(err);
-    msg.textContent = "Invalid email or password";
+    msg.textContent = "Error: Invalid email or password";
   }
 });
