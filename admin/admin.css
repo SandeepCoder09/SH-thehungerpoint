@@ -330,3 +330,25 @@ html, body {
   margin-top: 12px;
   font-size: 16px;
 }
+
+/* ============================================================
+   FIX: Add clean spacing between bottom glass panels
+===========================================================*/
+
+.panel {
+  margin-bottom: 24px !important;   /* adds nice gap between panels */
+}
+
+/* Extra spacing for the very last panel */
+.layout > .panel:last-child,
+.right-col .panel:last-child,
+.left-col .panel:last-child {
+  margin-bottom: 40px !important;
+}
+
+/* For mobile view (bigger spacing) */
+@media (max-width: 600px) {
+  .panel {
+    margin-bottom: 32px !important;
+  }
+}
