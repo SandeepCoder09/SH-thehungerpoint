@@ -1,14 +1,18 @@
-// profile.js — auto-save & load full profile data
+// FINAL FIXED profile.js
 
-async function waitForAuth(){
-  return new Promise(res=>{
-    const check=()=> (window.auth && window.db && window.firebase)? res(): setTimeout(check,50);
+// Wait for Firebase Auth & Firestore to be ready
+async function waitForFirebase() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (window.firebase && window.auth && window.db) resolve();
+      else setTimeout(check, 30);
+    };
     check();
   });
 }
 
-(async()=>{
-  await waitForAuth();
+(async () => {
+  await waitForFirebase();
 
   const nameEl = document.getElementById("name");
   const emailEl = document.getElementById("email");
@@ -16,103 +20,104 @@ async function waitForAuth(){
   const addressEl = document.getElementById("address");
   const photoImg = document.getElementById("photoImg");
   const photoInput = document.getElementById("photoInput");
-  const changePhotoBtn = document.getElementById("changePhotoBtn");
 
   const saveBtn = document.getElementById("saveBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const resetBtn = document.getElementById("resetPassBtn");
+  const changePhotoBtn = document.getElementById("changePhotoBtn");
+
   const toast = document.getElementById("toast");
 
-  function showToast(msg){
+  function showToast(msg) {
     toast.textContent = msg;
     toast.hidden = false;
-    setTimeout(()=>toast.hidden=true,2500);
+    setTimeout(() => toast.hidden = true, 2500);
   }
 
-  const user = auth.currentUser;
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      console.log("No user → Redirecting");
+      window.location.href = "/auth/login.html";
+      return;
+    }
 
-  // Load profile data
-  loadUserData(user);
+    console.log("User detected:", user.email);
 
-  async function loadUserData(u){
-    emailEl.value = u.email;
+    emailEl.value = user.email;
 
-    const doc = await db.collection("users").doc(u.uid).get();
+    const userRef = db.collection("users").doc(user.uid);
+    const snap = await userRef.get();
 
-    if(doc.exists){
-      const data = doc.data();
-      nameEl.value = data.name || "";
-      phoneEl.value = data.phone || "";
-      addressEl.value = data.address || "";
-
-      if(data.photoURL){
-        photoImg.src = data.photoURL;
-      }
-    } else {
-      // Auto create empty profile
-      await db.collection("users").doc(u.uid).set({
-        name: u.displayName || "",
-        email: u.email,
+    // If Firestore doc doesn't exist → create it
+    if (!snap.exists) {
+      console.log("Creating empty profile");
+      await userRef.set({
+        name: user.displayName || "",
+        email: user.email,
         phone: "",
         address: "",
         photoURL: "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
+      return;
     }
-  }
 
-  // Change profile photo
-  changePhotoBtn.addEventListener("click", ()=>{
-    photoInput.click();
+    // Load Firestore data
+    const data = snap.data();
+    console.log("Loaded Firestore data:", data);
+
+    nameEl.value = data.name || "";
+    phoneEl.value = data.phone || "";
+    addressEl.value = data.address || "";
+    if (data.photoURL) photoImg.src = data.photoURL;
   });
 
-  photoInput.addEventListener("change", async (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
+  // Change photo
+  changePhotoBtn.addEventListener("click", () => photoInput.click());
 
-    const ref = firebase.storage().ref(`users/${auth.currentUser.uid}/profile.jpg`);
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
+  photoInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const user = auth.currentUser;
+
+    const storageRef = firebase.storage().ref(`users/${user.uid}/profile.jpg`);
+    await storageRef.put(file);
+    const url = await storageRef.getDownloadURL();
 
     photoImg.src = url;
 
-    await db.collection("users").doc(auth.currentUser.uid).update({
-      photoURL: url
+    await db.collection("users").doc(user.uid).update({
+      photoURL: url,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     showToast("Photo updated!");
   });
 
-  // Save full profile
-  saveBtn.addEventListener("click", async ()=>{
-    const u = auth.currentUser;
+  // Save button
+  saveBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
 
-    const name = nameEl.value.trim();
-    const phone = phoneEl.value.trim();
-    const address = addressEl.value.trim();
-
-    await u.updateProfile({ displayName: name });
-
-    await db.collection("users").doc(u.uid).set({
-      name,
-      email: u.email,
-      phone,
-      address,
+    await db.collection("users").doc(user.uid).set({
+      name: nameEl.value.trim(),
+      phone: phoneEl.value.trim(),
+      address: addressEl.value.trim(),
       photoURL: photoImg.src,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    },{ merge:true });
+    }, { merge: true });
 
     showToast("Profile saved!");
   });
 
   // Reset password
-  resetBtn.addEventListener("click", async ()=>{
+  resetBtn.addEventListener("click", async () => {
     await auth.sendPasswordResetEmail(emailEl.value);
-    showToast("Reset email sent!");
+    showToast("Reset email sent");
   });
 
   // Logout
-  logoutBtn.addEventListener("click", async ()=>{
+  logoutBtn.addEventListener("click", async () => {
     await auth.signOut();
     window.location.href = "/auth/login.html";
   });
