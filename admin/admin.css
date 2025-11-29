@@ -414,3 +414,31 @@ body {
   display: flex;
   justify-content: center;
 }
+
+/* ============================================================
+   MAKE ORDER CARDS MORE COMPACT (NARROW WIDTH)
+===========================================================*/
+
+.order-row {
+  width: 90% !important;
+  max-width: 500px !important;   /* <-- reduce width */
+  margin: 0 auto !important;     /* center the card */
+  border-radius: 20px !important;
+  padding: 18px !important;
+}
+
+/* Center order list itself */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* center all cards */
+  gap: 20px;
+}
+
+/* On larger screens keep it compact */
+@media (min-width: 900px) {
+  .order-row {
+    width: 75% !important;
+    max-width: 600px !important;  /* still compact */
+  }
+}
