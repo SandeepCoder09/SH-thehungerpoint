@@ -381,11 +381,6 @@ body {
   cursor: pointer;
 }
 
-.edit-photo-btn svg {
-  width: 10px;
-  height: 10px;
-}
-
 .edit-photo-btn:hover {
   background: var(--accent-dark);
   transform: scale(1.05);
