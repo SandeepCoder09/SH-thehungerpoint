@@ -9,7 +9,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/profile/profile.css" />
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase (compat for your existing code) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -20,63 +20,76 @@
 
   <main class="profile-shell">
 
-    <header class="profile-head">
-      <button onclick="history.back()" class="back-btn">← Back</button>
-      <h1>Your Profile</h1>
+    <!-- Transparent header with back arrow (1A) -->
+    <header class="profile-head profile-head--transparent">
+      <button onclick="history.back()" class="back-btn" aria-label="Go back">‹</button>
+      <h1 class="title">Your Profile</h1>
     </header>
 
-    <section class="profile-card">
+    <!-- Card-based layout (A) -->
+    <section class="profile-card" role="region" aria-labelledby="profileTitle">
+      <h2 id="profileTitle" class="sr-only">Profile details</h2>
 
-      <!-- Profile Photo -->
-      <div class="avatar">
-        <img id="photoImg" class="photo" src="/profile/default-user.png">
-        <input id="photoInput" type="file" accept="image/*" hidden />
-        <button id="changePhotoBtn" class="btn small">Change Photo</button>
+      <!-- Top row: avatar + basic info -->
+      <div class="top-row">
+        <div class="avatar">
+          <img id="photoImg" class="photo" src="/profile/default-user.png" alt="Profile photo">
+          <input id="photoInput" type="file" accept="image/*" hidden />
+          <div class="avatar-actions">
+            <button id="changePhotoBtn" class="btn small outline">Change</button>
+            <button id="removePhotoBtn" class="btn small">Remove</button>
+          </div>
+        </div>
+
+        <div class="basic-info">
+          <label class="label">Full name</label>
+          <input id="name" type="text" placeholder="Your name" autocomplete="name">
+
+          <label class="label">Email</label>
+          <input id="email" type="email" disabled aria-disabled="true">
+
+          <label class="label">Gender</label>
+          <select id="gender" class="select">
+            <option value="">Prefer not to say</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
       </div>
 
-      <!-- NAME -->
-      <div class="info-row">
-        <label>Full name</label>
-        <input id="name" type="text" placeholder="Your name">
+      <!-- Address + phone -->
+      <div class="fields">
+        <div class="field">
+          <label class="label">Phone number</label>
+          <input id="phone" type="tel" placeholder="Optional" autocomplete="tel">
+        </div>
+
+        <div class="field">
+          <label class="label">Delivery address</label>
+          <textarea id="address" placeholder="Your full address" rows="3"></textarea>
+        </div>
       </div>
 
-      <!-- EMAIL -->
-      <div class="info-row">
-        <label>Email</label>
-        <input id="email" type="email" disabled>
-      </div>
-
-      <!-- PHONE -->
-      <div class="info-row">
-        <label>Phone number</label>
-        <input id="phone" type="text" placeholder="Optional">
-      </div>
-
-      <!-- ADDRESS -->
-      <div class="info-row">
-        <label>Delivery Address</label>
-        <textarea id="address" placeholder="Your full address" rows="3"></textarea>
-      </div>
-
+      <!-- Actions -->
       <div class="actions">
         <button id="saveBtn" class="btn primary">Save Profile</button>
-        <button id="resetPassBtn" class="btn outline">Send Password Reset Email</button>
-        <button id="logoutBtn" class="btn danger">Logout</button>
+        <div class="secondary-row">
+          <button id="resetPassBtn" class="btn outline">Send Password Reset Email</button>
+          <button id="logoutBtn" class="btn danger">Logout</button>
+        </div>
       </div>
-
     </section>
 
-    <div id="toast" class="toast" hidden></div>
+    <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
 
   </main>
 
-
-  <!-- Firebase Config + Protect -->
+  <!-- Project-wide Firebase config + protect -->
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
   <!-- Main Script -->
   <script src="/profile/profile.js"></script>
-
 </body>
 </html>
