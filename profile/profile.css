@@ -96,7 +96,7 @@ body {
 .photo {
 	width: 100%;
 	height: var(--avatar-size);
-	border-radius: 10px;
+	border-radius: 50%;
 	/* rounded square (2B) */
 	object-fit: cover;
 	border: 2px solid #f0f0f0;
