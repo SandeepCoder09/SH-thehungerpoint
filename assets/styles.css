@@ -1,0 +1,442 @@
+:root {
+	--primary: #E23744;
+	--primary-dark: #b71c1c;
+	--bg: #f6f6f7;
+	--card: #fff;
+	--muted: #6b7280;
+	--radius: 16px;
+	--shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
+	--soft-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+	--max-w: 960px;
+	--glass: rgba(255, 255, 255, 0.7);
+}
+
+/* Reset & base */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0
+}
+
+html,
+body {
+	height: 100%
+}
+
+body {
+	font-family: Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+	background: var(--bg);
+	color: #111827;
+	-webkit-font-smoothing: antialiased;
+	padding: 20px;
+}
+
+/* container */
+.container {
+	max-width: 960px;
+	margin: 0 auto
+}
+
+/* common helpers */
+.row {
+	display: flex;
+	gap: 12px;
+	align-items: center
+}
+
+.col {
+	display: flex;
+	flex-direction: column;
+	gap: 8px
+}
+
+.btn {
+	cursor: pointer;
+	border: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px
+}
+
+.small {
+	font-size: 13px;
+	padding: 8px 10px;
+	border-radius: 10px
+}
+
+.label {
+	font-size: 13px;
+	color: var(--muted);
+	margin-bottom: 6px
+}
+
+/* ===== Settings page ===== */
+.settings-shell {
+	max-width: 420px;
+	margin: 0 auto
+}
+
+.settings-card {
+	background: var(--card);
+	border-radius: 18px;
+	padding: 18px;
+	box-shadow: var(--shadow);
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+/* user banner */
+.user-banner {
+	display: flex;
+	gap: 12px;
+	align-items: center
+}
+
+.user-avatar {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	overflow: hidden;
+	flex: 0 0 56px;
+	box-shadow: var(--soft-shadow);
+	background: #fff;
+	border: 3px solid rgba(255, 255, 255, 0.9)
+}
+
+.user-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block
+}
+
+.user-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0
+}
+
+.user-name {
+	font-weight: 700;
+	color: #111827
+}
+
+.user-mail {
+	font-size: 13px;
+	color: var(--muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+/* list */
+.settings-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px
+}
+
+.settings-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px;
+	border-radius: 12px;
+	background: #fff;
+	border: 1px solid #f1f2f4;
+	box-shadow: 0 6px 10px rgba(2, 6, 23, 0.02);
+}
+
+.settings-item .icon {
+	font-size: 20px;
+	color: var(--primary-dark);
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center
+}
+
+.settings-item .title {
+	flex: 1;
+	font-weight: 600
+}
+
+.settings-item .desc {
+	font-size: 13px;
+	color: var(--muted)
+}
+
+/* push toggle */
+.toggle {
+	width: 44px;
+	height: 26px;
+	border-radius: 18px;
+	background: #ececec;
+	position: relative;
+	flex: 0 0 44px;
+	cursor: pointer;
+}
+
+.toggle .dot {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+	transition: all .18s
+}
+
+.toggle.on {
+	background: linear-gradient(90deg, var(--primary), var(--primary-dark))
+}
+
+.toggle.on .dot {
+	left: 21px
+}
+
+/* WhatsApp support box */
+.support-box {
+	background: linear-gradient(180deg, #f5f7f8, #fbfcfd);
+	border-radius: 12px;
+	padding: 10px;
+	border: 1px solid #eef2f3;
+	font-size: 13px;
+	color: var(--muted)
+}
+
+/* ===== Profile page ===== */
+.profile-card {
+	width: 100%;
+	max-width: 420px;
+	margin: 0 auto;
+	background: var(--card);
+	padding: 28px 22px 20px 22px;
+	border-radius: 22px;
+	box-shadow: var(--shadow);
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	align-items: center;
+}
+
+/* central avatar */
+.avatar {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	overflow: hidden;
+	box-shadow: var(--soft-shadow);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(180deg, #fff, #fafafa);
+	border: 6px solid rgba(255, 255, 255, 0.8);
+	position: relative;
+}
+
+.avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	border-radius: 50%
+}
+
+/* upload overlay (progress) */
+.avatar .overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.5);
+	backdrop-filter: blur(2px);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .18s;
+	border-radius: 50%;
+}
+
+.avatar.uploading .overlay {
+	opacity: 1;
+	pointer-events: auto
+}
+
+.loader {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background: rgba(255, 255, 255, 0.7)
+}
+
+.loader .ring {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: 3px solid rgba(226, 55, 68, 0.14);
+	border-left-color: var(--primary);
+	animation: spin .9s linear infinite
+}
+
+.loader .text {
+	font-size: 12px;
+	margin-top: 6px
+}
+
+/* inputs */
+.form {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px
+}
+
+.input,
+textarea,
+select {
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 12px;
+	border: 1px solid #eef0f2;
+	background: #fff;
+	font-size: 15px
+}
+
+.input[disabled] {
+	background: #fafafa;
+	color: #8b8f94
+}
+
+/* actions */
+.actions {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px
+}
+
+.btn.primary {
+	background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+	color: #fff;
+	padding: 12px;
+	border-radius: 12px;
+	font-weight: 700
+}
+
+.btn.outline {
+	background: #fff;
+	border: 1px solid #ececec;
+	padding: 10px;
+	border-radius: 12px;
+	color: #111827
+}
+
+.btn.danger {
+	background: var(--primary-dark);
+	color: #fff;
+	padding: 10px;
+	border-radius: 12px
+}
+
+/* bottom sheet / modal styles */
+.modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 9998
+}
+
+.modal-backdrop.show {
+	display: flex
+}
+
+.modal {
+	background: var(--card);
+	border-radius: 16px;
+	padding: 18px;
+	max-width: 92%;
+	width: 360px;
+	box-shadow: 0 20px 60px rgba(2, 6, 23, 0.18)
+}
+
+/* cropper area */
+.cropper-holder {
+	width: 320px;
+	height: 320px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f3f6f7;
+	border-radius: 12px;
+	overflow: hidden;
+	position: relative
+}
+
+.cropper-canvas {
+	max-width: 100%;
+	max-height: 100%
+}
+
+/* change password bottom sheet style */
+.sheet {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--card);
+	border-top-left-radius: 18px;
+	border-top-right-radius: 18px;
+	padding: 18px;
+	box-shadow: 0 -20px 60px rgba(2, 6, 23, 0.12);
+	display: none;
+	z-index: 9999
+}
+
+.sheet.show {
+	display: block
+}
+
+/* small helper */
+.kv {
+	font-size: 13px;
+	color: var(--muted)
+}
+
+/* keyframes */
+@keyframes spin {
+	to {
+		transform: rotate(360deg)
+	}
+}
+
+/* responsive */
+@media (max-width:480px) {
+	.profile-card {
+		padding: 18px;
+		border-radius: 16px
+	}
+
+	.avatar {
+		width: 96px;
+		height: 96px
+	}
+
+	.cropper-holder {
+		width: 280px;
+		height: 280px
+	}
+}
