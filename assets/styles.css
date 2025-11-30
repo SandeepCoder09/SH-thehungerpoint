@@ -1,344 +1,384 @@
-/* =========================================================
-   GLOBAL THEME VARIABLES
-   ========================================================= */
 :root {
-  --primary: #E23744;
-  --primary-dark: #b71c1c;
-  --bg: #f6f6f7;
-  --card: #ffffff;
-  --muted: #6b7280;
-  --radius: 16px;
-  --shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
-  --soft-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+	--primary: #E23744;
+	--primary-dark: #b71c1c;
+	--bg: #f6f6f7;
+	--card: #fff;
+	--muted: #6b7280;
+	--radius: 16px;
+	--shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
+	--soft-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+	--max-w: 960px;
 }
 
-/* =========================================================
-   RESET + BASE
-   ========================================================= */
+/* reset */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0
+}
+
+html,
+body {
+	height: 100%
 }
 
 body {
-  background: var(--bg);
-  font-family: "Inter", "Poppins", Arial;
-  padding: 20px;
-  color: #111827;
+	font-family: Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+	background: var(--bg);
+	color: #111827;
+	-webkit-font-smoothing: antialiased;
+	padding: 20px;
 }
 
 .container {
-  max-width: 420px;
-  margin: 0 auto;
+	max-width: 420px;
+	margin: 0 auto
 }
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+/* buttons */
 .btn {
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  padding: 12px;
-  width: 100%;
-  font-size: 15px;
+	cursor: pointer;
+	border: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  color: #fff;
+	background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+	color: #fff;
+	padding: 12px;
+	border-radius: 12px;
+	font-weight: 700
 }
 
 .btn.outline {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  color: #111;
+	background: #fff;
+	border: 1px solid #e8e8e8;
+	padding: 10px;
+	border-radius: 12px;
+	color: #111
 }
 
-.btn.small {
-  padding: 6px 10px;
-  font-size: 13px;
-  width: auto;
+/* settings card */
+.settings-shell {
+	max-width: 420px;
+	margin: 0 auto
 }
 
-/* =========================================================
-   SETTINGS PAGE
-   ========================================================= */
 .settings-card {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: var(--shadow);
+	background: var(--card);
+	border-radius: 20px;
+	padding: 18px;
+	box-shadow: var(--shadow)
 }
 
 .user-banner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+	display: flex;
+	gap: 14px;
+	align-items: center
 }
 
-/* Avatar in Settings */
 .user-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: var(--soft-shadow);
-  flex-shrink: 0;
-  position: relative;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	overflow: hidden;
+	box-shadow: var(--soft-shadow);
+	flex-shrink: 0;
+	position: relative
 }
 
 .user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-fit: cover
 }
 
 .user-info .user-name {
-  font-size: 17px;
-  font-weight: 700;
+	font-size: 17px;
+	font-weight: 700
 }
 
 .user-info .user-mail {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 2px;
+	font-size: 14px;
+	color: var(--muted);
+	margin-top: 2px
 }
 
-/* Settings List */
+/* list */
 .settings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 18px
 }
 
 .settings-item {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 14px;
-  padding: 12px;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 4px 10px rgba(2, 6, 23, 0.04);
-  cursor: pointer;
+	display: flex;
+	align-items: center;
+	background: #fff;
+	border-radius: 14px;
+	padding: 12px;
+	border: 1px solid #f0f0f0;
+	box-shadow: 0 4px 10px rgba(2, 6, 23, 0.04);
+	cursor: pointer
 }
 
 .settings-item .icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background: #f8f8f8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-dark);
-  margin-right: 12px;
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	background: #f8f8f8;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--primary-dark);
+	margin-right: 12px
 }
 
 .settings-item .title {
-  font-weight: 600;
+	font-weight: 600
 }
 
 .settings-item .kv {
-  font-size: 13px;
-  color: var(--muted);
+	font-size: 13px;
+	color: var(--muted)
 }
 
-/* Toggle Switch */
+/* toggle */
 .toggle {
-  width: 46px;
-  height: 26px;
-  border-radius: 26px;
-  background: #e3e3e3;
-  position: relative;
-  cursor: pointer;
-  margin-left: auto;
+	width: 46px;
+	height: 26px;
+	border-radius: 26px;
+	background: #e3e3e3;
+	position: relative;
+	cursor: pointer;
+	margin-left: auto
 }
 
 .toggle .dot {
-  width: 20px;
-  height: 20px;
-  background: white;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  border-radius: 50%;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-  transition: all 0.2s ease;
+	width: 20px;
+	height: 20px;
+	background: white;
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	border-radius: 50%;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+	transition: all .18s
 }
 
 .toggle.on {
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+	background: linear-gradient(90deg, var(--primary), var(--primary-dark))
 }
 
 .toggle.on .dot {
-  left: 23px;
+	left: 23px
 }
 
-/* Support Box */
+/* support box */
 .support-box {
-  background: #f8f8f9;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  color: var(--muted);
-  border: 1px solid #e0e0e0;
+	background: #f8f8f9;
+	padding: 12px;
+	border-radius: 12px;
+	font-size: 13px;
+	color: var(--muted);
+	border: 1px solid #e0e0e0
 }
 
-/* =========================================================
-   PROFILE PAGE
-   ========================================================= */
+/* profile card */
 .profile-card {
-  background: #fff;
-  padding: 22px;
-  border-radius: 22px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
+	background: #fff;
+	padding: 22px;
+	border-radius: 22px;
+	box-shadow: var(--shadow);
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	align-items: center
 }
 
 .back-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 10px
 }
 
 .back-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: var(--primary-dark);
+	background: none;
+	border: none;
+	font-size: 20px;
+	color: var(--primary-dark)
 }
 
-/* Avatar (Profile Page) */
+/* profile avatar */
 .profile-avatar-wrap {
-  position: relative;
+	position: relative
 }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: var(--soft-shadow);
-  border: 5px solid #fff;
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	overflow: hidden;
+	box-shadow: var(--soft-shadow);
+	border: 5px solid #fff
 }
 
 .profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-fit: cover
 }
 
-/* Pencil Icon */
 .avatar-edit-btn {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background: white;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	width: 34px;
+	height: 34px;
+	display: flex;
+	align-items: center;
+	justify-content: center
 }
 
-/* Form Section */
+/* form */
 .form-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px
 }
 
 .label {
-  font-size: 14px;
-  color: var(--muted);
+	font-size: 14px;
+	color: var(--muted)
 }
 
 .input {
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid #e3e3e3;
-  background: #fff;
-  font-size: 15px;
+	padding: 12px;
+	border-radius: 14px;
+	border: 1px solid #e3e3e3;
+	background: #fff;
+	font-size: 15px
 }
 
-/* Actions */
-.profile-actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* =========================================================
-   CROPPER MODAL
-   ========================================================= */
+/* cropper modal baseline */
 .cropper-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 99999;
+	padding: 18px
 }
 
 .cropper-modal.show {
-  display: flex;
+	display: flex
 }
 
 .cropper-content {
-  background: white;
-  border-radius: 18px;
-  padding: 18px;
-  width: 92%;
-  max-width: 380px;
+	background: #fff;
+	border-radius: 18px;
+	padding: 16px;
+	width: 100%;
+	max-width: 420px;
+	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25)
 }
 
+.cropper-content h3 {
+	margin: 0;
+	font-size: 18px;
+	color: #111;
+	margin-bottom: 8px
+}
+
+/* cropper area with circular overlay (250x250) */
+/* circle-mask-250 creates a visible circular area (radius:125px) centered */
 .cropper-area {
-  width: 100%;
-  height: 320px;
-  background: #f3f3f3;
-  border-radius: 14px;
-  overflow: hidden;
-  margin-top: 10px;
+	width: 100%;
+	height: 360px;
+	background: #f3f3f3;
+	border-radius: 12px;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.cropper-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 14px;
+/* image inside cropper area - cropper will use the img element */
+.cropper-area img {
+	max-width: 100%;
+	max-height: 100%;
+	display: block
 }
 
-/* =========================================================
-   PASSWORD SHEET (SETTINGS)
-   ========================================================= */
+/* circular mask overlay using radial-gradient.
+   transparent circle of radius 125px at center, dim outside. */
+.circle-mask-250::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	background:
+		radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 125px, rgba(0, 0, 0, 0.55) 126px);
+	/* subtle border around circle */
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.0) inset;
+}
+
+/* small guide circle stroke */
+.circle-mask-250::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 250px;
+	height: 250px;
+	border-radius: 50%;
+	border: 3px solid rgba(255, 255, 255, 0.9);
+	pointer-events: none;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* responsive tweaks */
+@media (max-width:480px) {
+	.cropper-area {
+		height: 320px
+	}
+
+	.circle-mask-250::after {
+		/* keep same radius visually; on small screens center remains 125px */
+	}
+}
+
+/* sheet bottom */
 .sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -100%;
-  background: #ffffff;
-  border-radius: 20px 20px 0 0;
-  padding: 20px;
-  box-shadow: 0 -20px 40px rgba(0,0,0,0.15);
-  z-index: 9999;
-  transition: bottom 0.25s ease;
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: -100%;
+	background: #fff;
+	border-radius: 20px 20px 0 0;
+	padding: 20px;
+	box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.15);
+	z-index: 9999;
+	transition: bottom .25s
 }
 
 .sheet.active {
-  bottom: 0;
+	bottom: 0
 }
