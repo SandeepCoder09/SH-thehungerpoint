@@ -3,87 +3,141 @@
 <head>
   <meta charset="utf-8" />
   <title>Settings — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="/home/SH-Favicon.png" />
-  <!-- Remix icons -->
+
+  <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Global Styles -->
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
+
 <body>
-  <main class="container settings-shell" role="main">
-    <section style="height:20px"></section>
+
+  <main class="container settings-shell">
+
+    <!-- User Card -->
     <article class="settings-card">
+
       <div class="user-banner">
-        <div class="user-avatar"><img id="hdrAvatar" src="/assets/default-user.png" alt="avatar"></div>
+
+        <!-- Avatar + Pencil -->
+        <div class="user-avatar" style="position:relative;">
+          <img id="hdrAvatar" src="/assets/default-user.png" alt="avatar">
+
+          <button onclick="openProfile()" 
+            style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;
+            border:1px solid #ddd;width:26px;height:26px;display:flex;align-items:center;
+            justify-content:center;">
+            <i class="ri-pencil-line" style="font-size:15px;color:var(--primary-dark)"></i>
+          </button>
+        </div>
+
+        <!-- User Info -->
         <div class="user-info">
           <div class="user-name" id="hdrName">User Name</div>
           <div class="user-mail" id="hdrEmail">user@example.com</div>
         </div>
-        <div style="margin-left:auto">
-          <a href="/profile/index.html" class="btn small" style="color:var(--primary);font-weight:700">Edit</a>
-        </div>
+
       </div>
 
-      <div class="settings-list" style="margin-top:6px">
-        <div class="settings-item" tabindex="0" role="button" onclick="openProfile()">
+      <!-- Settings List -->
+      <div class="settings-list" style="margin-top:14px">
+
+        <!-- Profile -->
+        <div class="settings-item" onclick="openProfile()">
           <div class="icon"><i class="ri-user-line"></i></div>
           <div>
             <div class="title">User Profile</div>
             <div class="kv">Edit profile & preferences</div>
           </div>
-          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
+          <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
         </div>
 
-        <div class="settings-item" tabindex="0" role="button" onclick="openChangePassword()">
+        <!-- Change Password -->
+        <div class="settings-item" onclick="openChangePassword()">
           <div class="icon"><i class="ri-lock-line"></i></div>
           <div>
             <div class="title">Change Password</div>
             <div class="kv">Update your login password</div>
           </div>
-          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
+          <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
         </div>
 
-        <div class="settings-item" tabindex="0">
-          <div class="icon"><i class="ri-question-line"></i></div>
-          <div>
-            <div class="title">FAQs</div>
-            <div class="kv">Common questions</div>
+        <!-- FAQs -->
+        <a href="/settings/faqs.html" style="text-decoration:none;color:inherit">
+          <div class="settings-item">
+            <div class="icon"><i class="ri-question-line"></i></div>
+            <div>
+              <div class="title">FAQs</div>
+              <div class="kv">Common questions</div>
+            </div>
+            <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
           </div>
-          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
-        </div>
+        </a>
 
-        <div class="settings-item" tabindex="0">
+        <!-- Push Notifications -->
+        <div class="settings-item">
           <div class="icon"><i class="ri-notification-3-line"></i></div>
           <div>
             <div class="title">Push Notifications</div>
             <div class="kv">Receive updates & offers</div>
           </div>
-          <div style="margin-left:auto">
-            <div id="pushToggle" class="toggle" role="switch" aria-checked="false" onclick="togglePush(this)">
-              <div class="dot"></div>
-            </div>
+
+          <div id="pushToggle" class="toggle" onclick="togglePush(this)">
+            <div class="dot"></div>
           </div>
         </div>
 
-        <div class="settings-item" tabindex="0" id="logoutItem">
+        <!-- Logout -->
+        <div class="settings-item" id="logoutItem">
           <div class="icon"><i class="ri-logout-box-r-line"></i></div>
           <div>
             <div class="title">Logout</div>
             <div class="kv">Sign out of your account</div>
           </div>
         </div>
+
       </div>
 
-      <div style="margin-top:14px" class="support-box">
-        Need help? Message us on WhatsApp — <a href="https://wa.me/919999999999" target="_blank" rel="noopener">WhatsApp</a>
+      <!-- WhatsApp Support -->
+      <div class="support-box" style="margin-top:18px">
+        Need help? Message us on WhatsApp — 
+        <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
       </div>
+
     </article>
+
   </main>
 
-  <!-- Firebase config + protect -->
+  <!-- CHANGE PASSWORD SHEET -->
+  <div id="pwSheet" class="sheet">
+    <div style="width:40px;height:4px;background:#bbb;margin:0 auto;border-radius:4px"></div>
+
+    <h3 style="text-align:center;margin-top:14px;">Change Password</h3>
+
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:12px;">
+      <input id="newPass" class="input" type="password" placeholder="New password">
+      <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
+
+      <div style="display:flex;gap:12px;margin-top:4px;">
+        <button onclick="closePwSheet()" class="btn outline" style="flex:1">Cancel</button>
+        <button onclick="savePassword()" class="btn primary" style="flex:1">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
   <script src="/assets/settings.js"></script>
+
 </body>
 </html>
