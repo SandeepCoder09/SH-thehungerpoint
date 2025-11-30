@@ -4,96 +4,120 @@
   <meta charset="utf-8" />
   <title>Profile — The Hunger Point</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/profile/profile.css" />
-
-  <!-- Firebase (compat for your existing code) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <link rel="icon" href="/home/SH-Favicon.png" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <!-- CropperJS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <link rel="stylesheet" href="/assets/styles.css" />
 </head>
-
 <body>
-  <main class="profile-shell">
+  <main class="container">
+    <section style="height:16px"></section>
 
-    <!-- Transparent header with back arrow -->
-    <header class="profile-head profile-head--transparent">
-      <button onclick="history.back()" class="back-btn" aria-label="Go back">‹</button>
-      <h1 class="title">Your Profile</h1>
-    </header>
+    <article class="profile-card" role="region" aria-labelledby="profileHeader">
+      <header style="width:100%;display:flex;align-items:center">
+        <button onclick="history.back()" class="btn small" style="background:transparent;color:var(--primary);font-weight:700"><i class="ri-arrow-left-line"></i></button>
+        <h2 id="profileHeader" style="margin-left:12px;font-size:20px;color:var(--primary-dark)">Your Profile</h2>
+      </header>
 
-    <!-- Center card -->
-    <section class="profile-card" role="region" aria-labelledby="profileTitle">
-      <h2 id="profileTitle" class="sr-only">Profile details</h2>
-
-      <!-- avatar center -->
-      <div class="avatar-wrap">
-        <div class="avatar">
-          <img id="photoImg" class="photo" src="/profile/default-user.png" alt="Profile photo">
-        </div>
-        <div class="avatar-actions">
-          <input id="photoInput" type="file" accept="image/*" hidden />
-          <button id="changePhotoBtn" class="btn small outline">Change</button>
-          <button id="removePhotoBtn" class="btn small" title="Remove photo">Remove</button>
-        </div>
+      <div class="avatar" id="avatarWrap" aria-live="polite">
+        <img id="photoImg" src="/assets/default-user.png" alt="Profile photo">
+        <div class="overlay" aria-hidden="true"></div>
       </div>
 
-      <!-- form -->
+      <div class="avatar-actions" style="display:flex;gap:10px">
+        <input id="photoInput" type="file" accept="image/*" hidden />
+        <button id="changePhotoBtn" class="btn small outline"><i class="ri-image-line"></i> Change</button>
+        <button id="removePhotoBtn" class="btn small"><i class="ri-delete-bin-line"></i> Remove</button>
+      </div>
+
       <form id="profileForm" class="form" onsubmit="return false;">
-        <div class="field">
+        <div class="col" style="width:100%;">
           <label class="label">Full name</label>
-          <input id="name" type="text" placeholder="Your name" autocomplete="name" />
+          <input id="name" class="input" type="text" placeholder="Your name" autocomplete="name">
         </div>
 
-        <div class="field">
+        <div class="col" style="width:100%;">
           <label class="label">Email</label>
-          <input id="email" type="email" disabled aria-disabled="true" />
+          <input id="email" class="input" type="email" disabled>
         </div>
 
-        <div class="row">
-          <div class="field half">
+        <div class="row" style="width:100%">
+          <div style="flex:1" class="col">
             <label class="label">Gender</label>
-            <select id="gender" class="select">
+            <select id="gender" class="input select">
               <option value="">Prefer not to say</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
           </div>
-
-          <div class="field half">
+          <div style="width:120px" class="col">
             <label class="label">Phone</label>
-            <input id="phone" type="tel" placeholder="Optional" autocomplete="tel" />
+            <input id="phone" class="input" type="tel" placeholder="Optional" autocomplete="tel">
           </div>
         </div>
 
-        <div class="field">
+        <div class="col" style="width:100%">
           <label class="label">Delivery address</label>
-          <textarea id="address" placeholder="Your full address" rows="3"></textarea>
+          <textarea id="address" class="input" rows="3" placeholder="Your full address"></textarea>
         </div>
 
         <div class="actions">
-          <button id="saveBtn" class="btn primary" type="button">Save</button>
+          <button id="saveBtn" class="btn primary" type="button">Save Profile</button>
         </div>
 
-        <div class="secondary-row">
+        <div class="secondary-row" style="margin-top:6px">
           <button id="resetPassBtn" class="btn outline" type="button">Send Password Reset Email</button>
           <button id="logoutBtn" class="btn danger" type="button">Logout</button>
         </div>
       </form>
-    </section>
-
-    <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+    </article>
   </main>
 
-  <!-- Project-wide Firebase config + protect -->
+  <!-- Cropper modal (white popup) -->
+  <div id="cropperModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 id="cropTitle">Crop photo</h3>
+        <button id="closeCrop" class="btn small" aria-label="Close">✕</button>
+      </div>
+
+      <div class="cropper-holder">
+        <img id="cropperImage" class="cropper-canvas" alt="Crop preview" />
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <input id="zoomRange" type="range" min="1" max="3" step="0.01" value="1" style="flex:1;margin-right:12px">
+        <button id="cropSaveBtn" class="btn primary">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change password sheet (bottom) -->
+  <div id="changeSheet" class="sheet" aria-hidden="true">
+    <div style="display:flex;justify-content:center;width:40px;margin:0 auto;height:4px;background:#e7e7e7;border-radius:4px;margin-bottom:10px"></div>
+    <h3 style="text-align:center">Change Password</h3>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;padding:6px 0">
+      <input id="newPass" class="input" type="password" placeholder="New password">
+      <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
+      <div style="display:flex;gap:10px">
+        <button id="sheetCancel" class="btn outline" style="flex:1">Cancel</button>
+        <button id="sheetSave" class="btn primary" style="flex:1">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase (compat) + CropperJS + Icons -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
-  <!-- Main Script -->
   <script src="/profile/profile.js"></script>
 </body>
 </html>
