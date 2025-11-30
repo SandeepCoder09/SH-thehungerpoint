@@ -90,30 +90,32 @@ async function waitForFirebase() {
     // Photo change flow
     changePhotoBtn.addEventListener("click", () => photoInput.click());
 
-    photoInput.addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+  photoInput.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return showToast("No file selected");
 
-      const user = auth.currentUser;
-      if (!user) return showToast("Not authenticated");
+  const user = auth.currentUser;
+  if (!user) return showToast("Not logged in");
 
-      const storageRef = firebase.storage().ref(`users/${user.uid}/profile.jpg`);
-      try {
-        const uploadTask = await storageRef.put(file);
-        const url = await storageRef.getDownloadURL();
-        photoImg.src = url;
+  try {
+    const storageRef = firebase.storage().ref(`profile/${user.uid}.jpg`);
+    await storageRef.put(file);
+    const url = await storageRef.getDownloadURL();
 
-        await db.collection("users").doc(user.uid).set({
-          photoURL: url,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+    // Update photo instantly on UI
+    photoImg.src = url;
 
-        showToast("Photo updated");
-      } catch (err) {
-        console.error("Upload failed", err);
-        showToast("Photo upload failed");
-      }
-    });
+    await db.collection("users").doc(user.uid).set({
+      photoURL: url,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    showToast("Profile photo updated");
+  } catch (err) {
+    console.error(err);
+    showToast("Upload failed");
+  }
+});
 
     removePhotoBtn.addEventListener("click", async () => {
       const user = auth.currentUser;
