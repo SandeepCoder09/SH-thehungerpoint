@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>09 QR Generater</title>
+  <title>09 QR Generator</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
+
 <body>
 
-  <header>
-    <h1>09 QR Generater</h1>
-    <button id="themeToggle">🌙</button>
-  </header>
+  <!-- Theme Toggle (Top Right) -->
+  <button id="themeToggle" class="toggle-btn">🌙</button>
+
+  <!-- Center Title -->
+  <h1 class="main-title">09 QR Generator</h1>
 
   <main class="card">
+
     <input type="text" id="qrText" placeholder="Enter text or URL">
 
-    <!-- Logo Upload -->
-    <input type="file" id="logoInput" accept="image/*">
+    <label class="file-label">
+      <span>Upload Your Brand Logo (Optional)</span>
+      <input type="file" id="logoInput" accept="image/*">
+    </label>
 
-    <button id="generateBtn">Generate QR</button>
+    <button id="generateBtn" class="btn">Generate QR</button>
 
     <div class="spinner" id="loadingSpinner"></div>
 
     <div id="qrOutput"></div>
 
-    <a id="downloadBtn" download="qr.png">Download QR</a>
+    <a id="downloadBtn" download="qr.png" class="btn-secondary">Download QR</a>
 
     <a href="decoder.html" class="switch-page">Go to Decoder →</a>
   </main>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
