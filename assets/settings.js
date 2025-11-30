@@ -1,5 +1,5 @@
 // ================================
-// SETTINGS PAGE MAIN SCRIPT
+// SETTINGS PAGE MAIN SCRIPT (Circle-mask crop, 250x250 output)
 // ================================
 
 // Wait for Firebase
@@ -24,6 +24,13 @@ function waitForFirebase() {
   const pwSheet = document.getElementById("pwSheet");
   const pushToggle = document.getElementById("pushToggle");
 
+  // Crop elements
+  const input = document.getElementById("settingsPhotoInput");
+  const modal = document.getElementById("settingsCropModal");
+  const cropImg = document.getElementById("settingsCropImage");
+
+  let cropper = null;
+
   // ---------- LOAD USER DATA ----------
   auth.onAuthStateChanged(async (user) => {
     if (!user) return;
@@ -31,17 +38,16 @@ function waitForFirebase() {
     const snap = await db.collection("users").doc(user.uid).get();
     const d = snap.data() || {};
 
-    hdrName.textContent = d.name || "User Name";
-    hdrEmail.textContent = user.email;
+    hdrName.textContent = d.name || (user.displayName || "User Name");
+    hdrEmail.textContent = user.email || "";
     hdrAvatar.src = d.photoURL || "/assets/default-user.png";
 
     if (d.pushEnabled) pushToggle.classList.add("on");
+    else pushToggle.classList.remove("on");
   });
 
-  // ---------- NAVIGATION ----------
-  window.openProfile = () => {
-    location.href = "/profile/index.html";
-  };
+  // ---------- NAV ----------
+  window.openProfile = () => location.href = "/profile/index.html";
 
   // ---------- LOGOUT ----------
   logoutItem.addEventListener("click", async () => {
@@ -49,7 +55,7 @@ function waitForFirebase() {
     location.href = "/auth/login.html";
   });
 
-  // ---------- CHANGE PASSWORD ----------
+  // ---------- PASSWORD SHEET ----------
   window.openChangePassword = () => pwSheet.classList.add("active");
   window.closePwSheet = () => pwSheet.classList.remove("active");
 
@@ -57,87 +63,140 @@ function waitForFirebase() {
     const newPass = document.getElementById("newPass").value.trim();
     const pass2 = document.getElementById("confirmPass").value.trim();
     const user = auth.currentUser;
-
     if (!newPass || !pass2) return alert("Enter password");
     if (newPass !== pass2) return alert("Passwords do not match");
-
     try {
       await user.updatePassword(newPass);
       alert("Password updated");
       closePwSheet();
     } catch (err) {
-      alert("Error: Login again to change password.");
+      console.error(err);
+      alert("Error: re-login may be required to change password.");
     }
   };
 
-  // ---------- PUSH NOTIFICATIONS ----------
+  // ---------- PUSH TOGGLE ----------
   window.togglePush = async (el) => {
     el.classList.toggle("on");
     const enabled = el.classList.contains("on");
-    await db.collection("users").doc(auth.currentUser.uid).set({ pushEnabled: enabled }, { merge: true });
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    await db.collection("users").doc(uid).set({ pushEnabled: enabled }, { merge: true });
   };
 
-  // ---------- PROFILE PHOTO (INSIDE SETTINGS) ----------
-  const input = document.getElementById("settingsPhotoInput");
-  const modal = document.getElementById("settingsCropModal");
-  const cropImg = document.getElementById("settingsCropImage");
-
-  let cropper = null;
-
+  // ---------- SETTINGS PHOTO PICKER ----------
   window.openSettingsPhotoPicker = () => input.click();
 
   input.addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
 
+    // create object url and load into img
     cropImg.src = URL.createObjectURL(file);
     modal.classList.add("show");
 
     cropImg.onload = () => {
-      if (cropper) cropper.destroy();
+      if (cropper) { cropper.destroy(); cropper = null; }
+
+      // initialize cropper with options suitable for circle overlay
       cropper = new Cropper(cropImg, {
-        aspectRatio: 1,
         viewMode: 1,
+        dragMode: 'move',
+        aspectRatio: 1,
         autoCropArea: 1,
         background: false,
+        guides: false,
+        center: true,
+        zoomOnWheel: true,
+        cropBoxResizable: false,
       });
     };
   });
 
   window.closeSettingsCropper = () => {
     modal.classList.remove("show");
-    if (cropper) cropper.destroy();
-    cropper = null;
+    if (cropper) { cropper.destroy(); cropper = null; }
     input.value = "";
   };
 
+  // ---------- Save: get square canvas, then create circular clipped canvas 250x250 ----------
   window.saveSettingsCroppedImage = async () => {
     if (!cropper) return;
-
     const user = auth.currentUser;
+    if (!user) return alert("Not authenticated");
 
-    const canvas = cropper.getCroppedCanvas({
-      width: 600,
-      height: 600,
-    });
+    // 1) get cropped square canvas (use 600px for quality)
+    const squareSize = 600;
+    const croppedCanvas = cropper.getCroppedCanvas({ width: squareSize, height: squareSize, imageSmoothingQuality: 'high' });
 
-    canvas.toBlob(async (blob) => {
-      const ref = firebase.storage().ref(`profile/${user.uid}.jpg`);
-      const upload = ref.put(blob);
+    // 2) create circular canvas 250x250 (final)
+    const finalSize = 250;
+    const circCanvas = document.createElement('canvas');
+    circCanvas.width = finalSize;
+    circCanvas.height = finalSize;
+    const ctx = circCanvas.getContext('2d');
 
-      hdrAvatar.style.opacity = 0.4;
+    // fill transparent background
+    ctx.clearRect(0, 0, finalSize, finalSize);
 
-      upload.on("state_changed", null, null, async () => {
-        const url = await ref.getDownloadURL();
+    // draw circle clipping path
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(finalSize/2, finalSize/2, finalSize/2, 0, Math.PI*2, true);
+    ctx.closePath();
+    ctx.clip();
 
-        await db.collection("users").doc(user.uid).set({ photoURL: url }, { merge: true });
+    // draw the croppedSquare into the clipped circle, scaling down
+    ctx.drawImage(croppedCanvas, 0, 0, squareSize, squareSize, 0, 0, finalSize, finalSize);
 
-        hdrAvatar.src = url;
+    ctx.restore();
+
+    // Optional: draw a subtle white border outside (not inside clipped area)
+    // We'll create a second canvas to add border as outer ring if desired.
+    // For now we upload the circular PNG with transparency.
+
+    // 3) convert to blob and upload
+    circCanvas.toBlob(async (blob) => {
+      if (!blob) return alert("Could not prepare image");
+
+      try {
+        const storageRef = firebase.storage().ref(`profile/${user.uid}.png`);
+
+        // upload
+        const uploadTask = storageRef.put(blob);
+
+        // UI feedback
+        hdrAvatar.style.opacity = 0.4;
+
+        uploadTask.on('state_changed', (snap) => {
+          const percent = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+          hdrAvatar.title = `Uploading ${percent}%`;
+        }, (err) => {
+          console.error(err);
+          alert("Upload failed");
+          hdrAvatar.style.opacity = 1;
+        }, async () => {
+          const url = await storageRef.getDownloadURL();
+
+          // write to Firestore
+          await db.collection('users').doc(user.uid).set({
+            photoURL: url,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
+          // update UI
+          hdrAvatar.src = url;
+          hdrAvatar.style.opacity = 1;
+
+          // cleanup
+          closeSettingsCropper();
+        });
+      } catch (e) {
+        console.error(e);
+        alert("Upload error");
         hdrAvatar.style.opacity = 1;
-
-        closeSettingsCropper();
-      });
-    }, "image/jpeg", 0.9);
+      }
+    }, 'image/png', 0.95);
   };
 
 })();
