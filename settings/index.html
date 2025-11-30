@@ -10,7 +10,7 @@
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- CropperJS -->
+  <!-- CropperJS CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
   <!-- Global CSS -->
@@ -30,7 +30,7 @@
           <img id="hdrAvatar" src="/assets/default-user.png" alt="avatar">
 
           <!-- Pencil button -->
-          <button onclick="openSettingsPhotoPicker()" 
+          <button id="settingsPencilBtn" onclick="openSettingsPhotoPicker()" 
             style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;
             border:1px solid #ddd;width:26px;height:26px;display:flex;align-items:center;
             justify-content:center;">
@@ -124,25 +124,27 @@
     </div>
   </div>
 
-  <!-- CROPPER MODAL -->
+  <!-- CROPPER MODAL (circle mask overlay style) -->
   <div id="settingsCropModal" class="cropper-modal">
     <div class="cropper-content">
 
       <h3>Crop photo</h3>
 
-      <div class="cropper-area">
-        <img id="settingsCropImage" />
+      <!-- cropper area: inside this container the cropper image will be shown.
+           A circular mask overlay is created via CSS to mimic "Fotor" style. -->
+      <div class="cropper-area circle-mask-250">
+        <img id="settingsCropImage" alt="Crop image preview" />
       </div>
 
-      <div class="cropper-buttons">
-        <button onclick="closeSettingsCropper()" class="btn outline">Cancel</button>
-        <button onclick="saveSettingsCroppedImage()" class="btn primary">Save</button>
+      <div style="display:flex;gap:12px;margin-top:12px;">
+        <button onclick="closeSettingsCropper()" class="btn outline" style="flex:1">Cancel</button>
+        <button onclick="saveSettingsCroppedImage()" class="btn primary" style="flex:1">Save</button>
       </div>
 
     </div>
   </div>
 
-  <!-- File picker -->
+  <!-- hidden file input -->
   <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
 
   <!-- Firebase -->
