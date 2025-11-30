@@ -1,61 +1,111 @@
-// /assets/settings.js
-(async function(){
-  // wait for firebase config to load
-  function wait() {
-    return new Promise(res => {
-      const ch = () => {
-        if (window.firebase && window.auth && window.db) res();
-        else setTimeout(ch, 30);
-      };
-      ch();
-    });
-  }
-  await wait();
+// ================================
+// SETTINGS PAGE MAIN SCRIPT
+// ================================
 
-  const hdrName = document.getElementById('hdrName');
-  const hdrEmail = document.getElementById('hdrEmail');
-  const hdrAvatar = document.getElementById('hdrAvatar');
-  const pushToggle = document.getElementById('pushToggle');
-  const logoutItem = document.getElementById('logoutItem');
+// Wait for Firebase
+function waitForFirebase() {
+  return new Promise((resolve) => {
+    const check = () => {
+      if (window.firebase && window.auth && window.db) resolve();
+      else setTimeout(check, 30);
+    };
+    check();
+  });
+}
 
-  // load user data
-  auth.onAuthStateChanged(async user => {
-    if (!user) { location.href = '/auth/login.html'; return; }
-    hdrEmail.textContent = user.email || '';
-    const uRef = db.collection('users').doc(user.uid);
-    const snap = await uRef.get();
-    if (snap.exists) {
-      const d = snap.data();
-      hdrName.textContent = d.name || (user.displayName || 'User');
-      hdrAvatar.src = d.photoURL || '/assets/default-user.png';
-      // push toggle preference
-      const push = !!d.pushEnabled;
-      if (push) pushToggle.classList.add('on'), pushToggle.setAttribute('aria-checked','true');
-      else pushToggle.classList.remove('on'), pushToggle.setAttribute('aria-checked','false');
-    } else {
-      hdrName.textContent = user.displayName || 'User';
-      hdrAvatar.src = '/assets/default-user.png';
+(async () => {
+  await waitForFirebase();
+
+  // Elements
+  const hdrName = document.getElementById("hdrName");
+  const hdrEmail = document.getElementById("hdrEmail");
+  const hdrAvatar = document.getElementById("hdrAvatar");
+  const logoutItem = document.getElementById("logoutItem");
+  const pwSheet = document.getElementById("pwSheet");
+  const pushToggle = document.getElementById("pushToggle");
+
+  // -----------------------------
+  // AUTH STATE
+  // -----------------------------
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return;
+
+    // Load user from Firestore
+    const snap = await db.collection("users").doc(user.uid).get();
+    const d = snap.data() || {};
+
+    hdrName.textContent = d.name || "User Name";
+    hdrEmail.textContent = user.email;
+    hdrAvatar.src = d.photoURL || "/assets/default-user.png";
+
+    // Load push toggle
+    if (d.pushEnabled) {
+      pushToggle.classList.add("on");
     }
   });
 
-  // functions opened by items
-  window.openProfile = ()=> location.href = '/profile/index.html';
-  window.openChangePassword = ()=> {
-    // navigate to change password page (or trigger sheet)
-    location.href = '/settings/change-password.html';
+  // -----------------------------
+  // NAVIGATION
+  // -----------------------------
+  window.openProfile = () => {
+    window.location.href = "/profile/index.html";
   };
 
-  window.togglePush = async (el)=>{
-    const user = auth.currentUser;
-    if (!user) return alert('Not authenticated');
-    const on = !el.classList.contains('on');
-    el.classList.toggle('on', on);
-    el.setAttribute('aria-checked', String(on));
-    await db.collection('users').doc(user.uid).set({ pushEnabled: on }, { merge:true });
-  };
-
-  logoutItem.addEventListener('click', async () => {
+  // -----------------------------
+  // LOGOUT
+  // -----------------------------
+  logoutItem.addEventListener("click", async () => {
     await auth.signOut();
-    location.href = '/auth/login.html';
+    window.location.href = "/auth/login.html";
   });
+
+  // -----------------------------
+  // OPEN CHANGE PASSWORD SHEET
+  // -----------------------------
+  window.openChangePassword = () => {
+    pwSheet.classList.add("active");
+  };
+
+  window.closePwSheet = () => {
+    pwSheet.classList.remove("active");
+  };
+
+  // -----------------------------
+  // SAVE NEW PASSWORD
+  // -----------------------------
+  window.savePassword = async () => {
+    const newPass = document.getElementById("newPass").value.trim();
+    const pass2 = document.getElementById("confirmPass").value.trim();
+    const user = auth.currentUser;
+
+    if (!newPass || !pass2) return alert("Enter password");
+    if (newPass !== pass2) return alert("Passwords do not match");
+
+    try {
+      await user.updatePassword(newPass);
+      alert("Password updated");
+      closePwSheet();
+    } catch (err) {
+      console.error(err);
+      alert("Error: You must re-login to change password.");
+    }
+  };
+
+  // -----------------------------
+  // PUSH NOTIFICATION TOGGLE
+  // -----------------------------
+  window.togglePush = async (el) => {
+    el.classList.toggle("on");
+
+    const enabled = el.classList.contains("on");
+    const uid = auth.currentUser.uid;
+
+    await db.collection("users").doc(uid).set(
+      {
+        pushEnabled: enabled,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
 })();
