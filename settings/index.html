@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Settings — The Hunger Point</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="/home/SH-Favicon.png" />
+  <!-- Remix icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <main class="container settings-shell" role="main">
+    <section style="height:20px"></section>
+    <article class="settings-card">
+      <div class="user-banner">
+        <div class="user-avatar"><img id="hdrAvatar" src="/assets/default-user.png" alt="avatar"></div>
+        <div class="user-info">
+          <div class="user-name" id="hdrName">User Name</div>
+          <div class="user-mail" id="hdrEmail">user@example.com</div>
+        </div>
+        <div style="margin-left:auto">
+          <a href="/profile/index.html" class="btn small" style="color:var(--primary);font-weight:700">Edit</a>
+        </div>
+      </div>
+
+      <div class="settings-list" style="margin-top:6px">
+        <div class="settings-item" tabindex="0" role="button" onclick="openProfile()">
+          <div class="icon"><i class="ri-user-line"></i></div>
+          <div>
+            <div class="title">User Profile</div>
+            <div class="kv">Edit profile & preferences</div>
+          </div>
+          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
+        </div>
+
+        <div class="settings-item" tabindex="0" role="button" onclick="openChangePassword()">
+          <div class="icon"><i class="ri-lock-line"></i></div>
+          <div>
+            <div class="title">Change Password</div>
+            <div class="kv">Update your login password</div>
+          </div>
+          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
+        </div>
+
+        <div class="settings-item" tabindex="0">
+          <div class="icon"><i class="ri-question-line"></i></div>
+          <div>
+            <div class="title">FAQs</div>
+            <div class="kv">Common questions</div>
+          </div>
+          <div style="margin-left:auto"><i class="ri-arrow-right-s-line"></i></div>
+        </div>
+
+        <div class="settings-item" tabindex="0">
+          <div class="icon"><i class="ri-notification-3-line"></i></div>
+          <div>
+            <div class="title">Push Notifications</div>
+            <div class="kv">Receive updates & offers</div>
+          </div>
+          <div style="margin-left:auto">
+            <div id="pushToggle" class="toggle" role="switch" aria-checked="false" onclick="togglePush(this)">
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-item" tabindex="0" id="logoutItem">
+          <div class="icon"><i class="ri-logout-box-r-line"></i></div>
+          <div>
+            <div class="title">Logout</div>
+            <div class="kv">Sign out of your account</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px" class="support-box">
+        Need help? Message us on WhatsApp — <a href="https://wa.me/919999999999" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </article>
+  </main>
+
+  <!-- Firebase config + protect -->
+  <script src="/auth/firebase-config.js"></script>
+  <script src="/auth/protect.js"></script>
+
+  <script src="/assets/settings.js"></script>
+</body>
+</html>
