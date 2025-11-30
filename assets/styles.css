@@ -1,384 +1,302 @@
-:root {
-	--primary: #E23744;
-	--primary-dark: #b71c1c;
-	--bg: #f6f6f7;
-	--card: #fff;
-	--muted: #6b7280;
-	--radius: 16px;
-	--shadow: 0 18px 40px rgba(2, 6, 23, 0.06);
-	--soft-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
-	--max-w: 960px;
-}
-
-/* reset */
+/* ---------------------------------------------------
+   GLOBAL RESET
+--------------------------------------------------- */
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0
-}
-
-html,
-body {
-	height: 100%
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
 }
 
 body {
-	font-family: Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-	background: var(--bg);
-	color: #111827;
-	-webkit-font-smoothing: antialiased;
-	padding: 20px;
+  background: #f7f7f7;
+  padding: 0;
+  margin: 0;
 }
 
+/* ---------------------------------------------------
+   CONTAINER
+--------------------------------------------------- */
 .container {
-	max-width: 420px;
-	margin: 0 auto
+  width: 100%;
+  padding: 20px;
 }
 
-/* buttons */
-.btn {
-	cursor: pointer;
-	border: none;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px
-}
-
-.btn.primary {
-	background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-	color: #fff;
-	padding: 12px;
-	border-radius: 12px;
-	font-weight: 700
-}
-
-.btn.outline {
-	background: #fff;
-	border: 1px solid #e8e8e8;
-	padding: 10px;
-	border-radius: 12px;
-	color: #111
-}
-
-/* settings card */
+/* ---------------------------------------------------
+   SETTINGS WRAPPER
+--------------------------------------------------- */
 .settings-shell {
-	max-width: 420px;
-	margin: 0 auto
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .settings-card {
-	background: var(--card);
-	border-radius: 20px;
-	padding: 18px;
-	box-shadow: var(--shadow)
+  background: #fff;
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
 
+/* ---------------------------------------------------
+   USER BANNER
+--------------------------------------------------- */
 .user-banner {
-	display: flex;
-	gap: 14px;
-	align-items: center
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 16px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #eee;
 }
 
 .user-avatar {
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	overflow: hidden;
-	box-shadow: var(--soft-shadow);
-	flex-shrink: 0;
-	position: relative
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  position: relative;
 }
 
 .user-avatar img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.user-info .user-name {
-	font-size: 17px;
-	font-weight: 700
+.user-info {
+  display: flex;
+  flex-direction: column;
 }
 
-.user-info .user-mail {
-	font-size: 14px;
-	color: var(--muted);
-	margin-top: 2px
+.user-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
 }
 
-/* list */
+.user-mail {
+  font-size: 14px;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ---------------------------------------------------
+   SETTINGS LIST
+--------------------------------------------------- */
 .settings-list {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-top: 18px
+  margin-top: 12px;
 }
 
 .settings-item {
-	display: flex;
-	align-items: center;
-	background: #fff;
-	border-radius: 14px;
-	padding: 12px;
-	border: 1px solid #f0f0f0;
-	box-shadow: 0 4px 10px rgba(2, 6, 23, 0.04);
-	cursor: pointer
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.settings-item:hover {
+  background: #f0f0f0;
 }
 
 .settings-item .icon {
-	width: 30px;
-	height: 30px;
-	border-radius: 10px;
-	background: #f8f8f8;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--primary-dark);
-	margin-right: 12px
+  background: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #eee;
+}
+
+.settings-item .icon i {
+  font-size: 20px;
+  color: #d33030;
 }
 
 .settings-item .title {
-	font-weight: 600
+  font-size: 17px;
+  font-weight: 600;
+  color: #222;
 }
 
 .settings-item .kv {
-	font-size: 13px;
-	color: var(--muted)
+  font-size: 13px;
+  color: #777;
+  margin-top: 2px;
 }
 
-/* toggle */
+/* ---------------------------------------------------
+   TOGGLE SWITCH
+--------------------------------------------------- */
 .toggle {
-	width: 46px;
-	height: 26px;
-	border-radius: 26px;
-	background: #e3e3e3;
-	position: relative;
-	cursor: pointer;
-	margin-left: auto
+  width: 48px;
+  height: 26px;
+  background: #ddd;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  transition: 0.2s;
+  margin-left: auto;
+}
+
+.toggle.active {
+  background: #d33030;
 }
 
 .toggle .dot {
-	width: 20px;
-	height: 20px;
-	background: white;
-	position: absolute;
-	top: 3px;
-	left: 3px;
-	border-radius: 50%;
-	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-	transition: all .18s
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.2s;
 }
 
-.toggle.on {
-	background: linear-gradient(90deg, var(--primary), var(--primary-dark))
+.toggle.active .dot {
+  margin-left: 20px;
 }
 
-.toggle.on .dot {
-	left: 23px
-}
-
-/* support box */
+/* ---------------------------------------------------
+   SUPPORT BOX
+--------------------------------------------------- */
 .support-box {
-	background: #f8f8f9;
-	padding: 12px;
-	border-radius: 12px;
-	font-size: 13px;
-	color: var(--muted);
-	border: 1px solid #e0e0e0
+  margin-top: 18px;
+  padding: 14px;
+  background: #fafafa;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #555;
 }
 
-/* profile card */
-.profile-card {
-	background: #fff;
-	padding: 22px;
-	border-radius: 22px;
-	box-shadow: var(--shadow);
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-	align-items: center
+.support-box a {
+  color: #d33030;
+  text-decoration: none;
+  font-weight: 600;
 }
 
-.back-header {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-bottom: 10px
-}
-
-.back-btn {
-	background: none;
-	border: none;
-	font-size: 20px;
-	color: var(--primary-dark)
-}
-
-/* profile avatar */
-.profile-avatar-wrap {
-	position: relative
-}
-
-.profile-avatar {
-	width: 120px;
-	height: 120px;
-	border-radius: 50%;
-	overflow: hidden;
-	box-shadow: var(--soft-shadow);
-	border: 5px solid #fff
-}
-
-.profile-avatar img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover
-}
-
-.avatar-edit-btn {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	background: white;
-	border: 1px solid #ddd;
-	border-radius: 50%;
-	width: 34px;
-	height: 34px;
-	display: flex;
-	align-items: center;
-	justify-content: center
-}
-
-/* form */
-.form-section {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	gap: 12px
-}
-
-.label {
-	font-size: 14px;
-	color: var(--muted)
-}
-
+/* ---------------------------------------------------
+   INPUTS
+--------------------------------------------------- */
 .input {
-	padding: 12px;
-	border-radius: 14px;
-	border: 1px solid #e3e3e3;
-	background: #fff;
-	font-size: 15px
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  background: #fafafa;
 }
 
-/* cropper modal baseline */
+/* ---------------------------------------------------
+   BUTTONS
+--------------------------------------------------- */
+.btn {
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: linear-gradient(90deg, #d33030, #b71c1c);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn.outline {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+/* ---------------------------------------------------
+   SHEET (BOTTOM POPUP)
+--------------------------------------------------- */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -100%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  transition: 0.35s ease-in-out;
+}
+
+.sheet.open {
+  bottom: 0;
+}
+
+/* ---------------------------------------------------
+   CROP MODAL
+--------------------------------------------------- */
 .cropper-modal {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.55);
-	display: none;
-	align-items: center;
-	justify-content: center;
-	z-index: 99999;
-	padding: 18px
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
 }
 
-.cropper-modal.show {
-	display: flex
+.cropper-modal.active {
+  display: flex;
 }
 
 .cropper-content {
-	background: #fff;
-	border-radius: 18px;
-	padding: 16px;
-	width: 100%;
-	max-width: 420px;
-	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25)
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  text-align: center;
 }
 
-.cropper-content h3 {
-	margin: 0;
-	font-size: 18px;
-	color: #111;
-	margin-bottom: 8px
-}
-
-/* cropper area with circular overlay (250x250) */
-/* circle-mask-250 creates a visible circular area (radius:125px) centered */
 .cropper-area {
-	width: 100%;
-	height: 360px;
-	background: #f3f3f3;
-	border-radius: 12px;
-	overflow: hidden;
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  width: 100%;
+  height: 350px;
+  margin-top: 15px;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
 }
 
-/* image inside cropper area - cropper will use the img element */
-.cropper-area img {
-	max-width: 100%;
-	max-height: 100%;
-	display: block
-}
-
-/* circular mask overlay using radial-gradient.
-   transparent circle of radius 125px at center, dim outside. */
+/* ---------------------------------------------------
+   CIRCLE MASK (250px)
+--------------------------------------------------- */
 .circle-mask-250::after {
-	content: "";
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	background:
-		radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 125px, rgba(0, 0, 0, 0.55) 126px);
-	/* subtle border around circle */
-	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.0) inset;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  height: 250px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.55);
+  pointer-events: none;
 }
 
-/* small guide circle stroke */
-.circle-mask-250::before {
-	content: "";
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: 250px;
-	height: 250px;
-	border-radius: 50%;
-	border: 3px solid rgba(255, 255, 255, 0.9);
-	pointer-events: none;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-}
-
-/* responsive tweaks */
-@media (max-width:480px) {
-	.cropper-area {
-		height: 320px
-	}
-
-	.circle-mask-250::after {
-		/* keep same radius visually; on small screens center remains 125px */
-	}
-}
-
-/* sheet bottom */
-.sheet {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: -100%;
-	background: #fff;
-	border-radius: 20px 20px 0 0;
-	padding: 20px;
-	box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.15);
-	z-index: 9999;
-	transition: bottom .25s
-}
-
-.sheet.active {
-	bottom: 0
+/* Cropper image */
+.cropper-area img {
+  width: 100%;
+  max-width: none;
 }
