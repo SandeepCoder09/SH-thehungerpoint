@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 QR Decoder</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>09 QR Decoder</h1>
+    <button id="themeToggle">🌙</button>
+  </header>
+
+  <main class="card">
+    <input type="file" id="qrImage" accept="image/*">
+
+    <div class="spinner" id="decodeSpinner"></div>
+
+    <canvas id="decodeCanvas" style="display:none;"></canvas>
+
+    <p id="decodedText">Upload a QR code to decode</p>
+
+    <button id="copyBtn" class="copy-btn">Copy Text</button>
+
+    <a href="index.html" class="switch-page">← Go to Generater</a>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
