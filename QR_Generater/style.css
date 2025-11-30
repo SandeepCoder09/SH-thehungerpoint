@@ -1,0 +1,135 @@
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* ---- THEME ---- */
+:root {
+  --blue: #00aaff;
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.25);
+  --text-light: #fff;
+  --text-dark: #111;
+  --bg-light: #eef3ff;
+  --bg-dark: #0b0e17;
+}
+
+[data-theme="light"] {
+  --text: var(--text-dark);
+  --bg: var(--bg-light);
+}
+
+[data-theme="dark"] {
+  --text: var(--text-light);
+  --bg: var(--bg-dark);
+}
+
+/* ---- BODY ---- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Poppins, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.3s;
+}
+
+/* ---- HEADER ---- */
+header {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px;
+}
+
+header h1 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+#themeToggle {
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+/* ---- CARD ---- */
+.card {
+  width: 90%;
+  max-width: 500px;
+  margin-top: 20px;
+  padding: 25px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(15px);
+  text-align: center;
+  box-shadow: 0 0 25px rgba(0, 170, 255, 0.3);
+}
+
+/* Inputs */
+input[type="text"],
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid var(--blue);
+  background: transparent;
+  color: var(--text);
+  margin-bottom: 15px;
+}
+
+/* Buttons */
+button,
+#downloadBtn,
+.switch-page,
+.copy-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  text-align: center;
+  background: var(--blue);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  box-shadow: 0 0 15px rgba(0, 170, 255, 0.6);
+}
+
+/* Spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top: 4px solid var(--blue);
+  border-radius: 50%;
+  margin: 15px auto;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Copy Button Initially Hidden */
+.copy-btn {
+  display: none;
+}
+
+/* Canvas QR */
+canvas {
+  margin-top: 20px;
+  width: 260px;
+  border-radius: 10px;
+}
