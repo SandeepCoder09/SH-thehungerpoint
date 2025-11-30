@@ -135,9 +135,33 @@ canvas, #qrOutput img {
 .decoded-box {
   padding: 14px;
   background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border);
+  border: 1px solid var(--blue);
   border-radius: 12px;
   margin-top: 15px;
+
+  /* Fix overflow */
+  max-height: 180px;
+  overflow-y: auto;
+
+  /* text */
+  text-align: left;
+}
+
+/* Title inside the decoded box */
+.decoded-title {
+  display: block;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 6px;
+  font-size: 15px;
+  text-shadow: 0 0 8px rgba(0,170,255,0.4);
+}
+
+#decodedText {
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 /* Spinner */
