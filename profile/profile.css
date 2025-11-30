@@ -87,21 +87,25 @@ body {
 	margin-bottom: 18px;
 }
 
-.avatar {
-	width: var(--avatar-size);
-	text-align: center;
-	flex: 0 0 var(--avatar-size);
+.avatar{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  overflow:hidden;    /* IMPORTANT */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:10px;
 }
 
-.photo {
-	width: 100%;
-	height: var(--avatar-size);
-	border-radius: 50%;
-	/* rounded square (2B) */
-	object-fit: cover;
-	border: 2px solid #f0f0f0;
-	box-shadow: var(--soft-shadow);
-	display: block;
+.photo{
+  width:110px;
+  height:110px;
+  border-radius:50% !important;   /* full circle */
+  object-fit:cover;
+  border:2px solid #e5e5e5;
+  display:block;
+  margin:0 auto;
 }
 
 .avatar-actions {
