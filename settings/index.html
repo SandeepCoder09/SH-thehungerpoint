@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <title>Settings — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <link rel="icon" href="/home/SH-Favicon.png" />
 
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- CropperJS CSS -->
+  <!-- Cropper CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
-  <!-- Global CSS -->
+  <!-- Global Styles -->
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 
@@ -23,30 +23,30 @@
 
     <article class="settings-card">
 
-      <!-- USER CARD -->
+      <!-- USER BANNER -->
       <div class="user-banner">
 
         <div class="user-avatar" style="position:relative;">
-          <img id="hdrAvatar" src="/assets/default-user.png" alt="avatar">
+          <img id="hdrAvatar" src="/assets/default-user.png">
 
-          <!-- Pencil button -->
-          <button id="settingsPencilBtn" onclick="openSettingsPhotoPicker()" 
+          <!-- Pencil -->
+          <button onclick="openSettingsPhotoPicker()" 
             style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;
             border:1px solid #ddd;width:26px;height:26px;display:flex;align-items:center;
-            justify-content:center;">
-            <i class="ri-pencil-line" style="font-size:15px;color:var(--primary-dark)"></i>
+            justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,0.1);">
+            <i class="ri-pencil-line" style="font-size:15px;color:#b71c1c;"></i>
           </button>
         </div>
 
         <div class="user-info">
-          <div class="user-name" id="hdrName">User Name</div>
-          <div class="user-mail" id="hdrEmail">user@example.com</div>
+          <div id="hdrName" class="user-name">User Name</div>
+          <div id="hdrEmail" class="user-mail">user@example.com</div>
         </div>
 
       </div>
 
-      <!-- SETTINGS LIST -->
-      <div class="settings-list" style="margin-top:16px;">
+      <!-- LIST -->
+      <div class="settings-list">
 
         <div class="settings-item" onclick="openProfile()">
           <div class="icon"><i class="ri-user-line"></i></div>
@@ -66,7 +66,7 @@
           <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
         </div>
 
-        <a href="/settings/faqs.html" style="text-decoration:none;color:inherit;">
+        <a href="/settings/faqs.html" style="color:inherit;text-decoration:none;">
           <div class="settings-item">
             <div class="icon"><i class="ri-question-line"></i></div>
             <div>
@@ -84,7 +84,7 @@
             <div class="kv">Receive updates & offers</div>
           </div>
 
-          <div id="pushToggle" class="toggle" onclick="togglePush(this)">
+          <div id="pushToggle" class="toggle">
             <div class="dot"></div>
           </div>
         </div>
@@ -99,18 +99,18 @@
 
       </div>
 
-      <div class="support-box" style="margin-top:18px;">
-        Need help? Message us on WhatsApp — <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
+      <div class="support-box">
+        Need help? Message us on WhatsApp — 
+        <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
       </div>
 
     </article>
 
   </main>
 
-  <!-- CHANGE PASSWORD SHEET -->
+  <!-- PASSWORD SHEET -->
   <div id="pwSheet" class="sheet">
     <div style="width:40px;height:4px;background:#bbb;margin:0 auto;border-radius:4px;"></div>
-
     <h3 style="text-align:center;margin-top:14px;">Change Password</h3>
 
     <div style="margin-top:18px;display:flex;flex-direction:column;gap:12px;">
@@ -124,27 +124,24 @@
     </div>
   </div>
 
-  <!-- CROPPER MODAL (circle mask overlay style) -->
+  <!-- CROPPING MODAL -->
   <div id="settingsCropModal" class="cropper-modal">
     <div class="cropper-content">
 
       <h3>Crop photo</h3>
 
-      <!-- cropper area: inside this container the cropper image will be shown.
-           A circular mask overlay is created via CSS to mimic "Fotor" style. -->
-      <div class="cropper-area circle-mask-250">
-        <img id="settingsCropImage" alt="Crop image preview" />
+      <div class="cropper-area circle-mask-250" style="position:relative;overflow:hidden;">
+        <img id="settingsCropImage" />
       </div>
 
       <div style="display:flex;gap:12px;margin-top:12px;">
-        <button onclick="closeSettingsCropper()" class="btn outline" style="flex:1">Cancel</button>
-        <button onclick="saveSettingsCroppedImage()" class="btn primary" style="flex:1">Save</button>
+        <button onclick="closeSettingsCropper()" class="btn outline" style="flex:1;">Cancel</button>
+        <button onclick="saveSettingsCroppedImage()" class="btn primary" style="flex:1;">Save</button>
       </div>
 
     </div>
   </div>
 
-  <!-- hidden file input -->
   <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
 
   <!-- Firebase -->
@@ -159,7 +156,6 @@
   <!-- CropperJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-  <!-- App JS -->
   <script src="/assets/settings.js"></script>
 
 </body>
