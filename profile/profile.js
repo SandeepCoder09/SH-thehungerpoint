@@ -1,10 +1,10 @@
 /* ======================================================
-   profile.js  — profile page (load/save fields + cropper)
+   profile.js  — FINAL BASE64 VERSION (no Firebase Storage)
+   Same structure, same UI, same cropper.
 ======================================================*/
 
 const auth = window.auth || firebase.auth();
 const db = window.db || firebase.firestore();
-const storage = window.storage || firebase.storage();
 
 const pfAvatar = document.getElementById("pfAvatar");
 const changePhotoBtn = document.getElementById("changePhotoBtn");
@@ -29,7 +29,7 @@ let objectUrl = null;
 function waitForFirebase() {
   return new Promise(res => {
     const check = () => {
-      if ((window.auth || firebase.auth()) && (window.db || firebase.firestore())) res();
+      if (window.auth && window.db) res();
       else setTimeout(check, 30);
     };
     check();
@@ -81,47 +81,69 @@ photoInput.addEventListener("change", (e) => {
   cropModal.classList.add("active");
   cropImage.src = objectUrl;
 
-  cropImage.addEventListener("load", () => {
-    cropper = new Cropper(cropImage, {
-      aspectRatio: 1,
-      viewMode: 1,
-      autoCropArea: 1,
-      background: false,
-      guides: false,
-      movable: true,
-      zoomable: true,
-      dragMode: "move"
-    });
-  }, { once: true });
+  cropImage.addEventListener(
+    "load",
+    () => {
+      cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+        guides: false,
+        movable: true,
+        zoomable: true,
+        dragMode: "move",
+      });
+    },
+    { once: true }
+  );
 });
 
-/* Close & destroy */
+/* Close cropper */
 function closeCropper() {
   cropModal.classList.remove("active");
-  if (cropper) { cropper.destroy(); cropper = null; }
-  if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+  if (objectUrl) {
+    URL.revokeObjectURL(objectUrl);
+    objectUrl = null;
+  }
 }
 window.closeCropper = closeCropper;
 
-/* Save cropped image */
+/* SAVE CROPPED PHOTO AS BASE64 */
 async function saveCroppedImage() {
   if (!cropper) return alert("Cropper not ready");
   const user = auth.currentUser;
   if (!user) return;
 
-  const canvas = cropper.getCroppedCanvas({ width: 600, height: 600, fillColor: "#fff" });
+  const canvas = cropper.getCroppedCanvas({
+    width: 600,
+    height: 600,
+    fillColor: "#fff",
+  });
 
-  canvas.toBlob(async (blob) => {
-    const ref = storage.ref(`profile/${user.uid}.jpg`);
-    await ref.put(blob);
-    const url = await ref.getDownloadURL();
+  // Convert to Base64 instead of blob upload
+  const base64 = canvas.toDataURL("image/jpeg", 0.85);
 
-    await db.collection("users").doc(user.uid).set({ photoURL: url }, { merge: true });
+  try {
+    // Save Base64 to Firestore
+    await db.collection("users").doc(user.uid).set(
+      { photoURL: base64 },
+      { merge: true }
+    );
 
-    pfAvatar.src = url;
+    // Update UI instantly
+    pfAvatar.src = base64 + "?t=" + Date.now();
+
     closeCropper();
     alert("Photo updated!");
-  }, "image/jpeg", 0.9);
+  } catch (err) {
+    console.error("Photo save error:", err);
+    alert("Failed to update photo");
+  }
 }
 window.saveCroppedImage = saveCroppedImage;
 
@@ -130,20 +152,29 @@ saveBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  await db.collection("users").doc(user.uid).set({
-    name: nameField.value,
-    gender: genderField.value,
-    phone: phoneField.value,
-    address: addressField.value
-  }, { merge: true });
+  await db.collection("users").doc(user.uid).set(
+    {
+      name: nameField.value,
+      gender: genderField.value,
+      phone: phoneField.value,
+      address: addressField.value,
+    },
+    { merge: true }
+  );
 
   alert("Profile saved!");
 });
 
 /* Reset password */
-resetPassBtn.addEventListener("click", () => {
+resetPassBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
-  auth.sendPasswordResetEmail(user.email);
-  alert("Reset email sent.");
+
+  try {
+    await auth.sendPasswordResetEmail(user.email);
+    alert("Reset email sent.");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send reset email");
+  }
 });
