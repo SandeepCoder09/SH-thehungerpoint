@@ -1,13 +1,11 @@
-/* ------------------------------------------
+/* ----------------------------------------------------
    SH - The Hunger Point
-   FINAL JS for Bottom Sheet Cart (B1)
-   Firestore Cart + Render Payment
-------------------------------------------- */
+   FINAL SCRIPT WITH FIREBASE-FIRST INIT
+-----------------------------------------------------*/
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
-/* DOM helpers */
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
@@ -26,7 +24,7 @@ function showToast(msg, dur = 2200) {
 let cart = [];
 const findItem = (id) => cart.findIndex((i) => i.id === id);
 
-/* IMAGE MAP */
+/* Images */
 const imageMap = {
   momo: "/home/sh-momo.png",
   finger: "/home/sh-french-fries.png",
@@ -38,7 +36,55 @@ function getImg(name) {
   return imageMap[name.toLowerCase()] || "/home/SH-Favicon.png";
 }
 
-/* UPDATE CART COUNT */
+/* Firebase UID detection */
+function getCurrentUserId() {
+  const f = firebase.auth().currentUser;
+  if (f?.uid) return f.uid;
+
+  const local = localStorage.getItem("userId");
+  if (local) return local;
+
+  return null;
+}
+
+/* Save cart */
+async function saveCartToFirestore() {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+
+  try {
+    await db.collection("cart").doc(userId).set({
+      items: cart,
+      updatedAt: Date.now(),
+    });
+    console.log("🟢 Cart saved");
+  } catch (err) {
+    console.error("🔥 Firestore Save Error:", err);
+  }
+}
+
+/* Load cart */
+async function loadCartFromFirestore() {
+  const userId = getCurrentUserId();
+  if (!userId) {
+    console.warn("❌ No UID... cannot load cart yet");
+    return;
+  }
+
+  try {
+    const snap = await db.collection("cart").doc(userId).get();
+    if (snap.exists && Array.isArray(snap.data().items)) {
+      cart = snap.data().items;
+      console.log("🟢 Cart loaded from Firestore");
+    } else {
+      cart = [];
+    }
+  } catch (err) {
+    console.error("🔥 Firestore Load Error:", err);
+  }
+}
+
+/* Update cart count icon */
 function updateCartCount() {
   const btn = $("#bottomCartBtn");
   if (!btn) return;
@@ -46,66 +92,7 @@ function updateCartCount() {
   btn.setAttribute("data-count", total);
 }
 
-/* --------------------------------------------------
-   FIX #1 — ALWAYS GET FIREBASE UID DIRECTLY
--------------------------------------------------- */
-function getCurrentUserId() {
-  const user = firebase.auth().currentUser;
-  return user ? user.uid : null;
-}
-
-/* --------------------------------------------------
-   FIRESTORE CART: SAVE
--------------------------------------------------- */
-async function saveCartToFirestore() {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    console.warn("⚠ No UID during saveCart");
-    return;
-  }
-
-  try {
-    await db.collection("cart").doc(userId).set({
-      items: cart,
-      updatedAt: Date.now(),
-    });
-
-    console.log("🟢 Cart saved to Firestore");
-  } catch (err) {
-    console.error("🔥 Firestore Save Error:", err);
-  }
-}
-
-/* --------------------------------------------------
-   FIRESTORE CART: LOAD
--------------------------------------------------- */
-async function loadCartFromFirestore() {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    console.warn("⚠ No UID during loadCart");
-    return;
-  }
-
-  try {
-    const snap = await db.collection("cart").doc(userId).get();
-
-    if (snap.exists) {
-      const data = snap.data();
-      if (Array.isArray(data.items)) {
-        cart = data.items;
-        console.log("🟢 Cart loaded from Firestore");
-      }
-    } else {
-      console.log("ℹ No cart found for this user");
-    }
-  } catch (err) {
-    console.error("🔥 Firestore Load Error:", err);
-  }
-}
-
-/* --------------------------------------------------
-   RENDER CART UI
--------------------------------------------------- */
+/* Render cart UI */
 function renderCart() {
   const box = $("#cartItems");
   if (!box) return;
@@ -114,7 +101,7 @@ function renderCart() {
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal")?.textContent = "₹0";
+    $("#cartTotal").textContent = "₹0";
     updateCartCount();
     return;
   }
@@ -132,7 +119,7 @@ function renderCart() {
       <img class="cart-img" src="${getImg(item.name)}">
       <div class="cart-info">
         <div class="cart-name">${item.name}</div>
-        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
+        <div class="cart-sub">₹${item.price} × ${item.qty}</div>
       </div>
 
       <div class="cart-actions">
@@ -147,52 +134,44 @@ function renderCart() {
   });
 
   $("#cartTotal").textContent = "₹" + total;
-
   updateCartCount();
   attachCartButtons();
 }
 
-/* --------------------------------------------------
-   CART BUTTON EVENT HANDLERS
--------------------------------------------------- */
+/* Cart item button events */
 function attachCartButtons() {
   $$(".c-dec").forEach((b) =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.id;
-      const i = findItem(id);
+    b.onclick = () => {
+      const i = findItem(b.dataset.id);
       if (i >= 0) {
         cart[i].qty = Math.max(1, cart[i].qty - 1);
         renderCart();
         saveCartToFirestore();
       }
-    })
+    }
   );
 
   $$(".c-inc").forEach((b) =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.id;
-      const i = findItem(id);
+    b.onclick = () => {
+      const i = findItem(b.dataset.id);
       if (i >= 0) {
         cart[i].qty++;
         renderCart();
         saveCartToFirestore();
       }
-    })
+    }
   );
 
   $$(".c-rem").forEach((b) =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.id;
-      cart = cart.filter((x) => x.id !== id);
+    b.onclick = () => {
+      cart = cart.filter((x) => x.id !== b.dataset.id);
       renderCart();
       saveCartToFirestore();
-    })
+    }
   );
 }
 
-/* --------------------------------------------------
-   FLY TO CART
--------------------------------------------------- */
+/* Fly to cart animation */
 function flyToCart(img) {
   if (!img) return;
 
@@ -220,9 +199,7 @@ function flyToCart(img) {
   setTimeout(() => clone.remove(), 800);
 }
 
-/* --------------------------------------------------
-   CART SHEET OPEN/CLOSE
--------------------------------------------------- */
+/* Bottom sheet */
 function openCartSheet() {
   $("#overlay").classList.add("active");
   $("#cartSheet").classList.add("active");
@@ -236,17 +213,11 @@ function closeCartSheet() {
   document.body.style.overflow = "";
 }
 
-$("#bottomCartBtn")?.addEventListener("click", openCartSheet);
-$("#overlay")?.addEventListener("click", closeCartSheet);
+$("#bottomCartBtn").onclick = openCartSheet;
+$("#overlay").onclick = closeCartSheet;
+$("#closeSheet")?.addEventListener("click", closeCartSheet);
 
-document.addEventListener("DOMContentLoaded", () => {
-  const xBtn = document.getElementById("closeSheet");
-  if (xBtn) xBtn.addEventListener("click", closeCartSheet);
-});
-
-/* --------------------------------------------------
-   MENU + ADD TO CART
--------------------------------------------------- */
+/* Menu item buttons (Add, +, −) */
 function initMenu() {
   $$(".menu-item").forEach((el) => {
     const minus = el.querySelector(".qty-btn.minus");
@@ -256,19 +227,19 @@ function initMenu() {
     const img = el.querySelector(".menu-img");
 
     let qty = 1;
-    if (disp) disp.textContent = qty;
+    disp.textContent = qty;
 
-    minus?.addEventListener("click", () => {
+    minus.onclick = () => {
       qty = Math.max(1, qty - 1);
-      if (disp) disp.textContent = qty;
-    });
+      disp.textContent = qty;
+    };
 
-    plus?.addEventListener("click", () => {
+    plus.onclick = () => {
       qty++;
-      if (disp) disp.textContent = qty;
-    });
+      disp.textContent = qty;
+    };
 
-    add?.addEventListener("click", () => {
+    add.onclick = () => {
       flyToCart(img);
 
       const name = el.dataset.item;
@@ -284,38 +255,12 @@ function initMenu() {
       saveCartToFirestore();
 
       qty = 1;
-      if (disp) disp.textContent = qty;
-    });
+      disp.textContent = qty;
+    };
   });
 }
 
-/* --------------------------------------------------
-   SEARCH + CATEGORY FILTER
--------------------------------------------------- */
-$("#menuSearch")?.addEventListener("input", (e) => {
-  const q = e.target.value.toLowerCase();
-  $$(".menu-item").forEach((el) => {
-    const name = (el.dataset.item || "").toLowerCase();
-    const desc = (el.querySelector(".menu-desc")?.textContent || "").toLowerCase();
-    el.style.display = name.includes(q) || desc.includes(q) ? "flex" : "none";
-  });
-});
-
-$$(".chip").forEach((chip) =>
-  chip.addEventListener("click", () => {
-    $$(".chip").forEach((c) => c.classList.remove("active"));
-    chip.classList.add("active");
-
-    const cat = chip.dataset.cat;
-    $$(".menu-item").forEach((el) => {
-      el.style.display = cat === "all" || el.dataset.cat === cat ? "flex" : "none";
-    });
-  })
-);
-
-/* --------------------------------------------------
-   CLEAR CART
--------------------------------------------------- */
+/* Clear cart */
 $("#clearCart")?.addEventListener("click", () => {
   cart = [];
   renderCart();
@@ -323,13 +268,11 @@ $("#clearCart")?.addEventListener("click", () => {
   showToast("Cart cleared");
 });
 
-/* --------------------------------------------------
-   PAYMENT USING RENDER SERVER
--------------------------------------------------- */
+/* Checkout */
 $("#checkoutBtn")?.addEventListener("click", startCheckoutFlow);
 
 async function startCheckoutFlow() {
-  if (cart.length === 0) return showToast("Cart is empty");
+  if (cart.length === 0) return showToast("Cart empty");
 
   const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
   const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
@@ -345,21 +288,15 @@ async function startCheckoutFlow() {
     const data = await res.json();
     if (!data.ok) return showToast(data.error || "Payment failed");
 
-    const session = data.session;
-    const orderId = data.orderId;
+    const { session, orderId } = data;
 
     if (window.Cashfree) {
       window.Cashfree.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
-    } else {
-      return showToast("Cashfree SDK missing");
-    }
+    } else return showToast("Cashfree missing");
 
     const handler = async (e) => {
-      const msg = e.data;
-
-      if (msg?.paymentStatus === "SUCCESS") {
-        showToast("Payment verifying...");
-
+      if (e.data?.paymentStatus === "SUCCESS") {
+        showToast("Verifying...");
         const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -373,8 +310,6 @@ async function startCheckoutFlow() {
           renderCart();
           saveCartToFirestore();
           closeCartSheet();
-        } else {
-          showToast("Payment verify failed");
         }
       }
       window.removeEventListener("message", handler);
@@ -387,17 +322,20 @@ async function startCheckoutFlow() {
   }
 }
 
-/* --------------------------------------------------
-   INIT
--------------------------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  initMenu();
+/* ----------------------------------------------------
+   FIREBASE-FIRST INITIALIZATION
+-----------------------------------------------------*/
 
-  firebase.auth().onAuthStateChanged(async (user) => {
-    if (user) {
-      console.log("🔐 UID ready:", user.uid);
-      await loadCartFromFirestore();
-      renderCart();
-    }
-  });
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    console.warn("❌ User NOT logged in — cart disabled");
+    return;
+  }
+
+  console.log("🟢 Firebase User Ready:", user.uid);
+  localStorage.setItem("userId", user.uid);
+
+  initMenu();                 // ALL buttons attach AFTER Firebase ready
+  await loadCartFromFirestore();  
+  renderCart();
 });
