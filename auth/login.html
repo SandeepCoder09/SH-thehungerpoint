@@ -7,33 +7,14 @@
   <title>Login — SH The Hunger Point</title>
 
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-
-  <!-- Firebase v10 Modular SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    window.firebaseApp = initializeApp({
-      apiKey: "AIzaSyBAR2bTveqOertBkpt95YId9hDPrg6S9_E",
-      authDomain: "sh-the-hunger-point.firebaseapp.com",
-      projectId: "sh-the-hunger-point",
-      storageBucket: "sh-thehungerpoint.appspot.com",
-      messagingSenderId: "312843485011",
-      appId: "1:312843485011:web:347c18ee0ad022a1beaba6"
-    });
-
-    window.auth = getAuth(firebaseApp);
-    window.db = getFirestore(firebaseApp);
-  </script>
-
   <link rel="stylesheet" href="/auth/login.css" />
+
+  <!-- Firebase v10 (ES Modules auto-loaded by login.js) -->
 </head>
 
 <body>
   <main class="auth-page">
     <div class="card">
-
       <header class="card-head">
         <div class="logo-box">
           <img src="/home/sh-thehungerpoint.png" alt="SH logo" />
@@ -45,18 +26,16 @@
         <form id="loginForm">
 
           <label>Email</label>
-          <input id="email" type="email" required />
+          <input id="email" type="email" required>
 
           <label>Password</label>
-          <input id="password" type="password" required />
+          <input id="password" type="password" required>
 
           <button type="submit" class="btn primary">Sign In</button>
 
           <div class="divider">or</div>
 
           <button type="button" id="googleLogin" class="btn google">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                 width="20" height="20" style="margin-right:8px;">
             Continue with Google
           </button>
 
@@ -67,7 +46,7 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Your login logic -->
+  <!-- Firebase Config + Login Script -->
   <script type="module" src="/auth/login.js"></script>
 </body>
 </html>
