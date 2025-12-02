@@ -4,21 +4,15 @@
   <meta charset="utf-8" />
   <title>Your Profile — The Hunger Point</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link rel="icon" href="/home/SH-Favicon.png" />
 
-  <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-
-  <!-- Global Styles -->
   <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 </head>
-
 <body>
 
   <main class="container profile-shell">
-
-    <!-- Header -->
     <div class="back-header">
       <button onclick="history.back()" class="back-btn">
         <i class="ri-arrow-left-line"></i>
@@ -26,34 +20,22 @@
       <h2>Your Profile</h2>
     </div>
 
-    <!-- Card -->
     <article class="profile-card">
-
-      <!-- Avatar -->
       <div class="profile-avatar-wrap">
-
         <div class="profile-avatar">
-          <img id="pfAvatar" src="/assets/default-user.png" alt="avatar">
+          <img id="pfAvatar" src="/home/SH-Favicon.png" alt="avatar">
         </div>
 
-        <!-- Pencil icon -->
-        <button id="changePhotoBtn" class="avatar-edit-btn">
-          <i class="ri-pencil-line"></i>
-        </button>
-
-        <!-- Hidden Input -->
-        <input type="file" hidden id="photoInput" accept="image/*" />
-
+        <button id="changePhotoBtn" class="avatar-edit-btn" aria-label="Change photo"><i class="ri-pencil-line"></i></button>
+        <input type="file" id="photoInput" accept="image/*" hidden />
       </div>
 
-      <!-- Fields -->
       <div class="form-section">
-
         <label class="label">Full Name</label>
-        <input id="name" class="input" type="text" placeholder="Your name" />
+        <input id="name" class="input" type="text" placeholder="Your name">
 
         <label class="label">Email</label>
-        <input id="email" class="input" type="email" disabled />
+        <input id="email" class="input" type="email" disabled>
 
         <label class="label">Gender</label>
         <select id="gender" class="input">
@@ -64,39 +46,31 @@
         </select>
 
         <label class="label">Phone Number</label>
-        <input id="phone" class="input" type="text" placeholder="Optional" />
+        <input id="phone" class="input" type="text" placeholder="Optional">
 
         <label class="label">Delivery Address</label>
         <textarea id="address" class="input" rows="3" placeholder="Your full address"></textarea>
-
       </div>
 
-      <!-- Actions -->
       <div class="profile-actions">
         <button id="saveBtn" class="btn primary">Save Profile</button>
         <button id="resetPassBtn" class="btn outline">Send Password Reset Email</button>
       </div>
-
     </article>
-
   </main>
 
-
-  <!-- CROPPER MODAL (hidden until JS opens it) -->
-  <div id="cropModal" class="cropper-modal">
+  <!-- CROPPER MODAL -->
+  <div id="cropModal" class="cropper-modal" aria-hidden="true">
     <div class="cropper-content">
-
       <h3>Crop photo</h3>
-
-      <div class="cropper-area">
-        <img id="cropImage" />
+      <div class="cropper-area circle-mask-250">
+        <img id="cropImage" alt="crop">
       </div>
 
-      <div class="cropper-buttons">
-        <button onclick="closeCropper()" class="btn outline">Cancel</button>
-        <button onclick="saveCroppedImage()" class="btn primary">Save</button>
+      <div class="cropper-buttons" style="display:flex;gap:12px;margin-top:12px;">
+        <button onclick="closeCropper()" class="btn outline" style="flex:1;">Cancel</button>
+        <button onclick="saveCroppedImage()" class="btn primary" style="flex:1;">Save</button>
       </div>
-
     </div>
   </div>
 
@@ -109,7 +83,7 @@
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script src="/profile/profile.js"></script>
-
 </body>
 </html>
