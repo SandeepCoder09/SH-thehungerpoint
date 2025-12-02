@@ -244,10 +244,10 @@ app.post("/create-cashfree-order", async (req, res) => {
       order_amount: Number(amount),
       order_currency: "INR",
       customer_details: {
-        customer_id: customerId,              // must be alphanumeric
-        customer_phone: phone?.slice(0, 20) || "9999999999",
-        customer_email: email || "guest@sh.com"
-      }
+      customer_id: phone ? `uid_${phone}` : "guest01",
+      customer_phone: "9999999999",     // ALWAYS valid numeric 10-digit
+      customer_email: email || "guest@sh.com"
+}
     };
 
     const cf = await fetch(`${CF_BASE}/pg/orders`, {
