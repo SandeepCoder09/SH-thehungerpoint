@@ -1,10 +1,15 @@
-/* ======================================================
-   profile.js  — FINAL BASE64 VERSION (no Firebase Storage)
-   Same structure, same UI, same cropper.
-======================================================*/
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const auth = window.auth || firebase.auth();
-const db = window.db || firebase.firestore();
+import {
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const auth = window.auth;
+const db = window.db;
 
 const pfAvatar = document.getElementById("pfAvatar");
 const changePhotoBtn = document.getElementById("changePhotoBtn");
@@ -25,139 +30,92 @@ const cropImage = document.getElementById("cropImage");
 let cropper = null;
 let objectUrl = null;
 
-/* Wait for firebase ready */
-function waitForFirebase() {
-  return new Promise(res => {
-    const check = () => {
-      if (window.auth && window.db) res();
-      else setTimeout(check, 30);
-    };
-    check();
-  });
-}
+/* Load user */
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
 
-(async () => {
-  await waitForFirebase();
+  emailField.value = user.email || "";
 
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) {
-      window.location.href = "/auth/login.html";
-      return;
-    }
+  const snap = await getDoc(doc(db, "users", user.uid));
 
-    emailField.value = user.email || "";
-    const doc = await db.collection("users").doc(user.uid).get();
+  if (snap.exists()) {
+    const data = snap.data();
 
-    if (doc.exists) {
-      const data = doc.data();
-      nameField.value = data.name || "";
-      genderField.value = data.gender || "";
-      phoneField.value = data.phone || "";
-      addressField.value = data.address || "";
-      pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
-    } else {
-      pfAvatar.src = "/home/SH-Favicon.png";
-    }
-  });
-})();
+    nameField.value = data.name || "";
+    genderField.value = data.gender || "";
+    phoneField.value = data.phone || "";
+    addressField.value = data.address || "";
+    pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
+  } else {
+    pfAvatar.src = "/home/SH-Favicon.png";
+  }
+});
 
-/* Open file picker */
+/* Upload photo */
 changePhotoBtn.addEventListener("click", () => photoInput.click());
 
-/* File selected → cropper */
 photoInput.addEventListener("change", (e) => {
-  const f = e.target.files && e.target.files[0];
+  const f = e.target.files?.[0];
   if (!f) return;
 
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(f);
 
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-
-  cropImage.src = "";
-  cropModal.classList.add("active");
   cropImage.src = objectUrl;
+  cropModal.classList.add("active");
 
-  cropImage.addEventListener(
-    "load",
-    () => {
-      cropper = new Cropper(cropImage, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-        background: false,
-        guides: false,
-        movable: true,
-        zoomable: true,
-        dragMode: "move",
-      });
-    },
-    { once: true }
-  );
+  cropImage.onload = () => {
+    if (cropper) cropper.destroy();
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1,
+      background: false
+    });
+  };
 });
 
-/* Close cropper */
-function closeCropper() {
+window.closeCropper = () => {
   cropModal.classList.remove("active");
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-  if (objectUrl) {
-    URL.revokeObjectURL(objectUrl);
-    objectUrl = null;
-  }
-}
-window.closeCropper = closeCropper;
+  if (cropper) cropper.destroy();
+  cropper = null;
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
+};
 
-/* SAVE CROPPED PHOTO AS BASE64 */
-async function saveCroppedImage() {
+/* Save cropped */
+window.saveCroppedImage = async () => {
   if (!cropper) return alert("Cropper not ready");
+
   const user = auth.currentUser;
   if (!user) return;
 
-  const canvas = cropper.getCroppedCanvas({
-    width: 600,
-    height: 600,
-    fillColor: "#fff",
-  });
+  const canvas = cropper.getCroppedCanvas({ width: 600, height: 600 });
 
-  // Convert to Base64 instead of blob upload
   const base64 = canvas.toDataURL("image/jpeg", 0.85);
 
-  try {
-    // Save Base64 to Firestore
-    await db.collection("users").doc(user.uid).set(
-      { photoURL: base64 },
-      { merge: true }
-    );
+  await setDoc(
+    doc(db, "users", user.uid),
+    { photoURL: base64 },
+    { merge: true }
+  );
 
-    // Update UI instantly
-    pfAvatar.src = base64 + "?t=" + Date.now();
+  pfAvatar.src = base64 + "?t=" + Date.now();
+  window.closeCropper();
+  alert("Photo updated!");
+};
 
-    closeCropper();
-    alert("Photo updated!");
-  } catch (err) {
-    console.error("Photo save error:", err);
-    alert("Failed to update photo");
-  }
-}
-window.saveCroppedImage = saveCroppedImage;
-
-/* Save profile data */
+/* Save details */
 saveBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  await db.collection("users").doc(user.uid).set(
+  await setDoc(
+    doc(db, "users", user.uid),
     {
       name: nameField.value,
       gender: genderField.value,
       phone: phoneField.value,
-      address: addressField.value,
+      address: addressField.value
     },
     { merge: true }
   );
@@ -171,10 +129,9 @@ resetPassBtn.addEventListener("click", async () => {
   if (!user) return;
 
   try {
-    await auth.sendPasswordResetEmail(user.email);
+    await sendPasswordResetEmail(auth, user.email);
     alert("Reset email sent.");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send reset email");
+  } catch {
+    alert("Failed!");
   }
 });
