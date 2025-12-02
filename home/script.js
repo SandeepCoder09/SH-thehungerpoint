@@ -1,10 +1,9 @@
 /* ------------------------------------------
    SH - The Hunger Point
    FINAL JS for Bottom Sheet Cart (B1)
-   Persist cart to server (cart collection) + local fallback
+   Firestore Cart Persistence (No Backend Needed)
    ------------------------------------------ */
 
-const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 const PRICE_DEFAULT = 10;
 
 /* DOM helpers */
@@ -55,7 +54,7 @@ function renderCart() {
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal" ) && ($("#cartTotal").textContent = "₹0");
+    $("#cartTotal") && ($("#cartTotal").textContent = "₹0");
     updateCartCount();
     return;
   }
@@ -93,38 +92,94 @@ function renderCart() {
   attachCartButtons();
 }
 
+/* ================================
+      USER ID DETECTOR
+================================ */
+function getCurrentUserId() {
+  if (window.SH?.user?.id) return window.SH.user.id;
+  if (window.currentUser?.id) return window.currentUser.id;
+
+  const uid1 = localStorage.getItem("userId");
+  if (uid1) return uid1;
+
+  const uid2 = localStorage.getItem("uid");
+  if (uid2) return uid2;
+
+  const fAuth = firebase.auth().currentUser;
+  if (fAuth?.uid) return fAuth.uid;
+
+  return null;
+}
+
+/* ================================
+      FIRESTORE CART FUNCTIONS
+================================ */
+async function saveCartToFirestore() {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+
+  try {
+    await db.collection("cart").doc(userId).set({
+      items: cart,
+      updatedAt: Date.now(),
+    });
+
+    console.log("🟢 Cart saved to Firestore");
+  } catch (err) {
+    console.error("🔥 Firestore Save Error:", err);
+  }
+}
+
+async function loadCartFromFirestore() {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+
+  try {
+    const snap = await db.collection("cart").doc(userId).get();
+    if (snap.exists) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cart = data.items;
+        console.log("🟢 Cart loaded from Firestore");
+      }
+    }
+  } catch (err) {
+    console.error("🔥 Firestore Load Error:", err);
+  }
+}
+
 /* ATTACH CART BUTTON EVENTS */
 function attachCartButtons() {
   $$(".c-dec").forEach((b) =>
-    b.addEventListener("click", async () => {
+    b.addEventListener("click", () => {
       const id = b.dataset.id;
       const i = findItem(id);
       if (i >= 0) {
         cart[i].qty = Math.max(1, cart[i].qty - 1);
         renderCart();
-        await scheduleSaveCart();
+        saveCartToFirestore();
       }
     })
   );
 
   $$(".c-inc").forEach((b) =>
-    b.addEventListener("click", async () => {
+    b.addEventListener("click", () => {
       const id = b.dataset.id;
       const i = findItem(id);
       if (i >= 0) {
         cart[i].qty++;
         renderCart();
-        await scheduleSaveCart();
+        saveCartToFirestore();
       }
     })
   );
 
   $$(".c-rem").forEach((b) =>
-    b.addEventListener("click", async () => {
+    b.addEventListener("click", () => {
       const id = b.dataset.id;
       cart = cart.filter((x) => x.id !== id);
       renderCart();
-      await scheduleSaveCart();
+      saveCartToFirestore();
     })
   );
 }
@@ -177,162 +232,8 @@ $("#overlay")?.addEventListener("click", closeCartSheet);
 /* FIX: ensure X button always works */
 document.addEventListener("DOMContentLoaded", () => {
   const xBtn = document.getElementById("closeSheet");
-  if (xBtn) {
-    xBtn.addEventListener("click", closeCartSheet);
-  }
+  if (xBtn) xBtn.addEventListener("click", closeCartSheet);
 });
-
-/* --- AUTH / USER detection helpers --- */
-/*
-  This tries common places where your app might store the logged-in user or token.
-  If your app has a different place (e.g. window.SH.user or a cookie), update getCurrentUserId/getAuthToken accordingly.
-*/
-function getCurrentUserId() {
-  // try common globals
-  if (window.SH && window.SH.user && window.SH.user.id) return window.SH.user.id;
-  if (window.currentUser && window.currentUser.id) return window.currentUser.id;
-  // try localStorage
-  try {
-    const uid = localStorage.getItem("userId") || localStorage.getItem("uid");
-    if (uid) return uid;
-    // maybe stored as JSON
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      const u = JSON.parse(raw);
-      if (u && u.id) return u.id;
-    }
-  } catch (e) {}
-  return null;
-}
-
-function getAuthToken() {
-  // token places
-  if (window.SH && window.SH.token) return window.SH.token;
-  if (window.currentUser && window.currentUser.token) return window.currentUser.token;
-  try {
-    return localStorage.getItem("authToken") || localStorage.getItem("token") || null;
-  } catch (e) {
-    return null;
-  }
-}
-
-/* --- SERVER COMMUNICATION --- */
-const SAVE_DEBOUNCE_MS = 700;
-let saveTimeout = null;
-let lastSavePromise = null;
-
-function buildHeaders() {
-  const headers = { "Content-Type": "application/json" };
-  const token = getAuthToken();
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  return headers;
-}
-
-async function saveCartToServer() {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    // no logged-in user detected -> persist locally
-    try {
-      localStorage.setItem("cart_fallback", JSON.stringify(cart));
-    } catch (e) {}
-    return false;
-  }
-
-  const payload = { userId, items: cart };
-
-  try {
-    const res = await fetch(`${SERVER_URL}/cart`, {
-      method: "POST", // server should accept POST to create/update cart for user
-      headers: buildHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      // server responded with error — fallback to localStorage
-      try {
-        localStorage.setItem("cart_fallback", JSON.stringify(cart));
-      } catch (e) {}
-      console.warn("Cart save failed:", res.status);
-      return false;
-    }
-
-    // Optionally read response
-    await res.json().catch(() => {});
-    return true;
-  } catch (err) {
-    console.warn("Cart save error:", err);
-    try {
-      localStorage.setItem("cart_fallback", JSON.stringify(cart));
-    } catch (e) {}
-    return false;
-  }
-}
-
-async function loadCartFromServer() {
-  const userId = getCurrentUserId();
-  // first try server if userId present
-  if (userId) {
-    try {
-      const token = getAuthToken();
-      const url = new URL(`${SERVER_URL}/cart`);
-      url.searchParams.set("userId", userId);
-
-      const res = await fetch(url.toString(), {
-        method: "GET",
-        headers: buildHeaders(),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.items)) {
-          cart = data.items.map((it) => ({
-            id: it.id,
-            name: it.name,
-            price: it.price,
-            qty: it.qty,
-          }));
-          renderCart();
-          return true;
-        }
-      } else {
-        console.warn("Load cart server responded:", res.status);
-      }
-    } catch (err) {
-      console.warn("Load cart from server error:", err);
-    }
-  }
-
-  // fallback: try localStorage saved cart (either from previous offline save or when user not detected)
-  try {
-    const raw = localStorage.getItem("cart_fallback");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        cart = parsed;
-        renderCart();
-        return true;
-      }
-    }
-  } catch (e) {}
-
-  // nothing found -> empty cart
-  cart = [];
-  renderCart();
-  return false;
-}
-
-/* Debounced save to avoid too many requests */
-function scheduleSaveCart() {
-  if (saveTimeout) clearTimeout(saveTimeout);
-  return new Promise((resolve) => {
-    saveTimeout = setTimeout(async () => {
-      lastSavePromise = saveCartToServer();
-      const ok = await lastSavePromise;
-      saveTimeout = null;
-      resolve(ok);
-    }, SAVE_DEBOUNCE_MS);
-  });
-}
 
 /* MENU ACTIONS (qty + add) */
 function initMenu() {
@@ -356,7 +257,7 @@ function initMenu() {
       if (disp) disp.textContent = qty;
     });
 
-    add?.addEventListener("click", async () => {
+    add?.addEventListener("click", () => {
       flyToCart(img);
 
       const name = el.dataset.item;
@@ -369,9 +270,7 @@ function initMenu() {
 
       showToast(`${qty} × ${name} added`);
       renderCart();
-
-      // persist
-      await scheduleSaveCart();
+      saveCartToFirestore();
 
       qty = 1;
       if (disp) disp.textContent = qty;
@@ -403,80 +302,16 @@ $$(".chip").forEach((chip) =>
 );
 
 /* CLEAR CART */
-$("#clearCart")?.addEventListener("click", async () => {
+$("#clearCart")?.addEventListener("click", () => {
   cart = [];
   renderCart();
-  await scheduleSaveCart();
+  saveCartToFirestore();
   showToast("Cart cleared");
 });
-
-/* CHECKOUT → CASHFREE */
-$("#checkoutBtn")?.addEventListener("click", startCheckoutFlow);
-
-async function startCheckoutFlow() {
-  if (cart.length === 0) return showToast("Cart is empty");
-
-  const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
-  const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
-
-  try {
-    showToast("Starting payment...");
-    const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, items }),
-    });
-
-    const data = await res.json();
-    if (!data.ok) return showToast(data.error || "Payment failed");
-
-    const session = data.session;
-    const orderId = data.orderId;
-
-    if (window.Cashfree) {
-      const cf = window.Cashfree;
-      cf.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
-    } else {
-      return showToast("Cashfree SDK missing");
-    }
-
-    const handler = async (e) => {
-      const msg = e.data;
-
-      if (msg?.paymentStatus === "SUCCESS") {
-        showToast("Payment verifying...");
-
-        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, items }),
-        });
-
-        const ok = await vr.json();
-        if (ok?.ok) {
-          showToast("Order Confirmed 🎉");
-          // clear cart locally and on server
-          cart = [];
-          renderCart();
-          await scheduleSaveCart();
-          closeCartSheet();
-        } else {
-          showToast("Payment verify failed");
-        }
-      }
-      window.removeEventListener("message", handler);
-    };
-
-    window.addEventListener("message", handler);
-  } catch (err) {
-    console.error(err);
-    showToast("Checkout error");
-  }
-}
 
 /* INIT */
 document.addEventListener("DOMContentLoaded", async () => {
   initMenu();
-  await loadCartFromServer(); // loads cart from server or fallback storage
+  await loadCartFromFirestore();
   renderCart();
 });
