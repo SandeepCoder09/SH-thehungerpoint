@@ -1,82 +1,92 @@
-// login.js — Prevent rider auto-login into user homepage
+// login.js (Firebase v10 Modular)
 
-async function waitForAuth() {
-  return new Promise(resolve => {
-    const check = () => {
-      if (window.auth && window.db) resolve();
-      else setTimeout(check, 50);
-    };
-    check();
-  });
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const auth = window.auth;
+const db = window.db;
+
+const form = document.getElementById("loginForm");
+const googleBtn = document.getElementById("googleLogin");
+const toast = document.getElementById("toast");
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.hidden = false;
+  setTimeout(() => toast.hidden = true, 2500);
 }
 
-(async () => {
-  await waitForAuth();
+// ------------------------------
+// EMAIL LOGIN
+// ------------------------------
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  const form = document.getElementById("loginForm");
-  const googleBtn = document.getElementById("googleLogin");
-  const toast = document.getElementById("toast");
+  const email = document.getElementById("email").value.trim();
+  const pass = document.getElementById("password").value;
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.hidden = false;
-    setTimeout(() => toast.hidden = true, 2500);
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, pass);
+    const uid = result.user.uid;
+
+    await handleLogin(uid, email);
+
+  } catch (err) {
+    showToast(err.message);
+  }
+});
+
+// ------------------------------
+// GOOGLE LOGIN
+// ------------------------------
+googleBtn.addEventListener("click", async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    const uid = result.user.uid;
+    const email = result.user.email;
+
+    await handleLogin(uid, email);
+
+  } catch (err) {
+    showToast(err.message);
+  }
+});
+
+// ------------------------------
+// HANDLE LOGIN TYPE
+// ------------------------------
+async function handleLogin(uid, email) {
+
+  // 1) Check Rider
+  const riderSnap = await getDoc(doc(db, "riders", email));
+  if (riderSnap.exists()) {
+    window.location.href = "/rider/index.html";
+    return;
   }
 
-  // Email + Password Login
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // 2) Check User
+  const userSnap = await getDoc(doc(db, "users", uid));
+  if (!userSnap.exists()) {
+    await setDoc(doc(db, "users", uid), {
+      email,
+      createdAt: new Date()
+    });
+  }
 
-    const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("password").value;
+  // Save UID for cart
+  localStorage.setItem("userId", uid);
+  localStorage.setItem("userEmail", email);
 
-    try {
-      const cred = await auth.signInWithEmailAndPassword(email, pass);
-      const uid = cred.user.uid;
-
-      // -------------------------------------
-      // 1) Check if this login is for RIDER
-      // -------------------------------------
-      const riderRef = await db.collection("riders").doc(email).get();
-
-      if (riderRef.exists) {
-        // Rider logged in → don't save userId
-        window.location.href = "/rider/index.html";
-        return;
-      }
-
-      // -------------------------------------
-      // 2) Check if this login is for USER
-      // -------------------------------------
-      const userRef = await db.collection("users").doc(uid).get();
-
-      if (userRef.exists) {
-
-        // ⭐⭐⭐ VERY IMPORTANT ⭐⭐⭐
-        localStorage.setItem("userId", uid);
-        localStorage.setItem("userEmail", email);
-
-        window.location.href = "/home/index.html";
-        return;
-      }
-
-      // -------------------------------------
-      // 3) If not found → create as USER
-      // -------------------------------------
-      await db.collection("users").doc(uid).set({
-        email,
-        createdAt: new Date(),
-      });
-
-      // ⭐⭐⭐ VERY IMPORTANT ⭐⭐⭐
-      localStorage.setItem("userId", uid);
-      localStorage.setItem("userEmail", email);
-
-      window.location.href = "/home/index.html";
-
-    } catch (err) {
-      showToast(err.message);
-    }
-  });
-
-})();
+  window.location.href = "/home/index.html";
+}
