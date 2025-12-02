@@ -15,7 +15,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import firebaseConfig from "/home/firebase-config.js";
+import { firebaseConfig } from "/auth/firebase-config.js";
 
 // Initialize Firebase (login page must init itself)
 const app = initializeApp(firebaseConfig);
