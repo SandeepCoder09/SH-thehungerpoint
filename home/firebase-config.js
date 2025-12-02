@@ -1,19 +1,22 @@
 // /home/firebase-config.js
-// FULL Firebase v10 initialization for HOME page
+// Firebase v10 — FULL INITIALIZATION for Home page
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getAuth,
   setPersistence,
   browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
   getFirestore
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase v10 Modular Config (Shared for Home + Auth)
-
-export const firebaseConfig = {
+/* ------------------------------------------
+   Firebase Config (YOUR correct project)
+------------------------------------------- */
+const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
   projectId: "sh-the-hunger-point",
@@ -23,22 +26,21 @@ export const firebaseConfig = {
   measurementId: "G-4KP3RJ15E9"
 };
 
-// Initialize Firebase
+/* ------------------------------------------
+   Initialize Firebase (HOME PAGE)
+------------------------------------------- */
 const app = initializeApp(firebaseConfig);
 
-// Auth + persistence
+/* AUTH */
 const auth = getAuth(app);
-try {
-  await setPersistence(auth, browserLocalPersistence);
-  console.log("HOME Auth persistence enabled");
-} catch (err) {
-  console.warn("Persistence error:", err);
-}
+await setPersistence(auth, browserLocalPersistence)
+  .then(() => console.log("🔥 Auth persistence enabled (home)"))
+  .catch((err) => console.warn("Persistence error:", err));
 
-// Firestore
+/* FIRESTORE */
 const db = getFirestore(app);
 
-console.log("🔥 Firebase v10 HOME initialized");
+console.log("🔥 Firebase v10 Home initialized");
 
-// Export for use in home/script.js
+/* EXPORT for script.js */
 export { auth, db };
