@@ -402,3 +402,137 @@ body {
 		height: 58px;
 	}
 }
+
+/* ======================================================
+   SH THEME — PROFILE PAGE COLORFUL HEADER + FORM UI
+   (No HTML/JS changes required)
+======================================================*/
+
+/* Profile Header Section */
+.back-header {
+	margin: -22px -22px 20px -22px;
+	padding: 22px 20px;
+	background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+	border-radius: 24px 24px 20px 20px;
+	color: #fff;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	box-shadow: 0 10px 28px rgba(211, 48, 48, 0.22);
+}
+
+.back-header .back-btn {
+	color: #fff !important;
+	font-size: 22px;
+}
+
+/* Avatar wrapper */
+.profile-avatar-wrap {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	padding: 10px 4px 18px 4px;
+	margin-top: 6px;
+	color: #fff;
+}
+
+.profile-avatar {
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 3px solid #fff;
+	background: #fff;
+	box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+}
+
+.profile-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+/* Pencil edit button */
+.avatar-edit-btn {
+	width: 40px;
+	height: 40px;
+	left: 78px;
+	top: 70px;
+	background: #fff !important;
+	border: none !important;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+
+.avatar-edit-btn i {
+	color: var(--primary-dark);
+	font-size: 18px;
+}
+
+/* Form Section (clean premium style) */
+.form-section {
+	margin-top: 20px;
+	padding: 0 4px;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.label {
+	font-size: 14px;
+	font-weight: 600;
+	color: #555;
+	margin-bottom: 4px;
+}
+
+.input {
+	width: 100%;
+	padding: 14px;
+	font-size: 15px;
+	border-radius: 14px;
+	border: 1px solid #ddd;
+	background: #fff;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+	transition: 0.25s;
+}
+
+.input:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px rgba(211,48,48,0.20);
+	outline: none;
+}
+
+/* Buttons */
+.profile-actions .btn.primary {
+	background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+	border-radius: 14px;
+}
+
+.profile-actions .btn.outline {
+	border-radius: 14px;
+	font-weight: 600;
+}
+
+/* Make the whole page feel like mobile app full screen */
+.profile-card {
+	background: #ffffff;
+	border-radius: 22px;
+	padding: 0 22px 28px 22px;
+	box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+	overflow: hidden;
+}
+
+/* Responsive Tweaks */
+@media(max-width: 450px) {
+	.profile-avatar {
+		width: 90px;
+		height: 90px;
+	}
+	.avatar-edit-btn {
+		left: 62px;
+		top: 56px;
+	}
+	.back-header {
+		padding: 18px;
+	}
+}
