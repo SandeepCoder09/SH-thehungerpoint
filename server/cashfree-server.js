@@ -1,6 +1,13 @@
 /**
- * SH — Cashfree + Firebase Admin + Rider Login + Socket.IO
- * FINAL STABLE SERVER FILE (2025)
+ * SH — The Hunger Point
+ * FINAL PRODUCTION SERVER (2025)
+ * --------------------------------------------
+ * - Firebase Admin (order DB)
+ * - Cashfree Order + Verify
+ * - Admin Login
+ * - Rider Login
+ * - Socket.IO Live Tracking
+ * --------------------------------------------
  */
 
 import express from "express";
@@ -12,17 +19,22 @@ import fetch from "node-fetch";
 import http from "http";
 import { Server } from "socket.io";
 
-/* -----------------------------------
-   Helpers
------------------------------------ */
+/* -------------------------------------------------
+   Utility
+------------------------------------------------- */
 
 function rebuildPrivateKey(raw) {
   if (!raw) return null;
   return raw.includes("\\n") ? raw.replace(/\\n/g, "\n") : raw;
 }
 
-// Required ENV Keys
-const requiredEnvs = [
+const safeJson = (res, status, obj) => res.status(status).json(obj);
+
+/* -------------------------------------------------
+   Environment Validation
+------------------------------------------------- */
+
+const required = [
   "FIREBASE_TYPE",
   "FIREBASE_PROJECT_ID",
   "FIREBASE_PRIVATE_KEY_ID",
@@ -33,26 +45,28 @@ const requiredEnvs = [
   "CF_SECRET_KEY"
 ];
 
-requiredEnvs.forEach(k => {
-  if (!process.env[k]) console.warn("⚠ Missing env:", k);
+required.forEach((k) => {
+  if (!process.env[k]) console.warn("⚠ Missing ENV variable:", k);
 });
 
-// Cashfree mode + base URL
+/* -------------------------------------------------
+   Cashfree Config
+------------------------------------------------- */
+
 const CF_MODE = (process.env.CF_MODE || "production").toLowerCase();
+
 const CF_BASE =
   CF_MODE === "sandbox"
     ? "https://sandbox.cashfree.com"
     : "https://api.cashfree.com";
 
-const safeJson = (res, status, obj) => res.status(status).json(obj);
-
-/* -----------------------------------
+/* -------------------------------------------------
    Firebase Admin Init
------------------------------------ */
+------------------------------------------------- */
 
 let db = null;
 try {
-  const serviceAccount = {
+  const creds = {
     type: process.env.FIREBASE_TYPE,
     project_id: process.env.FIREBASE_PROJECT_ID,
     private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
@@ -66,97 +80,74 @@ try {
     universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
   };
 
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  admin.initializeApp({ credential: admin.credential.cert(creds) });
   db = admin.firestore();
-  console.log("✅ Firebase Admin initialized");
+
+  console.log("🔥 Firebase Admin initialized");
 } catch (err) {
-  console.error("🔥 Firebase init failed:", err.message || err);
+  console.error("❌ Firebase Admin Init Failed:", err);
 }
 
-/* -----------------------------------
-   Express Init (ORDER FIXED)
------------------------------------ */
+/* -------------------------------------------------
+   Express Init + CORS
+------------------------------------------------- */
 
-const app = express(); // MUST be first
+const app = express();
 
-// Allowed origins (comma separated env)
-const CF_ALLOWED_ORIGINS = (process.env.CF_ALLOWED_ORIGINS || "")
+const ALLOWED = (process.env.CF_ALLOWED_ORIGINS || "")
   .split(",")
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
-// CORS MUST run after app is created
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // mobile, local apps
-
-      if (CF_ALLOWED_ORIGINS.length === 0) return callback(null, true);
-
-      if (CF_ALLOWED_ORIGINS.includes(origin)) {
-        return callback(null, true);
-      }
+    origin: function (origin, cb) {
+      if (!origin) return cb(null, true); // mobile / postman / local
+      if (ALLOWED.length === 0) return cb(null, true);
+      if (ALLOWED.includes(origin)) return cb(null, true);
       console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
+      return cb(new Error("Not allowed by CORS"));
     }
   })
 );
 
 app.use(express.json({ limit: "1mb" }));
 
-app.get("/ping", (req, res) => res.send("Server Awake ✔"));
-
-/* -----------------------------------
-   Create Test Order
------------------------------------ */
-app.post("/create-test-order", async (req, res) => {
-  try {
-    const ref = await db.collection("orders").add({
-      items: [{ name: "Momo", qty: 2, price: 10 }],
-      totalAmount: 20,
-      status: "preparing",
-      riderId: null,
-      createdAt: admin.firestore.Timestamp.now(),
-      updatedAt: admin.firestore.Timestamp.now()
-    });
-
-    await ref.update({ orderId: ref.id });
-    return safeJson(res, 200, { ok: true, orderId: ref.id });
-  } catch (err) {
-    return safeJson(res, 500, { ok: false, error: err.message });
-  }
+app.get("/ping", (req, res) => {
+  res.send("Server Awake ✔");
 });
 
-/* -----------------------------------
-   Admin Hash Factory
------------------------------------ */
+/* -------------------------------------------------
+   Admin Hash Generator
+------------------------------------------------- */
 app.get("/__makehash", async (req, res) => {
-  const pw = req.query.pw || "";
-  if (!pw) return res.json({ ok: false, error: "pw missing" });
-  const hash = await bcrypt.hash(pw, 10);
-  return res.json({ ok: true, pw, hash });
+  if (!req.query.pw) return res.json({ ok: false, error: "pw missing" });
+  const hash = await bcrypt.hash(req.query.pw, 10);
+  res.json({ ok: true, hash });
 });
 
-/* -----------------------------------
+/* -------------------------------------------------
    Admin Login
------------------------------------ */
+------------------------------------------------- */
 app.post("/admin/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password)
+      return safeJson(res, 400, { ok: false, error: "Missing inputs" });
 
-    const docSnap = await db.collection("admins").doc(email).get();
-    if (!docSnap.exists)
+    const snap = await db.collection("admins").doc(email).get();
+    if (!snap.exists)
       return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
-    const adminData = docSnap.data();
-    const storedHash = adminData.passwordHash || adminData.password;
+    const adminData = snap.data();
+    const hash = adminData.passwordHash || adminData.password;
 
-    const match = await bcrypt.compare(password, storedHash);
-    if (!match)
+    const ok = await bcrypt.compare(password, hash);
+    if (!ok)
       return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const token = jwt.sign(
-      { email: adminData.email, role: "admin" },
+      { email, role: "admin" },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -167,33 +158,14 @@ app.post("/admin/login", async (req, res) => {
   }
 });
 
-/* -----------------------------------
-   Admin Verify Token
------------------------------------ */
-function requireAdminToken(req, res, next) {
-  const auth = req.headers.authorization || "";
-  if (!auth.startsWith("Bearer "))
-    return safeJson(res, 401, { ok: false, error: "Unauthorized" });
-
-  try {
-    req.admin = jwt.verify(auth.split(" ")[1], process.env.JWT_SECRET);
-    next();
-  } catch {
-    return safeJson(res, 401, { ok: false, error: "Invalid token" });
-  }
-}
-
-app.get("/admin/verify", requireAdminToken, (req, res) => {
-  return safeJson(res, 200, { ok: true, email: req.admin.email });
-});
-
-/* -----------------------------------
+/* -------------------------------------------------
    Rider Login
------------------------------------ */
+------------------------------------------------- */
+
 async function findRider(identifier) {
   // doc id
-  const d1 = await db.collection("riders").doc(identifier).get();
-  if (d1.exists) return { id: d1.id, data: d1.data() };
+  const d = await db.collection("riders").doc(identifier).get();
+  if (d.exists) return { id: d.id, data: d.data() };
 
   // phone
   const q1 = await db.collection("riders").where("phone", "==", identifier).limit(1).get();
@@ -212,9 +184,9 @@ async function findRider(identifier) {
 
 app.post("/rider/login", async (req, res) => {
   try {
-    const { email, phone, password, riderId } = req.body;
-
+    const { email, phone, riderId, password } = req.body;
     const identifier = (email || phone || riderId || "").trim();
+
     if (!identifier || !password)
       return safeJson(res, 400, { ok: false, error: "Missing inputs" });
 
@@ -223,10 +195,10 @@ app.post("/rider/login", async (req, res) => {
       return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const rider = found.data;
-    const storedHash = rider.passwordHash || rider.password;
+    const hash = rider.passwordHash || rider.password;
 
-    const match = await bcrypt.compare(password, storedHash);
-    if (!match)
+    const ok = await bcrypt.compare(password, hash);
+    if (!ok)
       return safeJson(res, 200, { ok: false, error: "Incorrect password" });
 
     if (!rider.approved)
@@ -254,9 +226,9 @@ app.post("/rider/login", async (req, res) => {
   }
 });
 
-/* -----------------------------------
-   Cashfree — Create Order
------------------------------------ */
+/* -------------------------------------------------
+   Cashfree — Create Order (FIXED)
+------------------------------------------------- */
 app.post("/create-cashfree-order", async (req, res) => {
   try {
     const { amount, items = [], phone, email } = req.body;
@@ -264,17 +236,21 @@ app.post("/create-cashfree-order", async (req, res) => {
     if (!amount || Number(amount) <= 0)
       return safeJson(res, 400, { ok: false, error: "Amount required" });
 
+    // FINAL FIX:
+    // client sends phone=user.uid (safe alphanumeric)
+    const customerId = phone ? `uid_${phone}` : "guest_01";
+
     const payload = {
       order_amount: Number(amount),
       order_currency: "INR",
       customer_details: {
-  customer_id: phone ? `uid_${phone}` : "guest_01",
-  customer_phone: phone || "9999999999",
-  customer_email: email || "guest@sh.com"
-}
+        customer_id: customerId,              // must be alphanumeric
+        customer_phone: phone?.slice(0, 20) || "9999999999",
+        customer_email: email || "guest@sh.com"
+      }
     };
 
-    const cfRes = await fetch(`${CF_BASE}/pg/orders`, {
+    const cf = await fetch(`${CF_BASE}/pg/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -285,7 +261,7 @@ app.post("/create-cashfree-order", async (req, res) => {
       body: JSON.stringify(payload)
     });
 
-    const data = await cfRes.json();
+    const data = await cf.json();
 
     const orderId =
       data.order_id ||
@@ -311,9 +287,9 @@ app.post("/create-cashfree-order", async (req, res) => {
   }
 });
 
-/* -----------------------------------
+/* -------------------------------------------------
    Cashfree — Verify Payment
------------------------------------ */
+------------------------------------------------- */
 app.post("/verify-cashfree-payment", async (req, res) => {
   try {
     const { orderId, items = [] } = req.body;
@@ -321,7 +297,7 @@ app.post("/verify-cashfree-payment", async (req, res) => {
     if (!orderId)
       return safeJson(res, 400, { ok: false, error: "orderId required" });
 
-    const resp = await fetch(`${CF_BASE}/pg/orders/${orderId}`, {
+    const r = await fetch(`${CF_BASE}/pg/orders/${orderId}`, {
       headers: {
         "x-api-version": "2022-09-01",
         "x-client-id": process.env.CF_APP_ID,
@@ -329,7 +305,7 @@ app.post("/verify-cashfree-payment", async (req, res) => {
       }
     });
 
-    const data = await resp.json();
+    const data = await r.json();
     const status =
       data.order_status ||
       data.data?.order_status ||
@@ -338,25 +314,20 @@ app.post("/verify-cashfree-payment", async (req, res) => {
     if (String(status).toUpperCase() !== "PAID")
       return safeJson(res, 200, { ok: false, error: "Payment not completed" });
 
-    const total = items.reduce(
-      (s, i) => s + Number(i.price) * Number(i.qty),
-      0
-    );
+    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
 
-    await db.collection("orders")
-      .doc(orderId)
-      .set(
-        {
-          orderId,
-          items,
-          totalAmount: total,
-          status: "paid",
-          riderId: null,
-          createdAt: admin.firestore.Timestamp.now(),
-          updatedAt: admin.firestore.Timestamp.now()
-        },
-        { merge: true }
-      );
+    await db.collection("orders").doc(orderId).set(
+      {
+        orderId,
+        items,
+        totalAmount: total,
+        status: "paid",
+        riderId: null,
+        createdAt: admin.firestore.Timestamp.now(),
+        updatedAt: admin.firestore.Timestamp.now()
+      },
+      { merge: true }
+    );
 
     return safeJson(res, 200, { ok: true, orderId });
   } catch (err) {
@@ -364,58 +335,56 @@ app.post("/verify-cashfree-payment", async (req, res) => {
   }
 });
 
-/* -----------------------------------
-   Admin — All Active Orders
------------------------------------ */
+/* -------------------------------------------------
+   Active Orders (Admin Panel)
+------------------------------------------------- */
 app.get("/admin/active-orders", async (req, res) => {
   try {
-    const list = [];
+    const arr = [];
     const snap = await db.collection("orders").get();
 
-    snap.forEach(d => {
-      const o = d.data();
-      list.push({
+    snap.forEach((d) => {
+      const x = d.data();
+      arr.push({
         orderId: d.id,
-        riderId: o.riderId || null,
-        customerId: o.customerId || null,
-        customerName: o.customerName || null,
-        status: o.status || "new",
-        riderLat: o.riderLoc?.lat || null,
-        riderLng: o.riderLoc?.lng || null,
-        customerLat: o.customerLoc?.lat || null,
-        customerLng: o.customerLoc?.lng || null
+        status: x.status || "new",
+        riderId: x.riderId || null,
+        customerName: x.customerName || null,
+        riderLat: x.riderLoc?.lat || null,
+        riderLng: x.riderLoc?.lng || null,
+        customerLat: x.customerLoc?.lat || null,
+        customerLng: x.customerLoc?.lng || null
       });
     });
 
-    return res.json(list);
+    return res.json(arr);
   } catch (err) {
     return res.status(500).json({ ok: false });
   }
 });
 
-/* -----------------------------------
-   SOCKET.IO — Live Tracking
------------------------------------ */
+/* -------------------------------------------------
+   Socket.IO Live Tracking
+------------------------------------------------- */
+
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   console.log("🟢 Socket connected:", socket.id);
 
   socket.on("rider:join", ({ riderId }) => {
     socket.data.riderId = riderId;
   });
 
-  socket.on("rider:location", async data => {
+  socket.on("rider:location", async (data) => {
     if (!data || !data.riderId) return;
 
     io.emit("admin:riderLocation", data);
 
     if (data.orderId) {
       io.to("order_" + data.orderId).emit("order:riderLocation", data);
-
-      await db
-        .collection("orders")
+      await db.collection("orders")
         .doc(data.orderId)
         .set(
           {
@@ -427,13 +396,12 @@ io.on("connection", socket => {
     }
   });
 
-  socket.on("order:status", async p => {
-    if (!p || !p.orderId) return;
+  socket.on("order:status", async (p) => {
+    if (!p?.orderId) return;
 
     io.emit("order:status", p);
 
-    await db
-      .collection("orders")
+    await db.collection("orders")
       .doc(p.orderId)
       .set(
         { status: p.status, updatedAt: admin.firestore.Timestamp.now() },
@@ -448,10 +416,11 @@ io.on("connection", socket => {
   );
 });
 
-/* -----------------------------------
+/* -------------------------------------------------
    Server Start
------------------------------------ */
+------------------------------------------------- */
+
 const PORT = process.env.PORT || 10000;
-httpServer.listen(PORT, () => {
-  console.log(`🚀 SH Server running on port ${PORT} (Mode: ${CF_MODE})`);
-});
+httpServer.listen(PORT, () =>
+  console.log(`🚀 SH Server running on ${PORT} | Mode: ${CF_MODE}`)
+);
