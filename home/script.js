@@ -1,5 +1,5 @@
 // /home/script.js
-// FULL WORKING FINAL VERSION (Firebase v10 + Cart + Buttons)
+// FULL WORKING FINAL VERSION (Firebase v10 + Cart + Buttons + Payment)
 
 // Import Firebase objects from firebase-config.js
 import { auth, db } from "/home/firebase-config.js";
@@ -13,6 +13,11 @@ import {
   getDoc,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ------------------------------
+// Backend Server URL
+// ------------------------------
+const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
 
 // ------------------------------
 // Helpers
@@ -127,7 +132,6 @@ async function loadCartFromFirestore() {
       console.log("🟢 Cart loaded");
     } else {
       cart = [];
-      console.log("ℹ No cart found");
     }
   } catch (err) {
     console.error("🔥 Load Cart Error:", err);
@@ -260,7 +264,7 @@ function closeSheet() {
 }
 
 // ------------------------------
-// CLEAR + CHECKOUT
+// CLEAR CART
 // ------------------------------
 $("#clearCart").onclick = async () => {
   cart = [];
@@ -268,6 +272,76 @@ $("#clearCart").onclick = async () => {
   await saveCartToFirestore();
   showToast("Cart cleared");
 };
+
+// ------------------------------
+// PAYMENT — Cashfree
+// ------------------------------
+$("#checkoutBtn").onclick = startCheckoutFlow;
+
+async function startCheckoutFlow() {
+  if (cart.length === 0) return showToast("Cart is empty");
+
+  const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
+  const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
+
+  try {
+    showToast("Starting payment...");
+
+    const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, items }),
+    });
+
+    const data = await res.json();
+    if (!data.ok) return showToast(data.error || "Payment failed");
+
+    const session = data.session;
+    const orderId = data.orderId;
+
+    if (window.Cashfree) {
+      window.Cashfree.checkout({
+        paymentSessionId: session,
+        redirectTarget: "_modal",
+      });
+    } else {
+      return showToast("Cashfree SDK missing");
+    }
+
+    // Listen for popup result
+    const handler = async (e) => {
+      const msg = e.data;
+      if (msg?.paymentStatus === "SUCCESS") {
+        showToast("Verifying payment...");
+
+        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId, items }),
+        });
+
+        const ok = await vr.json();
+
+        if (ok?.ok) {
+          showToast("Order Confirmed 🎉");
+
+          cart = [];
+          renderCart();
+          await saveCartToFirestore();
+          closeSheet();
+        } else {
+          showToast("Verification failed");
+        }
+      }
+      window.removeEventListener("message", handler);
+    };
+
+    window.addEventListener("message", handler);
+  } catch (err) {
+    console.error(err);
+    showToast("Checkout error");
+  }
+}
 
 // ------------------------------
 // AUTH FIRST → THEN UI
