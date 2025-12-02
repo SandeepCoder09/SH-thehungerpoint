@@ -1,41 +1,32 @@
-// auth/firebase-config.js (FINAL FIXED VERSION)
+// auth/firebase-config.js — FINAL WORKING VERSION (NO API FETCH)
 
-async function loadFirebaseConfig() {
-  try {
-    const response = await fetch("/api/firebase-config", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
+// ------------------------------------------------------
+// 1. Your Firebase credentials (paste your actual values)
+// ------------------------------------------------------
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MSG_ID",
+  appId: "YOUR_APP_ID"
+};
 
-    if (!response.ok) {
-      throw new Error("Failed to load Firebase config (API error)");
-    }
-
-    const firebaseConfig = await response.json();
-
-    // Strong validation for config object
-    if (!firebaseConfig || !firebaseConfig.apiKey) {
-      throw new Error("Invalid Firebase config received");
-    }
-
-    // Initialize app only once
-    if (!firebase.apps || firebase.apps.length === 0) {
-      firebase.initializeApp(firebaseConfig);
-    }
-
-    // Make global
-    window.auth = firebase.auth();
-    window.db = firebase.firestore();
-
-    // IMPORTANT: Keep users logged in
-    await window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-    console.log("%cFirebase initialized successfully", "color: green; font-weight: bold;");
-  } 
-  catch (err) {
-    console.error("%cFIREBASE LOAD ERROR:", "color: red; font-weight: bold;", err);
-    alert("Unable to load Firebase configuration. Please try again later.");
-  }
+// ------------------------------------------------------
+// 2. Initialize Firebase correctly
+// ------------------------------------------------------
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
 
-loadFirebaseConfig();
+// ------------------------------------------------------
+// 3. Make Firebase services global for all pages
+// ------------------------------------------------------
+window.auth = firebase.auth();
+window.db = firebase.firestore();
+window.storage = firebase.storage();
+
+// Keep user logged in
+window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+console.log("%cFirebase initialized successfully", "color: green; font-weight:bold;");
