@@ -212,16 +212,36 @@
   <!-- Toast -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <!-- ⭐ FIREBASE v10 MODULAR ONLY (NO v8) -->
+  <script type="module">
+    // Load Firebase v10 modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<!-- Load Firebase v10 modules via ES module scripts (firebase-config initializes app + exports auth/db) -->
-  <script type="module" src="/home/firebase-config.js"></script>
+    // Import your config file
+    import firebaseConfig from "/home/firebase-config.js";
 
-  <!-- Your main app logic (module) -->
-  <script type="module" src="/home/script.js"></script>
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
 
+    console.log("🔥 Firebase v10 Loaded");
+
+    // Wait for login
+    onAuthStateChanged(window.auth, (user) => {
+      if (user) {
+        console.log("🔐 Logged in as:", user.uid);
+
+        // Load your cart logic only AFTER auth is ready
+        import("/home/script.js");
+      } else {
+        console.log("❌ No user logged in — redirecting…");
+        window.location.href = "/auth/login.html";
+      }
+    });
+  </script>
+  
 </body>
 </html>
