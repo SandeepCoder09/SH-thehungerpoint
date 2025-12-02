@@ -58,7 +58,6 @@
     <!-- MENU GRID -->
     <section class="menu grid-menu">
 
-      <!-- ITEM 1 -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
         <div class="card-media">
           <img src="/home/sh-momo.png" class="menu-img">
@@ -69,9 +68,7 @@
             <h3 class="menu-title">Momo</h3>
             <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
           </div>
-
           <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
-
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -83,7 +80,6 @@
         </div>
       </article>
 
-      <!-- ITEM 2 -->
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
         <div class="card-media">
           <img src="/home/sh-french-fries.png" class="menu-img">
@@ -94,9 +90,7 @@
             <h3 class="menu-title">Finger</h3>
             <div class="menu-price">₹10 <small>/ plate</small></div>
           </div>
-
           <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
-
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -108,20 +102,16 @@
         </div>
       </article>
 
-      <!-- ITEM 3 -->
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
         <div class="card-media">
           <img src="/home/sh-hot-tea.png" class="menu-img">
         </div>
-
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Hot Tea</h3>
             <div class="menu-price">₹10 <small>/ cup</small></div>
           </div>
-
           <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
-
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -133,20 +123,16 @@
         </div>
       </article>
 
-      <!-- ITEM 4 -->
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
         <div class="card-media">
           <img src="/home/sh-bread-pakoda.png" class="menu-img">
         </div>
-
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Bread Pakoda</h3>
             <div class="menu-price">₹10 <small>/ piece</small></div>
           </div>
-
           <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
-
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -164,25 +150,20 @@
   <!-- OVERLAY -->
   <div id="overlay" class="overlay"></div>
 
-  <!-- BOTTOM SHEET CART -->
+  <!-- CART SHEET -->
   <div id="cartSheet" class="cart-sheet">
-
     <div class="sheet-handle"></div>
-
     <div class="sheet-head">
       <h3>Your Cart</h3>
       <button id="closeSheet" class="cart-close-btn">✕</button>
     </div>
-
     <div id="cartItems" class="cart-items">
       <p class="empty">Cart is empty</p>
     </div>
-
     <div class="cart-footer">
       <div class="cart-total-text">
         Total: <span id="cartTotal">₹0</span>
       </div>
-
       <div class="cart-footer-btns">
         <button id="clearCart" class="btn-clear">Clear</button>
         <button id="checkoutBtn" class="btn-checkout">Checkout</button>
@@ -202,41 +183,37 @@
   <!-- Toast -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- ⭐ FINAL Firebase v10 Initialization -->
-  <!-- Firebase Init -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { auth, db, firebaseConfig } from "/home/firebase-config.js";
+  <!-- Firebase + Cashfree + Home Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { firebaseConfig } from "/home/firebase-config.js";
 
-  const app = initializeApp(firebaseConfig);
-  window.auth = getAuth(app);
-  window.db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
 
-  console.log("🔥 Firebase v10 Loaded");
+    console.log("🔥 Firebase Loaded");
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("User logged in:", user.uid);
+    onAuthStateChanged(window.auth, (user) => {
+      if (!user) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
 
-      // 👉 LOAD CASHFREE SDK FIRST
+      console.log("Logged in:", user.uid);
+
+      // Load Cashfree SDK once
       const cf = document.createElement("script");
       cf.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
       cf.onload = () => {
-        console.log("🟢 Cashfree SDK Ready");
-
-        // 👉 THEN LOAD YOUR HOME SCRIPT
+        console.log("🟢 Cashfree Ready");
         import("/home/script.js");
       };
       document.body.appendChild(cf);
-
-    } else {
-      console.log("User not logged in");
-      window.location.href = "/auth/login.html";
-    }
-  });
-</script>
+    });
+  </script>
 
 </body>
 </html>
