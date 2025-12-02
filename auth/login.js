@@ -40,6 +40,7 @@ async function waitForAuth() {
       const riderRef = await db.collection("riders").doc(email).get();
 
       if (riderRef.exists) {
+        // Rider logged in → don't save userId
         window.location.href = "/rider/index.html";
         return;
       }
@@ -50,17 +51,26 @@ async function waitForAuth() {
       const userRef = await db.collection("users").doc(uid).get();
 
       if (userRef.exists) {
+
+        // ⭐⭐⭐ VERY IMPORTANT ⭐⭐⭐
+        localStorage.setItem("userId", uid);
+        localStorage.setItem("userEmail", email);
+
         window.location.href = "/home/index.html";
         return;
       }
 
       // -------------------------------------
-      // 3) If not found in any → create as USER
+      // 3) If not found → create as USER
       // -------------------------------------
       await db.collection("users").doc(uid).set({
         email,
         createdAt: new Date(),
       });
+
+      // ⭐⭐⭐ VERY IMPORTANT ⭐⭐⭐
+      localStorage.setItem("userId", uid);
+      localStorage.setItem("userEmail", email);
 
       window.location.href = "/home/index.html";
 
