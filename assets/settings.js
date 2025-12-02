@@ -1,248 +1,194 @@
-/* settings.js — full working code for Settings page
-   - uses CropperJS
-   - uploads to Firebase Storage
-   - updates Firestore users/{uid}.photoURL
-   - implements push toggle, logout, openProfile, change password sheet
-*/
+/* ======================================================
+      SETTINGS.JS — FULL WORKING VERSION
+======================================================*/
 
-(function () {
-  // small helper to wait for firebase config/protect to prepare auth/db
-  function waitFirebase() {
-    return new Promise((resolve) => {
-      const check = () => {
-        if (window.firebase && window.auth && window.db) resolve();
-        else setTimeout(check, 30);
-      };
-      check();
-    });
-  }
+/* -------------------------------
+      Firebase references
+--------------------------------*/
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-  // Expose some functions globally (HTML uses onclick attributes)
-  window.openSettingsPhotoPicker = function () {
-    const input = document.getElementById("settingsPhotoInput");
-    if (input) input.click();
-  };
+/* -------------------------------
+      UI Elements
+--------------------------------*/
+const hdrName = document.getElementById("hdrName");
+const hdrEmail = document.getElementById("hdrEmail");
+const hdrAvatar = document.getElementById("hdrAvatar");
+const logoutItem = document.getElementById("logoutItem");
+const pushToggle = document.getElementById("pushToggle");
 
-  window.openProfile = function () {
-    window.location.href = "/profile/index.html";
-  };
+const pwSheet = document.getElementById("pwSheet");
+const newPass = document.getElementById("newPass");
+const confirmPass = document.getElementById("confirmPass");
 
-  window.openChangePassword = function () {
-    const sheet = document.getElementById("pwSheet");
-    if (!sheet) return;
-    sheet.classList.add("open");
-    sheet.setAttribute("aria-hidden", "false");
-  };
+/* -------------------------------
+      PHOTO CROP ELEMENTS
+--------------------------------*/
+const settingsPhotoInput = document.getElementById("settingsPhotoInput");
+const settingsCropModal = document.getElementById("settingsCropModal");
+const settingsCropImage = document.getElementById("settingsCropImage");
 
-  window.closePwSheet = function () {
-    const sheet = document.getElementById("pwSheet");
-    if (!sheet) return;
-    sheet.classList.remove("open");
-    sheet.setAttribute("aria-hidden", "true");
-  };
+let settingsCropper = null;
 
-  window.savePassword = async function () {
-    const newPass = document.getElementById("newPass").value.trim();
-    const confirmPass = document.getElementById("confirmPass").value.trim();
-    if (!newPass || newPass.length < 6) {
-      alert("Password must be at least 6 characters");
-      return;
+/* ======================================================
+      LOAD USER DATA
+======================================================*/
+
+auth.onAuthStateChanged(async (user) => {
+    if (!user) return;
+
+    hdrEmail.textContent = user.email;
+
+    const docRef = db.collection("users").doc(user.uid);
+    const snap = await docRef.get();
+
+    if (snap.exists) {
+        const data = snap.data();
+        hdrName.textContent = data.name || "User";
+
+        if (data.photoURL) {
+            hdrAvatar.src = data.photoURL;
+        }
     }
-    if (newPass !== confirmPass) {
-      alert("Passwords do not match");
-      return;
+});
+
+/* ======================================================
+      CHANGE PASSWORD SHEET
+======================================================*/
+
+function openChangePassword() {
+    pwSheet.classList.add("open");
+}
+window.openChangePassword = openChangePassword;
+
+function closePwSheet() {
+    pwSheet.classList.remove("open");
+    newPass.value = "";
+    confirmPass.value = "";
+}
+window.closePwSheet = closePwSheet;
+
+async function savePassword() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    if (!newPass.value.trim() || newPass.value !== confirmPass.value) {
+        return alert("Passwords do not match.");
     }
+
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error("Not signed in");
-      await user.updatePassword(newPass);
-      alert("Password updated");
-      closePwSheet();
-    } catch (e) {
-      console.error(e);
-      alert("Could not change password. You may need to re-login and try again.");
+        await user.updatePassword(newPass.value.trim());
+        alert("Password updated successfully.");
+        closePwSheet();
+    } catch (err) {
+        alert(err.message);
     }
-  };
+}
+window.savePassword = savePassword;
 
-  // Settings cropper functions (declared at top so other functions can call)
-  let cropper = null;
-  let currentFileObjectURL = null;
+/* ======================================================
+      LOGOUT
+======================================================*/
 
-  // Start main
-  waitFirebase().then(() => {
-    const hdrAvatar = document.getElementById("hdrAvatar");
-    const hdrName = document.getElementById("hdrName");
-    const hdrEmail = document.getElementById("hdrEmail");
+logoutItem.addEventListener("click", async () => {
+    await auth.signOut();
+    window.location.href = "/auth/login.html";
+});
 
-    const fileInput = document.getElementById("settingsPhotoInput");
-    const cropModal = document.getElementById("settingsCropModal");
-    const cropImg = document.getElementById("settingsCropImage");
+/* ======================================================
+      PUSH NOTIFICATIONS (LOCAL SAVE)
+======================================================*/
 
-    const pushToggle = document.getElementById("pushToggle");
-    const logoutItem = document.getElementById("logoutItem");
+pushToggle.addEventListener("click", () => {
+    pushToggle.classList.toggle("active");
+    const isOn = pushToggle.classList.contains("active");
+    localStorage.setItem("pushEnabled", isOn ? "1" : "0");
+});
 
-    // Auth
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = "/auth/login.html";
-        return;
-      }
+// Load saved toggle state
+if (localStorage.getItem("pushEnabled") === "1") {
+    pushToggle.classList.add("active");
+}
 
-      hdrEmail.textContent = user.email || "";
-      // load profile doc
-      try {
-        const snap = await db.collection("users").doc(user.uid).get();
-        const data = snap.exists ? snap.data() : null;
-        hdrName.textContent = (data && data.name) ? data.name : (user.displayName || "User Name");
-        if (data && data.photoURL) hdrAvatar.src = data.photoURL;
-      } catch (e) {
-        console.error("load profile failed", e);
-      }
+/* ======================================================
+      PHOTO UPLOAD + CROPPER
+======================================================*/
+
+// When user clicks pencil
+function openSettingsPhotoPicker() {
+    settingsPhotoInput.click();
+}
+window.openSettingsPhotoPicker = openSettingsPhotoPicker;
+
+// When file selected
+settingsPhotoInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    settingsCropImage.src = url;
+
+    if (settingsCropper) settingsCropper.destroy();
+
+    settingsCropper = new Cropper(settingsCropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: "move",
+        autoCropArea: 1
     });
 
-    // push toggle
-    if (pushToggle) {
-      pushToggle.addEventListener("click", async () => {
-        pushToggle.classList.toggle("on");
-        const on = pushToggle.classList.contains("on");
-        pushToggle.setAttribute("aria-pressed", String(on));
-        // Optionally save to Firestore user preferences:
-        try {
-          const user = auth.currentUser;
-          if (user) {
-            await db.collection("users").doc(user.uid).set({ pushNotifications: on }, { merge: true });
-          }
-        } catch (e) {
-          console.error("save push pref", e);
-        }
-      });
+    settingsCropModal.classList.add("active");
+});
+
+/* Close cropping modal */
+function closeSettingsCropper() {
+    settingsCropModal.classList.remove("active");
+
+    if (settingsCropper) {
+        settingsCropper.destroy();
+        settingsCropper = null;
     }
+}
+window.closeSettingsCropper = closeSettingsCropper;
 
-    // logout
-    if (logoutItem) {
-      logoutItem.addEventListener("click", async () => {
-        try {
-          await auth.signOut();
-          window.location.href = "/auth/login.html";
-        } catch (e) {
-          console.error("logout failed", e);
-        }
-      });
-    }
+/* Save cropped image */
+async function saveSettingsCroppedImage() {
+    const user = auth.currentUser;
+    if (!user || !settingsCropper) return;
 
-    // File input: show cropper modal
-    if (fileInput) {
-      fileInput.addEventListener("change", (ev) => {
-        const f = ev.target.files && ev.target.files[0];
-        if (!f) return;
+    const canvas = settingsCropper.getCroppedCanvas({
+        width: 500,
+        height: 500,
+        fillColor: "#fff"
+    });
 
-        // cleanup old objectURL
-        if (currentFileObjectURL) {
-          URL.revokeObjectURL(currentFileObjectURL);
-          currentFileObjectURL = null;
-        }
+    canvas.toBlob(async (blob) => {
+        const ref = storage.ref(`profile/${user.uid}.jpg`);
+        await ref.put(blob);
 
-        currentFileObjectURL = URL.createObjectURL(f);
-        cropImg.src = currentFileObjectURL;
+        const url = await ref.getDownloadURL();
 
-        // show modal
-        cropModal.classList.add("active");
-        cropModal.setAttribute("aria-hidden", "false");
+        // Update Firestore
+        await db.collection("users").doc(user.uid).set(
+            { photoURL: url },
+            { merge: true }
+        );
 
-        // init cropper after image loads
-        cropImg.onload = () => {
-          if (cropper) {
-            cropper.destroy();
-            cropper = null;
-          }
-          cropper = new Cropper(cropImg, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 1,
-            background: false,
-            guides: false,
-            zoomOnWheel: true,
-            movable: true,
-            dragMode: "move"
-          });
-        };
-      });
-    }
+        // Update UI
+        hdrAvatar.src = url;
 
-    // global functions to close and save
-    window.closeSettingsCropper = function () {
-      if (cropper) {
-        cropper.destroy();
-        cropper = null;
-      }
-      if (cropModal) {
-        cropModal.classList.remove("active");
-        cropModal.setAttribute("aria-hidden", "true");
-      }
-      if (fileInput) fileInput.value = "";
-      if (currentFileObjectURL) {
-        URL.revokeObjectURL(currentFileObjectURL);
-        currentFileObjectURL = null;
-      }
-    };
+        closeSettingsCropper();
+        alert("Profile photo updated!");
+    }, "image/jpeg");
+}
+window.saveSettingsCroppedImage = saveSettingsCroppedImage;
 
-    window.saveSettingsCroppedImage = async function () {
-      if (!cropper) return alert("No image selected");
-      try {
-        const square = cropper.getCroppedCanvas({ width: 600, height: 600, imageSmoothingQuality: "high" });
+/* ======================================================
+      NAVIGATION
+======================================================*/
 
-        // create circular canvas 250x250
-        const size = 250;
-        const circleCanvas = document.createElement("canvas");
-        circleCanvas.width = size;
-        circleCanvas.height = size;
-        const ctx = circleCanvas.getContext("2d");
-
-        ctx.clearRect(0, 0, size, size);
-        ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.drawImage(square, 0, 0, 600, 600, 0, 0, size, size);
-
-        circleCanvas.toBlob(async (blob) => {
-          if (!blob) return alert("Failed to prepare image");
-
-          const user = auth.currentUser;
-          if (!user) return alert("Not signed in");
-
-          const ref = firebase.storage().ref(`profile/${user.uid}.png`);
-          const uploadTask = ref.put(blob);
-
-          hdrAvatar.style.opacity = 0.45;
-
-          uploadTask.on("state_changed",
-            (snap) => {
-              // progress (optional)
-            },
-            (err) => {
-              console.error(err);
-              alert("Upload failed");
-              hdrAvatar.style.opacity = 1;
-            },
-            async () => {
-              const url = await ref.getDownloadURL();
-              await db.collection("users").doc(user.uid).set({ photoURL: url, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-              hdrAvatar.src = url;
-              hdrAvatar.style.opacity = 1;
-              closeSettingsCropper();
-            }
-          );
-        }, "image/png", 0.95);
-      } catch (e) {
-        console.error(e);
-        alert("Could not save image");
-      }
-    };
-
-  }).catch(err => {
-    console.error("firebase wait failed", err);
-  });
-
-})();
+function openProfile() {
+    window.location.href = "/profile/index.html";
+}
+window.openProfile = openProfile;
