@@ -1,11 +1,11 @@
 // /home/script.js
 // FULL WORKING FINAL VERSION (Firebase v10 + Cart + Buttons + Payment)
+// Defensive fixes + better logging
 
 // Import Firebase objects from firebase-config.js
 import { auth, db } from "/home/firebase-config.js";
 import {
-  onAuthStateChanged,
-  signOut
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -27,6 +27,11 @@ const $$ = (s) => Array.from(document.querySelectorAll(s));
 
 function showToast(msg, dur = 2000) {
   const box = $("#toast-container");
+  if (!box) {
+    // fallback to console if toast container missing
+    console.log("TOAST:", msg);
+    return;
+  }
   const t = document.createElement("div");
   t.className = "toast";
   t.textContent = msg;
@@ -61,11 +66,13 @@ function updateCartCount() {
 
 function renderCart() {
   const box = $("#cartItems");
+  if (!box) return; // defensive
   box.innerHTML = "";
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal").textContent = "₹0";
+    const totalEl = $("#cartTotal");
+    if (totalEl) totalEl.textContent = "₹0";
     updateCartCount();
     return;
   }
@@ -80,12 +87,10 @@ function renderCart() {
     row.dataset.id = item.id;
 
     row.innerHTML = `
-      <img class="cart-img" src="${getImg(item.name)}">
+      <img class="cart-img" src="${getImg(item.name)}" alt="${item.name}">
       <div class="cart-info">
         <div class="cart-name">${item.name}</div>
-        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${
-      item.price * item.qty
-    }</div>
+        <div class="cart-sub">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</div>
       </div>
 
       <div class="cart-actions">
@@ -98,7 +103,8 @@ function renderCart() {
     box.appendChild(row);
   });
 
-  $("#cartTotal").textContent = "₹" + total;
+  const totalEl = $("#cartTotal");
+  if (totalEl) totalEl.textContent = "₹" + total;
   updateCartCount();
   attachCartButtons();
 }
@@ -107,14 +113,15 @@ function renderCart() {
 // Firestore SAVE/LOAD
 // ------------------------------
 async function saveCartToFirestore() {
-  if (!auth.currentUser) return;
-
   try {
+    if (!auth || !auth.currentUser) {
+      console.warn("saveCartToFirestore: no auth user");
+      return;
+    }
     await setDoc(doc(db, "cart", auth.currentUser.uid), {
       items: cart,
       updatedAt: Date.now(),
     });
-
     console.log("🟢 Cart saved");
   } catch (err) {
     console.error("🔥 Save Cart Error:", err);
@@ -122,9 +129,13 @@ async function saveCartToFirestore() {
 }
 
 async function loadCartFromFirestore() {
-  if (!auth.currentUser) return;
-
   try {
+    if (!auth || !auth.currentUser) {
+      console.warn("loadCartFromFirestore: no auth user");
+      cart = [];
+      return;
+    }
+
     const snap = await getDoc(doc(db, "cart", auth.currentUser.uid));
     if (snap.exists()) {
       const data = snap.data();
@@ -135,6 +146,7 @@ async function loadCartFromFirestore() {
     }
   } catch (err) {
     console.error("🔥 Load Cart Error:", err);
+    cart = [];
   }
 }
 
@@ -150,24 +162,24 @@ function initMenu() {
     const img = el.querySelector(".menu-img");
 
     let qty = 1;
-    disp.textContent = qty;
+    if (disp) disp.textContent = qty;
 
-    minus.onclick = () => {
+    if (minus) minus.onclick = () => {
       qty = Math.max(1, qty - 1);
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     };
 
-    plus.onclick = () => {
+    if (plus) plus.onclick = () => {
       qty++;
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     };
 
-    add.onclick = async () => {
+    if (add) add.onclick = async () => {
       flyToCart(img);
 
       const name = el.dataset.item;
       const price = Number(el.dataset.price) || 10;
-      const id = name.toLowerCase().replace(/\s+/g, "-");
+      const id = (name || "").toLowerCase().replace(/\s+/g, "-");
 
       const i = findItem(id);
       if (i >= 0) cart[i].qty += qty;
@@ -178,7 +190,7 @@ function initMenu() {
       await saveCartToFirestore();
 
       qty = 1;
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     };
   });
 }
@@ -222,61 +234,74 @@ function attachCartButtons() {
 // UI - Cart Sheet
 // ------------------------------
 function flyToCart(img) {
-  const r = img.getBoundingClientRect();
-  const clone = img.cloneNode(true);
+  try {
+    if (!img) return;
+    const r = img.getBoundingClientRect();
+    const clone = img.cloneNode(true);
 
-  clone.style.position = "fixed";
-  clone.style.left = r.left + "px";
-  clone.style.top = r.top + "px";
-  clone.style.width = r.width + "px";
-  clone.style.height = r.height + "px";
-  clone.style.zIndex = 3000;
-  clone.style.opacity = "1";
-  clone.style.transition = "all .7s ease";
-  document.body.appendChild(clone);
+    clone.style.position = "fixed";
+    clone.style.left = r.left + "px";
+    clone.style.top = r.top + "px";
+    clone.style.width = r.width + "px";
+    clone.style.height = r.height + "px";
+    clone.style.zIndex = 3000;
+    clone.style.opacity = "1";
+    clone.style.transition = "all .7s ease";
+    document.body.appendChild(clone);
 
-  const target = $("#bottomCartBtn").getBoundingClientRect();
+    const targetEl = $("#bottomCartBtn");
+    if (!targetEl) {
+      setTimeout(() => clone.remove(), 700);
+      return;
+    }
+    const target = targetEl.getBoundingClientRect();
 
-  requestAnimationFrame(() => {
-    clone.style.transform = `translate(${target.left - r.left}px, ${
-      target.top - r.top
-    }px) scale(.2)`;
-    clone.style.opacity = "0";
-  });
+    requestAnimationFrame(() => {
+      clone.style.transform = `translate(${target.left - r.left}px, ${
+        target.top - r.top
+      }px) scale(.2)`;
+      clone.style.opacity = "0";
+    });
 
-  setTimeout(() => clone.remove(), 700);
+    setTimeout(() => clone.remove(), 700);
+  } catch (err) {
+    console.warn("flyToCart error:", err);
+  }
 }
 
-$("#bottomCartBtn").onclick = () => {
-  $("#overlay").classList.add("active");
-  $("#cartSheet").classList.add("active");
-  document.body.style.overflow = "hidden";
-  renderCart();
-};
+const bottomBtn = $("#bottomCartBtn");
+if (bottomBtn) {
+  bottomBtn.onclick = () => {
+    $("#overlay")?.classList.add("active");
+    $("#cartSheet")?.classList.add("active");
+    document.body.style.overflow = "hidden";
+    renderCart();
+  };
+}
 
-$("#overlay").onclick = closeSheet;
-$("#closeSheet").onclick = closeSheet;
+$("#overlay")?.addEventListener("click", closeSheet);
+$("#closeSheet")?.addEventListener("click", closeSheet);
 
 function closeSheet() {
-  $("#overlay").classList.remove("active");
-  $("#cartSheet").classList.remove("active");
+  $("#overlay")?.classList.remove("active");
+  $("#cartSheet")?.classList.remove("active");
   document.body.style.overflow = "";
 }
 
 // ------------------------------
 // CLEAR CART
 // ------------------------------
-$("#clearCart").onclick = async () => {
+$("#clearCart")?.addEventListener("click", async () => {
   cart = [];
   renderCart();
   await saveCartToFirestore();
   showToast("Cart cleared");
-};
+});
 
 // ------------------------------
 // PAYMENT — Cashfree
 // ------------------------------
-$("#checkoutBtn").onclick = startCheckoutFlow;
+$("#checkoutBtn")?.addEventListener("click", startCheckoutFlow);
 
 async function startCheckoutFlow() {
   if (cart.length === 0) return showToast("Cart is empty");
@@ -294,51 +319,90 @@ async function startCheckoutFlow() {
     });
 
     const data = await res.json();
-    if (!data.ok) return showToast(data.error || "Payment failed");
+    console.log("create-cashfree-order response:", data);
 
-    const session = data.session;
-    const orderId = data.orderId;
+    // Helpful debug if server returned raw error
+    if (!data.ok) {
+      showToast(data.error || "Payment failed");
+      // also show raw if present for debugging
+      if (data.raw) console.error("Cashfree raw:", data.raw);
+      return;
+    }
 
-    if (window.Cashfree) {
-      window.Cashfree.checkout({
+    const session = data.session || data.paymentSessionId || data.payment_session_id;
+    const orderId = data.orderId || data.order_id || data.data?.order_id;
+
+    if (!session || !orderId) {
+      console.error("Missing session/orderId:", data);
+      showToast("Payment setup failed (missing session)");
+      return;
+    }
+
+    if (window.Cashfree && typeof window.Cashfree.checkout === "function") {
+      // try both property names depending on SDK expectations
+      const payload = {
         paymentSessionId: session,
+        sessionId: session,
         redirectTarget: "_modal",
-      });
+      };
+
+      try {
+        window.Cashfree.checkout(payload);
+      } catch (err) {
+        console.warn("Cashfree.checkout threw, trying sessionId only", err);
+        try {
+          window.Cashfree.checkout({ sessionId: session, redirectTarget: "_modal" });
+        } catch (err2) {
+          console.error("Cashfree invocation failed:", err2);
+          showToast("Payment popup failed");
+          return;
+        }
+      }
     } else {
+      console.error("Cashfree SDK missing on window:", window.Cashfree);
       return showToast("Cashfree SDK missing");
     }
 
-    // Listen for popup result
+    // Listen for popup postMessage result
     const handler = async (e) => {
-      const msg = e.data;
-      if (msg?.paymentStatus === "SUCCESS") {
-        showToast("Verifying payment...");
+      try {
+        const msg = e.data;
+        // Debug
+        console.log("cashfree message:", msg);
 
-        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, items }),
-        });
+        if (msg?.paymentStatus === "SUCCESS" || msg?.status === "SUCCESS") {
+          showToast("Verifying payment...");
 
-        const ok = await vr.json();
+          const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, items }),
+          });
 
-        if (ok?.ok) {
-          showToast("Order Confirmed 🎉");
+          const ok = await vr.json();
+          console.log("verify-cashfree-payment response:", ok);
 
-          cart = [];
-          renderCart();
-          await saveCartToFirestore();
-          closeSheet();
-        } else {
-          showToast("Verification failed");
+          if (ok?.ok) {
+            showToast("Order Confirmed 🎉");
+            cart = [];
+            renderCart();
+            await saveCartToFirestore();
+            closeSheet();
+          } else {
+            showToast("Verification failed");
+            console.error("Verify failed:", ok);
+          }
         }
+      } catch (err) {
+        console.error("message handler error:", err);
+      } finally {
+        window.removeEventListener("message", handler);
       }
-      window.removeEventListener("message", handler);
     };
 
     window.addEventListener("message", handler);
   } catch (err) {
-    console.error(err);
+    console.error("Checkout error:", err);
     showToast("Checkout error");
   }
 }
@@ -349,7 +413,9 @@ async function startCheckoutFlow() {
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     console.warn("❌ Not logged in");
-    window.location.href = "/auth/login.html";
+    // keep menu interactive but do not allow checkout
+    initMenu();
+    renderCart();
     return;
   }
 
