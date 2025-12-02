@@ -217,11 +217,11 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-<!-- Your Firebase Config (VERY IMPORTANT) -->
-<script src="/home/firebase-config.js"></script>
+<!-- Load Firebase v10 modules via ES module scripts (firebase-config initializes app + exports auth/db) -->
+  <script type="module" src="/home/firebase-config.js"></script>
 
-<!-- Your App Script -->
-<script src="/home/script.js"></script>
+  <!-- Your main app logic (module) -->
+  <script type="module" src="/home/script.js"></script>
 
 </body>
 </html>
