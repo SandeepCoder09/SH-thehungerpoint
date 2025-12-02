@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Login — SH The Hunger Point</title>
-
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
   <link rel="stylesheet" href="/auth/login.css" />
-
-  <!-- Firebase v10 (ES Modules auto-loaded by login.js) -->
 </head>
-
 <body>
   <main class="auth-page">
     <div class="card">
@@ -24,21 +19,13 @@
 
       <section class="card-body">
         <form id="loginForm">
-
           <label>Email</label>
-          <input id="email" type="email" required>
-
+          <input id="email" type="email" required />
           <label>Password</label>
-          <input id="password" type="password" required>
-
+          <input id="password" type="password" required />
           <button type="submit" class="btn primary">Sign In</button>
-
           <div class="divider">or</div>
-
-          <button type="button" id="googleLogin" class="btn google">
-            Continue with Google
-          </button>
-
+          <button type="button" id="googleLogin" class="btn google">Continue with Google</button>
         </form>
       </section>
     </div>
@@ -46,7 +33,7 @@
     <div id="toast" class="toast" hidden></div>
   </main>
 
-  <!-- Firebase Config + Login Script -->
+  <!-- Login logic (module) -->
   <script type="module" src="/auth/login.js"></script>
 </body>
 </html>
