@@ -1,19 +1,11 @@
-import {
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import {
-  sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const auth = window.auth;
-const db = window.db;
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 const pfAvatar = document.getElementById("pfAvatar");
 const changePhotoBtn = document.getElementById("changePhotoBtn");
 const photoInput = document.getElementById("photoInput");
+const cropModal = document.getElementById("cropModal");
+const cropImage = document.getElementById("cropImage");
 
 const nameField = document.getElementById("name");
 const emailField = document.getElementById("email");
@@ -24,44 +16,33 @@ const addressField = document.getElementById("address");
 const saveBtn = document.getElementById("saveBtn");
 const resetPassBtn = document.getElementById("resetPassBtn");
 
-const cropModal = document.getElementById("cropModal");
-const cropImage = document.getElementById("cropImage");
-
 let cropper = null;
-let objectUrl = null;
 
-/* Load user */
+/* Load user data */
 auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
+  if (!user) return location.href = "/auth/login.html";
 
-  emailField.value = user.email || "";
+  emailField.value = user.email;
 
-  const snap = await getDoc(doc(db, "users", user.uid));
+  const snap = await db.collection("users").doc(user.uid).get();
+  if (!snap.exists) return;
 
-  if (snap.exists()) {
-    const data = snap.data();
-
-    nameField.value = data.name || "";
-    genderField.value = data.gender || "";
-    phoneField.value = data.phone || "";
-    addressField.value = data.address || "";
-    pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
-  } else {
-    pfAvatar.src = "/home/SH-Favicon.png";
-  }
+  const d = snap.data();
+  nameField.value = d.name || "";
+  genderField.value = d.gender || "";
+  phoneField.value = d.phone || "";
+  addressField.value = d.address || "";
+  if (d.photoURL) pfAvatar.src = d.photoURL;
 });
 
-/* Upload photo */
-changePhotoBtn.addEventListener("click", () => photoInput.click());
+/* Avatar Upload */
+changePhotoBtn.onclick = () => photoInput.click();
 
-photoInput.addEventListener("change", (e) => {
+photoInput.onchange = (e) => {
   const f = e.target.files?.[0];
   if (!f) return;
 
-  if (objectUrl) URL.revokeObjectURL(objectUrl);
-  objectUrl = URL.createObjectURL(f);
-
-  cropImage.src = objectUrl;
+  cropImage.src = URL.createObjectURL(f);
   cropModal.classList.add("active");
 
   cropImage.onload = () => {
@@ -69,48 +50,41 @@ photoInput.addEventListener("change", (e) => {
     cropper = new Cropper(cropImage, {
       aspectRatio: 1,
       viewMode: 1,
-      autoCropArea: 1,
-      background: false
+      autoCropArea: 1
     });
   };
-});
+};
 
 window.closeCropper = () => {
   cropModal.classList.remove("active");
   if (cropper) cropper.destroy();
   cropper = null;
-  if (objectUrl) URL.revokeObjectURL(objectUrl);
 };
 
-/* Save cropped */
 window.saveCroppedImage = async () => {
-  if (!cropper) return alert("Cropper not ready");
-
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user || !cropper) return;
 
-  const canvas = cropper.getCroppedCanvas({ width: 600, height: 600 });
+  const base64 = cropper.getCroppedCanvas({
+    width: 500,
+    height: 500
+  }).toDataURL("image/jpeg", 0.85);
 
-  const base64 = canvas.toDataURL("image/jpeg", 0.85);
-
-  await setDoc(
-    doc(db, "users", user.uid),
+  await db.collection("users").doc(user.uid).set(
     { photoURL: base64 },
     { merge: true }
   );
 
   pfAvatar.src = base64 + "?t=" + Date.now();
   window.closeCropper();
-  alert("Photo updated!");
 };
 
-/* Save details */
-saveBtn.addEventListener("click", async () => {
+/* Save profile */
+saveBtn.onclick = async () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  await setDoc(
-    doc(db, "users", user.uid),
+  await db.collection("users").doc(user.uid).set(
     {
       name: nameField.value,
       gender: genderField.value,
@@ -121,17 +95,13 @@ saveBtn.addEventListener("click", async () => {
   );
 
   alert("Profile saved!");
-});
+};
 
 /* Reset password */
-resetPassBtn.addEventListener("click", async () => {
+resetPassBtn.onclick = async () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  try {
-    await sendPasswordResetEmail(auth, user.email);
-    alert("Reset email sent.");
-  } catch {
-    alert("Failed!");
-  }
-});
+  await auth.sendPasswordResetEmail(user.email);
+  alert("Reset email sent");
+};
