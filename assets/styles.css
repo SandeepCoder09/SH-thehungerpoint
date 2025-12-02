@@ -284,43 +284,66 @@ html, body {
 }
 
 /* ======================================================
-   PROFILE PAGE
+   SH THEME — UPDATED & RESPONSIVE PROFILE PAGE
 ======================================================*/
 
-/* Header */
-.back-header {
-    margin: -22px -22px 20px -22px;
-    padding: 22px 20px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    border-radius: 24px 24px 20px 20px;
-    color: #fff;
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    box-shadow: 0 10px 28px rgba(211,48,48,0.22);
+/* Remove inner card layout for profile */
+.profile-card {
+    padding: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 
+/* Full-width Red Header */
+.back-header {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    padding: 34px 20px 90px;
+    border-radius: 0 0 26px 26px;
+    color: #fff;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 8px 28px rgba(211,48,48,0.25);
+}
+
+/* Back button */
 .back-header .back-btn {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(4px);
     color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 22px;
 }
 
-/* Avatar */
+/* Avatar — centered floating */
 .profile-avatar-wrap {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 10px 4px 18px;
-    color: #fff;
+    position: absolute;
+    left: 50%;
+    top: 68px;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
 }
 
 .profile-avatar {
-    width: 110px;
-    height: 110px;
+    width: 118px;
+    height: 118px;
     border-radius: 50%;
-    border: 3px solid #fff;
     overflow: hidden;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    border: 4px solid #fff;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    margin: 0 auto;
 }
 
 .profile-avatar img {
@@ -329,18 +352,19 @@ html, body {
     object-fit: cover;
 }
 
-/* Pencil Button */
+/* Pencil Edit Button */
 .avatar-edit-btn {
     position: absolute;
-    left: 78px;
-    top: 70px;
-    width: 40px;
-    height: 40px;
-    background: #fff !important;
+    right: calc(50% - 70px);
+    top: 142px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
+    background: #fff !important;
+    border: none;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     box-shadow: 0 6px 18px rgba(0,0,0,0.22);
 }
 
@@ -349,55 +373,88 @@ html, body {
     font-size: 18px;
 }
 
-/* Form Inputs */
-.form-section {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+/* White Form Card */
+.profile-form {
+    margin-top: 140px;
+    background: #fff;
+    padding: 26px 20px 40px;
+    border-radius: 26px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 }
 
+/* Labels */
 .label {
     font-size: 14px;
-    font-weight: 600;
-    color: #555;
+    font-weight: 700;
+    color: #444;
+    margin-bottom: 6px;
 }
 
+/* Inputs */
 .input {
     width: 100%;
     padding: 14px;
     border-radius: 14px;
-    background: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    border: 1px solid #e5e5e5;
+    background: #fafafa;
     font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: 0.25s ease;
 }
 
 .input:focus {
     border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(211,48,48,0.18);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(211,48,48,0.20);
 }
 
 /* Buttons */
-.btn {
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    font-size: 15px;
+.profile-actions {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.btn.primary {
+.profile-actions .btn.primary {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 14px;
     color: #fff;
     font-weight: 700;
 }
 
-.btn.outline {
+.profile-actions .btn.outline {
     background: #fff;
+    border-radius: 14px;
     border: 1px solid #ddd;
     font-weight: 600;
+}
+
+/* ------------------------------------------------------
+   RESPONSIVENESS
+-------------------------------------------------------*/
+
+@media (max-width: 450px) {
+    .back-header {
+        padding: 30px 16px 90px;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .avatar-edit-btn {
+        right: calc(50% - 60px);
+        top: 126px;
+        width: 38px;
+        height: 38px;
+    }
+
+    .profile-form {
+        padding: 22px 16px 32px;
+    }
 }
 
 /* ======================================================
