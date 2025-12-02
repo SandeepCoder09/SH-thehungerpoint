@@ -1,19 +1,22 @@
-// login.js (Firebase v10 Modular)
+// login.js — Firebase v10 ES Modules
 
 import {
+  getAuth,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  signInWithPopup,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 import {
+  getFirestore,
   doc,
   getDoc,
   setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-const auth = window.auth;
-const db = window.db;
+import { auth, db } from "./firebase-config.js";
 
 const form = document.getElementById("loginForm");
 const googleBtn = document.getElementById("googleLogin");
@@ -22,12 +25,12 @@ const toast = document.getElementById("toast");
 function showToast(msg) {
   toast.textContent = msg;
   toast.hidden = false;
-  setTimeout(() => toast.hidden = true, 2500);
+  setTimeout(() => (toast.hidden = true), 2500);
 }
 
-// ------------------------------
-// EMAIL LOGIN
-// ------------------------------
+// -----------------------------------------
+// EMAIL + PASSWORD LOGIN
+// -----------------------------------------
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -35,58 +38,69 @@ form.addEventListener("submit", async (e) => {
   const pass = document.getElementById("password").value;
 
   try {
-    const result = await signInWithEmailAndPassword(auth, email, pass);
-    const uid = result.user.uid;
+    await setPersistence(auth, browserLocalPersistence);
 
-    await handleLogin(uid, email);
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const uid = cred.user.uid;
+
+    // Check rider login
+    const riderSnap = await getDoc(doc(db, "riders", email));
+    if (riderSnap.exists()) {
+      window.location.href = "/rider/index.html";
+      return;
+    }
+
+    // Check existing user
+    const userSnap = await getDoc(doc(db, "users", uid));
+    if (userSnap.exists()) {
+      localStorage.setItem("userId", uid);
+      localStorage.setItem("userEmail", email);
+      window.location.href = "/home/index.html";
+      return;
+    }
+
+    // Create user if not exists
+    await setDoc(doc(db, "users", uid), {
+      email,
+      createdAt: new Date(),
+    });
+
+    localStorage.setItem("userId", uid);
+    localStorage.setItem("userEmail", email);
+
+    window.location.href = "/home/index.html";
 
   } catch (err) {
-    showToast(err.message);
+    showToast("Firebase: " + err.message);
   }
 });
 
-// ------------------------------
+// -----------------------------------------
 // GOOGLE LOGIN
-// ------------------------------
+// -----------------------------------------
 googleBtn.addEventListener("click", async () => {
   try {
     const provider = new GoogleAuthProvider();
+    await setPersistence(auth, browserLocalPersistence);
+
     const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-    const uid = result.user.uid;
-    const email = result.user.email;
+    const userSnap = await getDoc(doc(db, "users", user.uid));
 
-    await handleLogin(uid, email);
+    if (!userSnap.exists()) {
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        createdAt: new Date(),
+      });
+    }
+
+    localStorage.setItem("userId", user.uid);
+    localStorage.setItem("userEmail", user.email);
+
+    window.location.href = "/home/index.html";
 
   } catch (err) {
-    showToast(err.message);
+    showToast("Google Login Error: " + err.message);
   }
 });
-
-// ------------------------------
-// HANDLE LOGIN TYPE
-// ------------------------------
-async function handleLogin(uid, email) {
-
-  // 1) Check Rider
-  const riderSnap = await getDoc(doc(db, "riders", email));
-  if (riderSnap.exists()) {
-    window.location.href = "/rider/index.html";
-    return;
-  }
-
-  // 2) Check User
-  const userSnap = await getDoc(doc(db, "users", uid));
-  if (!userSnap.exists()) {
-    await setDoc(doc(db, "users", uid), {
-      email,
-      createdAt: new Date()
-    });
-  }
-
-  // Save UID for cart
-  localStorage.setItem("userId", uid);
-  localStorage.setItem("userEmail", email);
-
-  window.location.href = "/home/index.html";
-}
