@@ -1,61 +1,45 @@
-// protect.js — SH The Hunger Point
-// Secure page gate + safe auth loader (never blocks UI)
+// /auth/protect.js
+// Waits for window.auth (set by /auth/firebase-config.js) then protects pages.
+// Place in /auth/protect.js (your HTML already loads it after firebase-config.js).
 
-// ---------------------------------------------------------
-// 1. Wait until Firebase is fully loaded
-// ---------------------------------------------------------
-function waitForFirebase() {
-  return new Promise((resolve) => {
-    const check = () => {
-      if (window.firebase && window.firebase.apps && window.firebase.apps.length > 0) {
-        resolve();
-      } else {
-        setTimeout(check, 30);
-      }
-    };
-    check();
+// Wait until window.auth is defined
+function waitForAuth(timeout = 5000) {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    (function check() {
+      if (window.auth) return resolve(window.auth);
+      if (Date.now() - start > timeout) return reject(new Error("auth not available"));
+      setTimeout(check, 50);
+    })();
   });
 }
 
-// ---------------------------------------------------------
-// 2. Wait until firebase-config.js sets window.auth
-// ---------------------------------------------------------
-function waitForAuthObject() {
-  return new Promise((resolve) => {
-    const check = () => {
-      if (window.auth) resolve();
-      else setTimeout(check, 30);
-    };
-    check();
-  });
-}
-
-// ---------------------------------------------------------
-// 3. Main protection logic
-// ---------------------------------------------------------
 (async () => {
   try {
-    // Ensure Firebase + auth are ready
-    await waitForFirebase();
-    await waitForAuthObject();
+    await waitForAuth();
 
-    // Now safe to use `auth`
+    // Now attach state change listener
     auth.onAuthStateChanged((user) => {
-      const currentPage = window.location.pathname;
+      const currentPath = window.location.pathname || "/";
+      // Do not redirect if we are already on an auth page
+      const onAuthPage = currentPath.startsWith("/auth/") || currentPath.includes("/auth/");
 
       if (!user) {
-        console.warn("User not logged in — redirecting to login…");
+        console.warn("User not logged in — redirecting to login (if not already on auth page).");
 
-        const encodedNext = encodeURIComponent(currentPage);
-
-        window.location.href = `/auth/login.html?next=${encodedNext}`;
+        if (!onAuthPage) {
+          const encodedNext = encodeURIComponent(currentPath + (window.location.search || ""));
+          window.location.href = `/auth/login.html?next=${encodedNext}`;
+        }
         return;
       }
 
-      console.log("User logged in:", user.email);
+      // user is logged in: expose user object for other scripts and log
+      window.currentUser = user;
+      console.info("User logged in:", user.email || user.uid);
     });
-
   } catch (err) {
-    console.error("protect.js failed to initialize:", err);
+    // If auth never shows up, we don't want to crash the app — log the error
+    console.error("protect.js: failed to initialize auth watcher:", err);
   }
 })();
