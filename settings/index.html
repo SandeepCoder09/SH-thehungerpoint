@@ -27,13 +27,15 @@
       <div class="user-banner">
 
         <div class="user-avatar" style="position:relative;">
-          <img id="hdrAvatar" src="/assets/default-user.png">
+          <!-- use the favicon as default avatar -->
+          <img id="hdrAvatar" src="/home/SH-Favicon.png" alt="avatar">
 
           <!-- Pencil -->
           <button onclick="openSettingsPhotoPicker()" 
+            title="Change photo"
             style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;
-            border:1px solid #ddd;width:26px;height:26px;display:flex;align-items:center;
-            justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,0.1);">
+            border:1px solid #ddd;width:32px;height:32px;display:flex;align-items:center;
+            justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,0.08);">
             <i class="ri-pencil-line" style="font-size:15px;color:#b71c1c;"></i>
           </button>
         </div>
@@ -84,7 +86,7 @@
             <div class="kv">Receive updates & offers</div>
           </div>
 
-          <div id="pushToggle" class="toggle">
+          <div id="pushToggle" class="toggle" aria-pressed="false" title="Toggle push notifications">
             <div class="dot"></div>
           </div>
         </div>
@@ -99,7 +101,7 @@
 
       </div>
 
-      <div class="support-box">
+      <div class="support-box" style="text-align:left;">
         Need help? Message us on WhatsApp — 
         <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
       </div>
@@ -109,7 +111,7 @@
   </main>
 
   <!-- PASSWORD SHEET -->
-  <div id="pwSheet" class="sheet">
+  <div id="pwSheet" class="sheet" aria-hidden="true">
     <div style="width:40px;height:4px;background:#bbb;margin:0 auto;border-radius:4px;"></div>
     <h3 style="text-align:center;margin-top:14px;">Change Password</h3>
 
@@ -125,7 +127,7 @@
   </div>
 
   <!-- CROPPING MODAL -->
-  <div id="settingsCropModal" class="cropper-modal">
+  <div id="settingsCropModal" class="cropper-modal" aria-hidden="true">
     <div class="cropper-content">
 
       <h3>Crop photo</h3>
@@ -156,6 +158,7 @@
   <!-- CropperJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+  <!-- Settings Script -->
   <script src="/assets/settings.js"></script>
 
 </body>
