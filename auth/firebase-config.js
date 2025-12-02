@@ -9,14 +9,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Your Firebase project config
-const firebaseConfig = {
-  apiKey: "AIzaSyBAR2bTveqOertBkpt95YId9hDPrg6S9_E",
+// /auth/firebase-config.js
+// Firebase v10 config (Auth pages)
+
+export const firebaseConfig = {
+  apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
   projectId: "sh-the-hunger-point",
-  storageBucket: "sh-the-hunger-point.appspot.com",
-  messagingSenderId: "312843485011",
-  appId: "1:312843485011:web:347c18ee0ad022a1beaba6"
+  storageBucket: "sh-thehunger-point.firebasestorage.app",
+  messagingSenderId: "401237282420",
+  appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
+  measurementId: "G-4KP3RJ15E9"
 };
 
 // Initialize app
