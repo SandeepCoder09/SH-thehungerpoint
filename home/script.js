@@ -113,7 +113,8 @@ function renderCart() {
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal")?.textContent = "₹0";
+    const totalEl = $("#cartTotal");
+    if (totalEl) totalEl.textContent = "₹0";
     updateCartCount();
     return;
   }
