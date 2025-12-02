@@ -1,13 +1,11 @@
-/* -------------------------------------------
-   PROFILE PAGE SCRIPT
-------------------------------------------- */
+/* ======================================================
+   profile.js  — profile page (load/save fields + cropper)
+======================================================*/
 
-// Firebase references
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+const auth = window.auth || firebase.auth();
+const db = window.db || firebase.firestore();
+const storage = window.storage || firebase.storage();
 
-// DOM elements
 const pfAvatar = document.getElementById("pfAvatar");
 const changePhotoBtn = document.getElementById("changePhotoBtn");
 const photoInput = document.getElementById("photoInput");
@@ -21,169 +19,131 @@ const addressField = document.getElementById("address");
 const saveBtn = document.getElementById("saveBtn");
 const resetPassBtn = document.getElementById("resetPassBtn");
 
-// Cropper modal
 const cropModal = document.getElementById("cropModal");
 const cropImage = document.getElementById("cropImage");
 
 let cropper = null;
 let objectUrl = null;
 
-/* -------------------------------------------
-   LOAD USER PROFILE
-------------------------------------------- */
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
-
-  emailField.value = user.email;
-
-  const doc = await db.collection("users").doc(user.uid).get();
-
-  if (doc.exists) {
-    const u = doc.data();
-
-    nameField.value = u.name || "";
-    genderField.value = u.gender || "";
-    phoneField.value = u.phone || "";
-    addressField.value = u.address || "";
-
-    pfAvatar.src = u.photoURL || "/home/SH-Favicon.png";
-  } else {
-    pfAvatar.src = "/home/SH-Favicon.png";
-  }
-});
-
-/* -------------------------------------------
-   OPEN FILE PICKER
-------------------------------------------- */
-if (changePhotoBtn) {
-  changePhotoBtn.addEventListener("click", () => {
-    photoInput.click();
+/* Wait for firebase ready */
+function waitForFirebase() {
+  return new Promise(res => {
+    const check = () => {
+      if ((window.auth || firebase.auth()) && (window.db || firebase.firestore())) res();
+      else setTimeout(check, 30);
+    };
+    check();
   });
 }
 
-/* -------------------------------------------
-   START CROPPER (FIXED VERSION)
-------------------------------------------- */
-if (photoInput) {
-  photoInput.addEventListener("change", (ev) => {
-    const f = ev.target.files && ev.target.files[0];
-    if (!f) return;
+(async () => {
+  await waitForFirebase();
 
-    // Clean previous blob URL
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = URL.createObjectURL(f);
-
-    // Reset current image/cropper
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      window.location.href = "/auth/login.html";
+      return;
     }
 
-    cropImage.src = "";
-    cropModal.classList.add("show");
+    emailField.value = user.email || "";
+    const doc = await db.collection("users").doc(user.uid).get();
 
-    // Load image
-    cropImage.src = objectUrl;
-
-    cropImage.addEventListener(
-      "load",
-      () => {
-        cropper = new Cropper(cropImage, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          background: false,
-          guides: false,
-          movable: true,
-          zoomable: true,
-          dragMode: "move"
-        });
-      },
-      { once: true }
-    );
+    if (doc.exists) {
+      const data = doc.data();
+      nameField.value = data.name || "";
+      genderField.value = data.gender || "";
+      phoneField.value = data.phone || "";
+      addressField.value = data.address || "";
+      pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
+    } else {
+      pfAvatar.src = "/home/SH-Favicon.png";
+    }
   });
-}
+})();
 
-/* -------------------------------------------
-   CLOSE CROPPER
-------------------------------------------- */
+/* Open file picker */
+changePhotoBtn.addEventListener("click", () => photoInput.click());
+
+/* File selected → cropper */
+photoInput.addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = URL.createObjectURL(f);
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropImage.src = "";
+  cropModal.classList.add("active");
+  cropImage.src = objectUrl;
+
+  cropImage.addEventListener("load", () => {
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1,
+      background: false,
+      guides: false,
+      movable: true,
+      zoomable: true,
+      dragMode: "move"
+    });
+  }, { once: true });
+});
+
+/* Close & destroy */
 function closeCropper() {
-  cropModal.classList.remove("show");
-  if (cropper) cropper.destroy();
-  cropper = null;
+  cropModal.classList.remove("active");
+  if (cropper) { cropper.destroy(); cropper = null; }
+  if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
 }
 window.closeCropper = closeCropper;
 
-/* -------------------------------------------
-   SAVE CROPPED IMAGE
-------------------------------------------- */
+/* Save cropped image */
 async function saveCroppedImage() {
-  if (!cropper) {
-    alert("Cropper not ready");
-    return;
-  }
-
+  if (!cropper) return alert("Cropper not ready");
   const user = auth.currentUser;
   if (!user) return;
 
-  const canvas = cropper.getCroppedCanvas({
-    width: 400,
-    height: 400,
-    imageSmoothingQuality: "high"
-  });
+  const canvas = cropper.getCroppedCanvas({ width: 600, height: 600, fillColor: "#fff" });
 
-  const blob = await new Promise((resolve) =>
-    canvas.toBlob(resolve, "image/jpeg", 0.9)
-  );
+  canvas.toBlob(async (blob) => {
+    const ref = storage.ref(`profile/${user.uid}.jpg`);
+    await ref.put(blob);
+    const url = await ref.getDownloadURL();
 
-  const ref = storage.ref(`profile/${user.uid}.jpg`);
+    await db.collection("users").doc(user.uid).set({ photoURL: url }, { merge: true });
 
-  await ref.put(blob);
-  const url = await ref.getDownloadURL();
-
-  // Update Firestore
-  await db.collection("users").doc(user.uid).update({
-    photoURL: url
-  });
-
-  // Update UI
-  pfAvatar.src = url;
-
-  closeCropper();
+    pfAvatar.src = url;
+    closeCropper();
+    alert("Photo updated!");
+  }, "image/jpeg", 0.9);
 }
 window.saveCroppedImage = saveCroppedImage;
 
-/* -------------------------------------------
-   SAVE PROFILE FIELDS
-------------------------------------------- */
-if (saveBtn) {
-  saveBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (!user) return;
+/* Save profile data */
+saveBtn.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    await db.collection("users").doc(user.uid).set(
-      {
-        name: nameField.value,
-        gender: genderField.value,
-        phone: phoneField.value,
-        address: addressField.value
-      },
-      { merge: true }
-    );
+  await db.collection("users").doc(user.uid).set({
+    name: nameField.value,
+    gender: genderField.value,
+    phone: phoneField.value,
+    address: addressField.value
+  }, { merge: true });
 
-    alert("Profile updated successfully.");
-  });
-}
+  alert("Profile saved!");
+});
 
-/* -------------------------------------------
-   PASSWORD RESET EMAIL
-------------------------------------------- */
-if (resetPassBtn) {
-  resetPassBtn.addEventListener("click", () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    auth.sendPasswordResetEmail(user.email);
-    alert("Password reset email sent.");
-  });
-}
+/* Reset password */
+resetPassBtn.addEventListener("click", () => {
+  const user = auth.currentUser;
+  if (!user) return;
+  auth.sendPasswordResetEmail(user.email);
+  alert("Reset email sent.");
+});
