@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="icon" href="/home/SH-Favicon.png" />
 
-  <!-- Remix / Icons -->
+  <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
   <!-- Cropper CSS -->
@@ -22,11 +22,11 @@
 
       <!-- USER BANNER -->
       <div class="user-banner">
-        <div class="user-avatar" style="position:relative;">
+        <div class="user-avatar">
           <img id="hdrAvatar" src="/home/SH-Favicon.png" alt="avatar">
-          <button id="hdrAvatarBtn" aria-label="Change photo" title="Change photo"
-            style="position:absolute;bottom:2px;right:2px;background:#fff;border-radius:50%;border:1px solid #eee;width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
-            <i class="ri-pencil-line" style="font-size:14px;color:#b71c1c;"></i>
+
+          <button id="hdrAvatarBtn" class="avatar-edit-btn">
+            <i class="ri-pencil-line"></i>
           </button>
         </div>
 
@@ -36,15 +36,16 @@
         </div>
       </div>
 
-      <!-- LIST -->
+      <!-- Settings items -->
       <div class="settings-list">
+
         <div class="settings-item" id="openProfileBtn">
           <div class="icon"><i class="ri-user-line"></i></div>
           <div>
             <div class="title">User Profile</div>
             <div class="kv">Edit profile & preferences</div>
           </div>
-          <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
+          <i class="ri-arrow-right-s-line arrow"></i>
         </div>
 
         <div class="settings-item" id="openChangePassBtn">
@@ -53,17 +54,17 @@
             <div class="title">Change Password</div>
             <div class="kv">Update your login password</div>
           </div>
-          <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
+          <i class="ri-arrow-right-s-line arrow"></i>
         </div>
 
-        <a href="/settings/faqs.html" style="color:inherit;text-decoration:none;">
+        <a href="/settings/faqs.html" class="settings-link">
           <div class="settings-item">
             <div class="icon"><i class="ri-question-line"></i></div>
             <div>
               <div class="title">FAQs</div>
               <div class="kv">Common questions</div>
             </div>
-            <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
+            <i class="ri-arrow-right-s-line arrow"></i>
           </div>
         </a>
 
@@ -74,7 +75,7 @@
             <div class="kv">Receive updates & offers</div>
           </div>
 
-          <div id="pushToggle" class="toggle" role="switch" aria-checked="false">
+          <div id="pushToggle" class="toggle" role="switch">
             <div class="dot"></div>
           </div>
         </div>
@@ -86,97 +87,61 @@
             <div class="kv">Sign out of your account</div>
           </div>
         </div>
+
       </div>
 
       <div class="support-box">
         Need help? Message us on WhatsApp — 
-        <a href="https://wa.me/919999999999" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
       </div>
 
     </article>
   </main>
 
-  <!-- PASSWORD SHEET (hidden by default) -->
+  <!-- PASSWORD SHEET -->
   <div id="pwSheet" class="sheet" aria-hidden="true">
-    <div style="width:40px;height:4px;background:#bbb;margin:0 auto;border-radius:4px;"></div>
-    <h3 style="text-align:center;margin-top:14px;">Change Password</h3>
+    <h3>Change Password</h3>
 
-    <div style="margin-top:18px;display:flex;flex-direction:column;gap:12px;">
-      <input id="newPass" class="input" type="password" placeholder="New password">
-      <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
+    <input id="newPass" class="input" type="password" placeholder="New password">
+    <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
 
-      <div style="display:flex;gap:12px;margin-top:4px;">
-        <button onclick="closePwSheet()" class="btn outline" style="flex:1;">Cancel</button>
-        <button onclick="savePassword()" class="btn primary" style="flex:1;">Save</button>
-      </div>
+    <div class="sheet-btns">
+      <button onclick="closePwSheet()" class="btn outline">Cancel</button>
+      <button onclick="savePassword()" class="btn primary">Save</button>
     </div>
   </div>
 
-  <!-- CROPPING MODAL -->
+  <!-- CROP MODAL -->
   <div id="settingsCropModal" class="cropper-modal" aria-hidden="true">
     <div class="cropper-content">
-      <h3>Crop photo</h3>
-      <div class="cropper-area circle-mask-250" style="position:relative;overflow:hidden;">
-        <img id="settingsCropImage" alt="to crop" />
+      <h3>Crop Photo</h3>
+
+      <div class="cropper-area circle-mask-250">
+        <img id="settingsCropImage" alt="crop">
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:12px;">
-        <button onclick="closeSettingsCropper()" class="btn outline" style="flex:1;">Cancel</button>
-        <button onclick="saveSettingsCroppedImage()" class="btn primary" style="flex:1;">Save</button>
+      <div class="cropper-actions">
+        <button onclick="closeSettingsCropper()" class="btn outline">Cancel</button>
+        <button onclick="saveSettingsCroppedImage()" class="btn primary">Save</button>
       </div>
     </div>
   </div>
 
   <input type="file" id="settingsPhotoInput" accept="image/*" hidden>
 
-  <!-- Firebase core -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<!-- MUST LOAD FIRST -->
-<script src="/auth/firebase-config.js"></script>
+  <script src="/auth/firebase-config.js"></script>
+  <script src="/auth/protect.js"></script>
 
-<!-- MUST LOAD AFTER firebase-config -->
-<script src="/auth/protect.js"></script>
+  <!-- Cropper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-<!-- Page-specific scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script src="/settings/settings.js"></script>
-
-<!-- SH Floating Chat Widget -->
-<div id="sh-chat" aria-live="polite">
-  <button id="chatToggle" aria-label="Open chat" title="Chat with Support">
-    <i class="ri-chat-3-line"></i>
-  </button>
-
-  <div id="chatWindow" role="dialog" aria-hidden="true">
-    <div class="chat-header">
-      <div>
-        <div class="chat-title">SH Support</div>
-        <div class="chat-sub">Ask me anything</div>
-      </div>
-      <button id="chatClose" aria-label="Close chat"><i class="ri-close-line"></i></button>
-    </div>
-
-    <div id="chatBody" class="chat-body"></div>
-
-    <div class="chat-composer">
-      <input id="chatInput" type="text" placeholder="Type your question..." />
-      <button id="chatSend"><i class="ri-send-plane-2-line"></i></button>
-    </div>
-
-    <div class="chat-quick">
-      <button data-msg="How do I update my profile photo?">Update Photo</button>
-      <button data-msg="How to change password?">Change Password</button>
-      <button data-msg="I want to contact support">Support</button>
-    </div>
-  </div>
-</div>
-
-<!-- Chat widget logic -->
-<script src="/help/help.js"></script>
+  <!-- Page logic -->
+  <script src="/settings/settings.js"></script>
 
 </body>
 </html>
