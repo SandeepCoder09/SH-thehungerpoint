@@ -46,31 +46,23 @@ function updateCartCount() {
   btn.setAttribute("data-count", total);
 }
 
-/* -------------------------------
-    DETECT USER ID ANYWHERE
--------------------------------- */
+/* --------------------------------------------------
+   FIX #1 — ALWAYS GET FIREBASE UID DIRECTLY
+-------------------------------------------------- */
 function getCurrentUserId() {
-  if (window.SH?.user?.id) return window.SH.user.id;
-  if (window.currentUser?.id) return window.currentUser.id;
-
-  const uid1 = localStorage.getItem("userId");
-  if (uid1) return uid1;
-
-  const uid2 = localStorage.getItem("uid");
-  if (uid2) return uid2;
-
-  const f = firebase.auth().currentUser;
-  if (f?.uid) return f.uid;
-
-  return null;
+  const user = firebase.auth().currentUser;
+  return user ? user.uid : null;
 }
 
-/* -------------------------------
-    FIRESTORE CART FUNCTIONS
--------------------------------- */
+/* --------------------------------------------------
+   FIRESTORE CART: SAVE
+-------------------------------------------------- */
 async function saveCartToFirestore() {
   const userId = getCurrentUserId();
-  if (!userId) return;
+  if (!userId) {
+    console.warn("⚠ No UID during saveCart");
+    return;
+  }
 
   try {
     await db.collection("cart").doc(userId).set({
@@ -84,27 +76,36 @@ async function saveCartToFirestore() {
   }
 }
 
+/* --------------------------------------------------
+   FIRESTORE CART: LOAD
+-------------------------------------------------- */
 async function loadCartFromFirestore() {
   const userId = getCurrentUserId();
-  if (!userId) return;
+  if (!userId) {
+    console.warn("⚠ No UID during loadCart");
+    return;
+  }
 
   try {
     const snap = await db.collection("cart").doc(userId).get();
+
     if (snap.exists) {
       const data = snap.data();
       if (Array.isArray(data.items)) {
         cart = data.items;
         console.log("🟢 Cart loaded from Firestore");
       }
+    } else {
+      console.log("ℹ No cart found for this user");
     }
   } catch (err) {
     console.error("🔥 Firestore Load Error:", err);
   }
 }
 
-/* -------------------------------
-    RENDER CART UI
--------------------------------- */
+/* --------------------------------------------------
+   RENDER CART UI
+-------------------------------------------------- */
 function renderCart() {
   const box = $("#cartItems");
   if (!box) return;
@@ -113,8 +114,7 @@ function renderCart() {
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    const totalEl = $("#cartTotal");
-    if (totalEl) totalEl.textContent = "₹0";
+    $("#cartTotal")?.textContent = "₹0";
     updateCartCount();
     return;
   }
@@ -152,9 +152,9 @@ function renderCart() {
   attachCartButtons();
 }
 
-/* -------------------------------
-    CART BUTTON EVENTS
--------------------------------- */
+/* --------------------------------------------------
+   CART BUTTON EVENT HANDLERS
+-------------------------------------------------- */
 function attachCartButtons() {
   $$(".c-dec").forEach((b) =>
     b.addEventListener("click", () => {
@@ -190,9 +190,9 @@ function attachCartButtons() {
   );
 }
 
-/* -------------------------------
-    FLY TO CART
--------------------------------- */
+/* --------------------------------------------------
+   FLY TO CART
+-------------------------------------------------- */
 function flyToCart(img) {
   if (!img) return;
 
@@ -220,9 +220,9 @@ function flyToCart(img) {
   setTimeout(() => clone.remove(), 800);
 }
 
-/* -------------------------------
-    CART SHEET
--------------------------------- */
+/* --------------------------------------------------
+   CART SHEET OPEN/CLOSE
+-------------------------------------------------- */
 function openCartSheet() {
   $("#overlay").classList.add("active");
   $("#cartSheet").classList.add("active");
@@ -244,9 +244,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (xBtn) xBtn.addEventListener("click", closeCartSheet);
 });
 
-/* -------------------------------
-    MENU ADD BUTTON
--------------------------------- */
+/* --------------------------------------------------
+   MENU + ADD TO CART
+-------------------------------------------------- */
 function initMenu() {
   $$(".menu-item").forEach((el) => {
     const minus = el.querySelector(".qty-btn.minus");
@@ -289,9 +289,9 @@ function initMenu() {
   });
 }
 
-/* -------------------------------
-    SEARCH + CATEGORY FILTER
--------------------------------- */
+/* --------------------------------------------------
+   SEARCH + CATEGORY FILTER
+-------------------------------------------------- */
 $("#menuSearch")?.addEventListener("input", (e) => {
   const q = e.target.value.toLowerCase();
   $$(".menu-item").forEach((el) => {
@@ -313,9 +313,9 @@ $$(".chip").forEach((chip) =>
   })
 );
 
-/* -------------------------------
-    CLEAR CART
--------------------------------- */
+/* --------------------------------------------------
+   CLEAR CART
+-------------------------------------------------- */
 $("#clearCart")?.addEventListener("click", () => {
   cart = [];
   renderCart();
@@ -323,9 +323,9 @@ $("#clearCart")?.addEventListener("click", () => {
   showToast("Cart cleared");
 });
 
-/* -------------------------------
-    PAYMENTS (Render Server)
--------------------------------- */
+/* --------------------------------------------------
+   PAYMENT USING RENDER SERVER
+-------------------------------------------------- */
 $("#checkoutBtn")?.addEventListener("click", startCheckoutFlow);
 
 async function startCheckoutFlow() {
@@ -349,8 +349,7 @@ async function startCheckoutFlow() {
     const orderId = data.orderId;
 
     if (window.Cashfree) {
-      const cf = window.Cashfree;
-      cf.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
+      window.Cashfree.checkout({ paymentSessionId: session, redirectTarget: "_modal" });
     } else {
       return showToast("Cashfree SDK missing");
     }
@@ -388,11 +387,17 @@ async function startCheckoutFlow() {
   }
 }
 
-/* -------------------------------
-    INIT
--------------------------------- */
-document.addEventListener("DOMContentLoaded", async () => {
+/* --------------------------------------------------
+   INIT
+-------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
   initMenu();
-  await loadCartFromFirestore();
-  renderCart();
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (user) {
+      console.log("🔐 UID ready:", user.uid);
+      await loadCartFromFirestore();
+      renderCart();
+    }
+  });
 });
