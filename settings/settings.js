@@ -1,279 +1,127 @@
-// /settings/settings.js — FINAL BASE64 VERSION (keeps original structure exactly)
-
 (function () {
-  // ---------- Helpers ----------
-  function el(id) { return document.getElementById(id); }
-  function q(sel) { return document.querySelector(sel); }
 
-  function showToast(msg, timeout = 2500) {
-    let t = document.createElement("div");
-    t.textContent = msg;
-    t.style.position = "fixed";
-    t.style.bottom = "28px";
-    t.style.left = "50%";
-    t.style.transform = "translateX(-50%)";
-    t.style.background = "#222";
-    t.style.color = "#fff";
-    t.style.padding = "10px 14px";
-    t.style.borderRadius = "10px";
-    t.style.zIndex = 99999;
-    t.style.boxShadow = "0 10px 20px rgba(0,0,0,.2)";
-    document.body.appendChild(t);
-    setTimeout(() => { 
-      t.style.opacity = "0"; 
-      t.addEventListener("transitionend", () => t.remove()); 
-    }, timeout);
-  }
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-  // Wait for firebase auth + firestore to be available.
-  async function waitForFirebase() {
-    return new Promise((resolve) => {
-      const check = () => {
-        const hasAuth = !!window.auth;
-        const hasDb = !!window.db;
-        if (hasAuth && hasDb) resolve();
-        else setTimeout(check, 50);
-      };
-      check();
-    });
-  }
+  const hdrAvatar = document.getElementById("hdrAvatar");
+  const hdrAvatarBtn = document.getElementById("hdrAvatarBtn");
+  const settingsPhotoInput = document.getElementById("settingsPhotoInput");
 
-  // ---------- DOM refs ----------
-  const hdrAvatar = el("hdrAvatar");
-  const hdrAvatarBtn = el("hdrAvatarBtn");
-  const settingsPhotoInput = el("settingsPhotoInput");
-  const settingsCropModal = el("settingsCropModal");
-  const settingsCropImage = el("settingsCropImage");
-  const pwSheet = el("pwSheet");
-  const openChangePassBtn = el("openChangePassBtn");
-  const openProfileBtn = el("openProfileBtn");
-  const pushToggle = el("pushToggle");
-  const logoutItem = el("logoutItem");
-  const hdrName = el("hdrName");
-  const hdrEmail = el("hdrEmail");
+  const settingsCropModal = document.getElementById("settingsCropModal");
+  const settingsCropImage = document.getElementById("settingsCropImage");
 
-  // Cropper state
+  const pwSheet = document.getElementById("pwSheet");
+  const openChangePassBtn = document.getElementById("openChangePassBtn");
+  const openProfileBtn = document.getElementById("openProfileBtn");
+
+  const pushToggle = document.getElementById("pushToggle");
+  const logoutItem = document.getElementById("logoutItem");
+
+  const hdrName = document.getElementById("hdrName");
+  const hdrEmail = document.getElementById("hdrEmail");
+
   let cropper = null;
 
-  // ---------- Sheet ----------
-  function openPwSheet() {
-    pwSheet.classList.add("open");
-    pwSheet.setAttribute("aria-hidden", "false");
-  }
-  function closePwSheet() {
-    pwSheet.classList.remove("open");
-    pwSheet.setAttribute("aria-hidden", "true");
+  function showToast(msg) {
+    alert(msg);
   }
 
-  // ---------- Cropper Modal ----------
-  function openCropperModal() {
-    settingsCropModal.classList.add("active");
-    settingsCropModal.setAttribute("aria-hidden", "false");
-  }
-  function closeCropperModal() {
-    settingsCropModal.classList.remove("active");
-    settingsCropModal.setAttribute("aria-hidden", "true");
+  /* ---------------- Load User Data ---------------- */
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return;
 
-    if (cropper) {
-      try { cropper.destroy(); } catch (e) {}
-      cropper = null;
+    hdrEmail.textContent = user.email;
+
+    const snap = await db.collection("users").doc(user.uid).get();
+    if (!snap.exists) return;
+
+    const d = snap.data();
+    hdrName.textContent = d.name || "User";
+
+    if (d.photoURL) hdrAvatar.src = d.photoURL;
+    if (typeof d.notificationsEnabled !== "undefined") {
+      if (d.notificationsEnabled) pushToggle.classList.add("active");
     }
-    settingsCropImage.src = "";
-  }
+  });
 
-  // ---------- Image Selecting ----------
-  async function onSettingsFileChange(e) {
-    const f = e.target.files && e.target.files[0];
+  /* ---------------- Avatar Upload ---------------- */
+  hdrAvatarBtn.onclick = () => settingsPhotoInput.click();
+
+  settingsPhotoInput.onchange = (e) => {
+    const f = e.target.files?.[0];
     if (!f) return;
 
     settingsCropImage.src = URL.createObjectURL(f);
-
-    openCropperModal();
+    settingsCropModal.classList.add("active");
 
     settingsCropImage.onload = () => {
-      if (cropper) { try { cropper.destroy(); } catch (err) {} }
-
+      if (cropper) cropper.destroy();
       cropper = new Cropper(settingsCropImage, {
-        viewMode: 1,
-        dragMode: 'move',
         aspectRatio: 1,
-        background: false,
-        responsive: true,
-        autoCropArea: 1,
-        zoomable: true,
-        wheelZoomRatio: 0.1,
+        viewMode: 1,
+        autoCropArea: 1
       });
     };
-  }
+  };
 
-  // ---------- SAVE CROPPED PHOTO AS BASE64 ----------
-  async function saveSettingsCroppedImage() {
-    if (!cropper) {
-      showToast("Cropper not ready");
-      return;
-    }
-
-    // Get cropped canvas
-    const canvas = cropper.getCroppedCanvas({
-      width: 500,
-      height: 500,
-      imageSmoothingQuality: "high"
-    });
-
-    if (!canvas) {
-      showToast("Crop failed");
-      return;
-    }
-
-    // Convert to Base64
-    const base64 = canvas.toDataURL("image/jpeg", 0.85);
-
-    const user = auth.currentUser;
-    if (!user) {
-      showToast("Not signed in");
-      closeCropperModal();
-      return;
-    }
-
-    try {
-      // Save to Firestore directly
-      await db.collection("users").doc(user.uid).set(
-        {
-          photoURL: base64,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      // Update UI instantly
-      hdrAvatar.src = base64 + "?t=" + Date.now();
-
-      showToast("Photo updated!");
-      closeCropperModal();
-    } catch (err) {
-      console.error("SAVE BASE64 ERROR:", err);
-      showToast("Failed to save photo");
-      closeCropperModal();
-    }
-  }
-
-  // ---------- Push Toggle ----------
-  async function setPushToggle(active) {
-    if (active) {
-      pushToggle.classList.add("active");
-      pushToggle.setAttribute("aria-checked", "true");
-    } else {
-      pushToggle.classList.remove("active");
-      pushToggle.setAttribute("aria-checked", "false");
-    }
-  }
-
-  async function togglePush() {
-    const user = auth.currentUser;
-    if (!user) return showToast("Login first");
-
-    const current = pushToggle.classList.contains("active");
-    const next = !current;
-
-    setPushToggle(next);
-
-    try {
-      await db.collection("users").doc(user.uid).set(
-        { notificationsEnabled: next },
-        { merge: true }
-      );
-      showToast(next ? "Notifications enabled" : "Notifications disabled");
-    } catch (err) {
-      console.error(err);
-      setPushToggle(current);
-      showToast("Failed to save");
-    }
-  }
-
-  // ---------- Save Password ----------
-  async function savePassword() {
-    const user = auth.currentUser;
-    if (!user) return showToast("Not signed in");
-
-    try {
-      await auth.sendPasswordResetEmail(user.email);
-      showToast("Reset email sent");
-      closePwSheet();
-    } catch (err) {
-      showToast("Failed to send");
-    }
-  }
-
-  // ---------- Logout ----------
-  async function doLogout() {
-    try {
-      await auth.signOut();
-      window.location.href = "/auth/login.html";
-    } catch (err) {
-      console.error(err);
-      showToast("Logout failed");
-    }
-  }
-
-  // ---------- Wire Events ----------
-  function wireEvents() {
-    if (hdrAvatarBtn) hdrAvatarBtn.onclick = () => settingsPhotoInput.click();
-
-    if (settingsPhotoInput) settingsPhotoInput.addEventListener("change", onSettingsFileChange);
-
-    // expose functions for inline HTML
-    window.saveSettingsCroppedImage = saveSettingsCroppedImage;
-    window.closeSettingsCropper = closeCropperModal;
-
-    if (openChangePassBtn) openChangePassBtn.onclick = openPwSheet;
-    window.closePwSheet = closePwSheet;
-    window.savePassword = savePassword;
-
-    if (openProfileBtn) openProfileBtn.onclick = () => location.href = "/profile/index.html";
-
-    if (pushToggle) pushToggle.onclick = togglePush;
-
-    if (logoutItem) logoutItem.onclick = doLogout;
-
-    // Close modal by clicking background
-    settingsCropModal.onclick = (ev) => {
-      if (ev.target === settingsCropModal) closeCropperModal();
-    };
-  }
-
-  // ---------- Main Bootstrap ----------
-  (async function main() {
-    await waitForFirebase();
-    wireEvents();
-
-    // ensure closed initially
-    pwSheet.classList.remove("open");
+  window.closeSettingsCropper = () => {
     settingsCropModal.classList.remove("active");
+    if (cropper) cropper.destroy();
+    cropper = null;
+  };
 
-    // Load header details
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        hdrName.textContent = "Guest";
-        hdrEmail.textContent = "";
-        return;
-      }
+  window.saveSettingsCroppedImage = async () => {
+    const user = auth.currentUser;
+    if (!user || !cropper) return;
 
-      hdrEmail.textContent = user.email;
+    const base64 = cropper.getCroppedCanvas({
+      width: 500,
+      height: 500
+    }).toDataURL("image/jpeg", 0.85);
 
-      const snap = await db.collection("users").doc(user.uid).get();
-      if (!snap.exists) return;
+    await db.collection("users").doc(user.uid).set(
+      { photoURL: base64 },
+      { merge: true }
+    );
 
-      const data = snap.data();
+    hdrAvatar.src = base64 + "?t=" + Date.now();
+    window.closeSettingsCropper();
+  };
 
-      hdrName.textContent = data.name || "User";
+  /* ---------------- Push Toggle ---------------- */
+  pushToggle.onclick = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
 
-      if (data.photoURL) {
-        hdrAvatar.src = data.photoURL;
-      }
+    const newState = !pushToggle.classList.contains("active");
+    pushToggle.classList.toggle("active");
 
-      if (typeof data.notificationsEnabled !== "undefined") {
-        setPushToggle(!!data.notificationsEnabled);
-      }
-    });
-  })();
+    await db.collection("users").doc(user.uid).set(
+      { notificationsEnabled: newState },
+      { merge: true }
+    );
+  };
+
+  /* ---------------- Password Sheet ---------------- */
+  openChangePassBtn.onclick = () => pwSheet.classList.add("open");
+  window.closePwSheet = () => pwSheet.classList.remove("open");
+
+  window.savePassword = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await auth.sendPasswordResetEmail(user.email);
+    showToast("Reset email sent!");
+    pwSheet.classList.remove("open");
+  };
+
+  /* ---------------- Navigation ---------------- */
+  openProfileBtn.onclick = () => location.href = "/profile/index.html";
+
+  /* ---------------- Logout ---------------- */
+  logoutItem.onclick = async () => {
+    await auth.signOut();
+    location.href = "/auth/login.html";
+  };
+
 })();
