@@ -4,39 +4,29 @@
   <meta charset="utf-8" />
   <title>Settings — The Hunger Point</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-
   <link rel="icon" href="/home/SH-Favicon.png" />
 
-  <!-- Remix Icons -->
+  <!-- Remix / Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
   <!-- Cropper CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
-  <!-- Global Styles -->
-  <link rel="stylesheet" href="/assets/styles.css" />
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="/assets/styles.css">
 </head>
-
 <body>
 
   <main class="container settings-shell">
-
     <article class="settings-card">
 
       <!-- USER BANNER -->
       <div class="user-banner">
-
         <div class="user-avatar" style="position:relative;">
-          <!-- use the favicon as default avatar -->
           <img id="hdrAvatar" src="/home/SH-Favicon.png" alt="avatar">
-
-          <!-- Pencil -->
-          <button onclick="openSettingsPhotoPicker()" 
-            title="Change photo"
-            style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;
-            border:1px solid #ddd;width:32px;height:32px;display:flex;align-items:center;
-            justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,0.08);">
-            <i class="ri-pencil-line" style="font-size:15px;color:#b71c1c;"></i>
+          <button id="hdrAvatarBtn" aria-label="Change photo" title="Change photo"
+            style="position:absolute;bottom:2px;right:2px;background:#fff;border-radius:50%;border:1px solid #eee;width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+            <i class="ri-pencil-line" style="font-size:14px;color:#b71c1c;"></i>
           </button>
         </div>
 
@@ -44,13 +34,11 @@
           <div id="hdrName" class="user-name">User Name</div>
           <div id="hdrEmail" class="user-mail">user@example.com</div>
         </div>
-
       </div>
 
       <!-- LIST -->
       <div class="settings-list">
-
-        <div class="settings-item" onclick="openProfile()">
+        <div class="settings-item" id="openProfileBtn">
           <div class="icon"><i class="ri-user-line"></i></div>
           <div>
             <div class="title">User Profile</div>
@@ -59,7 +47,7 @@
           <i class="ri-arrow-right-s-line" style="margin-left:auto"></i>
         </div>
 
-        <div class="settings-item" onclick="openChangePassword()">
+        <div class="settings-item" id="openChangePassBtn">
           <div class="icon"><i class="ri-lock-line"></i></div>
           <div>
             <div class="title">Change Password</div>
@@ -86,7 +74,7 @@
             <div class="kv">Receive updates & offers</div>
           </div>
 
-          <div id="pushToggle" class="toggle" aria-pressed="false" title="Toggle push notifications">
+          <div id="pushToggle" class="toggle" role="switch" aria-checked="false">
             <div class="dot"></div>
           </div>
         </div>
@@ -98,19 +86,17 @@
             <div class="kv">Sign out of your account</div>
           </div>
         </div>
-
       </div>
 
-      <div class="support-box" style="text-align:left;">
+      <div class="support-box">
         Need help? Message us on WhatsApp — 
-        <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
+        <a href="https://wa.me/919999999999" target="_blank" rel="noopener">WhatsApp</a>
       </div>
 
     </article>
-
   </main>
 
-  <!-- PASSWORD SHEET -->
+  <!-- PASSWORD SHEET (hidden by default) -->
   <div id="pwSheet" class="sheet" aria-hidden="true">
     <div style="width:40px;height:4px;background:#bbb;margin:0 auto;border-radius:4px;"></div>
     <h3 style="text-align:center;margin-top:14px;">Change Password</h3>
@@ -129,22 +115,19 @@
   <!-- CROPPING MODAL -->
   <div id="settingsCropModal" class="cropper-modal" aria-hidden="true">
     <div class="cropper-content">
-
       <h3>Crop photo</h3>
-
       <div class="cropper-area circle-mask-250" style="position:relative;overflow:hidden;">
-        <img id="settingsCropImage" />
+        <img id="settingsCropImage" alt="to crop" />
       </div>
 
       <div style="display:flex;gap:12px;margin-top:12px;">
         <button onclick="closeSettingsCropper()" class="btn outline" style="flex:1;">Cancel</button>
         <button onclick="saveSettingsCroppedImage()" class="btn primary" style="flex:1;">Save</button>
       </div>
-
     </div>
   </div>
 
-  <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
+  <input type="file" id="settingsPhotoInput" accept="image/*" hidden>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -155,11 +138,7 @@
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
-  <!-- CropperJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-  <!-- Settings Script -->
-  <script src="/assets/settings.js"></script>
-
+  <script src="/settings/settings.js"></script>
 </body>
 </html>
