@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Help Center — The Hunger Point</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="/home/SH-Favicon.png" />
+
+  <!-- Remix Icons (already used in your app) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Global styles (keep your SH theme) -->
+  <link rel="stylesheet" href="/assets/styles.css">
+
+  <!-- Help page styles -->
+  <link rel="stylesheet" href="/help/help.css">
+</head>
+<body>
+
+  <!-- Page container -->
+  <main class="container help-shell">
+
+    <!-- Card -->
+    <article class="faq-card">
+
+      <!-- Header -->
+      <div class="faq-header">
+        <button class="back-btn" onclick="history.back()">
+          <i class="ri-arrow-left-line"></i>
+        </button>
+        <h2>Help Center</h2>
+      </div>
+
+      <!-- Top actions / search -->
+      <div class="help-actions" style="padding:18px;">
+        <input id="helpSearch" class="input" placeholder="Search help (e.g., 'profile photo', 'refund')" />
+        <div class="quick-actions" style="margin-top:12px;display:flex;gap:10px;">
+          <button class="btn outline" onclick="location.href='/settings/index.html'">Open Settings</button>
+          <button class="btn outline" onclick="location.href='/settings/faqs.html'">View FAQs</button>
+        </div>
+      </div>
+
+      <!-- Popular articles -->
+      <div class="help-articles" style="padding:0 18px 28px;">
+        <h3 style="margin:0 0 12px 0">Popular topics</h3>
+
+        <div class="article-list">
+          <button class="article" data-q="how do i update my profile photo">Update profile photo</button>
+          <button class="article" data-q="how to change password">Change password</button>
+          <button class="article" data-q="how to enable notifications">Enable push notifications</button>
+          <button class="article" data-q="how to contact support">Contact support</button>
+        </div>
+      </div>
+
+      <!-- Static FAQ teaser -->
+      <div style="padding:0 18px 28px;">
+        <h3 style="margin:0 0 12px 0">Quick answers</h3>
+        <div class="answer-card">
+          <strong>Profile photo not uploading?</strong>
+          <p style="margin:8px 0 0;">If Storage is disabled we store avatars in Firestore (Base64). Go to Settings → Update Photo and wait for the confirmation toast.</p>
+        </div>
+      </div>
+
+    </article>
+
+  </main>
+
+  <!-- Floating Chat Button & Widget (bot) -->
+  <div id="sh-chat" aria-live="polite">
+    <button id="chatToggle" aria-label="Open chat" title="Chat with support">
+      <i class="ri-chat-3-line"></i>
+    </button>
+
+    <div id="chatWindow" role="dialog" aria-hidden="true">
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">SH Support</div>
+          <div class="chat-sub">We're here to help — ask me anything</div>
+        </div>
+        <button id="chatClose" aria-label="Close chat"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div id="chatBody" class="chat-body" tabindex="0">
+        <!-- messages injected here -->
+      </div>
+
+      <div class="chat-composer">
+        <input id="chatInput" type="text" placeholder="Type your question..." aria-label="Type message" />
+        <button id="chatSend" aria-label="Send message"><i class="ri-send-plane-2-line"></i></button>
+      </div>
+
+      <div class="chat-quick">
+        <button data-msg="I want to update my profile photo">Update photo</button>
+        <button data-msg="How do I change my password?">Change password</button>
+        <button data-msg="I want to contact support">Contact support</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bot script -->
+  <script src="/help/help.js" defer></script>
+</body>
+</html>
