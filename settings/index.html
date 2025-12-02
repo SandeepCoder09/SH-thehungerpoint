@@ -145,5 +145,38 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="/settings/settings.js"></script>
 
+<!-- SH Floating Chat Widget -->
+<div id="sh-chat" aria-live="polite">
+  <button id="chatToggle" aria-label="Open chat" title="Chat with Support">
+    <i class="ri-chat-3-line"></i>
+  </button>
+
+  <div id="chatWindow" role="dialog" aria-hidden="true">
+    <div class="chat-header">
+      <div>
+        <div class="chat-title">SH Support</div>
+        <div class="chat-sub">Ask me anything</div>
+      </div>
+      <button id="chatClose" aria-label="Close chat"><i class="ri-close-line"></i></button>
+    </div>
+
+    <div id="chatBody" class="chat-body"></div>
+
+    <div class="chat-composer">
+      <input id="chatInput" type="text" placeholder="Type your question..." />
+      <button id="chatSend"><i class="ri-send-plane-2-line"></i></button>
+    </div>
+
+    <div class="chat-quick">
+      <button data-msg="How do I update my profile photo?">Update Photo</button>
+      <button data-msg="How to change password?">Change Password</button>
+      <button data-msg="I want to contact support">Support</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat widget logic -->
+<script src="/help/help.js"></script>
+
 </body>
 </html>
