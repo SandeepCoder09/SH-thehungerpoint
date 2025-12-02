@@ -9,7 +9,7 @@
 
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- CSS (FORCE RELOAD v=7) -->
+  <!-- CSS -->
   <link rel="stylesheet" href="/home/style.css?v=7" />
 
   <!-- Cashfree SDK -->
@@ -29,9 +29,7 @@
     </div>
 
     <div class="header-actions">
-      <div class="lang-wrapper">
-        <button class="lang-btn">🌐</button>
-      </div>
+      <button class="lang-btn">🌐</button>
     </div>
   </header>
 
@@ -172,7 +170,6 @@
   <!-- BOTTOM SHEET CART -->
   <div id="cartSheet" class="cart-sheet">
 
-    <!-- Drag indicator -->
     <div class="sheet-handle"></div>
 
     <div class="sheet-head">
@@ -196,52 +193,41 @@
     </div>
   </div>
 
-  <!-- Floating Cart Button -->
+  <!-- Bottom nav -->
   <nav class="bottom-nav">
     <button class="bn-item"><span>☰</span><small>Menu</small></button>
     <a href="/orders/orders.html"><button class="bn-item"><span>🧾</span><small>Orders</small></button></a>
-
     <button class="bn-center" id="bottomCartBtn">🛒</button>
-
-    <a href="/profile/index.html">
-      <button class="bn-item"><span>👤</span><small>Profile</small></button>
-    </a>
+    <a href="/profile/index.html"><button class="bn-item"><span>👤</span><small>Profile</small></button></a>
     <a href="/settings/index.html"><button class="bn-item"><span>⚙️</span><small>Setting</small></button></a>
   </nav>
 
   <!-- Toast -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- ⭐ FIREBASE v10 MODULAR ONLY (NO v8) -->
+  <!-- ⭐ FINAL Firebase v10 Initialization -->
   <script type="module">
-    // Load Firebase v10 modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    // Import your config file
     import firebaseConfig from "/home/firebase-config.js";
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
     window.db = getFirestore(app);
 
     console.log("🔥 Firebase v10 Loaded");
 
-    // Wait for login
-    onAuthStateChanged(window.auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("🔐 Logged in as:", user.uid);
-
-        // Load your cart logic only AFTER auth is ready
+        console.log("User logged in:", user.uid);
         import("/home/script.js");
       } else {
-        console.log("❌ No user logged in — redirecting…");
+        console.log("User not logged in");
         window.location.href = "/auth/login.html";
       }
     });
   </script>
-  
+
 </body>
 </html>
