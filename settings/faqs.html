@@ -3,53 +3,73 @@
 <head>
   <meta charset="utf-8" />
   <title>FAQs — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="icon" href="/home/SH-Favicon.png" />
-  <link rel="stylesheet" href="/assets/styles.css" />
-</head>
 
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
 <body>
 
-  <main class="container" style="margin-top:20px;">
+<main class="container faq-shell">
+  <article class="faq-card">
 
-    <div class="back-header">
-      <button onclick="history.back()" class="back-btn">
+    <!-- HEADER (same SH theme as profile) -->
+    <div class="faq-header">
+      <button class="back-btn" onclick="history.back()">
         <i class="ri-arrow-left-line"></i>
       </button>
       <h2>FAQs</h2>
     </div>
 
-    <article class="settings-card" style="margin-top:16px;">
+    <!-- FAQ LIST -->
+    <div class="faq-list">
 
-      <h3>How do I change my password?</h3>
-      <p class="kv" style="margin:6px 0 14px;">
-        Go to Settings → Change Password, then update your login password.
-      </p>
+      <details class="faq-item">
+        <summary>
+          <span>How to update my profile?</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </summary>
+        <p>You can update your name, address, and profile photo inside the “User Profile” section of Settings.</p>
+      </details>
 
-      <h3>How do I update my delivery address?</h3>
-      <p class="kv" style="margin:6px 0 14px;">
-        Open User Profile and update your complete address.
-      </p>
+      <details class="faq-item">
+        <summary>
+          <span>How do I change my password?</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </summary>
+        <p>Go to Settings → Change Password. A reset email will be sent to your registered email.</p>
+      </details>
 
-      <h3>How do I change my profile photo?</h3>
-      <p class="kv" style="margin:6px 0 14px;">
-        Go to your Profile page, tap the pencil icon, choose an image, crop it, and save.
-      </p>
+      <details class="faq-item">
+        <summary>
+          <span>How do I enable push notifications?</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </summary>
+        <p>In Settings, turn on the “Push Notifications” switch to receive updates & offers.</p>
+      </details>
 
-      <h3>How do I contact support?</h3>
-      <p class="kv" style="margin:6px 0 14px;">
-        Use the WhatsApp link available in the Settings page.
-      </p>
+      <details class="faq-item">
+        <summary>
+          <span>How do I log out?</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </summary>
+        <p>Scroll down to the bottom of Settings and tap “Logout”.</p>
+      </details>
 
-      <h3>How do I manage notifications?</h3>
-      <p class="kv" style="margin:6px 0 14px;">
-        Toggle Push Notifications ON/OFF from the Settings page.
-      </p>
+      <details class="faq-item">
+        <summary>
+          <span>How can I contact support?</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </summary>
+        <p>You can message us directly on WhatsApp for instant support.</p>
+      </details>
 
-    </article>
+    </div>
 
-  </main>
+  </article>
+</main>
 
 </body>
 </html>
