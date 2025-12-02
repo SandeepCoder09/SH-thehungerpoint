@@ -1,6 +1,7 @@
 /* ------------------------------------------
    SH - The Hunger Point
    FINAL JS for Bottom Sheet Cart (B1)
+   Persist cart to server (cart collection) + local fallback
    ------------------------------------------ */
 
 const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -27,11 +28,11 @@ const findItem = (id) => cart.findIndex((i) => i.id === id);
 
 /* IMAGE MAP */
 const imageMap = {
-  "momo": "/home/sh-momo.png",
-  "finger": "/home/sh-french-fries.png",
+  momo: "/home/sh-momo.png",
+  finger: "/home/sh-french-fries.png",
   "hot tea": "/home/sh-hot-tea.png",
-  "tea": "/home/sh-hot-tea.png",
-  "bread pakoda": "/home/sh-bread-pakoda.png"
+  tea: "/home/sh-hot-tea.png",
+  "bread pakoda": "/home/sh-bread-pakoda.png",
 };
 function getImg(name) {
   return imageMap[name.toLowerCase()] || "/home/SH-Favicon.png";
@@ -54,7 +55,7 @@ function renderCart() {
 
   if (cart.length === 0) {
     box.innerHTML = `<p class="empty">Cart is empty</p>`;
-    $("#cartTotal") && ($("#cartTotal").textContent = "₹0");
+    $("#cartTotal" ) && ($("#cartTotal").textContent = "₹0");
     updateCartCount();
     return;
   }
@@ -95,32 +96,35 @@ function renderCart() {
 /* ATTACH CART BUTTON EVENTS */
 function attachCartButtons() {
   $$(".c-dec").forEach((b) =>
-    b.addEventListener("click", () => {
+    b.addEventListener("click", async () => {
       const id = b.dataset.id;
       const i = findItem(id);
       if (i >= 0) {
         cart[i].qty = Math.max(1, cart[i].qty - 1);
         renderCart();
+        await scheduleSaveCart();
       }
     })
   );
 
   $$(".c-inc").forEach((b) =>
-    b.addEventListener("click", () => {
+    b.addEventListener("click", async () => {
       const id = b.dataset.id;
       const i = findItem(id);
       if (i >= 0) {
         cart[i].qty++;
         renderCart();
+        await scheduleSaveCart();
       }
     })
   );
 
   $$(".c-rem").forEach((b) =>
-    b.addEventListener("click", () => {
+    b.addEventListener("click", async () => {
       const id = b.dataset.id;
       cart = cart.filter((x) => x.id !== id);
       renderCart();
+      await scheduleSaveCart();
     })
   );
 }
@@ -178,6 +182,158 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/* --- AUTH / USER detection helpers --- */
+/*
+  This tries common places where your app might store the logged-in user or token.
+  If your app has a different place (e.g. window.SH.user or a cookie), update getCurrentUserId/getAuthToken accordingly.
+*/
+function getCurrentUserId() {
+  // try common globals
+  if (window.SH && window.SH.user && window.SH.user.id) return window.SH.user.id;
+  if (window.currentUser && window.currentUser.id) return window.currentUser.id;
+  // try localStorage
+  try {
+    const uid = localStorage.getItem("userId") || localStorage.getItem("uid");
+    if (uid) return uid;
+    // maybe stored as JSON
+    const raw = localStorage.getItem("user");
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u && u.id) return u.id;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function getAuthToken() {
+  // token places
+  if (window.SH && window.SH.token) return window.SH.token;
+  if (window.currentUser && window.currentUser.token) return window.currentUser.token;
+  try {
+    return localStorage.getItem("authToken") || localStorage.getItem("token") || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+/* --- SERVER COMMUNICATION --- */
+const SAVE_DEBOUNCE_MS = 700;
+let saveTimeout = null;
+let lastSavePromise = null;
+
+function buildHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  const token = getAuthToken();
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return headers;
+}
+
+async function saveCartToServer() {
+  const userId = getCurrentUserId();
+  if (!userId) {
+    // no logged-in user detected -> persist locally
+    try {
+      localStorage.setItem("cart_fallback", JSON.stringify(cart));
+    } catch (e) {}
+    return false;
+  }
+
+  const payload = { userId, items: cart };
+
+  try {
+    const res = await fetch(`${SERVER_URL}/cart`, {
+      method: "POST", // server should accept POST to create/update cart for user
+      headers: buildHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      // server responded with error — fallback to localStorage
+      try {
+        localStorage.setItem("cart_fallback", JSON.stringify(cart));
+      } catch (e) {}
+      console.warn("Cart save failed:", res.status);
+      return false;
+    }
+
+    // Optionally read response
+    await res.json().catch(() => {});
+    return true;
+  } catch (err) {
+    console.warn("Cart save error:", err);
+    try {
+      localStorage.setItem("cart_fallback", JSON.stringify(cart));
+    } catch (e) {}
+    return false;
+  }
+}
+
+async function loadCartFromServer() {
+  const userId = getCurrentUserId();
+  // first try server if userId present
+  if (userId) {
+    try {
+      const token = getAuthToken();
+      const url = new URL(`${SERVER_URL}/cart`);
+      url.searchParams.set("userId", userId);
+
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: buildHeaders(),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.items)) {
+          cart = data.items.map((it) => ({
+            id: it.id,
+            name: it.name,
+            price: it.price,
+            qty: it.qty,
+          }));
+          renderCart();
+          return true;
+        }
+      } else {
+        console.warn("Load cart server responded:", res.status);
+      }
+    } catch (err) {
+      console.warn("Load cart from server error:", err);
+    }
+  }
+
+  // fallback: try localStorage saved cart (either from previous offline save or when user not detected)
+  try {
+    const raw = localStorage.getItem("cart_fallback");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        cart = parsed;
+        renderCart();
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  // nothing found -> empty cart
+  cart = [];
+  renderCart();
+  return false;
+}
+
+/* Debounced save to avoid too many requests */
+function scheduleSaveCart() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  return new Promise((resolve) => {
+    saveTimeout = setTimeout(async () => {
+      lastSavePromise = saveCartToServer();
+      const ok = await lastSavePromise;
+      saveTimeout = null;
+      resolve(ok);
+    }, SAVE_DEBOUNCE_MS);
+  });
+}
+
 /* MENU ACTIONS (qty + add) */
 function initMenu() {
   $$(".menu-item").forEach((el) => {
@@ -188,19 +344,19 @@ function initMenu() {
     const img = el.querySelector(".menu-img");
 
     let qty = 1;
-    disp.textContent = qty;
+    if (disp) disp.textContent = qty;
 
     minus?.addEventListener("click", () => {
       qty = Math.max(1, qty - 1);
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     });
 
     plus?.addEventListener("click", () => {
       qty++;
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     });
 
-    add?.addEventListener("click", () => {
+    add?.addEventListener("click", async () => {
       flyToCart(img);
 
       const name = el.dataset.item;
@@ -214,8 +370,11 @@ function initMenu() {
       showToast(`${qty} × ${name} added`);
       renderCart();
 
+      // persist
+      await scheduleSaveCart();
+
       qty = 1;
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
     });
   });
 }
@@ -224,8 +383,8 @@ function initMenu() {
 $("#menuSearch")?.addEventListener("input", (e) => {
   const q = e.target.value.toLowerCase();
   $$(".menu-item").forEach((el) => {
-    const name = el.dataset.item.toLowerCase();
-    const desc = el.querySelector(".menu-desc").textContent.toLowerCase();
+    const name = (el.dataset.item || "").toLowerCase();
+    const desc = (el.querySelector(".menu-desc")?.textContent || "").toLowerCase();
     el.style.display = name.includes(q) || desc.includes(q) ? "flex" : "none";
   });
 });
@@ -244,9 +403,10 @@ $$(".chip").forEach((chip) =>
 );
 
 /* CLEAR CART */
-$("#clearCart")?.addEventListener("click", () => {
+$("#clearCart")?.addEventListener("click", async () => {
   cart = [];
   renderCart();
+  await scheduleSaveCart();
   showToast("Cart cleared");
 });
 
@@ -264,7 +424,7 @@ async function startCheckoutFlow() {
     const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, items })
+      body: JSON.stringify({ amount, items }),
     });
 
     const data = await res.json();
@@ -289,14 +449,16 @@ async function startCheckoutFlow() {
         const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, items })
+          body: JSON.stringify({ orderId, items }),
         });
 
         const ok = await vr.json();
         if (ok?.ok) {
           showToast("Order Confirmed 🎉");
+          // clear cart locally and on server
           cart = [];
           renderCart();
+          await scheduleSaveCart();
           closeCartSheet();
         } else {
           showToast("Payment verify failed");
@@ -313,7 +475,8 @@ async function startCheckoutFlow() {
 }
 
 /* INIT */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initMenu();
+  await loadCartFromServer(); // loads cart from server or fallback storage
   renderCart();
 });
