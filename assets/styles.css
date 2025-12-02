@@ -175,38 +175,39 @@ body {
 
 /* sheet */
 .sheet {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: -100%;
-	background: #fff;
-	padding: 20px;
-	border-radius: 16px 16px 0 0;
-	box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.12);
-	transition: all .35s
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -100%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  transition: 0.35s ease-in-out;
+  z-index: 9998;
 }
 
 .sheet.open {
-	bottom: 0
+  bottom: 0;
 }
 
 /* cropper modal */
 .cropper-modal {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	display: none;
-	align-items: center;
-	justify-content: center;
-	background: rgba(0, 0, 0, 0.5);
-	padding: 24px;
-	z-index: 9999
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
 }
 
 .cropper-modal.active {
-	display: flex
+  display: flex !important;
 }
 
 .cropper-content {
