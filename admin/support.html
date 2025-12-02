@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Support Inbox — The Hunger Point (Admin)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/admin-support.css">
+
+  <style>
+    /* tiny override so support page uses full width on desktop admin */
+    .container { max-width: 1100px; padding: 20px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <button id="backBtn" class="btn outline" style="width:44px;height:44px;border-radius:10px"><i class="ri-arrow-left-s-line"></i></button>
+      <h1 style="margin:0;font-size:20px">Support Inbox</h1>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <div id="adminEmail" style="color:var(--muted)"></div>
+        <button id="signOutBtn" class="btn outline">Sign out</button>
+      </div>
+    </header>
+
+    <section class="support-shell">
+      <!-- LEFT: chat list -->
+      <aside class="inbox-list" id="inboxList" aria-label="Chats list">
+        <div class="inbox-search">
+          <input id="searchInput" placeholder="Search users or email" class="input" />
+        </div>
+        <div id="chatsContainer" class="chats-container">
+          <!-- Chats appended here -->
+          <div class="empty">No chats yet</div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: chat view -->
+      <section class="chat-panel" id="chatPanel" aria-hidden="true">
+        <div class="chat-header">
+          <div>
+            <div id="chatUserName" class="chat-user-name">—</div>
+            <div id="chatUserEmail" class="kv" style="margin-top:2px">—</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+            <button id="closeChatBtn" class="btn outline">Close</button>
+          </div>
+        </div>
+
+        <div id="messagesArea" class="messages-area" role="log" aria-live="polite">
+          <!-- messages inserted here -->
+          <div class="messages-empty">Select a conversation</div>
+        </div>
+
+        <div class="message-composer">
+          <textarea id="messageInput" placeholder="Type your reply..." class="input" rows="2"></textarea>
+          <button id="sendBtn" class="btn primary"><i class="ri-send-plane-line"></i></button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- your bootstrap -->
+  <script src="/auth/firebase-config.js"></script>
+  <script src="/auth/protect.js"></script>
+
+  <!-- page logic -->
+  <script src="/admin/support.js"></script>
+</body>
+</html>
