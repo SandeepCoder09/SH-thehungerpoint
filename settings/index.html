@@ -14,6 +14,7 @@
 
   <!-- Shared styles -->
   <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/home/style.css">
 </head>
 <body>
 
@@ -128,6 +129,15 @@
   </div>
 
   <input type="file" id="settingsPhotoInput" accept="image/*" hidden>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="bn-item"><span>☰</span><small>Menu</small></button>
+    <a href="/orders/orders.html"><button class="bn-item"><span>🧾</span><small>Orders</small></button></a>
+    <button class="bn-center" id="bottomCartBtn">🛒</button>
+    <a href="/profile/index.html"><button class="bn-item"><span>👤</span><small>Profile</small></button></a>
+    <a href="/settings/index.html"><button class="bn-item"><span>⚙️</span><small>Setting</small></button></a>
+  </nav>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
