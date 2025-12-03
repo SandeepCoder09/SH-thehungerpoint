@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Payment Success — The Hunger Point</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/home/style.css?v=8" />
+</head>
+<body>
+  <main style="max-width:720px;margin:40px auto;padding:20px;background:#fff;border-radius:8px;text-align:center;">
+    <h2>Thank you — payment received</h2>
+    <p id="msg">Verifying your order...</p>
+    <div style="margin-top:20px;">
+      <a href="/home/index.html" class="btn-checkout" style="text-decoration:none;color:#fff">Return to home</a>
+    </div>
+  </main>
+
+  <script>
+    // Show query params on page (helpful for debugging)
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get('orderId') || params.get('order_id') || '';
+    document.getElementById('msg').textContent = orderId ? 'Order: ' + orderId : 'Payment complete. Order details are being verified.';
+  </script>
+</body>
+</html>
