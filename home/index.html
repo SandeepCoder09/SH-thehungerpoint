@@ -9,8 +9,8 @@
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
   <link rel="stylesheet" href="/home/style.css?v=8" />
 
-  <!-- Optional: Cashfree SDK (kept but not required for redirect flow) -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
+  <!-- Correct Cashfree v3 SDK -->
+  <script src="https://sdk.cashfree.com/js/ui/3.0.0/cashfree.js"></script>
 
   <!-- Firebase + boot -->
   <script type="module">
@@ -24,9 +24,7 @@
     window.db = getFirestore(app);
 
     console.log("🔥 Firebase Loaded (home)");
-    console.log("💳 Cashfree (global):", window.Cashfree);
 
-    // Wait for user auth then load script
     onAuthStateChanged(window.auth, (user) => {
       if (!user) {
         window.location.href = "/auth/login.html";
@@ -201,17 +199,13 @@
     <a href="/settings/index.html"><button class="bn-item"><span>⚙️</span><small>Setting</small></button></a>
   </nav>
 
-  <!-- Loading toast container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Small inline script to reveal bottomCart if chrome mobile emulation etc. -->
   <script>
-    // ensure touch target count attribute exists
     document.addEventListener('DOMContentLoaded', () => {
       const b = document.getElementById('bottomCartBtn');
       if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
     });
   </script>
-
 </body>
 </html>
