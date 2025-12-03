@@ -9,7 +9,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Firebase Core (Must load first) -->
+  <!-- Firebase Core -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -115,10 +115,17 @@
             </span>
           </div>
 
-          <!-- AGREEMENT -->
+          <!-- LEGAL AGREEMENT (updated) -->
           <label class="legal">
             <input type="checkbox" id="legalCheck">
-            <span>I accept all terms.</span>
+            <span>
+              I agree to the  
+              <a href="/legal/terms.html" target="_blank">Terms & Conditions</a>,  
+              <a href="/legal/privacy.html" target="_blank">Privacy Policy</a>,  
+              <a href="/legal/refund.html" target="_blank">Refund Policy</a>,  
+              and  
+              <a href="/legal/shipping.html" target="_blank">Shipping Policy</a>.
+            </span>
           </label>
 
           <!-- CREATE ACCOUNT BUTTON -->
@@ -126,9 +133,9 @@
 
           <div class="divider">or</div>
 
-          <!-- GOOGLE SIGNUP BUTTON (WITH ICON) -->
+          <!-- GOOGLE SIGNUP BUTTON -->
           <button type="button" id="googleSignup" class="btn google">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                  alt="G" width="20" height="20">
             Continue with Google
           </button>
