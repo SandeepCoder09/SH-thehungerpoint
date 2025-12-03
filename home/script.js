@@ -291,7 +291,7 @@
     const { session, orderId } = data;
 
     try {
-      window.Cashfree.checkout({
+      window.Cashfree.pay({
         paymentSessionId: session,
         redirectTarget: "_modal"
       });
