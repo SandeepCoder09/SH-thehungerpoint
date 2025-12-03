@@ -6,80 +6,73 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-  <link rel="stylesheet" href="/home/style.css?v=7" />
+  <link rel="stylesheet" href="/home/style.css?v=8" />
 
-  <!-- Load Cashfree SDK as a normal script (first) -->
+  <!-- 1️⃣ Load Cashfree SDK FIRST -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-  <!-- Initialize Firebase (module) and then load /home/script.js -->
+  <!-- 2️⃣ Loader: waits until SDK is ready -->
+  <script>
+    window.waitForCashfree = function () {
+      return new Promise((resolve) => {
+        let attempts = 0;
+        function check() {
+          attempts++;
+          if (window.Cashfree && typeof window.Cashfree.checkout === "function") {
+            console.log("💳 Cashfree SDK Ready");
+            resolve(true);
+          } else if (attempts < 50) {
+            return setTimeout(check, 100);
+          } else {
+            console.error("❌ Cashfree SDK failed to load");
+            resolve(false);
+          }
+        }
+        check();
+      });
+    };
+  </script>
+
+  <!-- 3️⃣ Firebase + script.js (load AFTER Cashfree) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { firebaseConfig } from "/home/firebase-config.js";
 
-    // Init Firebase app
+    // Wait for Cashfree before Firebase
+    const ok = await window.waitForCashfree();
+    if (!ok) console.warn("⚠️ Cashfree not loaded, but proceeding...");
+
     const app = initializeApp(firebaseConfig);
-    // Expose firebase objects to window for home/script.js
-    window.auth = getAuth(app);
-    window.db = getFirestore(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    console.log("🔥 Firebase initialized (v10)");
-    console.log("💳 Cashfree global:", typeof window.Cashfree !== "undefined" ? "present" : "missing");
+    window.auth = auth;
+    window.db = db;
 
-    // Helper: ensure Cashfree SDK is available (if CDN blocked or slow)
-    function ensureCashfreeLoaded(timeout = 5000) {
-      return new Promise((resolve) => {
-        if (window.Cashfree && typeof window.Cashfree.checkout === "function") return resolve(true);
+    console.log("🔥 Firebase Loaded");
 
-        // If SDK not present, try to (re)load it
-        const existing = Array.from(document.getElementsByTagName("script")).find(s => s.src && s.src.includes("cashfree.com/js"));
-        if (!existing) {
-          const s = document.createElement("script");
-          s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-          s.async = true;
-          s.onload = () => resolve(true);
-          s.onerror = () => resolve(false);
-          document.head.appendChild(s);
-        } else {
-          // Wait a short while if already added
-          const start = Date.now();
-          (function wait() {
-            if (window.Cashfree && typeof window.Cashfree.checkout === "function") return resolve(true);
-            if (Date.now() - start > timeout) return resolve(false);
-            setTimeout(wait, 100);
-          })();
-        }
-      });
-    }
-
-    onAuthStateChanged(window.auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // if user not signed in — redirect to login
-        console.warn("User not logged in, redirecting to /auth/login.html");
         window.location.href = "/auth/login.html";
         return;
       }
 
-      // Ensure Cashfree is loaded, then import client script
-      const ok = await ensureCashfreeLoaded(7000);
-      if (!ok) {
-        console.error("Cashfree SDK failed to load.");
-        // still load script.js (it handles missing SDK and will show message to user)
-      }
-
-      import("/home/script.js")
-        .then(() => console.log("✅ /home/script.js loaded"))
-        .catch((err) => console.error("Failed to load /home/script.js:", err));
+      // Load script.js AFTER Firebase + Cashfree ready
+      import("/home/script.js").then(() => {
+        console.log("🟢 script.js Loaded");
+      });
     });
   </script>
 </head>
 
 <body>
+
   <!-- TOP NAV -->
   <header class="nav">
     <div class="brand">
-      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point" />
+      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
       <div class="brand-text">
         <div class="name">The Hunger Point</div>
         <div class="tag">Family style · Premium · Fast food</div>
@@ -92,13 +85,13 @@
 
   <!-- MAIN APP -->
   <main class="app-shell">
-    <!-- HERO -->
     <section class="hero-box">
       <h1 class="type-h1">Fresh & Fast</h1>
       <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
 
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)" />
+        <input id="menuSearch" class="search-input" type="search"
+          placeholder="Search dishes (momo, tea…)" />
         <button class="search-icon">🔍</button>
       </div>
 
@@ -113,8 +106,9 @@
 
     <!-- MENU GRID -->
     <section class="menu grid-menu">
+      <!-- Your existing items preserved exactly -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-        <div class="card-media"><img src="/home/sh-momo.png" class="menu-img" /></div>
+        <div class="card-media"><img src="/home/sh-momo.png" class="menu-img"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Momo</h3>
@@ -133,7 +127,7 @@
       </article>
 
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-        <div class="card-media"><img src="/home/sh-french-fries.png" class="menu-img" /></div>
+        <div class="card-media"><img src="/home/sh-french-fries.png" class="menu-img"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Finger</h3>
@@ -152,7 +146,7 @@
       </article>
 
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-        <div class="card-media"><img src="/home/sh-hot-tea.png" class="menu-img" /></div>
+        <div class="card-media"><img src="/home/sh-hot-tea.png" class="menu-img"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Hot Tea</h3>
@@ -171,7 +165,7 @@
       </article>
 
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-        <div class="card-media"><img src="/home/sh-bread-pakoda.png" class="menu-img" /></div>
+        <div class="card-media"><img src="/home/sh-bread-pakoda.png" class="menu-img"></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Bread Pakoda</h3>
@@ -188,10 +182,11 @@
           </div>
         </div>
       </article>
+
     </section>
   </main>
 
-  <!-- OVERLAY / CART SHEET / NAV / TOAST -->
+  <!-- Overlays + Cart -->
   <div id="overlay" class="overlay"></div>
 
   <div id="cartSheet" class="cart-sheet">
@@ -210,6 +205,7 @@
     </div>
   </div>
 
+  <!-- Bottom nav -->
   <nav class="bottom-nav">
     <button class="bn-item"><span>☰</span><small>Menu</small></button>
     <a href="/orders/orders.html"><button class="bn-item"><span>🧾</span><small>Orders</small></button></a>
@@ -219,5 +215,6 @@
   </nav>
 
   <div id="toast-container" class="toast-container"></div>
+
 </body>
 </html>
