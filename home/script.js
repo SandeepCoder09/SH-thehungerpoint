@@ -1,4 +1,7 @@
-// /home/script.js — Clean & Fully Fixed Cashfree v3 Flow
+// /home/script.js — Fixed for Cashfree v3 (recommended)
+// - Uses Cashfree v3 SDK: https://sdk.cashfree.com/js/v3/cashfree.js
+// - Expects backend POST /create-cashfree-order to return:
+//   { ok: true, orderId, payment_session_id }  OR  { ok:true, redirectUrl }
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -97,19 +100,19 @@
       const img = el.querySelector(".menu-img");
 
       let qty = 1;
-      disp.textContent = qty;
+      if (disp) disp.textContent = qty;
 
-      minus.onclick = () => {
+      minus && (minus.onclick = () => {
         qty = Math.max(1, qty - 1);
         disp.textContent = qty;
-      };
+      });
 
-      plus.onclick = () => {
+      plus && (plus.onclick = () => {
         qty++;
         disp.textContent = qty;
-      };
+      });
 
-      add.onclick = () => {
+      add && (add.onclick = () => {
         flyToCart(img);
 
         const name = el.dataset.item;
@@ -126,7 +129,7 @@
 
         qty = 1;
         disp.textContent = qty;
-      };
+      });
     });
   }
 
@@ -154,6 +157,7 @@
 
   function flyToCart(img) {
     try {
+      if (!img) return;
       const r = img.getBoundingClientRect();
       const c = img.cloneNode(true);
       c.style.position = "fixed";
@@ -173,26 +177,28 @@
     } catch (e) {}
   }
 
-  $("#bottomCartBtn").onclick = () => {
+  $("#bottomCartBtn")?.addEventListener("click", () => {
     $("#overlay").classList.add("active");
     $("#cartSheet").classList.add("active");
     document.body.style.overflow = "hidden";
     renderCart();
-  };
+  });
 
-  $("#closeSheet").onclick =
-  $("#overlay").onclick = () => {
+  $("#closeSheet")?.addEventListener("click", closeSheet);
+  $("#overlay")?.addEventListener("click", closeSheet);
+
+  function closeSheet() {
     $("#overlay").classList.remove("active");
     $("#cartSheet").classList.remove("active");
     document.body.style.overflow = "";
-  };
+  }
 
-  $("#clearCart").onclick = () => {
+  $("#clearCart")?.addEventListener("click", () => {
     cart = []; saveLocal(); renderCart(); showToast("Cart cleared");
-  };
+  });
 
-  /* ---------- FIXED CASHFREE v3 CHECKOUT ---------- */
-  $("#checkoutBtn").addEventListener("click", startCheckout);
+  /* ---------- PAY (REDIRECT SAME-TAB) ---------- */
+  $("#checkoutBtn")?.addEventListener("click", startCheckout);
 
   async function startCheckout() {
     if (!auth) return showToast("Auth not ready");
@@ -206,7 +212,9 @@
     const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
     const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
 
+    // build payload for backend
     const payload = { amount, items, phone: user.uid, email: user.email || "guest@sh.com" };
+    console.log("➡ create-cashfree payload:", payload);
 
     let res;
     try {
@@ -216,31 +224,71 @@
         body: JSON.stringify(payload)
       });
     } catch (err) {
-      console.error(err);
+      console.error("Network error:", err);
       return showToast("Payment network error");
     }
 
     const data = await res.json().catch(() => ({}));
-    console.log("Cashfree Response:", data);
+    console.log("⬅ create-cashfree response:", data);
 
-    // 1) Preferred redirect URL flow
+    // 1) Preferred redirect URL flow (if backend returns hosted checkout url)
     if (data.ok && data.redirectUrl) {
       window.location.href = data.redirectUrl;
       return;
     }
 
-    // 2) Payment session flow using SDK
+    // 2) Payment session flow using Cashfree v3 SDK (official)
+    // NOTE: Use Cashfree() factory (not `new`) and call checkout(...)
     if (data.ok && data.payment_session_id) {
-      const cashfree = new Cashfree({
-        paymentSessionId: data.payment_session_id
-      });
-      cashfree.redirect();
-      return;
+      try {
+        // mode: "sandbox" for testing, "production" for live. Choose according to your CF_MODE.
+        const cashfree = Cashfree({ mode: "production" });
+
+        cashfree.checkout({
+          paymentSessionId: data.payment_session_id,
+          // open in same tab
+          redirectTarget: "_self"
+        });
+
+        // SDK will handle redirect, so return here
+        return;
+      } catch (err) {
+        console.error("Cashfree SDK error:", err);
+        // fallback to a user message
+        return showToast("Payment system not ready — try again");
+      }
     }
 
+    // If none of the above, show error
+    console.error("No redirectUrl and no payment_session_id:", data);
     showToast("Payment initialization failed");
   }
 
+  /* listen for post message verification (optional) */
+  window.addEventListener("message", async (e) => {
+    const msg = e.data;
+    if (msg?.paymentStatus === "SUCCESS" && msg.orderId) {
+      showToast("Verifying payment...");
+      try {
+        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: msg.orderId })
+        });
+        const v = await vr.json().catch(()=>({}));
+        if (v.ok) {
+          showToast("Order confirmed 🎉");
+          cart = []; saveLocal(); renderCart(); closeSheet();
+        } else {
+          showToast("Verification failed");
+        }
+      } catch (err) {
+        console.error("verify network error", err);
+      }
+    }
+  });
+
+  // init
   initMenu();
   renderCart();
 })();
