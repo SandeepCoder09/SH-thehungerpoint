@@ -1,56 +1,90 @@
 <!doctype html>
 <html lang="en">
 <head>
- <meta charset="utf-8" />
+  <meta charset="utf-8" />
   <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#E23744" />
-
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
   <link rel="stylesheet" href="/home/style.css?v=7" />
 
-  <!-- ✅ LOAD PAYMENT SDK FIRST -->
+  <!-- Load Cashfree SDK as a normal script (first) -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-  <!-- ❗ Load Firebase AFTER Cashfree -->
+  <!-- Initialize Firebase (module) and then load /home/script.js -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { firebaseConfig } from "/home/firebase-config.js";
 
+    // Init Firebase app
     const app = initializeApp(firebaseConfig);
+    // Expose firebase objects to window for home/script.js
     window.auth = getAuth(app);
     window.db = getFirestore(app);
 
-    console.log("🔥 Firebase Loaded");
-    console.log("💳 Cashfree:", window.Cashfree);
+    console.log("🔥 Firebase initialized (v10)");
+    console.log("💳 Cashfree global:", typeof window.Cashfree !== "undefined" ? "present" : "missing");
 
-    onAuthStateChanged(window.auth, (user) => {
+    // Helper: ensure Cashfree SDK is available (if CDN blocked or slow)
+    function ensureCashfreeLoaded(timeout = 5000) {
+      return new Promise((resolve) => {
+        if (window.Cashfree && typeof window.Cashfree.checkout === "function") return resolve(true);
+
+        // If SDK not present, try to (re)load it
+        const existing = Array.from(document.getElementsByTagName("script")).find(s => s.src && s.src.includes("cashfree.com/js"));
+        if (!existing) {
+          const s = document.createElement("script");
+          s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+          s.async = true;
+          s.onload = () => resolve(true);
+          s.onerror = () => resolve(false);
+          document.head.appendChild(s);
+        } else {
+          // Wait a short while if already added
+          const start = Date.now();
+          (function wait() {
+            if (window.Cashfree && typeof window.Cashfree.checkout === "function") return resolve(true);
+            if (Date.now() - start > timeout) return resolve(false);
+            setTimeout(wait, 100);
+          })();
+        }
+      });
+    }
+
+    onAuthStateChanged(window.auth, async (user) => {
       if (!user) {
+        // if user not signed in — redirect to login
+        console.warn("User not logged in, redirecting to /auth/login.html");
         window.location.href = "/auth/login.html";
         return;
       }
 
-      // Now Cashfree + Firebase BOTH loaded → safe to load script.js
-      import("/home/script.js").then(() => {
-        console.log("🟢 script.js Loaded");
-      });
+      // Ensure Cashfree is loaded, then import client script
+      const ok = await ensureCashfreeLoaded(7000);
+      if (!ok) {
+        console.error("Cashfree SDK failed to load.");
+        // still load script.js (it handles missing SDK and will show message to user)
+      }
+
+      import("/home/script.js")
+        .then(() => console.log("✅ /home/script.js loaded"))
+        .catch((err) => console.error("Failed to load /home/script.js:", err));
     });
   </script>
 </head>
-<body>
 
+<body>
   <!-- TOP NAV -->
   <header class="nav">
     <div class="brand">
-      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
+      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point" />
       <div class="brand-text">
         <div class="name">The Hunger Point</div>
         <div class="tag">Family style · Premium · Fast food</div>
       </div>
     </div>
-
     <div class="header-actions">
       <button class="lang-btn">🌐</button>
     </div>
@@ -58,20 +92,16 @@
 
   <!-- MAIN APP -->
   <main class="app-shell">
-
     <!-- HERO -->
     <section class="hero-box">
       <h1 class="type-h1">Fresh & Fast</h1>
       <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
 
-      <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search"
-          placeholder="Search dishes (momo, tea…)" />
+        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)" />
         <button class="search-icon">🔍</button>
       </div>
 
-      <!-- CATEGORY CHIPS -->
       <div class="chips">
         <button class="chip active" data-cat="all">All</button>
         <button class="chip" data-cat="momos">Momos</button>
@@ -83,12 +113,8 @@
 
     <!-- MENU GRID -->
     <section class="menu grid-menu">
-
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-        <div class="card-media">
-          <img src="/home/sh-momo.png" class="menu-img">
-        </div>
-
+        <div class="card-media"><img src="/home/sh-momo.png" class="menu-img" /></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Momo</h3>
@@ -107,10 +133,7 @@
       </article>
 
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-french-fries.png" class="menu-img">
-        </div>
-
+        <div class="card-media"><img src="/home/sh-french-fries.png" class="menu-img" /></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Finger</h3>
@@ -129,9 +152,7 @@
       </article>
 
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-        <div class="card-media">
-          <img src="/home/sh-hot-tea.png" class="menu-img">
-        </div>
+        <div class="card-media"><img src="/home/sh-hot-tea.png" class="menu-img" /></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Hot Tea</h3>
@@ -150,9 +171,7 @@
       </article>
 
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-bread-pakoda.png" class="menu-img">
-        </div>
+        <div class="card-media"><img src="/home/sh-bread-pakoda.png" class="menu-img" /></div>
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">Bread Pakoda</h3>
@@ -169,27 +188,21 @@
           </div>
         </div>
       </article>
-
     </section>
   </main>
 
-  <!-- OVERLAY -->
+  <!-- OVERLAY / CART SHEET / NAV / TOAST -->
   <div id="overlay" class="overlay"></div>
 
-  <!-- CART SHEET -->
   <div id="cartSheet" class="cart-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <h3>Your Cart</h3>
       <button id="closeSheet" class="cart-close-btn">✕</button>
     </div>
-    <div id="cartItems" class="cart-items">
-      <p class="empty">Cart is empty</p>
-    </div>
+    <div id="cartItems" class="cart-items"><p class="empty">Cart is empty</p></div>
     <div class="cart-footer">
-      <div class="cart-total-text">
-        Total: <span id="cartTotal">₹0</span>
-      </div>
+      <div class="cart-total-text">Total: <span id="cartTotal">₹0</span></div>
       <div class="cart-footer-btns">
         <button id="clearCart" class="btn-clear">Clear</button>
         <button id="checkoutBtn" class="btn-checkout">Checkout</button>
@@ -197,7 +210,6 @@
     </div>
   </div>
 
-  <!-- Bottom nav -->
   <nav class="bottom-nav">
     <button class="bn-item"><span>☰</span><small>Menu</small></button>
     <a href="/orders/orders.html"><button class="bn-item"><span>🧾</span><small>Orders</small></button></a>
@@ -206,8 +218,6 @@
     <a href="/settings/index.html"><button class="bn-item"><span>⚙️</span><small>Setting</small></button></a>
   </nav>
 
-  <!-- Toast -->
   <div id="toast-container" class="toast-container"></div>
-
 </body>
 </html>
