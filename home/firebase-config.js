@@ -1,17 +1,8 @@
 // /home/firebase-config.js
-// FULL Firebase v10 initialization for HOME page
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Correct config (new project)
 const firebaseConfig = {
   apiKey: "AIzaSyAyBMrrpmW0b7vhBCgaAObL0AOGeNrga_8",
   authDomain: "sh-the-hunger-point.firebaseapp.com",
@@ -22,15 +13,9 @@ const firebaseConfig = {
   measurementId: "G-4KP3RJ15E9"
 };
 
-// Initialize
 const app = initializeApp(firebaseConfig);
-
-// Auth + persistence
 const auth = getAuth(app);
 await setPersistence(auth, browserLocalPersistence);
-
-// Firestore
 const db = getFirestore(app);
 
-// Export **named values**
 export { auth, db, firebaseConfig };
