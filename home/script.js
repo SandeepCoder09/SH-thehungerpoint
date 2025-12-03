@@ -1,5 +1,5 @@
 // /home/script.js
-// FINAL STABLE VERSION — Cashfree + Firebase v10
+// FULLY SYNCED with Cashfree Loader + Firebase v10
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -8,7 +8,7 @@
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
   /* ---------------- Toast ---------------- */
-  function showToast(msg, dur = 2000) {
+  function showToast(msg, dur = 2500) {
     const wrap = $("#toast-container");
     if (!wrap) return alert(msg);
     const t = document.createElement("div");
@@ -18,12 +18,9 @@
     setTimeout(() => t.remove(), dur);
   }
 
-  /* ---------------- Global Firebase from window ---------------- */
+  /* ---------------- Firebase ---------------- */
   const auth = window.auth;
   const db = window.db;
-
-  if (!auth) console.error("❌ Firebase auth missing");
-  if (!db) console.error("❌ Firestore missing");
 
   /* ---------------- Cart State ---------------- */
   let cart = [];
@@ -60,6 +57,7 @@
     }
 
     let total = 0;
+
     cart.forEach((i) => {
       total += i.qty * i.price;
 
@@ -79,6 +77,7 @@
           <button class="c-rem" data-id="${i.id}">✕</button>
         </div>
       `;
+
       box.appendChild(row);
     });
 
@@ -115,6 +114,7 @@
         qty = Math.max(1, qty - 1);
         disp.textContent = qty;
       };
+
       plus.onclick = () => {
         qty++;
         disp.textContent = qty;
@@ -124,7 +124,7 @@
         flyToCart(img);
 
         const name = el.dataset.item;
-        const price = Number(el.dataset.price);
+        const price = Number(el.dataset.price) || 10;
         const id = name.toLowerCase().replace(/\s+/g, "-");
 
         const i = findItem(id);
@@ -188,14 +188,12 @@
       c.style.height = r.height + "px";
       c.style.transition = "all .7s ease";
       c.style.zIndex = 3000;
-
       document.body.appendChild(c);
 
       const target = $("#bottomCartBtn").getBoundingClientRect();
 
       requestAnimationFrame(() => {
-        c.style.transform =
-          `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
+        c.style.transform = `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
         c.style.opacity = "0";
       });
 
@@ -228,16 +226,40 @@
   });
 
   /* ======================================================
-     PAYMENT FLOW — FIXED + CASHFREE PROTECTED
+     PAYMENT FLOW WITH CASHFREE SDK LOADER
   ====================================================== */
-
   $("#checkoutBtn")?.addEventListener("click", startCheckout);
+
+  async function waitForSDK() {
+    return new Promise((resolve) => {
+      let tries = 0;
+      const timer = setInterval(() => {
+        if (window.cashfreeReady === true) {
+          clearInterval(timer);
+          resolve(true);
+        }
+        if (tries++ > 30) {
+          clearInterval(timer);
+          resolve(false);
+        }
+      }, 200);
+    });
+  }
 
   async function startCheckout() {
     if (cart.length === 0) return showToast("Cart is empty");
 
     const user = auth.currentUser;
-    if (!user) return showToast("Please login first");
+    if (!user) return showToast("Please login");
+
+    showToast("Loading payment...");
+
+    /* 🔥 Wait for SDK loader to complete */
+    const sdk = await waitForSDK();
+    if (!sdk || !window.Cashfree) {
+      console.error("SDK not ready:", window.Cashfree);
+      return showToast("Payment system still loading…");
+    }
 
     const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
     const items = cart.map((i) => ({
@@ -246,70 +268,52 @@
       price: i.price
     }));
 
-    showToast("Starting payment...");
-
     const payload = {
       amount,
       items,
-      customer_id: user.uid, // only UID (safe)
-      email: user.email || "guest@sh.com",
+      phone: user.uid,
+      email: user.email || "guest@sh.com"
     };
 
-    console.log("➡️ Payload:", payload);
-
-    const res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
+    let res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload)
     });
 
-    const data = await res.json().catch(() => ({}));
-    console.log("⬅️ Response:", data);
+    let data = await res.json().catch(() => ({}));
 
     if (!data.ok) {
-      showToast("Payment failed");
-      console.error("Raw error:", data);
-      return;
+      console.error(data);
+      return showToast("Payment failed");
     }
 
-    const session = data.session;
-    const orderId = data.orderId;
-
-    /* ---- SDK Check ---- */
-    if (!window.Cashfree || typeof window.Cashfree.checkout !== "function") {
-      showToast("Payment SDK missing");
-      console.error("SDK missing:", window.Cashfree);
-      return;
-    }
+    const { session, orderId } = data;
 
     try {
       window.Cashfree.checkout({
         paymentSessionId: session,
-        redirectTarget: "_modal",
+        redirectTarget: "_modal"
       });
     } catch (err) {
-      console.error("Checkout error:", err);
-      showToast("Payment popup error");
-      return;
+      console.error(err);
+      return showToast("Checkout error");
     }
 
-    /* ---- Listen for result from Cashfree ---- */
+    /* ---- Payment Result Listener ---- */
     const handler = async (e) => {
       const msg = e.data;
 
-      console.log("CF Event:", msg);
-
       if (msg?.paymentStatus === "SUCCESS") {
-        showToast("Verifying payment...");
+        showToast("Verifying...");
 
         const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, items }),
+          body: JSON.stringify({ orderId, items })
         });
 
         const v = await vr.json().catch(() => ({}));
-        console.log("Verify:", v);
 
         if (v.ok) {
           showToast("Order Confirmed 🎉");
