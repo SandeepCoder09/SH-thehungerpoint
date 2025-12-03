@@ -3,7 +3,7 @@
  * FINAL PRODUCTION SERVER (2025)
  * --------------------------------------------
  * - Firebase Admin (order DB)
- * - Cashfree Order + Verify
+ * - Cashfree v3 Order + Verify
  * - Admin Login
  * - Rider Login
  * - Socket.IO Live Tracking
@@ -65,6 +65,7 @@ const CF_BASE =
 ------------------------------------------------- */
 
 let db = null;
+
 try {
   const creds = {
     type: process.env.FIREBASE_TYPE,
@@ -102,7 +103,7 @@ const ALLOWED = (process.env.CF_ALLOWED_ORIGINS || "")
 app.use(
   cors({
     origin: function (origin, cb) {
-      if (!origin) return cb(null, true); // mobile / postman / local
+      if (!origin) return cb(null, true);
       if (ALLOWED.length === 0) return cb(null, true);
       if (ALLOWED.includes(origin)) return cb(null, true);
       console.log("❌ Blocked by CORS:", origin);
@@ -113,9 +114,7 @@ app.use(
 
 app.use(express.json({ limit: "1mb" }));
 
-app.get("/ping", (req, res) => {
-  res.send("Server Awake ✔");
-});
+app.get("/ping", (req, res) => res.send("Server Awake ✔"));
 
 /* -------------------------------------------------
    Admin Hash Generator
@@ -136,21 +135,15 @@ app.post("/admin/login", async (req, res) => {
       return safeJson(res, 400, { ok: false, error: "Missing inputs" });
 
     const snap = await db.collection("admins").doc(email).get();
-    if (!snap.exists)
-      return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+    if (!snap.exists) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
     const adminData = snap.data();
     const hash = adminData.passwordHash || adminData.password;
 
     const ok = await bcrypt.compare(password, hash);
-    if (!ok)
-      return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
+    if (!ok) return safeJson(res, 200, { ok: false, error: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { email, role: "admin" },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     return safeJson(res, 200, { ok: true, token });
   } catch (err) {
@@ -163,19 +156,15 @@ app.post("/admin/login", async (req, res) => {
 ------------------------------------------------- */
 
 async function findRider(identifier) {
-  // doc id
   const d = await db.collection("riders").doc(identifier).get();
   if (d.exists) return { id: d.id, data: d.data() };
 
-  // phone
   const q1 = await db.collection("riders").where("phone", "==", identifier).limit(1).get();
   if (!q1.empty) return { id: q1.docs[0].id, data: q1.docs[0].data() };
 
-  // email
   const q2 = await db.collection("riders").where("email", "==", identifier).limit(1).get();
   if (!q2.empty) return { id: q2.docs[0].id, data: q2.docs[0].data() };
 
-  // riderId
   const q3 = await db.collection("riders").where("riderId", "==", identifier).limit(1).get();
   if (!q3.empty) return { id: q3.docs[0].id, data: q3.docs[0].data() };
 
@@ -260,13 +249,8 @@ app.post("/create-cashfree-order", async (req, res) => {
     const data = await cf.json();
     console.log("CASHFREE RAW:", data);
 
-    const orderId =
-      data.order_id ||
-      data.data?.order_id;
-
-    const paymentSessionId =
-      data.payment_session_id ||
-      data.data?.payment_session_id;
+    const orderId = data.order_id || data.data?.order_id;
+    const paymentSessionId = data.payment_session_id || data.data?.payment_session_id;
 
     if (!orderId || !paymentSessionId) {
       return safeJson(res, 500, {
@@ -385,7 +369,9 @@ io.on("connection", (socket) => {
 
     if (data.orderId) {
       io.to("order_" + data.orderId).emit("order:riderLocation", data);
-      await db.collection("orders")
+
+      await db
+        .collection("orders")
         .doc(data.orderId)
         .set(
           {
@@ -402,7 +388,8 @@ io.on("connection", (socket) => {
 
     io.emit("order:status", p);
 
-    await db.collection("orders")
+    await db
+      .collection("orders")
       .doc(p.orderId)
       .set(
         { status: p.status, updatedAt: admin.firestore.Timestamp.now() },
@@ -412,9 +399,7 @@ io.on("connection", (socket) => {
 
   socket.on("order:join", ({ orderId }) => socket.join("order_" + orderId));
 
-  socket.on("disconnect", () =>
-    console.log("🔴 Socket disconnected:", socket.id)
-  );
+  socket.on("disconnect", () => console.log("🔴 Socket disconnected:", socket.id));
 });
 
 /* -------------------------------------------------
