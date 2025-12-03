@@ -227,27 +227,23 @@ app.post("/rider/login", async (req, res) => {
 });
 
 /* -------------------------------------------------
-   Cashfree — Create Order (FIXED)
+   Cashfree — Create Order (v3 FIXED)
 ------------------------------------------------- */
 app.post("/create-cashfree-order", async (req, res) => {
   try {
-    const { amount, items = [], phone, email } = req.body;
+    const { amount, phone, email } = req.body;
 
     if (!amount || Number(amount) <= 0)
       return safeJson(res, 400, { ok: false, error: "Amount required" });
-
-    // FINAL FIX:
-    // client sends phone=user.uid (safe alphanumeric)
-    const customerId = phone ? `uid_${phone}` : "guest_01";
 
     const payload = {
       order_amount: Number(amount),
       order_currency: "INR",
       customer_details: {
-      customer_id: phone ? `uid_${phone}` : "guest01",
-      customer_phone: "9999999999",     // ALWAYS valid numeric 10-digit
-      customer_email: email || "guest@sh.com"
-}
+        customer_id: phone ? `uid_${phone}` : "guest01",
+        customer_phone: "9999999999",
+        customer_email: email || "guest@sh.com"
+      }
     };
 
     const cf = await fetch(`${CF_BASE}/pg/orders`, {
@@ -262,27 +258,32 @@ app.post("/create-cashfree-order", async (req, res) => {
     });
 
     const data = await cf.json();
+    console.log("CASHFREE RAW:", data);
 
     const orderId =
       data.order_id ||
-      data.data?.order_id ||
-      data.data?.order?.id;
+      data.data?.order_id;
 
-    const session =
+    const paymentSessionId =
       data.payment_session_id ||
-      data.data?.payment_session_id ||
-      data.data?.session;
+      data.data?.payment_session_id;
 
-    if (!orderId || !session) {
+    if (!orderId || !paymentSessionId) {
       return safeJson(res, 500, {
         ok: false,
-        error: "Cashfree failed",
+        error: "Cashfree v3 failed",
         raw: data
       });
     }
 
-    return safeJson(res, 200, { ok: true, orderId, session });
+    return safeJson(res, 200, {
+      ok: true,
+      orderId,
+      payment_session_id: paymentSessionId
+    });
+
   } catch (err) {
+    console.error(err);
     return safeJson(res, 500, { ok: false, error: "Server error" });
   }
 });
