@@ -504,3 +504,53 @@ body {
   margin-top: -38px;
   box-shadow: 0 4px 14px rgba(226,55,68,0.35);
 }
+
+/* ================================
+   BOTTOM NAV ACTIVE GLOW
+================================ */
+
+.bn-item,
+.bn-center {
+  position: relative;
+  color: #777;
+  transition: all 0.25s ease;
+}
+
+.bn-item.active,
+.bn-center.active {
+  color: #E23744; /* SH theme */
+}
+
+.bn-item.active i,
+.bn-center.active i {
+  stroke: #E23744 !important;
+}
+
+/* SH Premium Glow for Active */
+.bn-item.active::after,
+.bn-center.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 4px;
+  background: #E23744;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(226, 55, 68, 0.7);
+}
+
+/* Cart badge */
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #E23744;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 50px;
+  font-weight: 700;
+  display: none; /* hidden until >0 */
+}
