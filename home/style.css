@@ -439,6 +439,28 @@ body {
   gap: 12px;
 }
 
+/* CART COUNT BADGE */
+#bottomCartBtn[data-count]:after {
+  content: attr(data-count);
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #E23744;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#bottomCartBtn {
+  position: relative;
+}
+
 /* =========================================================
    BOTTOM NAV
 ========================================================= */
