@@ -1,0 +1,130 @@
+:root {
+  --primary: #d33030;
+  --text-dark: #222;
+  --text-light: #777;
+  --card-bg: #fff;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+body {
+  background: #f7f7f7;
+  padding: 20px;
+  font-family: Inter, sans-serif;
+}
+
+.settings-container {
+  max-width: 480px;
+  margin: auto;
+}
+
+/* Top Card */
+.settings-top-card {
+  background: var(--primary);
+  padding: 30px 20px;
+  border-radius: 26px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.settings-avatar-wrap img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: white;
+  padding: 6px;
+  margin-bottom: 12px;
+}
+
+/* Settings List */
+.settings-list {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px 0;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f2f2f2;
+  cursor: pointer;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.settings-icon {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.settings-arrow {
+  margin-left: auto;
+  font-size: 18px;
+  color: #aaa;
+}
+
+.settings-item h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-item small {
+  color: var(--text-light);
+}
+
+.settings-icon.danger {
+  color: #d9534f;
+}
+
+/* Switch Toggle */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+}
+.switch input {
+  display: none;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 50px;
+  inset: 0;
+  transition: .3s;
+}
+.slider::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: white;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  border-radius: 50%;
+  transition: .3s;
+}
+input:checked + .slider {
+  background: var(--primary);
+}
+input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* Help Box */
+.settings-help-box {
+  margin-top: 18px;
+  padding: 18px;
+  background: white;
+  border-radius: var(--radius);
+  text-align: center;
+  color: var(--text-dark);
+  font-size: 15px;
+}
