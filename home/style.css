@@ -34,6 +34,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: fixed;
+  top: 0px;
 }
 
 .logo-img {
@@ -68,8 +70,6 @@ body {
 
 .hero-box {
   padding: 20px;
-  position: fixed;
-  top: 0px;
 }
 
 .type-h1 {
