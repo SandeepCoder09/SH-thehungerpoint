@@ -249,5 +249,39 @@
       if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
     });
   </script>
+
+<script>
+  // Detect active page
+  const path = window.location.pathname;
+
+  document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+    if (path.includes(el.dataset.nav)) {
+      el.classList.add("active");
+    }
+  });
+
+  // Cart badge updater
+  function updateCartBadge() {
+    let cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
+    } catch(e) {}
+
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById("cartBadge");
+
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "block" : "none";
+    }
+  }
+
+  // Initial update
+  updateCartBadge();
+
+  // Listen for updates from script.js
+  document.addEventListener("cart-updated", updateCartBadge);
+</script>
+
 </body>
 </html>
