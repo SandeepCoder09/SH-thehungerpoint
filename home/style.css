@@ -554,3 +554,14 @@ body {
   font-weight: 700;
   display: none; /* hidden until >0 */
 }
+
+/* Remove underline from bottom nav links */
+.bottom-nav a {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+/* Also remove underline from nested small tag */
+.bottom-nav a small {
+  text-decoration: none !important;
+}
