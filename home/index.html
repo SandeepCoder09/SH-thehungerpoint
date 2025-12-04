@@ -197,35 +197,32 @@
 
   <!-- Bottom nav -->
   <nav class="bottom-nav">
-  <button class="bn-item">
+
+  <a href="/home/index.html" class="bn-item" data-nav="home">
     <i data-feather="home"></i>
     <small>Home</small>
-  </button>
-
-  <a href="/orders/orders.html">
-    <button class="bn-item">
-      <i data-feather="file-text"></i>
-      <small>Orders</small>
-    </button>
   </a>
 
-  <button class="bn-center" id="bottomCartBtn">
+  <a href="/orders/orders.html" class="bn-item" data-nav="orders">
+    <i data-feather="file-text"></i>
+    <small>Orders</small>
+  </a>
+
+  <button class="bn-center" id="bottomCartBtn" data-nav="cart">
     <i data-feather="shopping-cart"></i>
+    <span class="cart-badge" id="cartBadge">0</span>
   </button>
 
-  <a href="/profile/index.html">
-    <button class="bn-item">
-      <i data-feather="user"></i>
-      <small>Profile</small>
-    </button>
+  <a href="/profile/index.html" class="bn-item" data-nav="profile">
+    <i data-feather="user"></i>
+    <small>Profile</small>
   </a>
 
-  <a href="/settings/index.html">
-    <button class="bn-item">
-      <i data-feather="settings"></i>
-      <small>Setting</small>
-    </button>
+  <a href="/settings/index.html" class="bn-item" data-nav="settings">
+    <i data-feather="settings"></i>
+    <small>Setting</small>
   </a>
+
 </nav>
 
   <div id="toast-container" class="toast-container"></div>
@@ -252,12 +249,36 @@
     });
   </script>
 
-<!-- Father Icon Loader -->
-
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    feather.replace();
+  // Feather icons
+  feather.replace();
+
+  // Detect active page
+  const path = window.location.pathname;
+
+  document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+    if (path.includes(el.dataset.nav)) {
+      el.classList.add("active");
+    }
   });
+
+  // Cart badge updater
+  function updateCartBadge() {
+    let cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
+    } catch(e) {}
+
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById("cartBadge");
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "block" : "none";
+    }
+  }
+
+  updateCartBadge();
+  document.addEventListener("cart-updated", updateCartBadge);
 </script>
 
 </body>
