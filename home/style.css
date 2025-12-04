@@ -285,15 +285,18 @@ body {
   left: 0;
   right: 0;
   background: #fff;
-  border-radius: 26px 26px 0 0;
+  border-radius: 22px 22px 0 0;
   box-shadow: 0 -8px 28px rgba(0,0,0,0.15);
   transition: bottom .35s ease-out;
   z-index: 99999;
-  max-height: 88vh;
+
+  /* FIXED HEIGHT = PERFECT */
+  height: 65vh;
+  max-height: 65vh;
   overflow-y: auto;
 }
 
-/* ✅ FIX 2 — slide cart up */
+/* Slide up */
 .cart-sheet.active {
   bottom: 0 !important;
 }
