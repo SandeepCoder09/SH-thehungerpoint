@@ -280,6 +280,73 @@
     }
   }
 
+/* =====================================================
+   LANG ENGINE — ENGLISH <-> HINDI (FULL AUTO)
+===================================================== */
+
+// MASTER DICTIONARY
+const DICT = {
+  "Fresh & Fast": "ताज़ा और फास्ट",
+  "Local favorites served hot — tap to add, order in seconds.":
+    "गरमा-गरम स्थानीय पसंद — टैप करें और सेकंडों में ऑर्डर करें।",
+  "Search dishes (momo, tea…)": "व्यंजन खोजें (मोमो, चाय…)",
+  "All": "सभी",
+  "Momos": "मोमोज़",
+  "Snacks": "नाश्ता",
+  "Tea": "चाय",
+  "Special": "विशेष",
+  "Momo": "मोमो",
+  "Finger": "फ्रेंच फ्राइज",
+  "Hot Tea": "गरम चाय",
+  "Bread Pakoda": "ब्रेड पकोड़ा",
+  "Steam-fresh dumplings — soft, juicy & spicy chutney.":
+    "स्टीम मोमो — नरम, रसीले और मसालेदार चटनी के साथ।",
+  "Crispy fries, double-fried — tasty with ketchup.":
+    "कुरकुरे फ्राइज — केचप के साथ स्वादिष्ट।",
+  "Masala or ginger — aromatic & warming.":
+    "मसाला या अदरक — सुगंधित और गर्माहट देने वाला।",
+  "Crispy, spiced batter — perfect chai snack.":
+    "कुरकुरी, मसालेदार परत — चाय के साथ परफेक्ट स्नैक।",
+  "Your Cart": "आपकी टोकरी",
+  "Cart is empty": "टोकरी खाली है",
+  "Total:": "कुल:",
+  "Clear": "खाली करें",
+  "Checkout": "भुगतान करें",
+  "Add": "जोड़ें",
+};
+
+const DICT_REVERSE = {};
+Object.keys(DICT).forEach(k => DICT_REVERSE[DICT[k]] = k);
+
+function applyTranslation(lang) {
+  const reverse = lang === "en";
+
+  document.querySelectorAll("*").forEach((el) => {
+    el.childNodes.forEach((node) => {
+      if (node.nodeType === 3) {
+        const text = node.nodeValue.trim();
+        if (!text) return;
+
+        if (!reverse && DICT[text]) node.nodeValue = DICT[text];
+        else if (reverse && DICT_REVERSE[text]) node.nodeValue = DICT_REVERSE[text];
+      }
+    });
+  });
+}
+
+$(".lang-btn")?.addEventListener("click", () => {
+  const newLang = localStorage.getItem("sh_lang") === "hi" ? "en" : "hi";
+  localStorage.setItem("sh_lang", newLang);
+  applyTranslation(newLang);
+});
+
+applyTranslation(localStorage.getItem("sh_lang") || "en");
+
+
+/* ------------------------------------------
+   DON'T TOUCH BELOW THIS LINE
+------------------------------------------- */
+
   // Init
   initMenu();
   renderCart();
