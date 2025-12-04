@@ -1,168 +1,108 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <title>Settings — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="/home/SH-Favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="/home/SH-Favicon.png">
 
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- Cropper CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-
-  <!-- Shared styles -->
+  <!-- Global styles -->
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/home/style.css">
+
+  <!-- Settings page CSS -->
+  <link rel="stylesheet" href="/settings/settings.css">
 </head>
+
 <body>
 
-  <main class="container settings-shell">
-    <article class="settings-card">
+  <main class="settings-container">
 
-      <!-- USER BANNER -->
-      <div class="user-banner">
-        <div class="user-avatar">
-          <img id="hdrAvatar" src="/home/SH-Favicon.png" alt="avatar">
+    <!-- TOP CARD -->
+    <section class="settings-top-card">
+      <div class="settings-avatar-wrap">
+        <img id="userAvatar" src="/home/SH-Favicon.png" alt="">
+      </div>
 
-          <button id="hdrAvatarBtn" class="avatar-edit-btn">
-            <i class="ri-pencil-line"></i>
-          </button>
+      <div class="settings-user-info">
+        <h2 id="userName">USER NAME</h2>
+        <p id="userEmail">user@example.com</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS LIST -->
+    <section class="settings-list">
+
+      <div class="settings-item" id="openProfile">
+        <i class="ri-user-line settings-icon"></i>
+        <div>
+          <h4>User Profile</h4>
+          <small>Edit profile & preferences</small>
+        </div>
+        <i class="ri-arrow-right-s-line settings-arrow"></i>
+      </div>
+
+      <div class="settings-item" id="changePassword">
+        <i class="ri-lock-password-line settings-icon"></i>
+        <div>
+          <h4>Change Password</h4>
+          <small>Update your login password</small>
+        </div>
+        <i class="ri-arrow-right-s-line settings-arrow"></i>
+      </div>
+
+      <div class="settings-item" id="openFaqs">
+        <i class="ri-questionnaire-line settings-icon"></i>
+        <div>
+          <h4>FAQs</h4>
+          <small>Common questions</small>
+        </div>
+        <i class="ri-arrow-right-s-line settings-arrow"></i>
+      </div>
+
+      <div class="settings-item">
+        <i class="ri-notification-3-line settings-icon"></i>
+        <div>
+          <h4>Push Notifications</h4>
+          <small>Receive updates & offers</small>
         </div>
 
-        <div class="user-info">
-          <div id="hdrName" class="user-name">User Name</div>
-          <div id="hdrEmail" class="user-mail">user@example.com</div>
+        <label class="switch">
+          <input type="checkbox" id="notifToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-item" id="logoutBtn">
+        <i class="ri-logout-box-line settings-icon danger"></i>
+        <div>
+          <h4>Logout</h4>
+          <small>Sign out of your account</small>
         </div>
       </div>
 
-      <!-- Settings items -->
-      <div class="settings-list">
+    </section>
 
-        <div class="settings-item" id="openProfileBtn">
-          <div class="icon"><i class="ri-user-line"></i></div>
-          <div>
-            <div class="title">User Profile</div>
-            <div class="kv">Edit profile & preferences</div>
-          </div>
-          <i class="ri-arrow-right-s-line arrow"></i>
-        </div>
-
-        <div class="settings-item" id="openChangePassBtn">
-          <div class="icon"><i class="ri-lock-line"></i></div>
-          <div>
-            <div class="title">Change Password</div>
-            <div class="kv">Update your login password</div>
-          </div>
-          <i class="ri-arrow-right-s-line arrow"></i>
-        </div>
-
-        <a href="/settings/faqs.html" class="settings-link">
-          <div class="settings-item">
-            <div class="icon"><i class="ri-question-line"></i></div>
-            <div>
-              <div class="title">FAQs</div>
-              <div class="kv">Common questions</div>
-            </div>
-            <i class="ri-arrow-right-s-line arrow"></i>
-          </div>
-        </a>
-
-        <div class="settings-item">
-          <div class="icon"><i class="ri-notification-3-line"></i></div>
-          <div>
-            <div class="title">Push Notifications</div>
-            <div class="kv">Receive updates & offers</div>
-          </div>
-
-          <div id="pushToggle" class="toggle" role="switch">
-            <div class="dot"></div>
-          </div>
-        </div>
-
-        <div class="settings-item" id="logoutItem">
-          <div class="icon"><i class="ri-logout-box-r-line"></i></div>
-          <div>
-            <div class="title">Logout</div>
-            <div class="kv">Sign out of your account</div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="support-box">
-        Need help? Message us on WhatsApp — 
-        <a href="https://wa.me/919999999999" target="_blank">WhatsApp</a>
-      </div>
-
-    </article>
+    <!-- WHATSAPP SECTION -->
+    <section class="settings-help-box">
+      Need help? Message us on WhatsApp —
+      <strong>WhatsApp</strong>
+    </section>
   </main>
 
-  <!-- PASSWORD SHEET -->
-  <div id="pwSheet" class="sheet" aria-hidden="true">
-    <h3>Change Password</h3>
-
-    <input id="newPass" class="input" type="password" placeholder="New password">
-    <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
-
-    <div class="sheet-btns">
-      <button onclick="closePwSheet()" class="btn outline">Cancel</button>
-      <button onclick="savePassword()" class="btn primary">Save</button>
-    </div>
-  </div>
-
-  <!-- CROP MODAL -->
-  <div id="settingsCropModal" class="cropper-modal" aria-hidden="true">
-    <div class="cropper-content">
-      <h3>Crop Photo</h3>
-
-      <div class="cropper-area circle-mask-250">
-        <img id="settingsCropImage" alt="crop">
-      </div>
-
-      <div class="cropper-actions">
-        <button onclick="closeSettingsCropper()" class="btn outline">Cancel</button>
-        <button onclick="saveSettingsCroppedImage()" class="btn primary">Save</button>
-      </div>
-    </div>
-  </div>
-
-    <!-- OVERLAY -->
-  <div id="overlay" class="overlay"></div>
-
-  <!-- CART SHEET -->
-  <div id="cartSheet" class="cart-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <h3>Your Cart</h3>
-      <button id="closeSheet" class="cart-close-btn">✕</button>
-    </div>
-    <div id="cartItems" class="cart-items">
-      <p class="empty">Cart is empty</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total-text">
-        Total: <span id="cartTotal">₹0</span>
-      </div>
-      <div class="cart-footer-btns">
-        <button id="clearCart" class="btn-clear">Clear</button>
-        <button id="checkoutBtn" class="btn-checkout">Checkout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
+  <!-- Bottom Nav -->
   <nav class="bottom-nav">
-
     <a href="/home/index.html" class="bn-item" data-nav="home">
-      <i class="ri-home-5-line"></i>
-      <small>Home</small>
+      <i class="ri-home-5-line"></i><small>Home</small>
     </a>
 
     <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-      <i class="ri-file-list-3-line"></i>
-      <small>Orders</small>
+      <i class="ri-file-list-3-line"></i><small>Orders</small>
     </a>
 
     <button class="bn-center" id="bottomCartBtn" data-nav="cart">
@@ -171,87 +111,31 @@
     </button>
 
     <a href="/profile/index.html" class="bn-item" data-nav="profile">
-      <i class="ri-user-3-line"></i>
-      <small>Profile</small>
+      <i class="ri-user-3-line"></i><small>Profile</small>
     </a>
 
     <a href="/settings/index.html" class="bn-item" data-nav="settings">
-      <i class="ri-settings-3-line"></i>
-      <small>Setting</small>
+      <i class="ri-settings-3-line"></i><small>Setting</small>
     </a>
-
   </nav>
 
+  <!-- Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Cashfree fullscreen -->
-  <div id="cf-fullscreen"
-       style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
-  </div>
-
-  <!-- Cart badge init -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const b = document.getElementById('bottomCartBtn');
-      if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
-    });
-  </script>
-
-  <!-- Active nav + cart badge -->
-  <script>
-    const path = window.location.pathname;
-
-    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
-      if (path.includes(el.dataset.nav)) {
-        el.classList.add("active");
-      }
-    });
-
-    function updateCartBadge() {
-      let cart = [];
-      try {
-        cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
-      } catch(e) {}
-
-      const count = cart.reduce((s, i) => s + i.qty, 0);
-      const badge = document.getElementById("cartBadge");
-
-      if (badge) {
-        badge.textContent = count;
-        badge.style.display = count > 0 ? "block" : "none";
-      }
-    }
-
-    updateCartBadge();
-    document.addEventListener("cart-updated", updateCartBadge);
-  </script>
-
-
-  <!-- Firebase -->
+  <!-- Firebase COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
-  <!-- Cropper -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-  <!-- Page logic -->
-  <script src="/settings/settings.js"></script>
   <!-- Home Script -->
   <script src="/home/script.js"></script>
 
-<script type="module">
-import { requireUser, logoutUser } from "/auth/sh-auth.js";
-
-requireUser((user) => {
-    document.getElementById("email").textContent = user.email;
-});
-
-document.getElementById("logoutBtn").onclick = logoutUser;
-</script>
+  <!-- Settings JS -->
+  <script src="/settings/settings.js"></script>
 
 </body>
 </html>
