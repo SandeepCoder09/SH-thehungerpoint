@@ -68,6 +68,8 @@ body {
 
 .hero-box {
   padding: 20px;
+  position: fixed;
+  top: 0px;
 }
 
 .type-h1 {
