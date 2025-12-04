@@ -17,15 +17,14 @@ body {
 }
 
 /* =========================================================
-   TOP NAV — (same premium style, untouched look)
+   TOP NAV — fixed premium navbar
 ========================================================= */
-/* --- FIXED TOP NAV (old style + fixed + safe) --- */
+
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-
   background: linear-gradient(180deg, #E23744, #d22d3a);
   padding: 14px 18px 22px;
   display: flex;
@@ -34,14 +33,12 @@ body {
 
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
-
   box-shadow: 0 5px 14px rgba(226,55,68,0.35);
   z-index: 5000;
 }
 
-/* Push all content below navbar safely */
 .app-shell {
-  padding-top: 120px;   /* perfect alignment (adjust if needed) */
+  padding-top: 120px;
 }
 
 .brand {
@@ -77,7 +74,7 @@ body {
 }
 
 /* =========================================================
-   HERO SECTION
+   HERO
 ========================================================= */
 
 .hero-box {
@@ -96,7 +93,8 @@ body {
   margin-bottom: 20px;
 }
 
-/* SEARCH BAR */
+/* SEARCH */
+
 .search-row {
   display: flex;
   align-items: center;
@@ -128,7 +126,10 @@ body {
   height: 44px;
 }
 
-/* CATEGORY CHIPS */
+/* =========================================================
+   CATEGORY CHIPS
+========================================================= */
+
 .chips {
   display: flex;
   gap: 12px;
@@ -146,9 +147,9 @@ body {
 }
 
 .chip.active {
-  background: #E23744;
+  background: #E23745;
   color: #fff;
-  border-color: #E23744;
+  border-color: #E23745;
 }
 
 /* =========================================================
@@ -162,7 +163,6 @@ body {
   padding: 10px 16px 100px;
 }
 
-/* MENU CARD */
 .menu-item {
   background: #fff;
   border-radius: 22px;
@@ -184,7 +184,6 @@ body {
   object-fit: cover;
 }
 
-/* CONTENT */
 .card-body {
   padding: 14px 14px 8px;
 }
@@ -209,7 +208,6 @@ body {
 
 .menu-price small {
   font-size: 12px;
-  font-weight: 600;
   opacity: 0.8;
 }
 
@@ -221,14 +219,12 @@ body {
   margin-bottom: 12px;
 }
 
-/* CARD ACTIONS */
 .card-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* QUANTITY PILL */
 .qty-pill {
   display: flex;
   align-items: center;
@@ -251,7 +247,6 @@ body {
   font-weight: 700;
 }
 
-/* ADD BUTTON */
 .add-cart-btn {
   background: #E23744;
   color: #fff;
@@ -264,7 +259,7 @@ body {
 }
 
 /* =========================================================
-   CART SHEET (safe premium)
+   CART SYSTEM
 ========================================================= */
 
 .overlay {
@@ -272,7 +267,16 @@ body {
   inset: 0;
   background: rgba(0,0,0,0.45);
   display: none;
+  opacity: 0;
+  transition: opacity .25s ease;
   z-index: 99990;
+}
+
+/* ✅ FIX 1 — overlay becomes visible */
+.overlay.active {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .cart-sheet {
@@ -283,10 +287,15 @@ body {
   background: #fff;
   border-radius: 26px 26px 0 0;
   box-shadow: 0 -8px 28px rgba(0,0,0,0.15);
-  transition: 0.3s ease;
+  transition: bottom .35s ease-out;
   z-index: 99999;
   max-height: 88vh;
   overflow-y: auto;
+}
+
+/* ✅ FIX 2 — slide cart up */
+.cart-sheet.active {
+  bottom: 0 !important;
 }
 
 .sheet-handle {
@@ -349,7 +358,7 @@ body {
 }
 
 /* =========================================================
-   BOTTOM NAV — do NOT change UI (only smooth clean)
+   BOTTOM NAV
 ========================================================= */
 
 .bottom-nav {
