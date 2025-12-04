@@ -28,8 +28,6 @@ body {
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
   box-shadow: 0 5px 14px rgba(226,55,68,0.35);
-  position: fixed;
-  top: 0px;
 }
 
 .brand {
