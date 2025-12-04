@@ -1,348 +1,261 @@
-/* =========================================================
-   GLOBAL
-========================================================= */
+/* ======= PATCH: FIX MENU GRID + BUTTONS + CART SHEET ======= */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  font-family: "Inter", system-ui, sans-serif;
-  background: #fafafa;
-  color: #111;
-  overflow-x: hidden;
-}
-
-/* =========================================================
-   TOP NAV — (same premium style, untouched look)
-========================================================= */
-.nav {
-  background: linear-gradient(180deg, #E23744, #d22d3a);
-  padding: 14px 18px 22px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom-left-radius: 28px;
-  border-bottom-right-radius: 28px;
-  box-shadow: 0 5px 14px rgba(226,55,68,0.35);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-img {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-}
-
-.brand-text .name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.brand-text .tag {
-  font-size: 13px;
-  color: rgba(255,255,255,0.85);
-}
-
-.lang-btn {
-  background: #fff;
-  border: none;
-  font-size: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-/* =========================================================
-   HERO SECTION
-========================================================= */
-
-.hero-box {
-  padding: 20px;
-}
-
-.type-h1 {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-
-.type-p {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 20px;
-}
-
-/* SEARCH BAR */
-.search-row {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  padding: 0 10px;
-  border-radius: 50px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-}
-
-.search-input {
-  flex: 1;
-  border: none;
-  padding: 14px 14px;
-  font-size: 16px;
-  background: none;
-}
-
-.search-input:focus {
-  outline: none;
-}
-
-.search-icon {
-  background: #E23744;
-  border: none;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 18px;
-  width: 44px;
-  height: 44px;
-}
-
-/* CATEGORY CHIPS */
-.chips {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
-
-.chip {
-  padding: 10px 22px;
-  font-size: 15px;
-  border-radius: 50px;
-  border: 1px solid #eee;
-  background: #fff;
-}
-
-.chip.active {
-  background: #E23744;
-  color: #fff;
-  border-color: #E23744;
-}
-
-/* =========================================================
-   MENU GRID
-========================================================= */
-
-.grid-menu {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  padding: 10px 16px 100px;
-}
-
-/* MENU CARD */
+/* 1) Ensure uniform card image area & consistent card height */
 .menu-item {
-  background: #fff;
-  border-radius: 22px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 380px;
+	/* keeps cards equal height - tune if necessary */
 }
 
 .card-media {
-  width: 100%;
-  height: 160px;
-  overflow: hidden;
+	height: 170px;
+	/* consistent image box height */
+	background: #fff;
+	display: block;
+	overflow: hidden;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .menu-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* keep aspect ratio and fill box */
+	display: block;
+	transform-origin: center;
 }
 
-/* CONTENT */
+/* keep body area consistent */
 .card-body {
-  padding: 14px 14px 8px;
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex: 1 1 auto;
 }
 
-.card-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.menu-title {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.menu-price {
-  font-size: 15px;
-  font-weight: 700;
-  color: #E23744;
-}
-
-.menu-price small {
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.8;
-}
-
+/* ensure description area doesn't push layout */
 .menu-desc {
-  font-size: 13px;
-  color: #777;
-  line-height: 1.35;
-  min-height: 38px;
-  margin-bottom: 12px;
+	margin-bottom: 8px;
+	flex-shrink: 0;
 }
 
-/* Premium card actions — centered layout */
+/* 2) Center qty + add button with matching look */
 .card-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;                 /* Perfect spacing */
-  margin-top: 18px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* horizontally centered */
+	gap: 12px;
+	margin-top: 12px;
+	width: 100%;
 }
 
-/* Premium rounded quantity pill */
+/* qty pill — compact, rounded and centered */
 .qty-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  background: #f5f5f5;
-  padding: 12px 20px;
-  border-radius: 50px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	background: #fafafa;
+	padding: 10px 16px;
+	border-radius: 999px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-/* Buttons inside qty pill */
+/* rounded small buttons */
 .qty-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1;
-  color: #444;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	width: 34px;
+	height: 34px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+	border: none;
+	background: transparent;
+	font-size: 20px;
+	color: #333;
+	cursor: pointer;
+	transition: background .12s ease;
 }
 
-/* Display number */
+.qty-btn:active {
+	transform: scale(.98);
+}
+
+/* qty number */
 .qty-display {
-  font-size: 17px;
-  font-weight: 700;
-  min-width: 18px;
-  text-align: center;
+	min-width: 22px;
+	text-align: center;
+	font-weight: 700;
+	font-size: 16px;
 }
 
-/* Add button — Premium round style */
+/* Add button aligned beside pill and vertically centered */
 .add-cart-btn {
-  background: #E23744;
-  color: #fff;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 50px;
-  font-size: 16px;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(226,55,68,0.35);
-  transition: 0.2s ease;
+	background: linear-gradient(180deg, #E23744, #D22D3A);
+	color: #fff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 999px;
+	font-size: 15px;
+	font-weight: 700;
+	box-shadow: 0 8px 18px rgba(226, 55, 68, 0.18);
+	margin-left: 6px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .add-cart-btn:active {
-  transform: scale(0.96);
+	transform: translateY(1px) scale(.995);
 }
 
-/* PREMIUM OVERLAY (blur + smooth dim) */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.20);
-  backdrop-filter: blur(3px);
-  z-index: 99990;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
+/* small-screen tweak: ensure card actions wrap nicely */
+@media (max-width:420px) {
+	.card-actions {
+		gap: 10px;
+	}
+
+	.qty-pill {
+		gap: 10px;
+		padding: 8px 12px;
+	}
+
+	.add-cart-btn {
+		padding: 9px 16px;
+		font-size: 14px;
+	}
 }
 
-.overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+/* 3) CART SHEET — item list & controls (premium style) */
+.cart-items {
+	max-height: 55vh;
+	overflow-y: auto;
+	padding-right: 6px;
 }
 
-/* CART SHEET — Smooth slide-up */
-.cart-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -100%;
-  background: #fff;
-  border-radius: 26px 26px 0 0;
-  padding: 22px;
-  box-shadow: 0 -12px 38px rgba(0,0,0,0.20);
-  transition: bottom 0.35s ease-out;
-  z-index: 99991;   /* Above overlay, below CF fullscreen */
+/* individual cart item row */
+.cart-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 6px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.cart-sheet.active {
-  bottom: 0;
+/* cart thumbnail */
+.cart-img {
+	width: 56px;
+	height: 56px;
+	border-radius: 8px;
+	object-fit: cover;
+	flex: 0 0 56px;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Sheet Handle */
-.sheet-handle {
-  width: 55px;
-  height: 6px;
-  background: #ddd;
-  border-radius: 4px;
-  margin: 0 auto 16px;
+/* cart info: name + price/qty text */
+.cart-info {
+	flex: 1 1 auto;
 }
 
-/* FIX: Prevent bottom-nav from covering cart sheet */
+.cart-name {
+	font-weight: 700;
+	font-size: 15px;
+	margin-bottom: 4px;
+}
+
+.cart-sub {
+	font-size: 13px;
+	color: #666;
+}
+
+/* cart controls: qty + remove aligned right */
+.cart-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-direction: column;
+	justify-content: center;
+}
+
+/* reuse pill style for sheet controls but smaller */
+.cart-actions .qty-pill {
+	padding: 6px 10px;
+	gap: 8px;
+	border-radius: 999px;
+	background: #fafafa;
+}
+
+.cart-actions .qty-btn {
+	width: 28px;
+	height: 28px;
+	font-size: 18px;
+}
+
+/* small square remove button */
+.c-rem {
+	background: transparent;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	width: 30px;
+	height: 30px;
+	border-radius: 6px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+/* footer buttons in sheet */
+.cart-footer {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	justify-content: space-between;
+	padding-top: 12px;
+}
+
+.btn-clear {
+	background: #f5f5f5;
+	border: none;
+	padding: 10px 16px;
+	border-radius: 999px;
+	font-weight: 700;
+}
+
+.btn-checkout {
+	background: linear-gradient(180deg, #E23744, #D22D3A);
+	color: #fff;
+	border: none;
+	padding: 10px 18px;
+	border-radius: 999px;
+	font-weight: 800;
+	box-shadow: 0 10px 30px rgba(226, 55, 68, 0.16);
+}
+
+/* 4) Accessibility & clickable areas */
+.cart-close-btn {
+	background: transparent;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	width: 36px;
+	height: 36px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+/* 5) Keep footer nav below sheet (z-index sanity) */
 .bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99980;   /* Below cart sheet */
+	z-index: 99970;
 }
 
-.bn-item {
-  background: none;
-  border: none;
-  font-size: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+/* 6) tiny fix: prevent extremely large image cropping in sheet or grid */
+.menu-img,
+.cart-img {
+	max-width: 100%;
 }
 
-.bn-item small {
-  font-size: 12px;
-}
-
-.bn-center {
-  background: #E23744;
-  color: #fff;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 4px solid #fff;
-  font-size: 28px;
-  margin-top: -38px;
-  box-shadow: 0 4px 14px rgba(226,55,68,0.35);
-}
+/* ============== end patch ============== */
