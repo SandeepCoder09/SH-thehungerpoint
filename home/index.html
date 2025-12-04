@@ -221,5 +221,38 @@
       if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
     });
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  
+  const cartBtn = document.getElementById("bottomCartBtn");
+  const cartSheet = document.getElementById("cartSheet");
+  const overlay = document.getElementById("overlay");
+  const closeBtn = document.getElementById("closeSheet");
+
+  if (!cartBtn) {
+    console.error("❌ bottomCartBtn not found!");
+    return;
+  }
+
+  cartBtn.addEventListener("click", () => {
+    console.log("🛒 Cart button clicked!");
+
+    cartSheet.classList.add("active");
+    overlay.style.display = "block";
+  });
+
+  closeBtn.addEventListener("click", () => {
+    cartSheet.classList.remove("active");
+    overlay.style.display = "none";
+  });
+
+  overlay.addEventListener("click", () => {
+    cartSheet.classList.remove("active");
+    overlay.style.display = "none";
+  });
+});
+</script>
+
 </body>
 </html>
