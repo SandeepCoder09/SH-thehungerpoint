@@ -241,5 +241,15 @@
   <!-- Page logic -->
   <script src="/settings/settings.js"></script>
 
+<script type="module">
+import { requireUser, logoutUser } from "/auth/sh-auth.js";
+
+requireUser((user) => {
+    document.getElementById("email").textContent = user.email;
+});
+
+document.getElementById("logoutBtn").onclick = logoutUser;
+</script>
+
 </body>
 </html>
