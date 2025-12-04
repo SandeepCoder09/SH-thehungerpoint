@@ -128,16 +128,104 @@
     </div>
   </div>
 
-  <input type="file" id="settingsPhotoInput" accept="image/*" hidden>
+    <!-- OVERLAY -->
+  <div id="overlay" class="overlay"></div>
 
-  <!-- Bottom nav -->
+  <!-- CART SHEET -->
+  <div id="cartSheet" class="cart-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>Your Cart</h3>
+      <button id="closeSheet" class="cart-close-btn">✕</button>
+    </div>
+    <div id="cartItems" class="cart-items">
+      <p class="empty">Cart is empty</p>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total-text">
+        Total: <span id="cartTotal">₹0</span>
+      </div>
+      <div class="cart-footer-btns">
+        <button id="clearCart" class="btn-clear">Clear</button>
+        <button id="checkoutBtn" class="btn-checkout">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <button class="bn-item"><span>☰</span><small>Menu</small></button>
-    <a href="/orders/orders.html"><button class="bn-item"><span>🧾</span><small>Orders</small></button></a>
-    <button class="bn-center" id="bottomCartBtn">🛒</button>
-    <a href="/profile/index.html"><button class="bn-item"><span>👤</span><small>Profile</small></button></a>
-    <a href="/settings/index.html"><button class="bn-item"><span>⚙️</span><small>Setting</small></button></a>
+
+    <a href="/home/index.html" class="bn-item" data-nav="home">
+      <i class="ri-home-5-line"></i>
+      <small>Home</small>
+    </a>
+
+    <a href="/orders/orders.html" class="bn-item" data-nav="orders">
+      <i class="ri-file-list-3-line"></i>
+      <small>Orders</small>
+    </a>
+
+    <button class="bn-center" id="bottomCartBtn" data-nav="cart">
+      <i class="ri-shopping-cart-2-line"></i>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+
+    <a href="/profile/index.html" class="bn-item" data-nav="profile">
+      <i class="ri-user-3-line"></i>
+      <small>Profile</small>
+    </a>
+
+    <a href="/settings/index.html" class="bn-item" data-nav="settings">
+      <i class="ri-settings-3-line"></i>
+      <small>Setting</small>
+    </a>
+
   </nav>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Cashfree fullscreen -->
+  <div id="cf-fullscreen"
+       style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
+  </div>
+
+  <!-- Cart badge init -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const b = document.getElementById('bottomCartBtn');
+      if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
+    });
+  </script>
+
+  <!-- Active nav + cart badge -->
+  <script>
+    const path = window.location.pathname;
+
+    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+      if (path.includes(el.dataset.nav)) {
+        el.classList.add("active");
+      }
+    });
+
+    function updateCartBadge() {
+      let cart = [];
+      try {
+        cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
+      } catch(e) {}
+
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const badge = document.getElementById("cartBadge");
+
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? "block" : "none";
+      }
+    }
+
+    updateCartBadge();
+    document.addEventListener("cart-updated", updateCartBadge);
+  </script>
+
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
