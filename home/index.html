@@ -10,14 +10,14 @@
 
   <link rel="stylesheet" href="/home/style.css?v=8" />
 
-<!-- Remix Icons -->
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
+  <!-- ✅ Remix Icons (Correct Working CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 
   <!-- Correct Cashfree v3 SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-<!-- Protection JS -->
-<script src="/auth/protect.js"></script>
+  <!-- Protection JS -->
+  <script src="/auth/protect.js"></script>
 
   <!-- Firebase + boot -->
   <script type="module">
@@ -41,6 +41,7 @@
     });
   </script>
 </head>
+
 <body>
 
   <!-- TOP NAV -->
@@ -68,8 +69,7 @@
 
       <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search"
-          placeholder="Search dishes (momo, tea…)" />
+        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)" />
         <button class="search-icon">🔍</button>
       </div>
 
@@ -85,90 +85,95 @@
 
     <!-- MENU GRID -->
     <section class="menu grid-menu">
-      
+
+      <!-- ITEM 1 -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-  <div class="card-media">
-    <img src="/home/sh-momo.png" class="menu-img" alt="">
-  </div>
-  <div class="card-body">
-    <div class="card-row">
-      <h3 class="menu-title">Momo</h3>
-      <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
-    </div>
-    <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
-    <div class="card-actions">
-      <div class="qty-pill">
-        <button class="qty-btn minus">−</button>
-        <div class="qty-display">1</div>
-        <button class="qty-btn plus">+</button>
-      </div>
-      <button class="add-cart-btn">Add</button>
-    </div>
-  </div>
-</article>
+        <div class="card-media">
+          <img src="/home/sh-momo.png" class="menu-img" alt="">
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <h3 class="menu-title">Momo</h3>
+            <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
+          </div>
+          <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
+          <div class="card-actions">
+            <div class="qty-pill">
+              <button class="qty-btn minus">−</button>
+              <div class="qty-display">1</div>
+              <button class="qty-btn plus">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </div>
+      </article>
 
-<article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-  <div class="card-media">
-    <img src="/home/sh-french-fries.png" class="menu-img" alt="">
-  </div>
-  <div class="card-body">
-    <div class="card-row">
-      <h3 class="menu-title">Finger</h3>
-      <div class="menu-price">₹10 <small>/ plate</small></div>
-    </div>
-    <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
-    <div class="card-actions">
-      <div class="qty-pill">
-        <button class="qty-btn minus">−</button>
-        <div class="qty-display">1</div>
-        <button class="qty-btn plus">+</button>
-      </div>
-      <button class="add-cart-btn">Add</button>
-    </div>
-  </div>
-</article>
+      <!-- ITEM 2 -->
+      <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
+        <div class="card-media">
+          <img src="/home/sh-french-fries.png" class="menu-img" alt="">
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <h3 class="menu-title">Finger</h3>
+            <div class="menu-price">₹10 <small>/ plate</small></div>
+          </div>
+          <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
+          <div class="card-actions">
+            <div class="qty-pill">
+              <button class="qty-btn minus">−</button>
+              <div class="qty-display">1</div>
+              <button class="qty-btn plus">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </div>
+      </article>
 
-<article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-  <div class="card-media">
-    <img src="/home/sh-hot-tea.png" class="menu-img" alt="">
-  </div>
-  <div class="card-body">
-    <div class="card-row">
-      <h3 class="menu-title">Hot Tea</h3>
-      <div class="menu-price">₹10 <small>/ cup</small></div>
-    </div>
-    <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
-    <div class="card-actions">
-      <div class="qty-pill">
-        <button class="qty-btn minus">−</button>
-        <div class="qty-display">1</div>
-        <button class="qty-btn plus">+</button>
-      </div>
-      <button class="add-cart-btn">Add</button>
-    </div>
-  </div>
-</article>
+      <!-- ITEM 3 -->
+      <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
+        <div class="card-media">
+          <img src="/home/sh-hot-tea.png" class="menu-img" alt="">
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <h3 class="menu-title">Hot Tea</h3>
+            <div class="menu-price">₹10 <small>/ cup</small></div>
+          </div>
+          <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
+          <div class="card-actions">
+            <div class="qty-pill">
+              <button class="qty-btn minus">−</button>
+              <div class="qty-display">1</div>
+              <button class="qty-btn plus">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </div>
+      </article>
 
-<article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-  <div class="card-media">
-    <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="">
-  </div>
-  <div class="card-body">
-    <div class="card-row">
-      <h3 class="menu-title">B.Pakoda</h3>
-      <div class="menu-price">₹10 <small>/ pcs</small></div>
-    </div>
-    <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
-    <div class="card-actions">
-      <div class="qty-pill">
-        <button class="qty-btn minus">−</button>
-        <div class="qty-display">1</div>
-        <button class="qty-btn plus">+</button>
-      </div>
-      <button class="add-cart-btn">Add</button>
-    </div>
-  </div>
-</article>
+      <!-- ITEM 4 -->
+      <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
+        <div class="card-media">
+          <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="">
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <h3 class="menu-title">B.Pakoda</h3>
+            <div class="menu-price">₹10 <small>/ pcs</small></div>
+          </div>
+          <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
+          <div class="card-actions">
+            <div class="qty-pill">
+              <button class="qty-btn minus">−</button>
+              <div class="qty-display">1</div>
+              <button class="qty-btn plus">+</button>
+            </div>
+            <button class="add-cart-btn">Add</button>
+          </div>
+        </div>
+      </article>
+
     </section>
   </main>
 
@@ -196,53 +201,44 @@
     </div>
   </div>
 
-  <!-- Bottom nav -->
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
 
-  <a href="/home/index.html" class="bn-item" data-nav="home">
-    <i class="ri-home-5-line"></i>
-    <small>Home</small>
-  </a>
+    <a href="/home/index.html" class="bn-item" data-nav="home">
+      <i class="ri-home-5-line"></i>
+      <small>Home</small>
+    </a>
 
-  <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-    <i class="ri-file-list-3-line"></i>
-    <small>Orders</small>
-  </a>
+    <a href="/orders/orders.html" class="bn-item" data-nav="orders">
+      <i class="ri-file-list-3-line"></i>
+      <small>Orders</small>
+    </a>
 
-  <button class="bn-center" id="bottomCartBtn" data-nav="cart">
-    <i class="ri-shopping-cart-2-line"></i>
-    <span class="cart-badge" id="cartBadge">0</span>
-  </button>
+    <button class="bn-center" id="bottomCartBtn" data-nav="cart">
+      <i class="ri-shopping-cart-2-line"></i>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
 
-  <a href="/profile/index.html" class="bn-item" data-nav="profile">
-    <i class="ri-user-3-line"></i>
-    <small>Profile</small>
-  </a>
+    <a href="/profile/index.html" class="bn-item" data-nav="profile">
+      <i class="ri-user-3-line"></i>
+      <small>Profile</small>
+    </a>
 
-  <a href="/settings/index.html" class="bn-item" data-nav="settings">
-    <i class="ri-settings-3-line"></i>
-    <small>Setting</small>
-  </a>
+    <a href="/settings/index.html" class="bn-item" data-nav="settings">
+      <i class="ri-settings-3-line"></i>
+      <small>Setting</small>
+    </a>
 
-</nav>
+  </nav>
 
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- 🔥 Added Cashfree Fullscreen Container -->
-  <!-- Cashfree Fullscreen (SAFE) -->
-<div id="cf-fullscreen"
-     style="
-       position: fixed;
-       inset: 0;
-       background: #fff;
-       z-index: 999999;
-       display: none;
-       overflow-y: auto;
-       padding: 20px;
-       min-height: 100vh;
-     ">
-</div>
+  <!-- Cashfree fullscreen -->
+  <div id="cf-fullscreen"
+       style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
+  </div>
 
+  <!-- Cart badge init -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const b = document.getElementById('bottomCartBtn');
@@ -250,38 +246,34 @@
     });
   </script>
 
-<script>
-  // Detect active page
-  const path = window.location.pathname;
+  <!-- Active nav + cart badge -->
+  <script>
+    const path = window.location.pathname;
 
-  document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
-    if (path.includes(el.dataset.nav)) {
-      el.classList.add("active");
+    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+      if (path.includes(el.dataset.nav)) {
+        el.classList.add("active");
+      }
+    });
+
+    function updateCartBadge() {
+      let cart = [];
+      try {
+        cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
+      } catch(e) {}
+
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const badge = document.getElementById("cartBadge");
+
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? "block" : "none";
+      }
     }
-  });
 
-  // Cart badge updater
-  function updateCartBadge() {
-    let cart = [];
-    try {
-      cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
-    } catch(e) {}
-
-    const count = cart.reduce((s, i) => s + i.qty, 0);
-    const badge = document.getElementById("cartBadge");
-
-    if (badge) {
-      badge.textContent = count;
-      badge.style.display = count > 0 ? "block" : "none";
-    }
-  }
-
-  // Initial update
-  updateCartBadge();
-
-  // Listen for updates from script.js
-  document.addEventListener("cart-updated", updateCartBadge);
-</script>
+    updateCartBadge();
+    document.addEventListener("cart-updated", updateCartBadge);
+  </script>
 
 </body>
 </html>
