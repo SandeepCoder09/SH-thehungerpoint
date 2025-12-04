@@ -19,15 +19,29 @@ body {
 /* =========================================================
    TOP NAV — (same premium style, untouched look)
 ========================================================= */
+/* --- FIXED TOP NAV (old style + fixed + safe) --- */
 .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
   background: linear-gradient(180deg, #E23744, #d22d3a);
   padding: 14px 18px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
+
   box-shadow: 0 5px 14px rgba(226,55,68,0.35);
+  z-index: 9999;
+}
+
+/* Push all content below navbar safely */
+.app-shell {
+  padding-top: 120px;   /* perfect alignment (adjust if needed) */
 }
 
 .brand {
