@@ -275,5 +275,13 @@
     document.addEventListener("cart-updated", updateCartBadge);
   </script>
 
+<script type="module">
+import { requireUser } from "/auth/sh-auth.js";
+
+requireUser((user) => {
+    // Use user data here
+});
+</script>
+
 </body>
 </html>
