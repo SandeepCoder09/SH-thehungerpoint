@@ -1,107 +1,297 @@
-const auth = firebase.auth();
-const db = firebase.firestore();
+/* PROFILE PAGE JS (Firebase COMPAT + Cropper) */
 
-const pfAvatar = document.getElementById("pfAvatar");
-const changePhotoBtn = document.getElementById("changePhotoBtn");
-const photoInput = document.getElementById("photoInput");
-const cropModal = document.getElementById("cropModal");
-const cropImage = document.getElementById("cropImage");
+(function () {
 
-const nameField = document.getElementById("name");
-const emailField = document.getElementById("email");
-const genderField = document.getElementById("gender");
-const phoneField = document.getElementById("phone");
-const addressField = document.getElementById("address");
+  // ---------------------
+  // DOM REFERENCES
+  // ---------------------
+  const pfAvatar = document.getElementById('pfAvatar');
+  const changePhotoBtn = document.getElementById('changePhotoBtn');
+  const photoInput = document.getElementById('photoInput');
 
-const saveBtn = document.getElementById("saveBtn");
-const resetPassBtn = document.getElementById("resetPassBtn");
+  const cropModal = document.getElementById('cropModal');
+  const cropImage = document.getElementById('cropImage');
+  const cancelCrop = document.getElementById('cancelCrop');
+  const saveCropped = document.getElementById('saveCropped');
 
-let cropper = null;
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const genderSelect = document.getElementById('gender');
+  const phoneInput = document.getElementById('phone');
+  const addressInput = document.getElementById('address');
 
-/* Load user data */
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return location.href = "/auth/login.html";
+  const displayName = document.getElementById('displayName');
+  const displayEmail = document.getElementById('displayEmail');
 
-  emailField.value = user.email;
+  const saveBtn = document.getElementById('saveBtn');
+  const resetPassBtn = document.getElementById('resetPassBtn');
+  const backBtn = document.getElementById('backBtn');
 
-  const snap = await db.collection("users").doc(user.uid).get();
-  if (!snap.exists) return;
+  const progressWrap = document.getElementById('progressWrap');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const progressText = document.getElementById('progressText');
 
-  const d = snap.data();
-  nameField.value = d.name || "";
-  genderField.value = d.gender || "";
-  phoneField.value = d.phone || "";
-  addressField.value = d.address || "";
-  if (d.photoURL) pfAvatar.src = d.photoURL;
-});
 
-/* Avatar Upload */
-changePhotoBtn.onclick = () => photoInput.click();
+  // ---------------------
+  // BOTTOM NAV ACTIVE
+  // ---------------------
+  const path = window.location.pathname;
+  document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+    if (path.includes(el.dataset.nav)) el.classList.add("active");
+  });
 
-photoInput.onchange = (e) => {
-  const f = e.target.files?.[0];
-  if (!f) return;
+  // ---------------------
+  // CART BADGE
+  // ---------------------
+  function updateCartBadge() {
+    let cart = [];
+    try {
+      cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
+    } catch (e) {}
+    const count = cart.reduce((s, i) => s + (i.qty || 0), 0);
+    const badge = document.getElementById("cartBadge");
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "block" : "none";
+    }
+  }
+  updateCartBadge();
+  document.addEventListener("cart-updated", updateCartBadge);
 
-  cropImage.src = URL.createObjectURL(f);
-  cropModal.classList.add("active");
 
-  cropImage.onload = () => {
-    if (cropper) cropper.destroy();
+  // ---------------------
+  // TOAST
+  // ---------------------
+  function toast(msg, duration = 3000) {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    container.appendChild(el);
+
+    setTimeout(() => el.classList.add("show"), 20);
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 250);
+    }, duration);
+  }
+
+
+  // ---------------------
+  // CROPPER
+  // ---------------------
+  let cropper = null;
+  let croppedBlob = null;
+
+  changePhotoBtn.addEventListener("click", () => photoInput.click());
+
+  photoInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    cropImage.src = URL.createObjectURL(file);
+    openCropper();
+  });
+
+  function openCropper() {
+    cropModal.style.display = "flex";
+    cropModal.setAttribute("aria-hidden", "false");
+
+    cropper && cropper.destroy();
     cropper = new Cropper(cropImage, {
       aspectRatio: 1,
       viewMode: 1,
-      autoCropArea: 1
+      autoCropArea: 1,
+      background: false,
+      movable: true,
+      zoomable: true,
+      responsive: true,
     });
-  };
-};
+  }
 
-window.closeCropper = () => {
-  cropModal.classList.remove("active");
-  if (cropper) cropper.destroy();
-  cropper = null;
-};
+  cancelCrop.addEventListener("click", closeCropper);
 
-window.saveCroppedImage = async () => {
-  const user = auth.currentUser;
-  if (!user || !cropper) return;
+  function closeCropper() {
+    cropModal.style.display = "none";
+    cropModal.setAttribute("aria-hidden", "true");
 
-  const base64 = cropper.getCroppedCanvas({
-    width: 500,
-    height: 500
-  }).toDataURL("image/jpeg", 0.85);
+    if (cropper) cropper.destroy();
+    cropper = null;
 
-  await db.collection("users").doc(user.uid).set(
-    { photoURL: base64 },
-    { merge: true }
-  );
+    if (cropImage.src && cropImage.src.startsWith("blob:")) {
+      URL.revokeObjectURL(cropImage.src);
+    }
+    photoInput.value = "";
+    croppedBlob = null;
+  }
 
-  pfAvatar.src = base64 + "?t=" + Date.now();
-  window.closeCropper();
-};
+  saveCropped.addEventListener("click", () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+      width: 600,
+      height: 600,
+      imageSmoothingQuality: "high",
+    });
 
-/* Save profile */
-saveBtn.onclick = async () => {
-  const user = auth.currentUser;
-  if (!user) return;
+    canvas.toBlob((blob) => {
+      croppedBlob = blob;
+      pfAvatar.src = URL.createObjectURL(blob);
+      closeCropper();
+    }, "image/jpeg", 0.85);
+  });
 
-  await db.collection("users").doc(user.uid).set(
-    {
-      name: nameField.value,
-      gender: genderField.value,
-      phone: phoneField.value,
-      address: addressField.value
-    },
-    { merge: true }
-  );
 
-  alert("Profile saved!");
-};
+  // ---------------------
+  // FIREBASE COMPAT LOGIC
+  // ---------------------
+  let currentUser = null;
+  let userDocRef = null;
+  let lastData = {};
 
-/* Reset password */
-resetPassBtn.onclick = async () => {
-  const user = auth.currentUser;
-  if (!user) return;
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      try { window.location.href = "/auth/login.html"; } catch (e) {}
+      return;
+    }
 
-  await auth.sendPasswordResetEmail(user.email);
-  alert("Reset email sent");
-};
+    currentUser = user;
+    emailInput.value = user.email || "";
+    displayEmail.textContent = user.email || "";
+
+    userDocRef = firebase.firestore().collection("users").doc(user.uid);
+
+    try {
+      const snap = await userDocRef.get();
+      if (snap.exists) {
+        lastData = snap.data();
+        applyUserData(lastData);
+      } else {
+        applyUserData({});
+      }
+    } catch (err) {
+      console.error("Firestore fetch error:", err);
+    }
+  });
+
+
+  function applyUserData(data) {
+    nameInput.value = data.name || "";
+    genderSelect.value = data.gender || "";
+    phoneInput.value = data.phone || "";
+    addressInput.value = data.address || "";
+
+    displayName.textContent =
+      data.name || (currentUser && currentUser.displayName) || "Your name";
+
+    if (data.photoURL) {
+      pfAvatar.src = data.photoURL;
+    } else if (currentUser && currentUser.photoURL) {
+      pfAvatar.src = currentUser.photoURL;
+    }
+  }
+
+
+  // ---------------------
+  // SAVE PROFILE
+  // ---------------------
+  saveBtn.addEventListener("click", async () => {
+    if (!currentUser) return toast("Not authenticated");
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+
+    try {
+      let photoURL = lastData.photoURL || currentUser.photoURL || null;
+
+      // Upload cropped image
+      if (croppedBlob) {
+        progressWrap.classList.remove("hidden");
+        uploadProgress.value = 0;
+        progressText.textContent = "Uploading: 0%";
+
+        const storageRef = firebase.storage().ref();
+        const filePath = `profiles/${currentUser.uid}/${Date.now()}.jpg`;
+        const fileRef = storageRef.child(filePath);
+        const uploadTask = fileRef.put(croppedBlob);
+
+        await new Promise((resolve, reject) => {
+          uploadTask.on(
+            "state_changed",
+            (snap) => {
+              const pct = Math.round(
+                (snap.bytesTransferred / snap.totalBytes) * 100
+              );
+              uploadProgress.value = pct;
+              progressText.textContent = `Uploading: ${pct}%`;
+            },
+            (err) => reject(err),
+            async () => {
+              photoURL = await uploadTask.snapshot.ref.getDownloadURL();
+              resolve();
+            }
+          );
+        });
+      }
+
+      const payload = {
+        name: nameInput.value.trim(),
+        gender: genderSelect.value,
+        phone: phoneInput.value.trim(),
+        address: addressInput.value.trim(),
+      };
+
+      if (photoURL) payload.photoURL = photoURL;
+
+      await userDocRef.set(payload, { merge: true });
+
+      try {
+        await currentUser.updateProfile({
+          displayName: payload.name,
+          photoURL: payload.photoURL,
+        });
+      } catch (e) {}
+
+      toast("Profile saved");
+      progressText.textContent = "Saved ✓";
+
+      setTimeout(() => {
+        progressWrap.classList.add("hidden");
+      }, 800);
+
+      croppedBlob = null;
+
+    } catch (err) {
+      console.error("Save error:", err);
+      toast("Save failed — see console");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Profile";
+    }
+  });
+
+
+  // ---------------------
+  // RESET PASSWORD
+  // ---------------------
+  resetPassBtn.addEventListener("click", async () => {
+    const email = emailInput.value;
+    if (!email) return toast("Email missing");
+
+    try {
+      await firebase.auth().sendPasswordResetEmail(email);
+      toast("Password reset email sent");
+    } catch (err) {
+      console.error("Reset error:", err);
+      toast("Failed to send reset email");
+    }
+  });
+
+
+  // ---------------------
+  // BACK BUTTON
+  // ---------------------
+  backBtn.addEventListener("click", () => history.back());
+
+
+})();
