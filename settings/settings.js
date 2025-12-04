@@ -1,127 +1,137 @@
+/* SETTINGS PAGE — Firebase COMPAT + FCM + Live User Data */
+
 (function () {
 
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  // DOM
+  const userName = document.getElementById("userName");
+  const userEmail = document.getElementById("userEmail");
+  const userAvatar = document.getElementById("userAvatar");
 
-  const hdrAvatar = document.getElementById("hdrAvatar");
-  const hdrAvatarBtn = document.getElementById("hdrAvatarBtn");
-  const settingsPhotoInput = document.getElementById("settingsPhotoInput");
+  const openProfile = document.getElementById("openProfile");
+  const changePassword = document.getElementById("changePassword");
+  const openFaqs = document.getElementById("openFaqs");
+  const notifToggle = document.getElementById("notifToggle");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  const settingsCropModal = document.getElementById("settingsCropModal");
-  const settingsCropImage = document.getElementById("settingsCropImage");
-
-  const pwSheet = document.getElementById("pwSheet");
-  const openChangePassBtn = document.getElementById("openChangePassBtn");
-  const openProfileBtn = document.getElementById("openProfileBtn");
-
-  const pushToggle = document.getElementById("pushToggle");
-  const logoutItem = document.getElementById("logoutItem");
-
-  const hdrName = document.getElementById("hdrName");
-  const hdrEmail = document.getElementById("hdrEmail");
-
-  let cropper = null;
-
-  function showToast(msg) {
-    alert(msg);
+  // Toast
+  function toast(msg) {
+    const c = document.getElementById("toast-container");
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => el.classList.add("show"), 30);
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 200);
+    }, 2200);
   }
 
-  /* ---------------- Load User Data ---------------- */
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return;
+  let currentUser = null;
+  let userDocRef = null;
 
-    hdrEmail.textContent = user.email;
+  // -------------------------------------
+  // LOAD USER DATA FROM FIRESTORE (LIVE)
+  // -------------------------------------
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      window.location.href = "/auth/login.html";
+      return;
+    }
 
-    const snap = await db.collection("users").doc(user.uid).get();
-    if (!snap.exists) return;
+    currentUser = user;
+    userDocRef = firebase.firestore().collection("users").doc(user.uid);
 
-    const d = snap.data();
-    hdrName.textContent = d.name || "User";
+    // Live updates
+    userDocRef.onSnapshot((doc) => {
+      if (!doc.exists) return;
 
-    if (d.photoURL) hdrAvatar.src = d.photoURL;
-    if (typeof d.notificationsEnabled !== "undefined") {
-      if (d.notificationsEnabled) pushToggle.classList.add("active");
+      const data = doc.data();
+      userName.textContent = data.name || "USER NAME";
+      userEmail.textContent = user.email || "example@email.com";
+      userAvatar.src = data.photoURL || "/home/SH-Favicon.png";
+
+      // Restore FCM toggle
+      notifToggle.checked = data.fcmEnabled === true;
+    });
+  });
+
+  // -------------------------------------
+  // NAVIGATION
+  // -------------------------------------
+  openProfile.onclick = () => {
+    window.location.href = "/profile/index.html";
+  };
+
+  changePassword.onclick = async () => {
+    if (!currentUser) return;
+
+    try {
+      await firebase.auth().sendPasswordResetEmail(currentUser.email);
+      toast("Password reset link sent!");
+    } catch (err) {
+      toast("Failed to send reset email");
+    }
+  };
+
+  openFaqs.onclick = () => {
+    window.location.href = "/settings/faqs.html";
+  };
+
+  // -------------------------------------
+  // FCM REAL NOTIFICATIONS
+  // -------------------------------------
+  const messaging = firebase.messaging();
+
+  notifToggle.addEventListener("change", async () => {
+    if (notifToggle.checked) {
+      // Request permission
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        notifToggle.checked = false;
+        toast("Permission denied");
+        return;
+      }
+
+      // Get FCM token
+      try {
+        const token = await messaging.getToken({
+          vapidKey: "BDvFl7D2Z7SkLkq8G8JHqJl...your-vapid-key..."
+        });
+
+        if (!token) {
+          toast("Unable to get token");
+          notifToggle.checked = false;
+          return;
+        }
+
+        // Save token
+        await userDocRef.set({
+          fcmEnabled: true,
+          fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+        }, { merge: true });
+
+        toast("Notifications Enabled");
+
+      } catch (err) {
+        console.error(err);
+        notifToggle.checked = false;
+        toast("Error enabling notifications");
+      }
+
+    } else {
+      // Disable notifications
+      await userDocRef.set({ fcmEnabled: false }, { merge: true });
+      toast("Notifications Disabled");
     }
   });
 
-  /* ---------------- Avatar Upload ---------------- */
-  hdrAvatarBtn.onclick = () => settingsPhotoInput.click();
-
-  settingsPhotoInput.onchange = (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-
-    settingsCropImage.src = URL.createObjectURL(f);
-    settingsCropModal.classList.add("active");
-
-    settingsCropImage.onload = () => {
-      if (cropper) cropper.destroy();
-      cropper = new Cropper(settingsCropImage, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1
-      });
-    };
-  };
-
-  window.closeSettingsCropper = () => {
-    settingsCropModal.classList.remove("active");
-    if (cropper) cropper.destroy();
-    cropper = null;
-  };
-
-  window.saveSettingsCroppedImage = async () => {
-    const user = auth.currentUser;
-    if (!user || !cropper) return;
-
-    const base64 = cropper.getCroppedCanvas({
-      width: 500,
-      height: 500
-    }).toDataURL("image/jpeg", 0.85);
-
-    await db.collection("users").doc(user.uid).set(
-      { photoURL: base64 },
-      { merge: true }
-    );
-
-    hdrAvatar.src = base64 + "?t=" + Date.now();
-    window.closeSettingsCropper();
-  };
-
-  /* ---------------- Push Toggle ---------------- */
-  pushToggle.onclick = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const newState = !pushToggle.classList.contains("active");
-    pushToggle.classList.toggle("active");
-
-    await db.collection("users").doc(user.uid).set(
-      { notificationsEnabled: newState },
-      { merge: true }
-    );
-  };
-
-  /* ---------------- Password Sheet ---------------- */
-  openChangePassBtn.onclick = () => pwSheet.classList.add("open");
-  window.closePwSheet = () => pwSheet.classList.remove("open");
-
-  window.savePassword = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    await auth.sendPasswordResetEmail(user.email);
-    showToast("Reset email sent!");
-    pwSheet.classList.remove("open");
-  };
-
-  /* ---------------- Navigation ---------------- */
-  openProfileBtn.onclick = () => location.href = "/profile/index.html";
-
-  /* ---------------- Logout ---------------- */
-  logoutItem.onclick = async () => {
-    await auth.signOut();
-    location.href = "/auth/login.html";
+  // -------------------------------------
+  // LOGOUT
+  // -------------------------------------
+  logoutBtn.onclick = async () => {
+    await firebase.auth().signOut();
+    window.location.href = "/auth/login.html";
   };
 
 })();
