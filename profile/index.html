@@ -185,5 +185,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script src="/profile/profile.js"></script>
 
+<script type="module">
+import { requireUser } from "/auth/sh-auth.js";
+
+requireUser((user) => {
+    document.getElementById("name").value = user.name;
+});
+</script>
+
 </body>
 </html>
