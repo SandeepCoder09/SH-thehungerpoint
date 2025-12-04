@@ -36,7 +36,7 @@ body {
   border-bottom-right-radius: 28px;
 
   box-shadow: 0 5px 14px rgba(226,55,68,0.35);
-  z-index: 9999;
+  z-index: 5000;
 }
 
 /* Push all content below navbar safely */
@@ -272,7 +272,7 @@ body {
   inset: 0;
   background: rgba(0,0,0,0.45);
   display: none;
-  z-index: 9998;
+  z-index: 99990;
 }
 
 .cart-sheet {
@@ -284,7 +284,7 @@ body {
   border-radius: 26px 26px 0 0;
   box-shadow: 0 -8px 28px rgba(0,0,0,0.15);
   transition: 0.3s ease;
-  z-index: 9999;
+  z-index: 99999;
   max-height: 88vh;
   overflow-y: auto;
 }
@@ -363,7 +363,7 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 9999;
+  z-index: 5000;
 }
 
 .bn-item {
