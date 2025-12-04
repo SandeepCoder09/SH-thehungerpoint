@@ -252,50 +252,6 @@ progress::-webkit-progress-value {
 	object-fit: cover;
 }
 
-/* bottom nav (your SH style kept) */
-.bottom-nav {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 12px;
-	display: flex;
-	justify-content: space-around;
-	max-width: 460px;
-	margin: 0 auto;
-	padding: 8px 12px;
-}
-
-.bn-item {
-	color: #777;
-	text-decoration: none;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	align-items: center;
-	font-size: 12px;
-	padding: 6px 8px;
-	border-radius: 10px;
-}
-
-.bn-item.active {
-	color: var(--primary);
-	font-weight: 700;
-}
-
-.bn-center {
-	background: var(--primary);
-	color: #fff;
-	border-radius: 50%;
-	width: 56px;
-	height: 56px;
-	border: none;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transform: translateY(-18px);
-	box-shadow: 0 8px 24px rgba(211, 49, 48, 0.12);
-}
-
 /* toast */
 .toast-container {
 	position: fixed;
