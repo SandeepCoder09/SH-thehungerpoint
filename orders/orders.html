@@ -44,5 +44,14 @@
   </main>
 
   <script src="orders.js"></script>
+
+<script type="module">
+import { requireUser } from "/auth/sh-auth.js";
+
+requireUser((user) => {
+    loadOrders(user.uid);
+});
+</script>
+
 </body>
 </html>
