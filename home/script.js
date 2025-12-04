@@ -1,4 +1,4 @@
-// /home/script.js — FINAL STABLE VERSION (Cashfree Fullscreen Drop-in)
+// /home/script.js — FINAL CASHFREE V3 (Production, Same-tab redirect)
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -28,7 +28,8 @@
     tea: "/home/sh-hot-tea.png",
     "bread pakoda": "/home/sh-bread-pakoda.png",
   };
-  const getImg = (name) => imageMap[name?.toLowerCase()] || "/home/SH-Favicon.png";
+  const getImg = (name) =>
+    imageMap[name?.toLowerCase()] || "/home/SH-Favicon.png";
 
   function updateCartCount() {
     const b = $("#bottomCartBtn");
@@ -85,7 +86,9 @@
   } catch (e) {}
 
   function saveLocal() {
-    try { localStorage.setItem("sh_cart_v1", JSON.stringify(cart)); } catch (e) {}
+    try {
+      localStorage.setItem("sh_cart_v1", JSON.stringify(cart));
+    } catch (e) {}
   }
 
   function initMenu() {
@@ -99,57 +102,73 @@
       let qty = 1;
       if (disp) disp.textContent = qty;
 
-      minus && (minus.onclick = () => {
-        qty = Math.max(1, qty - 1);
-        disp.textContent = qty;
-      });
+      minus &&
+        (minus.onclick = () => {
+          qty = Math.max(1, qty - 1);
+          disp.textContent = qty;
+        });
 
-      plus && (plus.onclick = () => {
-        qty++;
-        disp.textContent = qty;
-      });
+      plus &&
+        (plus.onclick = () => {
+          qty++;
+          disp.textContent = qty;
+        });
 
-      add && (add.onclick = () => {
-        flyToCart(img);
+      add &&
+        (add.onclick = () => {
+          flyToCart(img);
 
-        const name = el.dataset.item;
-        const price = Number(el.dataset.price) || 10;
-        const id = name.toLowerCase().replace(/\s+/g, "-");
+          const name = el.dataset.item;
+          const price = Number(el.dataset.price) || 10;
+          const id = name.toLowerCase().replace(/\s+/g, "-");
 
-        const i = findItem(id);
-        if (i >= 0) cart[i].qty += qty;
-        else cart.push({ id, name, price, qty });
+          const i = findItem(id);
+          if (i >= 0) cart[i].qty += qty;
+          else cart.push({ id, name, price, qty });
 
-        showToast(`${qty} × ${name} added`);
-        saveLocal();
-        renderCart();
+          showToast(`${qty} × ${name} added`);
+          saveLocal();
+          renderCart();
 
-        qty = 1;
-        disp.textContent = qty;
-      });
+          qty = 1;
+          disp.textContent = qty;
+        });
     });
   }
 
   function attachCartButtons() {
-    $$(".c-dec").forEach((b) => b.onclick = () => {
-      const idx = findItem(b.dataset.id);
-      if (idx >= 0) {
-        cart[idx].qty = Math.max(1, cart[idx].qty - 1);
-        saveLocal(); renderCart();
-      }
-    });
+    $$(".c-dec").forEach(
+      (b) =>
+        (b.onclick = () => {
+          const idx = findItem(b.dataset.id);
+          if (idx >= 0) {
+            cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+            saveLocal();
+            renderCart();
+          }
+        })
+    );
 
-    $$(".c-inc").forEach((b) => b.onclick = () => {
-      const idx = findItem(b.dataset.id);
-      if (idx >= 0) {
-        cart[idx].qty++; saveLocal(); renderCart();
-      }
-    });
+    $$(".c-inc").forEach(
+      (b) =>
+        (b.onclick = () => {
+          const idx = findItem(b.dataset.id);
+          if (idx >= 0) {
+            cart[idx].qty++;
+            saveLocal();
+            renderCart();
+          }
+        })
+    );
 
-    $$(".c-rem").forEach((b) => b.onclick = () => {
-      cart = cart.filter((x) => x.id !== b.dataset.id);
-      saveLocal(); renderCart();
-    });
+    $$(".c-rem").forEach(
+      (b) =>
+        (b.onclick = () => {
+          cart = cart.filter((x) => x.id !== b.dataset.id);
+          saveLocal();
+          renderCart();
+        })
+    );
   }
 
   function flyToCart(img) {
@@ -167,7 +186,9 @@
       document.body.appendChild(c);
       const target = $("#bottomCartBtn").getBoundingClientRect();
       requestAnimationFrame(() => {
-        c.style.transform = `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
+        c.style.transform = `translate(${
+          target.left - r.left
+        }px, ${target.top - r.top}px) scale(.2)`;
         c.style.opacity = "0";
       });
       setTimeout(() => c.remove(), 700);
@@ -191,29 +212,13 @@
   }
 
   $("#clearCart")?.addEventListener("click", () => {
-    cart = []; saveLocal(); renderCart(); showToast("Cart cleared");
+    cart = [];
+    saveLocal();
+    renderCart();
+    showToast("Cart cleared");
   });
 
-  /* ---------- FULLSCREEN CASHFREE ---------- */
-
-  // Wait until element is truly visible
-  async function waitForVisible(el, timeout = 8000) {
-    const start = Date.now();
-    return new Promise((resolve, reject) => {
-      (function check() {
-        const ok =
-          el &&
-          el.offsetWidth > 50 &&
-          el.offsetHeight > 50 &&
-          getComputedStyle(el).display !== "none";
-
-        if (ok) return resolve(true);
-        if (Date.now() - start > timeout) return reject("container not visible");
-        requestAnimationFrame(check);
-      })();
-    });
-  }
-
+  /* ---------------------- CASHFREE V3 CHECKOUT ---------------------- */
   $("#checkoutBtn")?.addEventListener("click", startCheckout);
 
   async function startCheckout() {
@@ -223,12 +228,21 @@
     const user = auth.currentUser;
     if (!user) return showToast("Please login");
 
-    showToast("Loading payment...");
+    showToast("Starting payment...");
 
     const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
-    const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
+    const items = cart.map((i) => ({
+      name: i.name,
+      qty: i.qty,
+      price: i.price,
+    }));
 
-    const payload = { amount, items, phone: user.uid, email: user.email || "guest@sh.com" };
+    const payload = {
+      amount,
+      items,
+      phone: user.uid,
+      email: user.email || "guest@sh.com",
+    };
 
     let res;
     try {
@@ -238,91 +252,35 @@
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error("Network create-order error:", err);
+      console.error("Network error:", err);
       return showToast("Payment network error");
     }
 
     const data = await res.json().catch(() => ({}));
-    console.log("⬅ create-cashfree response:", data);
+    console.log("Cashfree response:", data);
 
     if (!data.ok || !data.payment_session_id) {
-      console.error("Missing payment_session_id:", data);
+      console.error("Bad session:", data);
       return showToast("Payment initialization failed");
     }
 
-    // Close cart sheet (your chosen option)
-    closeSheet();
-
-    const cfBox = document.getElementById("cf-fullscreen");
-    if (!cfBox) return showToast("Payment UI error");
-
-    // Prepare container
-    cfBox.style.display = "block";
-    cfBox.style.minHeight = "100vh";
-    cfBox.innerHTML = ""; // must be empty for drop-in
-
-    // Wait container visible before mount
+    // Use Cashfree V3 Checkout
     try {
-      await waitForVisible(cfBox);
-    } catch (e) {
-      console.error("Container not visible:", e);
-      cfBox.style.display = "none";
-      return showToast("Payment UI error");
-    }
+      const cf = Cashfree({ mode: "production" });
 
-    // Mount Drop-in
-    try {
-      const cashfree = Cashfree({ mode: "production" });
+      cf.checkout({
+        paymentSessionId: data.payment_session_id,
+        redirectTarget: "_self", // stays in same tab
+      });
 
-      cashfree.initialiseDropin(
-        cfBox,
-        {
-          paymentSessionId: data.payment_session_id,
-          redirectTarget: "_self",
-        },
-        async (event) => {
-          console.log("CF EVENT:", event);
-
-          if (event.type === "PAYMENT_SUCCESS") {
-            showToast("Verifying payment...");
-
-            const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId: event.order.orderId, items }),
-            });
-
-            const v = await vr.json().catch(() => ({}));
-
-            if (v.ok) {
-              showToast("Order confirmed 🎉");
-              cart = [];
-              saveLocal();
-              renderCart();
-            } else {
-              showToast("Verification failed");
-            }
-
-            cfBox.style.display = "none";
-            cfBox.innerHTML = "";
-          }
-
-          if (event.type === "PAYMENT_ERROR" || event.type === "PAYMENT_CANCEL") {
-            showToast("Payment failed or cancelled");
-            cfBox.style.display = "none";
-            cfBox.innerHTML = "";
-          }
-        }
-      );
+      return;
     } catch (err) {
-      console.error("DROP-IN ERROR:", err);
-      cfBox.style.display = "none";
-      cfBox.innerHTML = "";
-      showToast("Payment UI error");
+      console.error("Cashfree SDK error:", err);
+      return showToast("Payment system not ready — try again");
     }
   }
 
-  // init
+  // Init
   initMenu();
   renderCart();
 })();
