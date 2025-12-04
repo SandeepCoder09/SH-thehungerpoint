@@ -1,4 +1,4 @@
-// /home/script.js — Updated for embedded Cashfree Drop-in (Production)
+// /home/script.js — Regenerated (Fullscreen embedded Cashfree drop-in, Production)
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -154,6 +154,7 @@
 
   function flyToCart(img) {
     try {
+      if (!img) return;
       const r = img.getBoundingClientRect();
       const c = img.cloneNode(true);
       c.style.position = "fixed";
@@ -166,8 +167,7 @@
       document.body.appendChild(c);
       const target = $("#bottomCartBtn").getBoundingClientRect();
       requestAnimationFrame(() => {
-        c.style.transform =
-          `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
+        c.style.transform = `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
         c.style.opacity = "0";
       });
       setTimeout(() => c.remove(), 700);
@@ -194,7 +194,7 @@
     cart = []; saveLocal(); renderCart(); showToast("Cart cleared");
   });
 
-  /* ---------- PAY (EMBEDDED DROP-IN) ---------- */
+  /* ---------- PAY (EMBEDDED FULLSCREEN DROP-IN) ---------- */
   $("#checkoutBtn")?.addEventListener("click", startCheckout);
 
   async function startCheckout() {
@@ -224,76 +224,137 @@
         body: JSON.stringify(payload),
       });
     } catch (err) {
+      console.error("Network create-order error:", err);
       return showToast("Payment network error");
     }
 
     const data = await res.json().catch(() => ({}));
+    console.log("⬅ create-cashfree response:", data);
 
-    // ❌ No more redirect  
-    // ❌ No checkout redirect  
-    // ✔ Embedded Drop-in Only  
+    // Preferred redirect flow (if backend returns hosted checkout)
+    if (data.ok && data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+      return;
+    }
+
+    // Payment session flow: require payment_session_id
     if (!data.ok || !data.payment_session_id) {
+      console.error("Missing payment_session_id or bad response:", data);
       return showToast("Payment initialization failed");
     }
 
-    // Close cart sheet immediately
+    // CLOSE cart sheet (user requested)
     closeSheet();
 
-    // Open fullscreen container
+    // Get fullscreen container (must exist in DOM)
     const cfBox = document.getElementById("cf-fullscreen");
+    if (!cfBox) {
+      console.error("cf-fullscreen container not found");
+      return showToast("Payment UI error");
+    }
+
+    // Ensure container visible & sized BEFORE mounting drop-in
     cfBox.style.display = "block";
-    cfBox.innerHTML = "<h3 style='text-align:center;margin:20px 0;'>Loading Payment...</h3>";
+    cfBox.style.minHeight = "100vh";
+    cfBox.style.padding = "20px";
+    // Clear any placeholder content (Cashfree prefers a clean container)
+    cfBox.innerHTML = "";
+
+    // Add a lightweight loader while drop-in mounts
+    const loader = document.createElement("div");
+    loader.style.cssText = "text-align:center;margin:24px 0;font-weight:600;";
+    loader.textContent = "Loading payment...";
+    cfBox.appendChild(loader);
 
     try {
+      // Create cashfree instance (production)
       const cashfree = Cashfree({ mode: "production" });
 
-      cashfree.initialiseDropin(
-        cfBox,
-        {
-          paymentSessionId: data.payment_session_id,
-          redirectTarget: "_self",
-        },
-        async (event) => {
-          console.log("CF:", event);
+      // initialiseDropin may be async; wrap with Promise to support both callback or promise styles
+      await new Promise((resolve, reject) => {
+        try {
+          const cb = async (event) => {
+            // Cashfree drop-in events
+            console.log("CF DROPIN EVENT:", event);
 
-          if (event.type === "PAYMENT_SUCCESS") {
-            showToast("Verifying payment...");
+            // Remove loader on first event (UI mounted)
+            if (loader && loader.parentNode) loader.remove();
 
-            const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId: event.order.orderId }),
-            });
-
-            const v = await vr.json().catch(() => ({}));
-
-            if (v.ok) {
-              showToast("Order confirmed 🎉");
-              cart = [];
-              saveLocal();
-              renderCart();
-            } else {
-              showToast("Verification failed");
+            if (event?.type === "PAYMENT_SUCCESS") {
+              // event.order.orderId is expected
+              showToast("Verifying payment...");
+              try {
+                const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: event.order.orderId, items }),
+                });
+                const v = await vr.json().catch(() => ({}));
+                if (v.ok) {
+                  showToast("Order confirmed 🎉");
+                  cart = [];
+                  saveLocal();
+                  renderCart();
+                } else {
+                  showToast("Verification failed");
+                }
+              } catch (err) {
+                console.error("verify error:", err);
+                showToast("Verification network error");
+              } finally {
+                // hide drop-in on success
+                cfBox.style.display = "none";
+                cfBox.innerHTML = "";
+              }
             }
 
-            cfBox.style.display = "none";
-            cfBox.innerHTML = "";
-          }
+            if (event?.type === "PAYMENT_ERROR" || event?.type === "PAYMENT_CANCEL") {
+              showToast("Payment failed or cancelled");
+              cfBox.style.display = "none";
+              cfBox.innerHTML = "";
+            }
+            // keep the drop-in active for other events; resolve once mounted
+            if (event?.type === "UI_READY") {
+              resolve(true);
+            }
+          };
 
-          if (event.type === "PAYMENT_ERROR") {
-            showToast("Payment failed or cancelled");
-            cfBox.style.display = "none";
-            cfBox.innerHTML = "";
-          }
+          // Some Cashfree SDKs expect initialiseDropin to accept a container + options + callback
+          // Others return a promise. We call with callback and also set a fallback timeout.
+          cashfree.initialiseDropin(
+            cfBox,
+            {
+              paymentSessionId: data.payment_session_id,
+              redirectTarget: "_self",
+              ui: { theme: "light" }
+            },
+            cb
+          );
+
+          // fallback: if UI_READY didn't fire within 8s, resolve anyway (but keep drop-in active)
+          const fallback = setTimeout(() => {
+            console.warn("CF dropin UI_READY timeout — proceeding anyway");
+            try { if (loader && loader.parentNode) loader.remove(); } catch(e){}
+            resolve(true);
+          }, 8000);
+
+          // clear fallback when promise resolved
+          const originalResolve = resolve;
+          resolve = (v) => { clearTimeout(fallback); originalResolve(v); };
+        } catch (err) {
+          reject(err);
         }
-      );
+      });
+
     } catch (err) {
-      showToast("Payment UI error");
-      cfBox.style.display = "none";
+      console.error("DROPIN ERROR:", err);
+      // cleanup and show message
+      try { cfBox.style.display = "none"; cfBox.innerHTML = ""; } catch (e) {}
+      return showToast("Payment UI error");
     }
   }
 
-  // Init
+  // init
   initMenu();
   renderCart();
 })();
