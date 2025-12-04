@@ -1,7 +1,4 @@
-// /home/script.js — Fixed for Cashfree v3 (recommended)
-// - Uses Cashfree v3 SDK: https://sdk.cashfree.com/js/v3/cashfree.js
-// - Expects backend POST /create-cashfree-order to return:
-//   { ok: true, orderId, payment_session_id }  OR  { ok:true, redirectUrl }
+// /home/script.js — Updated for embedded Cashfree Drop-in (Production)
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -157,7 +154,6 @@
 
   function flyToCart(img) {
     try {
-      if (!img) return;
       const r = img.getBoundingClientRect();
       const c = img.cloneNode(true);
       c.style.position = "fixed";
@@ -170,7 +166,8 @@
       document.body.appendChild(c);
       const target = $("#bottomCartBtn").getBoundingClientRect();
       requestAnimationFrame(() => {
-        c.style.transform = `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
+        c.style.transform =
+          `translate(${target.left - r.left}px, ${target.top - r.top}px) scale(.2)`;
         c.style.opacity = "0";
       });
       setTimeout(() => c.remove(), 700);
@@ -197,7 +194,7 @@
     cart = []; saveLocal(); renderCart(); showToast("Cart cleared");
   });
 
-  /* ---------- PAY (REDIRECT SAME-TAB) ---------- */
+  /* ---------- PAY (EMBEDDED DROP-IN) ---------- */
   $("#checkoutBtn")?.addEventListener("click", startCheckout);
 
   async function startCheckout() {
@@ -207,88 +204,96 @@
     const user = auth.currentUser;
     if (!user) return showToast("Please login");
 
-    showToast("Starting payment...");
+    showToast("Loading payment...");
 
     const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
     const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
 
-    // build payload for backend
-    const payload = { amount, items, phone: user.uid, email: user.email || "guest@sh.com" };
-    console.log("➡ create-cashfree payload:", payload);
+    const payload = {
+      amount,
+      items,
+      phone: user.uid,
+      email: user.email || "guest@sh.com",
+    };
 
     let res;
     try {
       res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error("Network error:", err);
       return showToast("Payment network error");
     }
 
     const data = await res.json().catch(() => ({}));
-    console.log("⬅ create-cashfree response:", data);
 
-    // 1) Preferred redirect URL flow (if backend returns hosted checkout url)
-    if (data.ok && data.redirectUrl) {
-      window.location.href = data.redirectUrl;
-      return;
+    // ❌ No more redirect  
+    // ❌ No checkout redirect  
+    // ✔ Embedded Drop-in Only  
+    if (!data.ok || !data.payment_session_id) {
+      return showToast("Payment initialization failed");
     }
 
-    // 2) Payment session flow using Cashfree v3 SDK (official)
-    // NOTE: Use Cashfree() factory (not `new`) and call checkout(...)
-    if (data.ok && data.payment_session_id) {
-      try {
-        // mode: "sandbox" for testing, "production" for live. Choose according to your CF_MODE.
-        const cashfree = Cashfree({ mode: "production" });
+    // Close cart sheet immediately
+    closeSheet();
 
-        cashfree.checkout({
+    // Open fullscreen container
+    const cfBox = document.getElementById("cf-fullscreen");
+    cfBox.style.display = "block";
+    cfBox.innerHTML = "<h3 style='text-align:center;margin:20px 0;'>Loading Payment...</h3>";
+
+    try {
+      const cashfree = Cashfree({ mode: "production" });
+
+      cashfree.initialiseDropin(
+        cfBox,
+        {
           paymentSessionId: data.payment_session_id,
-          // open in same tab
-          redirectTarget: "_self"
-        });
+          redirectTarget: "_self",
+        },
+        async (event) => {
+          console.log("CF:", event);
 
-        // SDK will handle redirect, so return here
-        return;
-      } catch (err) {
-        console.error("Cashfree SDK error:", err);
-        // fallback to a user message
-        return showToast("Payment system not ready — try again");
-      }
+          if (event.type === "PAYMENT_SUCCESS") {
+            showToast("Verifying payment...");
+
+            const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: event.order.orderId }),
+            });
+
+            const v = await vr.json().catch(() => ({}));
+
+            if (v.ok) {
+              showToast("Order confirmed 🎉");
+              cart = [];
+              saveLocal();
+              renderCart();
+            } else {
+              showToast("Verification failed");
+            }
+
+            cfBox.style.display = "none";
+            cfBox.innerHTML = "";
+          }
+
+          if (event.type === "PAYMENT_ERROR") {
+            showToast("Payment failed or cancelled");
+            cfBox.style.display = "none";
+            cfBox.innerHTML = "";
+          }
+        }
+      );
+    } catch (err) {
+      showToast("Payment UI error");
+      cfBox.style.display = "none";
     }
-
-    // If none of the above, show error
-    console.error("No redirectUrl and no payment_session_id:", data);
-    showToast("Payment initialization failed");
   }
 
-  /* listen for post message verification (optional) */
-  window.addEventListener("message", async (e) => {
-    const msg = e.data;
-    if (msg?.paymentStatus === "SUCCESS" && msg.orderId) {
-      showToast("Verifying payment...");
-      try {
-        const vr = await fetch(`${SERVER_URL}/verify-cashfree-payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: msg.orderId })
-        });
-        const v = await vr.json().catch(()=>({}));
-        if (v.ok) {
-          showToast("Order confirmed 🎉");
-          cart = []; saveLocal(); renderCart(); closeSheet();
-        } else {
-          showToast("Verification failed");
-        }
-      } catch (err) {
-        console.error("verify network error", err);
-      }
-    }
-  });
-
-  // init
+  // Init
   initMenu();
   renderCart();
 })();
