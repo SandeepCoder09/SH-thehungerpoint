@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <title>Settings — The Hunger Point</title>
@@ -11,8 +10,10 @@
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- Global styles -->
+  <!-- Global Styles -->
   <link rel="stylesheet" href="/home/style.css">
+
+  <!-- Settings CSS -->
   <link rel="stylesheet" href="/settings/settings.css">
 </head>
 
@@ -35,41 +36,33 @@
     <!-- SETTINGS LIST -->
     <section class="settings-list">
 
-      <!-- USER PROFILE -->
-      <a href="/profile/profile.html" class="settings-link">
-        <div class="settings-item">
-          <i class="ri-user-line settings-icon"></i>
-          <div>
-            <h4>User Profile</h4>
-            <small>Edit profile & preferences</small>
-          </div>
-          <i class="ri-arrow-right-s-line settings-arrow"></i>
+      <a href="/profile/index.html" class="settings-item">
+        <i class="ri-user-line settings-icon"></i>
+        <div>
+          <h4>User Profile</h4>
+          <small>Edit profile & preferences</small>
         </div>
+        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
       </a>
 
-      <!-- CHANGE PASSWORD -->
       <div class="settings-item" id="changePassword">
         <i class="ri-lock-password-line settings-icon"></i>
         <div>
           <h4>Change Password</h4>
           <small>Update your login password</small>
         </div>
-        <i class="ri-arrow-right-s-line settings-arrow"></i>
+        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
       </div>
 
-      <!-- FAQs -->
-      <a href="/settings/faqs.html" class="settings-link">
-        <div class="settings-item">
-          <i class="ri-questionnaire-line settings-icon"></i>
-          <div>
-            <h4>FAQs</h4>
-            <small>Common questions</small>
-          </div>
-          <i class="ri-arrow-right-s-line settings-arrow"></i>
+      <a href="/settings/faqs.html" class="settings-item">
+        <i class="ri-questionnaire-line settings-icon"></i>
+        <div>
+          <h4>FAQs</h4>
+          <small>Common questions</small>
         </div>
+        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
       </a>
 
-      <!-- NOTIFICATIONS -->
       <div class="settings-item">
         <i class="ri-notification-3-line settings-icon"></i>
         <div>
@@ -83,29 +76,26 @@
         </label>
       </div>
 
-      <!-- LOGOUT -->
-      <a href="/auth/logout.html" class="settings-link">
-        <div class="settings-item">
-          <i class="ri-logout-box-line settings-icon danger"></i>
-          <div>
-            <h4>Logout</h4>
-            <small>Sign out of your account</small>
-          </div>
+      <div class="settings-item" id="logoutBtn">
+        <i class="ri-logout-box-line settings-icon danger"></i>
+        <div>
+          <h4>Logout</h4>
+          <small>Sign out of your account</small>
         </div>
-      </a>
+        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
+      </div>
 
     </section>
 
-    <!-- WHATSAPP HELP -->
+    <!-- WHATSAPP SUPPORT -->
     <section class="settings-help-box">
-      Need help? Message us on <strong>WhatsApp</strong>
+      Need help? Message us on WhatsApp —
+      <strong>WhatsApp</strong>
     </section>
-
   </main>
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-
     <a href="/home/index.html" class="bn-item" data-nav="home">
       <i class="ri-home-5-line"></i><small>Home</small>
     </a>
@@ -126,10 +116,8 @@
     <a href="/settings/index.html" class="bn-item" data-nav="settings">
       <i class="ri-settings-3-line"></i><small>Setting</small>
     </a>
-
   </nav>
 
-  <!-- Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Firebase -->
@@ -137,14 +125,39 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <!-- Config & Protection -->
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
 
-  <!-- Home Script -->
+  <!-- Home Script (for cart badge) -->
   <script src="/home/script.js"></script>
 
-  <!-- Settings Script -->
+  <!-- Settings JS -->
   <script src="/settings/settings.js"></script>
+
+  <!-- Bottom Nav Active Glow -->
+  <script>
+    const path = window.location.pathname;
+
+    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
+      if (path.includes(el.dataset.nav)) {
+        el.classList.add("active");
+      }
+    });
+
+    function updateCartBadge() {
+      let cart = [];
+      try { cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || []; } catch(e) {}
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const badge = document.getElementById("cartBadge");
+
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "block" : "none";
+    }
+
+    updateCartBadge();
+    document.addEventListener("cart-updated", updateCartBadge);
+  </script>
 
 </body>
 </html>
