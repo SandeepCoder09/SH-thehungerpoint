@@ -172,4 +172,5 @@ input:checked + .slider:before {
 
 a {
    text-decoration: none;
+   color: black;
 }
