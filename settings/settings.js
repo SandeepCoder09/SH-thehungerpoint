@@ -2,25 +2,27 @@
 
 (function () {
 
-  // DOM
+  // DOM ELEMENTS
   const userName = document.getElementById("userName");
   const userEmail = document.getElementById("userEmail");
   const userAvatar = document.getElementById("userAvatar");
 
-  const openProfile = document.getElementById("openProfile");
   const changePassword = document.getElementById("changePassword");
-  const openFaqs = document.getElementById("openFaqs");
   const notifToggle = document.getElementById("notifToggle");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // Toast
+  // Toast System
   function toast(msg) {
     const c = document.getElementById("toast-container");
+    if (!c) return alert(msg);
+
     const el = document.createElement("div");
     el.className = "toast";
     el.textContent = msg;
     c.appendChild(el);
+
     setTimeout(() => el.classList.add("show"), 30);
+
     setTimeout(() => {
       el.classList.remove("show");
       setTimeout(() => el.remove(), 200);
@@ -31,7 +33,7 @@
   let userDocRef = null;
 
   // -------------------------------------
-  // LOAD USER DATA FROM FIRESTORE (LIVE)
+  // LOAD USER DATA — FIREBASE COMPAT
   // -------------------------------------
   firebase.auth().onAuthStateChanged(async (user) => {
     if (!user) {
@@ -40,15 +42,18 @@
     }
 
     currentUser = user;
+
+    // Firestore reference
     userDocRef = firebase.firestore().collection("users").doc(user.uid);
 
-    // Live updates
+    // Live snapshot
     userDocRef.onSnapshot((doc) => {
       if (!doc.exists) return;
 
       const data = doc.data();
+
       userName.textContent = data.name || "USER NAME";
-      userEmail.textContent = user.email || "example@email.com";
+      userEmail.textContent = user.email || "email@example.com";
       userAvatar.src = data.photoURL || "/home/SH-Favicon.png";
 
       // Restore FCM toggle
@@ -57,12 +62,8 @@
   });
 
   // -------------------------------------
-  // NAVIGATION
+  // CHANGE PASSWORD
   // -------------------------------------
-  openProfile.onclick = () => {
-    window.location.href = "/profile/index.html";
-  };
-
   changePassword.onclick = async () => {
     if (!currentUser) return;
 
@@ -70,46 +71,47 @@
       await firebase.auth().sendPasswordResetEmail(currentUser.email);
       toast("Password reset link sent!");
     } catch (err) {
+      console.error(err);
       toast("Failed to send reset email");
     }
   };
 
-  openFaqs.onclick = () => {
-    window.location.href = "/settings/faqs.html";
-  };
-
   // -------------------------------------
-  // FCM REAL NOTIFICATIONS
+  // NOTIFICATIONS (FCM)
   // -------------------------------------
   const messaging = firebase.messaging();
 
   notifToggle.addEventListener("change", async () => {
     if (notifToggle.checked) {
-      // Request permission
+      // Ask browser permission
       const permission = await Notification.requestPermission();
+
       if (permission !== "granted") {
         notifToggle.checked = false;
         toast("Permission denied");
         return;
       }
 
-      // Get FCM token
       try {
+        // Get FCM token
         const token = await messaging.getToken({
-          vapidKey: "BDvFl7D2Z7SkLkq8G8JHqJl...your-vapid-key..."
+          vapidKey: "YOUR_FCM_VAPID_KEY_HERE"
         });
 
         if (!token) {
-          toast("Unable to get token");
           notifToggle.checked = false;
+          toast("Failed to get token");
           return;
         }
 
-        // Save token
-        await userDocRef.set({
-          fcmEnabled: true,
-          fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
-        }, { merge: true });
+        // Save token in Firestore
+        await userDocRef.set(
+          {
+            fcmEnabled: true,
+            fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+          },
+          { merge: true }
+        );
 
         toast("Notifications Enabled");
 
@@ -130,8 +132,13 @@
   // LOGOUT
   // -------------------------------------
   logoutBtn.onclick = async () => {
-    await firebase.auth().signOut();
-    window.location.href = "/auth/login.html";
+    try {
+      await firebase.auth().signOut();
+      window.location.href = "/auth/login.html";
+    } catch (err) {
+      console.error(err);
+      toast("Error logging out");
+    }
   };
 
 })();
