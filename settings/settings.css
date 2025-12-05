@@ -169,3 +169,7 @@ input:checked + .slider:before {
   font-weight: 600;
   border: 1.5px solid #E23744;
 }
+
+a {
+   text-decoration: none;
+}
