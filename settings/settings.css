@@ -1,130 +1,170 @@
-:root {
-  --primary: #d33030;
-  --text-dark: #222;
-  --text-light: #777;
-  --card-bg: #fff;
-  --radius: 16px;
-  --shadow: 0 10px 30px rgba(0,0,0,0.06);
-}
-
-body {
-  background: #f7f7f7;
-  padding: 20px;
-  font-family: Inter, sans-serif;
-}
+/* ============================================
+   SETTINGS PAGE — SH Premium Gradient Theme
+===============================================*/
 
 .settings-container {
-  max-width: 480px;
+  padding: 20px;
+  padding-bottom: 120px;
+  max-width: 600px;
   margin: auto;
 }
 
-/* Top Card */
+/* TOP CARD */
 .settings-top-card {
-  background: var(--primary);
-  padding: 30px 20px;
-  border-radius: 26px;
-  color: #fff;
+  background: linear-gradient(180deg, #E23744, #c82432);
+  padding: 28px;
+  border-radius: 20px;
   text-align: center;
-  margin-bottom: 20px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(226, 55, 68, 0.35);
+  margin-bottom: 25px;
+}
+
+.settings-avatar-wrap {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .settings-avatar-wrap img {
-  width: 90px;
-  height: 90px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: white;
-  padding: 6px;
-  margin-bottom: 12px;
 }
 
-/* Settings List */
+.settings-user-info h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.settings-user-info p {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* LIST SECTION */
 .settings-list {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* SETTINGS ITEM */
 .settings-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 20px;
-  border-bottom: 1px solid #f2f2f2;
-  cursor: pointer;
+  gap: 16px;
+  background: #fff;
+  padding: 18px 18px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.2s ease;
 }
 
-.settings-item:last-child {
-  border-bottom: none;
+.settings-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(226, 55, 68, 0.25);
 }
 
 .settings-icon {
-  font-size: 22px;
-  color: var(--primary);
-}
-
-.settings-arrow {
-  margin-left: auto;
-  font-size: 18px;
-  color: #aaa;
-}
-
-.settings-item h4 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.settings-item small {
-  color: var(--text-light);
+  font-size: 26px;
+  color: #E23744;
+  min-width: 30px;
 }
 
 .settings-icon.danger {
-  color: #d9534f;
+  color: #cc1e28;
 }
 
-/* Switch Toggle */
-.switch {
-  position: relative;
-  width: 42px;
-  height: 22px;
+/* TEXT */
+.settings-item h4 {
+  font-size: 16px;
+  font-weight: 700;
 }
+
+.settings-item small {
+  font-size: 13px;
+  color: #666;
+}
+
+/* RIGHT ARROW */
+.settings-arrow {
+  margin-left: auto;
+  font-size: 22px;
+  color: #bbb;
+}
+
+.red-arrow {
+  color: #E23744 !important;
+}
+
+/* SWITCH (for notifications) */
+.switch {
+  margin-left: auto;
+  position: relative;
+  width: 48px;
+  height: 24px;
+}
+
 .switch input {
   display: none;
 }
+
 .slider {
   position: absolute;
   cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: #ccc;
-  border-radius: 50px;
-  inset: 0;
-  transition: .3s;
-}
-.slider::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  background: white;
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  border-radius: 50%;
-  transition: .3s;
-}
-input:checked + .slider {
-  background: var(--primary);
-}
-input:checked + .slider::before {
-  transform: translateX(20px);
+  border-radius: 30px;
+  transition: 0.3s;
 }
 
-/* Help Box */
+.slider:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 2px;
+  top: 2px;
+  background: #fff;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background: #E23744;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* WHATSAPP BOX */
 .settings-help-box {
-  margin-top: 18px;
+  margin-top: 30px;
   padding: 18px;
-  background: white;
-  border-radius: var(--radius);
-  text-align: center;
-  color: var(--text-dark);
+  background: #fff;
+  border-radius: 16px;
   font-size: 15px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.settings-help-box strong {
+  color: #25D366;
+  font-weight: 700;
+}
+
+/* REMOVE underline for links */
+a {
+  text-decoration: none !important;
+  color: inherit;
 }
