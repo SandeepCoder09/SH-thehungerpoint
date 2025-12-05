@@ -13,8 +13,6 @@
 
   <!-- Global styles -->
   <link rel="stylesheet" href="/home/style.css">
-
-  <!-- Settings page CSS -->
   <link rel="stylesheet" href="/settings/settings.css">
 </head>
 
@@ -37,17 +35,19 @@
     <!-- SETTINGS LIST -->
     <section class="settings-list">
 
-      <a href="/profile/profile.html">
-      <div class="settings-item" id="openProfile">
-        <i class="ri-user-line settings-icon"></i>
-        <div>
-          <h4>User Profile</h4>
-          <small>Edit profile & preferences</small>
-        </div> </a>
-        
-        <i class="ri-arrow-right-s-line settings-arrow"></i>
-      </div>
+      <!-- USER PROFILE -->
+      <a href="/profile/profile.html" class="settings-link">
+        <div class="settings-item">
+          <i class="ri-user-line settings-icon"></i>
+          <div>
+            <h4>User Profile</h4>
+            <small>Edit profile & preferences</small>
+          </div>
+          <i class="ri-arrow-right-s-line settings-arrow"></i>
+        </div>
+      </a>
 
+      <!-- CHANGE PASSWORD -->
       <div class="settings-item" id="changePassword">
         <i class="ri-lock-password-line settings-icon"></i>
         <div>
@@ -56,18 +56,20 @@
         </div>
         <i class="ri-arrow-right-s-line settings-arrow"></i>
       </div>
-      
-     <a href="/settings/faqs.html">
-      <div class="settings-item" id="openFaqs">
-        <i class="ri-questionnaire-line settings-icon"></i>
-        <div>
-          <h4>FAQs</h4>
-          <small>Common questions</small>
-        </div> </a>
-        
-        <i class="ri-arrow-right-s-line settings-arrow"></i>
-      </div>
 
+      <!-- FAQs -->
+      <a href="/settings/faqs.html" class="settings-link">
+        <div class="settings-item">
+          <i class="ri-questionnaire-line settings-icon"></i>
+          <div>
+            <h4>FAQs</h4>
+            <small>Common questions</small>
+          </div>
+          <i class="ri-arrow-right-s-line settings-arrow"></i>
+        </div>
+      </a>
+
+      <!-- NOTIFICATIONS -->
       <div class="settings-item">
         <i class="ri-notification-3-line settings-icon"></i>
         <div>
@@ -81,26 +83,29 @@
         </label>
       </div>
 
-      <a href="/auth/login.html">
-      <div class="settings-item" id="logoutBtn">
-        <i class="ri-logout-box-line settings-icon danger"></i>
-        <div>
-          <h4>Logout</h4>
-          <small>Sign out of your account</small>
-        </div> </a>
-      </div>
+      <!-- LOGOUT -->
+      <a href="/auth/logout.html" class="settings-link">
+        <div class="settings-item">
+          <i class="ri-logout-box-line settings-icon danger"></i>
+          <div>
+            <h4>Logout</h4>
+            <small>Sign out of your account</small>
+          </div>
+        </div>
+      </a>
 
     </section>
 
-    <!-- WHATSAPP SECTION -->
+    <!-- WHATSAPP HELP -->
     <section class="settings-help-box">
-      Need help? Message us on WhatsApp —
-      <strong>WhatsApp</strong>
+      Need help? Message us on <strong>WhatsApp</strong>
     </section>
+
   </main>
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
+
     <a href="/home/index.html" class="bn-item" data-nav="home">
       <i class="ri-home-5-line"></i><small>Home</small>
     </a>
@@ -121,16 +126,16 @@
     <a href="/settings/index.html" class="bn-item" data-nav="settings">
       <i class="ri-settings-3-line"></i><small>Setting</small>
     </a>
+
   </nav>
 
   <!-- Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Firebase COMPAT -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
   <script src="/auth/firebase-config.js"></script>
   <script src="/auth/protect.js"></script>
@@ -138,7 +143,7 @@
   <!-- Home Script -->
   <script src="/home/script.js"></script>
 
-  <!-- Settings JS -->
+  <!-- Settings Script -->
   <script src="/settings/settings.js"></script>
 
 </body>
