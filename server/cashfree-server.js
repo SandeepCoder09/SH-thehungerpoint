@@ -209,6 +209,33 @@ app.get("/admin/active-orders", adminAuth, async (req, res) => {
 });
 
 /* -------------------------------------------------
+   Create Test Order (Admin Panel)
+------------------------------------------------- */
+app.post("/create-test-order", adminAuth, async (req, res) => {
+  try {
+    const orderId = "TEST-" + Date.now();
+
+    await db.collection("orders").doc(orderId).set({
+      orderId,
+      items: [
+        { name: "Momo", qty: 1, price: 10 }
+      ],
+      totalAmount: 10,
+      status: "preparing",
+      riderId: null,
+      customerName: "Test User",
+      createdAt: admin.firestore.Timestamp.now(),
+      updatedAt: admin.firestore.Timestamp.now()
+    });
+
+    return res.json({ ok: true, orderId });
+  } catch (err) {
+    console.error("Test order creation failed:", err);
+    return res.status(500).json({ ok: false, error: "Server error creating test order" });
+  }
+});
+
+/* -------------------------------------------------
    Rider Login
 ------------------------------------------------- */
 
