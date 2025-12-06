@@ -152,6 +152,63 @@ app.post("/admin/login", async (req, res) => {
 });
 
 /* -------------------------------------------------
+   ⭐ ADMIN AUTH MIDDLEWARE + /admin/verify  (NEW)
+------------------------------------------------- */
+
+function adminAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    if (!authHeader) return res.status(401).json({ ok: false, error: "Missing token" });
+
+    const parts = String(authHeader).split(" ");
+    const token = parts.length === 2 ? parts[1] : parts[0];
+
+    if (!token) return res.status(401).json({ ok: false, error: "Missing token" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.admin = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ ok: false, error: "Invalid token" });
+  }
+}
+
+// ⭐ NEW: used by frontend to confirm admin session is valid
+app.get("/admin/verify", adminAuth, (req, res) => {
+  res.json({ ok: true, email: req.admin.email });
+});
+
+/* -------------------------------------------------
+   Active Orders (Admin Panel)
+   ⭐ (You can add adminAuth here too if you want)
+------------------------------------------------- */
+
+app.get("/admin/active-orders", adminAuth, async (req, res) => {
+  try {
+    const arr = [];
+    const snap = await db.collection("orders").get();
+
+    snap.forEach((d) => {
+      const x = d.data();
+      arr.push({
+        orderId: d.id,
+        status: x.status || "new",
+        riderId: x.riderId || null,
+        customerName: x.customerName || null,
+        riderLat: x.riderLoc?.lat || null,
+        riderLng: x.riderLoc?.lng || null,
+        customerLat: x.customerLoc?.lat || null,
+        customerLng: x.customerLoc?.lng || null
+      });
+    });
+
+    return res.json(arr);
+  } catch (err) {
+    return res.status(500).json({ ok: false });
+  }
+});
+
+/* -------------------------------------------------
    Rider Login
 ------------------------------------------------- */
 
