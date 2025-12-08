@@ -10,10 +10,8 @@
   <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- Global Styles -->
+  <!-- SH Global CSS -->
   <link rel="stylesheet" href="/home/style.css">
-
-  <!-- Settings CSS -->
   <link rel="stylesheet" href="/settings/settings.css">
 </head>
 
@@ -21,10 +19,9 @@
 
   <main class="settings-container">
 
-    <!-- TOP CARD -->
     <section class="settings-top-card">
       <div class="settings-avatar-wrap">
-        <img id="userAvatar" src="/home/SH-Favicon.png" alt="">
+        <img id="userAvatar" src="/home/SH-Favicon.png">
       </div>
 
       <div class="settings-user-info">
@@ -33,7 +30,6 @@
       </div>
     </section>
 
-    <!-- SETTINGS LIST -->
     <section class="settings-list">
 
       <a href="/profile/index.html" class="settings-item">
@@ -76,90 +72,25 @@
         </label>
       </div>
 
-      <a href="/auth/login.html">
-<div class="settings-item" id="logoutBtn">
+      <div class="settings-item" id="logoutBtn">
         <i class="ri-logout-box-line settings-icon danger"></i>
         <div>
           <h4>Logout</h4>
-          <small>Sign out of your account</small>
+          <small>Sign out</small>
         </div>
-        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
       </div>
-      </a>
 
     </section>
 
-    <!-- WHATSAPP SUPPORT -->
-    <section class="settings-help-box">
-      Need help? Message us on WhatsApp —
-      <strong>WhatsApp</strong>
-    </section>
   </main>
-
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <a href="/home/index.html" class="bn-item" data-nav="home">
-      <i class="ri-home-5-line"></i><small>Home</small>
-    </a>
-
-    <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-      <i class="ri-file-list-3-line"></i><small>Orders</small>
-    </a>
-
-    <button class="bn-center" id="bottomCartBtn" data-nav="cart">
-      <i class="ri-shopping-cart-2-line"></i>
-      <span class="cart-badge" id="cartBadge">0</span>
-    </button>
-
-    <a href="/profile/index.html" class="bn-item" data-nav="profile">
-      <i class="ri-user-3-line"></i><small>Profile</small>
-    </a>
-
-    <a href="/settings/index.html" class="bn-item" data-nav="settings">
-      <i class="ri-settings-3-line"></i><small>Setting</small>
-    </a>
-  </nav>
 
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase Modular Loader -->
+  <script type="module" src="/auth/sh-auth.js"></script>
 
-  <!-- Config & Protection -->
-  <script src="/auth/firebase-config.js"></script>
-  <script src="/auth/protect.js"></script>
-
-  <!-- Home Script (for cart badge) -->
-  <script src="/home/script.js"></script>
-
-  <!-- Settings JS -->
-  <script src="/settings/settings.js"></script>
-
-  <!-- Bottom Nav Active Glow -->
-  <script>
-    const path = window.location.pathname;
-
-    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
-      if (path.includes(el.dataset.nav)) {
-        el.classList.add("active");
-      }
-    });
-
-    function updateCartBadge() {
-      let cart = [];
-      try { cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || []; } catch(e) {}
-      const count = cart.reduce((s, i) => s + i.qty, 0);
-      const badge = document.getElementById("cartBadge");
-
-      badge.textContent = count;
-      badge.style.display = count > 0 ? "block" : "none";
-    }
-
-    updateCartBadge();
-    document.addEventListener("cart-updated", updateCartBadge);
-  </script>
+  <!-- Settings Logic -->
+  <script type="module" src="/settings/settings.js"></script>
 
 </body>
 </html>
