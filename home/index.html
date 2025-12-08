@@ -19,27 +19,29 @@
 
   <!-- Firebase Boot (single source of truth) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { firebaseConfig } from "/home/firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { firebaseConfig } from "/home/firebase-config.js";
 
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    window.db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+window.auth = getAuth(app);
+window.db = getFirestore(app);
 
-    console.log("🔥 Firebase Loaded (Home)");
+console.log("🔥 Firebase Loaded (home)");
 
-    onAuthStateChanged(window.auth, (user) => {
-      if (!user) {
-        window.location.href = "/auth/login.html";
-        return;
-      }
-      import("/home/script.js").then(() =>
-        console.log("🟢 Home script.js Loaded Successfully")
-      );
-    });
-  </script>
+onAuthStateChanged(window.auth, (user) => {
+  if (!user) {
+    window.location.href = "/auth/login.html";
+    return;
+  }
+
+  // ⭐ Load script.js AFTER DOM is ready ⭐
+  window.addEventListener("DOMContentLoaded", () => {
+    import("/home/script.js").then(() => console.log("🟢 script.js ready"));
+  });
+});
+</script>
 </head>
 
 <body>
