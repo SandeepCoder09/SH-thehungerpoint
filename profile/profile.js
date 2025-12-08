@@ -1,121 +1,177 @@
-/* PROFILE PAGE — Uses SHAuth to load user + Firestore */
+// -----------------------------------------------------------
+// PROFILE PAGE — SH AUTH + FIRESTORE LIVE SYNC + CROP UPLOAD
+// -----------------------------------------------------------
 
-(function () {
+import {
+  doc,
+  onSnapshot,
+  updateDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const pfAvatar = document.getElementById('pfAvatar');
-  const changePhotoBtn = document.getElementById('changePhotoBtn');
-  const photoInput = document.getElementById('photoInput');
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-  const cropModal = document.getElementById('cropModal');
-  const cropImage = document.getElementById('cropImage');
-  const cancelCrop = document.getElementById('cancelCrop');
-  const saveCropped = document.getElementById('saveCropped');
+document.addEventListener("sh:user-ready", (e) => {
+  const user = e.detail;
+  if (!user) return (window.location.href = "/auth/login.html");
 
-  const nameInput = document.getElementById('name');
-  const emailInput = document.getElementById('email');
-  const genderSelect = document.getElementById('gender');
-  const phoneInput = document.getElementById('phone');
-  const addressInput = document.getElementById('address');
+  const db = window.SHAuth.db;
+  const auth = window.SHAuth.auth;
+  const storage = getStorage();
 
-  const displayName = document.getElementById('displayName');
-  const displayEmail = document.getElementById('displayEmail');
+  const uid = user.uid;
+  const userRef = doc(db, "users", uid);
 
-  const saveBtn = document.getElementById('saveBtn');
-  const resetPassBtn = document.getElementById('resetPassBtn');
+  // DOM
+  const pfAvatar = document.getElementById("pfAvatar");
+  const displayName = document.getElementById("displayName");
+  const displayEmail = document.getElementById("displayEmail");
 
-  let croppedBlob = null;
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const genderSelect = document.getElementById("gender");
+  const phoneInput = document.getElementById("phone");
+  const addressInput = document.getElementById("address");
+
+  const saveBtn = document.getElementById("saveBtn");
+  const resetPassBtn = document.getElementById("resetPassBtn");
+
+  const photoInput = document.getElementById("photoInput");
+  const changePhotoBtn = document.getElementById("changePhotoBtn");
+
+  // Toast
+  function toast(msg) {
+    const c = document.getElementById("toast-container");
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => el.classList.add("show"), 30);
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 200);
+    }, 2200);
+  }
+
+  // PRE-FILL EMAIL
+  emailInput.value = user.email;
+  displayEmail.textContent = user.email;
+
+  // ------------------------------------------------
+  // 📌 LIVE SYNC — AUTO LOAD PROFILE DATA
+  // ------------------------------------------------
+  onSnapshot(userRef, (snap) => {
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    nameInput.value = data.name || "";
+    genderSelect.value = data.gender || "";
+    phoneInput.value = data.phone || "";
+    addressInput.value = data.address || "";
+
+    displayName.textContent = data.name || "Your name";
+    pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
+  });
+
+  // ------------------------------------------------
+  // 📌 PHOTO UPLOAD + CROPPER (same as before)
+  // ------------------------------------------------
   let cropper = null;
+  let croppedBlob = null;
 
-  // Load UI when SHAuth.userData arrives
-  document.addEventListener("shauth-ready", () => {
-    const u = SHAuth.user;
-    const d = SHAuth.userData || {};
+  changePhotoBtn.onclick = () => photoInput.click();
 
-    emailInput.value = u.email;
-    displayEmail.textContent = u.email;
+  photoInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    document.getElementById("cropImage").src = URL.createObjectURL(file);
+    openCropper();
+  };
 
-    nameInput.value = d.name || "";
-    genderSelect.value = d.gender || "";
-    phoneInput.value = d.phone || "";
-    addressInput.value = d.address || "";
+  function openCropper() {
+    const modal = document.getElementById("cropModal");
+    modal.style.display = "flex";
 
-    pfAvatar.src = d.photoURL || "/home/SH-Favicon.png";
-    displayName.textContent = d.name || "Your name";
-  });
+    if (cropper) cropper.destroy();
 
-  // CROPPER
-  changePhotoBtn.addEventListener("click", () => photoInput.click());
-  photoInput.addEventListener("change", (e) => {
-    if (!e.target.files.length) return;
-    cropImage.src = URL.createObjectURL(e.target.files[0]);
+    cropper = new Cropper(document.getElementById("cropImage"), {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1
+    });
+  }
 
-    cropModal.style.display = "flex";
-    cropper = new Cropper(cropImage, { aspectRatio: 1, viewMode: 1 });
-  });
-
-  cancelCrop.onclick = () => closeCropper();
-
+  document.getElementById("cancelCrop").onclick = closeCropper;
   function closeCropper() {
-    cropModal.style.display = "none";
+    document.getElementById("cropModal").style.display = "none";
     if (cropper) cropper.destroy();
     cropper = null;
     croppedBlob = null;
+    photoInput.value = "";
   }
 
-  saveCropped.onclick = () => {
+  document.getElementById("saveCropped").onclick = () => {
     if (!cropper) return;
-
-    cropper.getCroppedCanvas({ width: 600 }).toBlob((blob) => {
+    cropper.getCroppedCanvas().toBlob((blob) => {
       croppedBlob = blob;
       pfAvatar.src = URL.createObjectURL(blob);
       closeCropper();
-    });
+    }, "image/jpeg", 0.85);
   };
 
-  // SAVE PROFILE
+  // ------------------------------------------------
+  // 📌 SAVE PROFILE
+  // ------------------------------------------------
   saveBtn.onclick = async () => {
-    const u = SHAuth.user;
-    const ref = firebase.firestore().collection("users").doc(u.uid);
-
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving...";
 
-    let photoURL = SHAuth.userData?.photoURL || null;
+    try {
+      let photoURL = null;
 
-    // Upload new photo if selected
-    if (croppedBlob) {
-      const storageRef = firebase.storage().ref(`profiles/${u.uid}/${Date.now()}.jpg`);
-      const uploadTask = storageRef.put(croppedBlob);
-      await uploadTask;
-      photoURL = await storageRef.getDownloadURL();
+      if (croppedBlob) {
+        const fileRef = ref(storage, `profiles/${uid}/${Date.now()}.jpg`);
+        const uploadTask = uploadBytesResumable(fileRef, croppedBlob);
+
+        uploadTask.on("state_changed", null, null, async () => {
+          photoURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          await updateDoc(userRef, { photoURL });
+        });
+      }
+
+      await updateDoc(userRef, {
+        name: nameInput.value.trim(),
+        gender: genderSelect.value,
+        phone: phoneInput.value.trim(),
+        address: addressInput.value.trim(),
+        ...(photoURL && { photoURL })
+      });
+
+      toast("Saved!");
+    } catch (e) {
+      toast("Save error");
     }
-
-    // Update Firestore
-    const updated = {
-      name: nameInput.value.trim(),
-      gender: genderSelect.value,
-      phone: phoneInput.value.trim(),
-      address: addressInput.value.trim(),
-      photoURL
-    };
-
-    await ref.set(updated, { merge: true });
-
-    // Update Firebase Auth
-    await u.updateProfile({
-      displayName: updated.name,
-      photoURL
-    });
 
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Profile";
-
-    alert("Profile saved!");
   };
 
+  // ------------------------------------------------
+  // 📌 PASSWORD RESET
+  // ------------------------------------------------
   resetPassBtn.onclick = async () => {
-    await firebase.auth().sendPasswordResetEmail(SHAuth.user.email);
-    alert("Password reset email sent!");
+    try {
+      await auth.sendPasswordResetEmail(user.email);
+      toast("Password reset sent");
+    } catch {
+      toast("Error sending email");
+    }
   };
-
-})();
+});
