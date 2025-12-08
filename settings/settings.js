@@ -1,8 +1,7 @@
-/* SETTINGS PAGE — Firebase COMPAT + FCM + Live User Data */
+/* SETTINGS PAGE — Uses SHAuth data */
 
 (function () {
 
-  // DOM ELEMENTS
   const userName = document.getElementById("userName");
   const userEmail = document.getElementById("userEmail");
   const userAvatar = document.getElementById("userAvatar");
@@ -11,134 +10,56 @@
   const notifToggle = document.getElementById("notifToggle");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // Toast System
-  function toast(msg) {
-    const c = document.getElementById("toast-container");
-    if (!c) return alert(msg);
+  // Load UI when SHAuth has user data
+  document.addEventListener("shauth-ready", () => {
+    const u = SHAuth.user;
+    const d = SHAuth.userData || {};
 
-    const el = document.createElement("div");
-    el.className = "toast";
-    el.textContent = msg;
-    c.appendChild(el);
+    userName.textContent = d.name || "USER NAME";
+    userEmail.textContent = u.email;
+    userAvatar.src = d.photoURL || "/home/SH-Favicon.png";
 
-    setTimeout(() => el.classList.add("show"), 30);
-
-    setTimeout(() => {
-      el.classList.remove("show");
-      setTimeout(() => el.remove(), 200);
-    }, 2200);
-  }
-
-  let currentUser = null;
-  let userDocRef = null;
-
-  // -------------------------------------
-  // LOAD USER DATA — FIREBASE COMPAT
-  // -------------------------------------
-  firebase.auth().onAuthStateChanged(async (user) => {
-    if (!user) {
-      window.location.href = "/auth/login.html";
-      return;
-    }
-
-    currentUser = user;
-
-    // Firestore reference
-    userDocRef = firebase.firestore().collection("users").doc(user.uid);
-
-    // Live snapshot
-    userDocRef.onSnapshot((doc) => {
-      if (!doc.exists) return;
-
-      const data = doc.data();
-
-      userName.textContent = data.name || "USER NAME";
-      userEmail.textContent = user.email || "email@example.com";
-      userAvatar.src = data.photoURL || "/home/SH-Favicon.png";
-
-      // Restore FCM toggle
-      notifToggle.checked = data.fcmEnabled === true;
-    });
+    notifToggle.checked = d.fcmEnabled === true;
   });
 
-  // -------------------------------------
-  // CHANGE PASSWORD
-  // -------------------------------------
+  // Change Password
   changePassword.onclick = async () => {
-    if (!currentUser) return;
-
-    try {
-      await firebase.auth().sendPasswordResetEmail(currentUser.email);
-      toast("Password reset link sent!");
-    } catch (err) {
-      console.error(err);
-      toast("Failed to send reset email");
-    }
+    await firebase.auth().sendPasswordResetEmail(SHAuth.user.email);
+    alert("Password reset email sent!");
   };
 
-  // -------------------------------------
-  // NOTIFICATIONS (FCM)
-  // -------------------------------------
+  // Push Notifications
   const messaging = firebase.messaging();
 
-  notifToggle.addEventListener("change", async () => {
-    if (notifToggle.checked) {
-      // Ask browser permission
-      const permission = await Notification.requestPermission();
+  notifToggle.onchange = async () => {
+    const u = SHAuth.user;
+    const ref = firebase.firestore().collection("users").doc(u.uid);
 
+    if (notifToggle.checked) {
+      const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         notifToggle.checked = false;
-        toast("Permission denied");
         return;
       }
 
-      try {
-        // Get FCM token
-        const token = await messaging.getToken({
-          vapidKey: "YOUR_FCM_VAPID_KEY_HERE"
-        });
+      const token = await messaging.getToken({
+        vapidKey: "YOUR_VAPID_KEY"
+      });
 
-        if (!token) {
-          notifToggle.checked = false;
-          toast("Failed to get token");
-          return;
-        }
-
-        // Save token in Firestore
-        await userDocRef.set(
-          {
-            fcmEnabled: true,
-            fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
-          },
-          { merge: true }
-        );
-
-        toast("Notifications Enabled");
-
-      } catch (err) {
-        console.error(err);
-        notifToggle.checked = false;
-        toast("Error enabling notifications");
-      }
+      await ref.set({
+        fcmEnabled: true,
+        fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+      }, { merge: true });
 
     } else {
-      // Disable notifications
-      await userDocRef.set({ fcmEnabled: false }, { merge: true });
-      toast("Notifications Disabled");
+      await ref.set({ fcmEnabled: false }, { merge: true });
     }
-  });
+  };
 
-  // -------------------------------------
-  // LOGOUT
-  // -------------------------------------
+  // Logout
   logoutBtn.onclick = async () => {
-    try {
-      await firebase.auth().signOut();
-      window.location.href = "/auth/login.html";
-    } catch (err) {
-      console.error(err);
-      toast("Error logging out");
-    }
+    await firebase.auth().signOut();
+    window.location.href = "/auth/login.html";
   };
 
 })();
