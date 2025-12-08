@@ -10,10 +10,8 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
-  <!-- Global SH styles -->
+  <!-- SH Global Styles -->
   <link rel="stylesheet" href="/home/style.css">
-
-  <!-- Profile Styles -->
   <link rel="stylesheet" href="/profile/profile.css" />
 </head>
 
@@ -50,7 +48,7 @@
       <!-- FORM -->
       <form id="profileForm" class="form-section" onsubmit="return false;">
         <label class="label">Full Name</label>
-        <input id="name" class="input" type="text" placeholder="Your full name">
+        <input id="name" class="input" type="text">
 
         <label class="label">Email</label>
         <input id="email" class="input" type="email" disabled>
@@ -64,10 +62,10 @@
         </select>
 
         <label class="label">Phone Number</label>
-        <input id="phone" class="input" type="text" placeholder="+91 99999 99999">
+        <input id="phone" class="input" type="text">
 
         <label class="label">Delivery Address</label>
-        <textarea id="address" class="input" rows="3" placeholder="Your address"></textarea>
+        <textarea id="address" class="input" rows="3"></textarea>
 
         <div class="profile-actions">
           <button id="saveBtn" class="btn primary" type="button">Save Profile</button>
@@ -99,80 +97,14 @@
     </div>
   </div>
 
-  <!-- OVERLAY (unused but kept for SH) -->
-  <div id="overlay" class="overlay"></div>
-
-  <!-- CART SHEET (kept from original) -->
-  <div id="cartSheet" class="cart-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <h3>Your Cart</h3>
-      <button id="closeSheet" class="cart-close-btn">✕</button>
-    </div>
-    <div id="cartItems" class="cart-items">
-      <p class="empty">Cart is empty</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total-text">
-        Total: <span id="cartTotal">₹0</span>
-      </div>
-      <div class="cart-footer-btns">
-        <button id="clearCart" class="btn-clear">Clear</button>
-        <button id="checkoutBtn" class="btn-checkout">Checkout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <a href="/home/index.html" class="bn-item" data-nav="home">
-      <i class="ri-home-5-line"></i><small>Home</small>
-    </a>
-
-    <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-      <i class="ri-file-list-3-line"></i><small>Orders</small>
-    </a>
-
-    <button class="bn-center" id="bottomCartBtn" data-nav="cart">
-      <i class="ri-shopping-cart-2-line"></i>
-      <span class="cart-badge" id="cartBadge">0</span>
-    </button>
-
-    <a href="/profile/index.html" class="bn-item" data-nav="profile">
-      <i class="ri-user-3-line"></i><small>Profile</small>
-    </a>
-
-    <a href="/settings/index.html" class="bn-item" data-nav="settings">
-      <i class="ri-settings-3-line"></i><small>Setting</small>
-    </a>
-  </nav>
-
-  <!-- Toast container -->
-  <div id="toast-container" class="toast-container"></div>
-
-  <!-- Cashfree fullscreen (kept) -->
-  <div id="cf-fullscreen"
-       style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
-  </div>
-
-  <!-- Firebase COMPAT -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-  <!-- SH Firebase Config + Protect -->
-  <script src="/auth/firebase-config.js"></script>
-  <script src="/auth/protect.js"></script>
-
-  <!-- SH cart + home script -->
-  <script src="/home/script.js"></script>
+  <!-- Firebase Modular (ONLY ONCE) -->
+  <script type="module" src="/auth/sh-auth.js"></script>
 
   <!-- CropperJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-  <!-- Profile JS (separate file) -->
-  <script src="/profile/profile.js"></script>
+  <!-- Profile Logic -->
+  <script type="module" src="/profile/profile.js"></script>
 
 </body>
 </html>
