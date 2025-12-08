@@ -8,39 +8,36 @@
 
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <link rel="stylesheet" href="/home/style.css?v=8" />
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/home/style.css?v=10" />
 
-  <!-- ✅ Remix Icons (Correct Working CDN) -->
+  <!-- Remix Icons -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- Correct Cashfree v3 SDK -->
+  <!-- Cashfree v3 SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-  <!-- Protection JS -->
-  <script src="/auth/protect.js"></script>
-  <script type="module" src="/auth/sh-auth.js"></script>
-
-  <!-- Firebase + boot -->
+  <!-- Firebase (Modular Auto Loader) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { firebaseConfig } from "/home/firebase-config.js";
 
+    // Init Firebase (once)
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
     window.db = getFirestore(app);
 
     console.log("🔥 Firebase Loaded (home)");
-
-    onAuthStateChanged(window.auth, (user) => {
-      if (!user) {
-        window.location.href = "/auth/login.html";
-        return;
-      }
-      import("/home/script.js").then(() => console.log("🟢 script.js Loaded"));
-    });
   </script>
+
+  <!-- SH Auth Loader -->
+  <script type="module" src="/auth/sh-auth.js"></script>
+
+  <!-- Protect Page -->
+  <script src="/auth/protect.js"></script>
+
 </head>
 
 <body>
@@ -60,7 +57,6 @@
     </div>
   </header>
 
-  <!-- MAIN APP -->
   <main class="app-shell">
 
     <!-- HERO -->
@@ -70,7 +66,7 @@
 
       <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)" />
+        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)">
         <button class="search-icon">🔍</button>
       </div>
 
@@ -90,7 +86,7 @@
       <!-- ITEM 1 -->
       <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
         <div class="card-media">
-          <img src="/home/sh-momo.png" class="menu-img" alt="">
+          <img src="/home/sh-momo.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -98,6 +94,7 @@
             <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
           </div>
           <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -106,13 +103,14 @@
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
+
         </div>
       </article>
 
       <!-- ITEM 2 -->
       <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
         <div class="card-media">
-          <img src="/home/sh-french-fries.png" class="menu-img" alt="">
+          <img src="/home/sh-french-fries.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -120,6 +118,7 @@
             <div class="menu-price">₹10 <small>/ plate</small></div>
           </div>
           <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -128,13 +127,14 @@
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
+
         </div>
       </article>
 
       <!-- ITEM 3 -->
       <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
         <div class="card-media">
-          <img src="/home/sh-hot-tea.png" class="menu-img" alt="">
+          <img src="/home/sh-hot-tea.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -142,6 +142,7 @@
             <div class="menu-price">₹10 <small>/ cup</small></div>
           </div>
           <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -150,13 +151,14 @@
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
+
         </div>
       </article>
 
       <!-- ITEM 4 -->
       <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
         <div class="card-media">
-          <img src="/home/sh-bread-pakoda.png" class="menu-img" alt="">
+          <img src="/home/sh-bread-pakoda.png" class="menu-img">
         </div>
         <div class="card-body">
           <div class="card-row">
@@ -164,6 +166,7 @@
             <div class="menu-price">₹10 <small>/ pcs</small></div>
           </div>
           <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
+
           <div class="card-actions">
             <div class="qty-pill">
               <button class="qty-btn minus">−</button>
@@ -172,6 +175,7 @@
             </div>
             <button class="add-cart-btn">Add</button>
           </div>
+
         </div>
       </article>
 
@@ -191,10 +195,12 @@
     <div id="cartItems" class="cart-items">
       <p class="empty">Cart is empty</p>
     </div>
+
     <div class="cart-footer">
       <div class="cart-total-text">
         Total: <span id="cartTotal">₹0</span>
       </div>
+
       <div class="cart-footer-btns">
         <button id="clearCart" class="btn-clear">Clear</button>
         <button id="checkoutBtn" class="btn-checkout">Checkout</button>
@@ -206,13 +212,11 @@
   <nav class="bottom-nav">
 
     <a href="/home/index.html" class="bn-item" data-nav="home">
-      <i class="ri-home-5-line"></i>
-      <small>Home</small>
+      <i class="ri-home-5-line"></i><small>Home</small>
     </a>
 
     <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-      <i class="ri-file-list-3-line"></i>
-      <small>Orders</small>
+      <i class="ri-file-list-3-line"></i><small>Orders</small>
     </a>
 
     <button class="bn-center" id="bottomCartBtn" data-nav="cart">
@@ -221,33 +225,34 @@
     </button>
 
     <a href="/profile/index.html" class="bn-item" data-nav="profile">
-      <i class="ri-user-3-line"></i>
-      <small>Profile</small>
+      <i class="ri-user-3-line"></i><small>Profile</small>
     </a>
 
     <a href="/settings/index.html" class="bn-item" data-nav="settings">
-      <i class="ri-settings-3-line"></i>
-      <small>Setting</small>
+      <i class="ri-settings-3-line"></i><small>Setting</small>
     </a>
 
   </nav>
 
+  <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Cashfree fullscreen -->
+  <!-- Cashfree fullscreen container -->
   <div id="cf-fullscreen"
        style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
   </div>
 
-  <!-- Cart badge init -->
+  <!-- Initialize Cart Count (early) -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const b = document.getElementById('bottomCartBtn');
-      if (b && !b.hasAttribute('data-count')) b.setAttribute('data-count', 0);
+    document.addEventListener("DOMContentLoaded", () => {
+      const b = document.getElementById("bottomCartBtn");
+      if (b && !b.hasAttribute("data-count")) {
+        b.setAttribute("data-count", 0);
+      }
     });
   </script>
 
-  <!-- Active nav + cart badge -->
+  <!-- Active Nav + Cart Badge -->
   <script>
     const path = window.location.pathname;
 
@@ -276,13 +281,16 @@
     document.addEventListener("cart-updated", updateCartBadge);
   </script>
 
-<script type="module">
-import { requireUser } from "/auth/sh-auth.js";
+  <!-- Load Home Script AFTER everything is ready -->
+  <script type="module">
+    import { requireUser } from "/auth/sh-auth.js";
 
-requireUser((user) => {
-    // Use user data here
-});
-</script>
+    requireUser(() => {
+      import("/home/script.js")
+        .then(() => console.log("🟢 Home script ready"))
+        .catch((e) => console.error("script.js load error", e));
+    });
+  </script>
 
 </body>
 </html>
