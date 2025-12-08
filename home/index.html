@@ -8,7 +8,7 @@
 
   <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
 
-  <!-- Global Styles -->
+  <!-- Global CSS -->
   <link rel="stylesheet" href="/home/style.css?v=10" />
 
   <!-- Remix Icons -->
@@ -17,27 +17,29 @@
   <!-- Cashfree v3 SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
-  <!-- Firebase (Modular Auto Loader) -->
+  <!-- Firebase Boot (single source of truth) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { firebaseConfig } from "/home/firebase-config.js";
 
-    // Init Firebase (once)
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
     window.db = getFirestore(app);
 
-    console.log("🔥 Firebase Loaded (home)");
+    console.log("🔥 Firebase Loaded (Home)");
+
+    onAuthStateChanged(window.auth, (user) => {
+      if (!user) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
+      import("/home/script.js").then(() =>
+        console.log("🟢 Home script.js Loaded Successfully")
+      );
+    });
   </script>
-
-  <!-- SH Auth Loader -->
-  <script type="module" src="/auth/sh-auth.js"></script>
-
-  <!-- Protect Page -->
-  <script src="/auth/protect.js"></script>
-
 </head>
 
 <body>
@@ -53,10 +55,14 @@
     </div>
 
     <div class="header-actions">
-      <button class="lang-btn">🌐</button>
+      <!-- NEW Remix Icon -->
+      <button class="lang-btn">
+        <i class="ri-translate-2"></i>
+      </button>
     </div>
   </header>
 
+  <!-- MAIN APP -->
   <main class="app-shell">
 
     <!-- HERO -->
@@ -66,8 +72,13 @@
 
       <!-- SEARCH -->
       <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search" placeholder="Search dishes (momo, tea…)">
-        <button class="search-icon">🔍</button>
+        <input id="menuSearch" class="search-input" type="search"
+          placeholder="Search dishes (momo, tea…)" />
+
+        <!-- NEW Remix Icon -->
+        <button class="search-icon">
+          <i class="ri-search-line"></i>
+        </button>
       </div>
 
       <!-- CATEGORY CHIPS -->
@@ -93,7 +104,9 @@
             <h3 class="menu-title">Momo</h3>
             <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
           </div>
-          <p class="menu-desc">Steam-fresh dumplings — soft, juicy & spicy chutney.</p>
+          <p class="menu-desc">
+            Steam-fresh dumplings — soft, juicy & spicy chutney.
+          </p>
 
           <div class="card-actions">
             <div class="qty-pill">
@@ -101,9 +114,9 @@
               <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
+
             <button class="add-cart-btn">Add</button>
           </div>
-
         </div>
       </article>
 
@@ -117,7 +130,9 @@
             <h3 class="menu-title">Finger</h3>
             <div class="menu-price">₹10 <small>/ plate</small></div>
           </div>
-          <p class="menu-desc">Crispy fries, double-fried — tasty with ketchup.</p>
+          <p class="menu-desc">
+            Crispy fries, double-fried — tasty with ketchup.
+          </p>
 
           <div class="card-actions">
             <div class="qty-pill">
@@ -125,9 +140,9 @@
               <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
+
             <button class="add-cart-btn">Add</button>
           </div>
-
         </div>
       </article>
 
@@ -141,7 +156,9 @@
             <h3 class="menu-title">Hot Tea</h3>
             <div class="menu-price">₹10 <small>/ cup</small></div>
           </div>
-          <p class="menu-desc">Masala or ginger — aromatic & warming.</p>
+          <p class="menu-desc">
+            Masala or ginger — aromatic & warming.
+          </p>
 
           <div class="card-actions">
             <div class="qty-pill">
@@ -149,9 +166,9 @@
               <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
+
             <button class="add-cart-btn">Add</button>
           </div>
-
         </div>
       </article>
 
@@ -160,12 +177,16 @@
         <div class="card-media">
           <img src="/home/sh-bread-pakoda.png" class="menu-img">
         </div>
+
         <div class="card-body">
           <div class="card-row">
             <h3 class="menu-title">B.Pakoda</h3>
             <div class="menu-price">₹10 <small>/ pcs</small></div>
           </div>
-          <p class="menu-desc">Crispy, spiced batter — perfect chai snack.</p>
+
+          <p class="menu-desc">
+            Crispy, spiced batter — perfect chai snack.
+          </p>
 
           <div class="card-actions">
             <div class="qty-pill">
@@ -173,9 +194,9 @@
               <div class="qty-display">1</div>
               <button class="qty-btn plus">+</button>
             </div>
+
             <button class="add-cart-btn">Add</button>
           </div>
-
         </div>
       </article>
 
@@ -188,10 +209,12 @@
   <!-- CART SHEET -->
   <div id="cartSheet" class="cart-sheet">
     <div class="sheet-handle"></div>
+
     <div class="sheet-head">
       <h3>Your Cart</h3>
       <button id="closeSheet" class="cart-close-btn">✕</button>
     </div>
+
     <div id="cartItems" class="cart-items">
       <p class="empty">Cart is empty</p>
     </div>
@@ -200,7 +223,6 @@
       <div class="cart-total-text">
         Total: <span id="cartTotal">₹0</span>
       </div>
-
       <div class="cart-footer-btns">
         <button id="clearCart" class="btn-clear">Clear</button>
         <button id="checkoutBtn" class="btn-checkout">Checkout</button>
@@ -210,7 +232,6 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-
     <a href="/home/index.html" class="bn-item" data-nav="home">
       <i class="ri-home-5-line"></i><small>Home</small>
     </a>
@@ -231,66 +252,9 @@
     <a href="/settings/index.html" class="bn-item" data-nav="settings">
       <i class="ri-settings-3-line"></i><small>Setting</small>
     </a>
-
   </nav>
 
-  <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- Cashfree fullscreen container -->
-  <div id="cf-fullscreen"
-       style="position:fixed; inset:0; background:#fff; z-index:999999; display:none; overflow-y:auto; padding:20px; min-height:100vh;">
-  </div>
-
-  <!-- Initialize Cart Count (early) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const b = document.getElementById("bottomCartBtn");
-      if (b && !b.hasAttribute("data-count")) {
-        b.setAttribute("data-count", 0);
-      }
-    });
-  </script>
-
-  <!-- Active Nav + Cart Badge -->
-  <script>
-    const path = window.location.pathname;
-
-    document.querySelectorAll(".bottom-nav [data-nav]").forEach(el => {
-      if (path.includes(el.dataset.nav)) {
-        el.classList.add("active");
-      }
-    });
-
-    function updateCartBadge() {
-      let cart = [];
-      try {
-        cart = JSON.parse(localStorage.getItem("sh_cart_v1")) || [];
-      } catch(e) {}
-
-      const count = cart.reduce((s, i) => s + i.qty, 0);
-      const badge = document.getElementById("cartBadge");
-
-      if (badge) {
-        badge.textContent = count;
-        badge.style.display = count > 0 ? "block" : "none";
-      }
-    }
-
-    updateCartBadge();
-    document.addEventListener("cart-updated", updateCartBadge);
-  </script>
-
-  <!-- Load Home Script AFTER everything is ready -->
-  <script type="module">
-    import { requireUser } from "/auth/sh-auth.js";
-
-    requireUser(() => {
-      import("/home/script.js")
-        .then(() => console.log("🟢 Home script ready"))
-        .catch((e) => console.error("script.js load error", e));
-    });
-  </script>
 
 </body>
 </html>
