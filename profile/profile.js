@@ -1,6 +1,9 @@
-// -----------------------------------------------------------
-// PROFILE PAGE — SH AUTH + FIRESTORE LIVE SYNC + CROP UPLOAD
-// -----------------------------------------------------------
+// /profile/profile.js
+import {
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
   doc,
@@ -10,22 +13,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
-  getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-document.addEventListener("sh:user-ready", (e) => {
-  const user = e.detail;
-  if (!user) return (window.location.href = "/auth/login.html");
-
-  const db = window.SHAuth.db;
-  const auth = window.SHAuth.auth;
-  const storage = getStorage();
-
-  const uid = user.uid;
-  const userRef = doc(db, "users", uid);
+// Wait for auth
+document.addEventListener("sh-user-ready", async ({ detail: user }) => {
+  const auth = window.auth;
+  const db = window.db;
+  const storage = window.storage;
 
   // DOM
   const pfAvatar = document.getElementById("pfAvatar");
@@ -34,144 +31,135 @@ document.addEventListener("sh:user-ready", (e) => {
 
   const nameInput = document.getElementById("name");
   const emailInput = document.getElementById("email");
-  const genderSelect = document.getElementById("gender");
+  const genderInput = document.getElementById("gender");
   const phoneInput = document.getElementById("phone");
   const addressInput = document.getElementById("address");
 
   const saveBtn = document.getElementById("saveBtn");
-  const resetPassBtn = document.getElementById("resetPassBtn");
+  const resetBtn = document.getElementById("resetPassBtn");
 
+  const cropModal = document.getElementById("cropModal");
+  const cropImage = document.getElementById("cropImage");
   const photoInput = document.getElementById("photoInput");
   const changePhotoBtn = document.getElementById("changePhotoBtn");
 
-  // Toast
-  function toast(msg) {
-    const c = document.getElementById("toast-container");
-    const el = document.createElement("div");
-    el.className = "toast";
-    el.textContent = msg;
-    c.appendChild(el);
-    setTimeout(() => el.classList.add("show"), 30);
-    setTimeout(() => {
-      el.classList.remove("show");
-      setTimeout(() => el.remove(), 200);
-    }, 2200);
-  }
+  let cropper = null;
+  let croppedBlob = null;
 
-  // PRE-FILL EMAIL
-  emailInput.value = user.email;
-  displayEmail.textContent = user.email;
+  // -----------------------------------------
+  // LOAD USER SNAPSHOT
+  // -----------------------------------------
+  const userDocRef = doc(db, "users", user.uid);
 
-  // ------------------------------------------------
-  // 📌 LIVE SYNC — AUTO LOAD PROFILE DATA
-  // ------------------------------------------------
-  onSnapshot(userRef, (snap) => {
+  onSnapshot(userDocRef, (snap) => {
     if (!snap.exists()) return;
 
     const data = snap.data();
 
     nameInput.value = data.name || "";
-    genderSelect.value = data.gender || "";
+    genderInput.value = data.gender || "";
     phoneInput.value = data.phone || "";
     addressInput.value = data.address || "";
 
     displayName.textContent = data.name || "Your name";
+    displayEmail.textContent = user.email;
+    emailInput.value = user.email;
+
     pfAvatar.src = data.photoURL || "/home/SH-Favicon.png";
   });
 
-  // ------------------------------------------------
-  // 📌 PHOTO UPLOAD + CROPPER (same as before)
-  // ------------------------------------------------
-  let cropper = null;
-  let croppedBlob = null;
-
+  // -----------------------------------------
+  // PHOTO UPLOAD + CROPPER
+  -----------------------------------------
   changePhotoBtn.onclick = () => photoInput.click();
 
-  photoInput.onchange = (e) => {
-    const file = e.target.files[0];
+  photoInput.onchange = () => {
+    const file = photoInput.files[0];
     if (!file) return;
-    document.getElementById("cropImage").src = URL.createObjectURL(file);
-    openCropper();
+
+    cropImage.src = URL.createObjectURL(file);
+    cropModal.style.display = "flex";
+
+    if (cropper) cropper.destroy();
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1,
+      autoCropArea: 1,
+      viewMode: 1,
+    });
   };
 
-  function openCropper() {
-    const modal = document.getElementById("cropModal");
-    modal.style.display = "flex";
-
+  document.getElementById("cancelCrop").onclick = () => {
+    cropModal.style.display = "none";
     if (cropper) cropper.destroy();
-
-    cropper = new Cropper(document.getElementById("cropImage"), {
-      aspectRatio: 1,
-      viewMode: 1,
-      autoCropArea: 1
-    });
-  }
-
-  document.getElementById("cancelCrop").onclick = closeCropper;
-  function closeCropper() {
-    document.getElementById("cropModal").style.display = "none";
-    if (cropper) cropper.destroy();
-    cropper = null;
-    croppedBlob = null;
-    photoInput.value = "";
-  }
+  };
 
   document.getElementById("saveCropped").onclick = () => {
-    if (!cropper) return;
-    cropper.getCroppedCanvas().toBlob((blob) => {
+    cropper.getCroppedCanvas({
+      width: 700,
+      height: 700
+    }).toBlob((blob) => {
       croppedBlob = blob;
       pfAvatar.src = URL.createObjectURL(blob);
-      closeCropper();
-    }, "image/jpeg", 0.85);
+      cropModal.style.display = "none";
+      cropper.destroy();
+    });
   };
 
-  // ------------------------------------------------
-  // 📌 SAVE PROFILE
-  // ------------------------------------------------
+  // -----------------------------------------
+  // SAVE PROFILE
+  // -----------------------------------------
   saveBtn.onclick = async () => {
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving...";
 
-    try {
-      let photoURL = null;
+    let photoURL = null;
 
-      if (croppedBlob) {
-        const fileRef = ref(storage, `profiles/${uid}/${Date.now()}.jpg`);
-        const uploadTask = uploadBytesResumable(fileRef, croppedBlob);
+    // Upload new photo if needed
+    if (croppedBlob) {
+      const filePath = `profiles/${user.uid}/${Date.now()}.jpg`;
+      const storageRef = ref(storage, filePath);
 
-        uploadTask.on("state_changed", null, null, async () => {
+      const uploadTask = uploadBytesResumable(storageRef, croppedBlob);
+
+      await new Promise((resolve, reject) => {
+        uploadTask.on("state_changed", null, reject, async () => {
           photoURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-          await updateDoc(userRef, { photoURL });
+          resolve();
         });
-      }
-
-      await updateDoc(userRef, {
-        name: nameInput.value.trim(),
-        gender: genderSelect.value,
-        phone: phoneInput.value.trim(),
-        address: addressInput.value.trim(),
-        ...(photoURL && { photoURL })
       });
-
-      toast("Saved!");
-    } catch (e) {
-      toast("Save error");
     }
 
+    const updateData = {
+      name: nameInput.value,
+      gender: genderInput.value,
+      phone: phoneInput.value,
+      address: addressInput.value
+    };
+
+    if (photoURL) updateData.photoURL = photoURL;
+
+    await updateDoc(userDocRef, updateData);
+
+    if (updateData.name || updateData.photoURL) {
+      await updateProfile(user, {
+        displayName: updateData.name || user.displayName,
+        photoURL: updateData.photoURL || user.photoURL
+      });
+    }
+
+    croppedBlob = null;
     saveBtn.disabled = false;
     saveBtn.textContent = "Save Profile";
+
+    alert("Profile updated!");
   };
 
-  // ------------------------------------------------
-  // 📌 PASSWORD RESET
-  // ------------------------------------------------
-  resetPassBtn.onclick = async () => {
-    try {
-      await auth.sendPasswordResetEmail(user.email);
-      toast("Password reset sent");
-    } catch {
-      toast("Error sending email");
-    }
+  // -----------------------------------------
+  // PASSWORD RESET
+  // -----------------------------------------
+  resetBtn.onclick = async () => {
+    await sendPasswordResetEmail(auth, user.email);
+    alert("Password reset email sent!");
   };
+
 });
