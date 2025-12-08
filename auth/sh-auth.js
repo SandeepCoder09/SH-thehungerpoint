@@ -1,84 +1,69 @@
 // /auth/sh-auth.js
-// Modular Firebase bootstrap for SH — exports auth/db/storage and a waitForAuth() helper.
-// Place this as a module and load it before other modular page scripts.
+// Modular Firebase initializer + small auth helper for your app.
+// Exports: requireUser(callback) and getCurrentUser() (also sets window.auth/window.db)
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 import { firebaseConfig } from "/auth/firebase-config.js";
 
-// Initialize Firebase app (idempotent if called multiple times)
+// Initialize Firebase app if not already initialized
 let app;
-try {
+if (!getApps().length) {
   app = initializeApp(firebaseConfig);
-} catch (e) {
-  // initializeApp throws if already initialized — ignore
-  // but still continue to get services
-  // console.warn("Firebase already initialized");
+} else {
+  app = getApps()[0];
 }
 
-// Services
+// Expose modular auth & db on window for legacy scripts that expect window.auth/window.db
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
-
-// Expose globals for older scripts that rely on window.* (safe)
 window.auth = auth;
 window.db = db;
-window.storage = storage;
-
-// Ensure local persistence for auth by default (same device)
-try {
-  setPersistence(auth, browserLocalPersistence).catch(() => {});
-} catch (e) {}
-
-// When auth is ready, dispatch event; also keep a promise for waiters
-let _resolveReady;
-const _readyPromise = new Promise((resolve) => { _resolveReady = resolve; });
-
-function _notifyReady() {
-  // mark ready: set window.__sh_auth_ready__ and dispatch event
-  window.__sh_auth_ready__ = true;
-  _resolveReady(true);
-  try {
-    window.dispatchEvent(new Event("sh-auth-ready"));
-  } catch (e) {}
-}
-
-// monitor onAuthStateChanged to populate window.currentUser for compat
-onAuthStateChanged(auth, (user) => {
-  window.currentUser = user || null;
-  // always notify ready once we have run at least once
-  _notifyReady();
-});
-
-// safety: if onAuthStateChanged didn't fire within 2s, still notify so pages don't hang
-setTimeout(() => {
-  if (!window.__sh_auth_ready__) _notifyReady();
-}, 2000);
 
 /**
- * waitForAuth(timeoutMs)
- * Resolves when sh-auth is ready (auth and db exposed), or rejects on timeout.
+ * requireUser(cb)
+ * - cb receives the firebase user object when signed-in.
+ * - If user is already signed in, cb is invoked synchronously (but scheduled).
+ * - If not signed in, redirects to /auth/login.html (keeps current path in `next` param).
  */
-export async function waitForAuth(timeoutMs = 5000) {
-  if (window.__sh_auth_ready__) return Promise.resolve(true);
-  let timedOut = false;
-  const t = setTimeout(() => (timedOut = true), timeoutMs);
-  await _readyPromise;
-  clearTimeout(t);
-  if (timedOut) return Promise.reject(new Error("sh-auth: timeout"));
-  return true;
+export function requireUser(cb, opts = {}) {
+  // opts.allowRedirect (default true) - set false if caller wants to handle redirect itself
+  const allowRedirect = opts.allowRedirect !== false;
+
+  return new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        if (allowRedirect) {
+          const current = location.pathname + (location.search || "");
+          const encoded = encodeURIComponent(current);
+          location.href = `/auth/login.html?next=${encoded}`;
+          // don't resolve — page will navigate
+        } else {
+          // resolve null so caller can handle
+          unsub();
+          resolve(null);
+        }
+        return;
+      }
+
+      // Attach to window for any non-module code
+      window.currentUser = user;
+
+      // Small async dispatch so caller behaves uniformly
+      setTimeout(() => {
+        try { cb && cb(user); } catch (e) { console.error(e); }
+        unsub();
+        resolve(user);
+      }, 0);
+    });
+  });
 }
 
-// Export the services for module users
-export { auth, db, storage };
+// convenience getter
+export function getCurrentUser() {
+  return auth.currentUser || window.currentUser || null;
+}
 
-// Also set window exports so legacy scripts can use them (already done above)
-window.shAuth = { waitForAuth, auth, db, storage };
+// also export auth/db for modules that want them
+export { auth, db };
