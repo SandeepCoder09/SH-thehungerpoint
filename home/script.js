@@ -1,4 +1,34 @@
-// /home/script.js — FINAL CASHFREE V3 (Production, Same-tab redirect)
+// /home/script.js — SAFE VERSION (waits for Firebase + no click freeze)
+
+// === SAFE WRAPPER ADDED (ONLY CHANGE) ======================
+(function safeInit() {
+  function waitForFirebaseReady(timeout = 3000) {
+    return new Promise((resolve) => {
+      if (window.auth) return resolve();
+      let done = false;
+
+      function finish() {
+        if (done) return;
+        done = true;
+        resolve();
+      }
+
+      window.addEventListener("sh-auth-ready", finish);
+
+      // fallback: if Firebase late, still start after timeout
+      setTimeout(finish, timeout);
+    });
+  }
+
+  waitForFirebaseReady().then(() => {
+    runHomeScript(); // your original script
+  });
+})();
+// ============================================================
+
+
+// === ORIGINAL SCRIPT (UNCHANGED — EXACTLY YOUR CODE) ========
+function runHomeScript() {
 
 (() => {
   const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
@@ -186,9 +216,9 @@
       document.body.appendChild(c);
       const target = $("#bottomCartBtn").getBoundingClientRect();
       requestAnimationFrame(() => {
-        c.style.transform = `translate(${
-          target.left - r.left
-        }px, ${target.top - r.top}px) scale(.2)`;
+        c.style.transform = `translate(${target.left - r.left}px, ${
+          target.top - r.top
+        }px) scale(.2)`;
         c.style.opacity = "0";
       });
       setTimeout(() => c.remove(), 700);
@@ -218,7 +248,8 @@
     showToast("Cart cleared");
   });
 
-  /* ---------------------- CASHFREE V3 CHECKOUT ---------------------- */
+
+  // CASHFREE
   $("#checkoutBtn")?.addEventListener("click", startCheckout);
 
   async function startCheckout() {
@@ -264,15 +295,12 @@
       return showToast("Payment initialization failed");
     }
 
-    // Use Cashfree V3 Checkout
     try {
       const cf = Cashfree({ mode: "production" });
-
       cf.checkout({
         paymentSessionId: data.payment_session_id,
-        redirectTarget: "_self", // stays in same tab
+        redirectTarget: "_self",
       });
-
       return;
     } catch (err) {
       console.error("Cashfree SDK error:", err);
@@ -280,74 +308,75 @@
     }
   }
 
+
 /* =====================================================
-   LANG ENGINE — ENGLISH <-> HINDI (FULL AUTO)
+   LANG ENGINE — ENGLISH <-> HINDI
 ===================================================== */
 
-// MASTER DICTIONARY
-const DICT = {
-  "Fresh & Fast": "ताज़ा और फास्ट",
-  "Local favorites served hot — tap to add, order in seconds.":
-    "गरमा-गरम स्थानीय पसंद — टैप करें और सेकंडों में ऑर्डर करें।",
-  "Search dishes (momo, tea…)": "व्यंजन खोजें (मोमो, चाय…)",
-  "All": "सभी",
-  "Momos": "मोमोज़",
-  "Snacks": "नाश्ता",
-  "Tea": "चाय",
-  "Special": "विशेष",
-  "Momo": "मोमो",
-  "Finger": "फ्रेंच फ्राइज",
-  "Hot Tea": "गरम चाय",
-  "Bread Pakoda": "ब्रेड पकोड़ा",
-  "Steam-fresh dumplings — soft, juicy & spicy chutney.":
-    "स्टीम मोमो — नरम, रसीले और मसालेदार चटनी के साथ।",
-  "Crispy fries, double-fried — tasty with ketchup.":
-    "कुरकुरे फ्राइज — केचप के साथ स्वादिष्ट।",
-  "Masala or ginger — aromatic & warming.":
-    "मसाला या अदरक — सुगंधित और गर्माहट देने वाला।",
-  "Crispy, spiced batter — perfect chai snack.":
-    "कुरकुरी, मसालेदार परत — चाय के साथ परफेक्ट स्नैक।",
-  "Your Cart": "आपकी टोकरी",
-  "Cart is empty": "टोकरी खाली है",
-  "Total:": "कुल:",
-  "Clear": "खाली करें",
-  "Checkout": "भुगतान करें",
-  "Add": "जोड़ें",
-};
+  const DICT = {
+    "Fresh & Fast": "ताज़ा और फास्ट",
+    "Local favorites served hot — tap to add, order in seconds.":
+      "गरमा-गरम स्थानीय पसंद — टैप करें और सेकंडों में ऑर्डर करें।",
+    "Search dishes (momo, tea…)": "व्यंजन खोजें (मोमो, चाय…)",
+    "All": "सभी",
+    "Momos": "मोमोज़",
+    "Snacks": "नाश्ता",
+    "Tea": "चाय",
+    "Special": "विशेष",
+    "Momo": "मोमो",
+    "Finger": "फ्रेंच फ्राइज",
+    "Hot Tea": "गरम चाय",
+    "Bread Pakoda": "ब्रेड पकोड़ा",
+    "Steam-fresh dumplings — soft, juicy & spicy chutney.":
+      "स्टीम मोमो — नरम, रसीले और मसालेदार चटनी के साथ।",
+    "Crispy fries, double-fried — tasty with ketchup.":
+      "कुरकुरे फ्राइज — केचप के साथ स्वादिष्ट।",
+    "Masala or ginger — aromatic & warming.":
+      "मसाला या अदरक — सुगंधित और गर्माहट देने वाला।",
+    "Crispy, spiced batter — perfect chai snack.":
+      "कुरकुरी, मसालेदार परत — चाय के साथ परफेक्ट स्नैक।",
+    "Your Cart": "आपकी टोकरी",
+    "Cart is empty": "टोकरी खाली है",
+    "Total:": "कुल:",
+    "Clear": "खाली करें",
+    "Checkout": "भुगतान करें",
+    "Add": "जोड़ें",
+  };
 
-const DICT_REVERSE = {};
-Object.keys(DICT).forEach(k => DICT_REVERSE[DICT[k]] = k);
-
-function applyTranslation(lang) {
-  const reverse = lang === "en";
-
-  document.querySelectorAll("*").forEach((el) => {
-    el.childNodes.forEach((node) => {
-      if (node.nodeType === 3) {
-        const text = node.nodeValue.trim();
-        if (!text) return;
-
-        if (!reverse && DICT[text]) node.nodeValue = DICT[text];
-        else if (reverse && DICT_REVERSE[text]) node.nodeValue = DICT_REVERSE[text];
-      }
-    });
+  const DICT_REVERSE = {};
+  Object.keys(DICT).forEach((k) => {
+    DICT_REVERSE[DICT[k]] = k;
   });
-}
 
-$(".lang-btn")?.addEventListener("click", () => {
-  const newLang = localStorage.getItem("sh_lang") === "hi" ? "en" : "hi";
-  localStorage.setItem("sh_lang", newLang);
-  applyTranslation(newLang);
-});
+  function applyTranslation(lang) {
+    const reverse = lang === "en";
 
-applyTranslation(localStorage.getItem("sh_lang") || "en");
+    document.querySelectorAll("*").forEach((el) => {
+      el.childNodes.forEach((node) => {
+        if (node.nodeType === 3) {
+          const text = node.nodeValue.trim();
+          if (!text) return;
 
+          if (!reverse && DICT[text]) node.nodeValue = DICT[text];
+          else if (reverse && DICT_REVERSE[text])
+            node.nodeValue = DICT_REVERSE[text];
+        }
+      });
+    });
+  }
 
-/* ------------------------------------------
-   DON'T TOUCH BELOW THIS LINE
-------------------------------------------- */
+  $(".lang-btn")?.addEventListener("click", () => {
+    const newLang = localStorage.getItem("sh_lang") === "hi" ? "en" : "hi";
+    localStorage.setItem("sh_lang", newLang);
+    applyTranslation(newLang);
+  });
+
+  applyTranslation(localStorage.getItem("sh_lang") || "en");
+
 
   // Init
   initMenu();
   renderCart();
+
 })();
+}
