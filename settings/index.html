@@ -1,96 +1,314 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Settings — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <link rel="icon" href="/home/SH-Favicon.png">
-
-  <!-- Remix Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-
-  <!-- SH Global CSS -->
-  <link rel="stylesheet" href="/home/style.css">
-  <link rel="stylesheet" href="/settings/settings.css">
-</head>
-
-<body>
-
-  <main class="settings-container">
-
-    <section class="settings-top-card">
-      <div class="settings-avatar-wrap">
-        <img id="userAvatar" src="/home/SH-Favicon.png">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>Settings — SH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <link rel="stylesheet" href="../settings/settings.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="top-bar">
+        <h2 class="top-bar-title">Settings</h2>
       </div>
 
-      <div class="settings-user-info">
-        <h2 id="userName">USER NAME</h2>
-        <p id="userEmail">user@example.com</p>
+      <div class="page-body">
+        <!-- User card -->
+        <a href="../profile/index.html" class="user-card">
+          <div class="user-avatar" id="settAvatar">
+            👤<img id="settAvatarImg" alt="" />
+          </div>
+          <div class="user-info">
+            <h3 id="settName">Your Name</h3>
+            <p id="settEmail">email@example.com</p>
+          </div>
+          <span class="user-card-arrow">›</span>
+        </a>
+
+        <!-- Account -->
+        <div class="settings-group">
+          <div class="settings-group-label">Account</div>
+          <div class="settings-list">
+            <a href="../profile/index.html" class="setting-row">
+              <div class="setting-icon si-red">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Edit Profile</h4>
+                <p>Update your name, photo & address</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </a>
+            <div class="setting-row" onclick="openPassModal()">
+              <div class="setting-icon si-blue">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Change Password</h4>
+                <p>Update your login password</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </div>
+            <div class="setting-row">
+              <div class="setting-icon si-orange">
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Saved Addresses</h4>
+                <p>Manage your delivery locations</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="settings-group">
+          <div class="settings-group-label">Preferences</div>
+          <div class="settings-list">
+            <div class="setting-row" style="cursor: default">
+              <div class="setting-icon si-green">
+                <svg viewBox="0 0 24 24">
+                  <path d="M18 8h1a4 4 0 010 8h-1" />
+                  <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                  <line x1="6" y1="1" x2="6" y2="4" />
+                  <line x1="10" y1="1" x2="10" y2="4" />
+                  <line x1="14" y1="1" x2="14" y2="4" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Push Notifications</h4>
+                <p>Order updates &amp; offers</p>
+              </div>
+              <div
+                class="toggle"
+                id="notifToggle"
+                onclick="toggleSetting('notif')"
+              ></div>
+            </div>
+            <div class="setting-row" style="cursor: default">
+              <div class="setting-icon si-purple">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Dark Mode</h4>
+                <p>App always uses dark theme</p>
+              </div>
+              <div
+                class="toggle on"
+                style="cursor: default; opacity: 0.5"
+              ></div>
+            </div>
+            <div class="setting-row" style="cursor: default">
+              <div class="setting-icon si-orange">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Promotional Emails</h4>
+                <p>Deals &amp; new menu items</p>
+              </div>
+              <div
+                class="toggle"
+                id="emailToggle"
+                onclick="toggleSetting('email')"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="settings-group">
+          <div class="settings-group-label">Support</div>
+          <div class="settings-list">
+            <a href="../help/index.html" class="setting-row">
+              <div class="setting-icon si-blue">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Help &amp; Support</h4>
+                <p>Contact us, report issues</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </a>
+            <a href="faqs.html" class="setting-row">
+              <div class="setting-icon si-green">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>FAQs</h4>
+                <p>Common questions answered</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </a>
+            <div class="setting-row" onclick="shareApp()">
+              <div class="setting-icon si-purple">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4>Share App</h4>
+                <p>Tell friends about SH</p>
+              </div>
+              <span class="setting-arrow">›</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="settings-group">
+          <div class="settings-group-label">Account Actions</div>
+          <div class="settings-list">
+            <div class="setting-row" onclick="showLogout()">
+              <div class="setting-icon si-danger">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </div>
+              <div class="setting-text">
+                <h4 style="color: var(--red)">Logout</h4>
+                <p>Sign out of your account</p>
+              </div>
+              <span class="setting-arrow" style="color: var(--red)">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-version">SH — The Hunger Point · v2.0 · Fatehpur</div>
       </div>
-    </section>
+    </div>
 
-    <section class="settings-list">
-
-      <a href="/profile/index.html" class="settings-item">
-        <i class="ri-user-line settings-icon"></i>
-        <div>
-          <h4>User Profile</h4>
-          <small>Edit profile & preferences</small>
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="passModal" onclick="closePassModal(event)">
+      <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="modal-head">
+          <h3>Change Password</h3>
+          <button class="modal-close" onclick="closePassModal()">✕</button>
         </div>
-        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
-      </a>
-
-      <div class="settings-item" id="changePassword">
-        <i class="ri-lock-password-line settings-icon"></i>
-        <div>
-          <h4>Change Password</h4>
-          <small>Update your login password</small>
-        </div>
-        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
-      </div>
-
-      <a href="/settings/faqs.html" class="settings-item">
-        <i class="ri-questionnaire-line settings-icon"></i>
-        <div>
-          <h4>FAQs</h4>
-          <small>Common questions</small>
-        </div>
-        <i class="ri-arrow-right-s-line settings-arrow red-arrow"></i>
-      </a>
-
-      <div class="settings-item">
-        <i class="ri-notification-3-line settings-icon"></i>
-        <div>
-          <h4>Push Notifications</h4>
-          <small>Receive updates & offers</small>
-        </div>
-
-        <label class="switch">
-          <input type="checkbox" id="notifToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="settings-item" id="logoutBtn">
-        <i class="ri-logout-box-line settings-icon danger"></i>
-        <div>
-          <h4>Logout</h4>
-          <small>Sign out</small>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Current Password</label
+            ><input
+              type="password"
+              class="form-input"
+              id="cpCurr"
+              placeholder="Current password"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label
+            ><input
+              type="password"
+              class="form-input"
+              id="cpNew"
+              placeholder="New password"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label
+            ><input
+              type="password"
+              class="form-input"
+              id="cpConf"
+              placeholder="Confirm new password"
+            />
+          </div>
+          <button class="btn btn-red btn-full btn-lg" onclick="changePass()">
+            Update Password
+          </button>
         </div>
       </div>
+    </div>
 
-    </section>
+    <!-- Logout confirm -->
+    <div class="logout-confirm" id="logoutConfirm" onclick="closeLogout(event)">
+      <div class="logout-box">
+        <div class="icon">👋</div>
+        <h4>Logging out?</h4>
+        <p>You'll be signed out of your SH account. Your cart will be saved.</p>
+        <div class="logout-actions">
+          <button class="btn btn-outline btn-full" onclick="closeLogout()">
+            Stay
+          </button>
+          <button class="btn btn-red btn-full" onclick="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
 
-  </main>
-
-  <div id="toast-container" class="toast-container"></div>
-
-  <!-- Firebase Modular Loader -->
-  <script type="module" src="/auth/sh-auth.js"></script>
-
-  <!-- Settings Logic -->
-  <script type="module" src="/settings/settings.js"></script>
-
-</body>
+    <nav class="bottom-nav">
+      <a href="../home/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" /></svg
+        ><span class="nav-label">Home</span></a
+      >
+      <a href="../orders/orders.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" /></svg
+        ><span class="nav-label">Orders</span></a
+      >
+      <a href="../profile/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" /></svg
+        ><span class="nav-label">Profile</span></a
+      >
+      <a href="index.html" class="nav-item active"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+          /></svg
+        ><span class="nav-label">Settings</span></a
+      >
+    </nav>
+    <script src="../settings/settings.js"></script>
+  </body>
 </html>

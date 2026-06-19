@@ -1,262 +1,230 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>SH - The Hunger Point | Fresh & Fast Food in Fatehpur</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#E23744" />
-
-  <link rel="icon" type="image/png" href="/home/SH-Favicon.png" />
-
-  <!-- Global CSS -->
-  <link rel="stylesheet" href="/home/style.css?v=10" />
-
-  <!-- Remix Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-
-  <!-- Cashfree v3 SDK -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-
-  <!-- Firebase Boot (single source of truth) -->
-  <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { firebaseConfig } from "/home/firebase-config.js";
-
-const app = initializeApp(firebaseConfig);
-window.auth = getAuth(app);
-window.db = getFirestore(app);
-
-console.log("🔥 Firebase Loaded (home)");
-
-onAuthStateChanged(window.auth, (user) => {
-  if (!user) {
-    window.location.href = "/auth/login.html";
-    return;
-  }
-
-  // ⭐ Load script.js AFTER DOM is ready ⭐
-  window.addEventListener("DOMContentLoaded", () => {
-    import("/home/script.js").then(() => console.log("🟢 script.js ready"));
-  });
-});
-</script>
-</head>
-
-<body>
-
-  <!-- TOP NAV -->
-  <header class="nav">
-    <div class="brand">
-      <img src="/home/sh-thehungerpoint.png" class="logo-img" alt="The Hunger Point">
-      <div class="brand-text">
-        <div class="name">The Hunger Point</div>
-        <div class="tag">Family style · Premium · Fast food</div>
-      </div>
-    </div>
-
-    <div class="header-actions">
-      <!-- NEW Remix Icon -->
-      <button class="lang-btn">
-        <i class="ri-translate-2"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- MAIN APP -->
-  <main class="app-shell">
-
-    <!-- HERO -->
-    <section class="hero-box">
-      <h1 class="type-h1">Fresh & Fast</h1>
-      <p class="type-p">Local favorites served hot — tap to add, order in seconds.</p>
-
-      <!-- SEARCH -->
-      <div class="search-row">
-        <input id="menuSearch" class="search-input" type="search"
-          placeholder="Search dishes (momo, tea…)" />
-
-        <!-- NEW Remix Icon -->
-        <button class="search-icon">
-          <i class="ri-search-line"></i>
-        </button>
-      </div>
-
-      <!-- CATEGORY CHIPS -->
-      <div class="chips">
-        <button class="chip active" data-cat="all">All</button>
-        <button class="chip" data-cat="momos">Momos</button>
-        <button class="chip" data-cat="snacks">Snacks</button>
-        <button class="chip" data-cat="tea">Tea</button>
-        <button class="chip" data-cat="special">Special</button>
-      </div>
-    </section>
-
-    <!-- MENU GRID -->
-    <section class="menu grid-menu">
-
-      <!-- ITEM 1 -->
-      <article class="menu-item" data-item="Momo" data-price="10" data-cat="momos">
-        <div class="card-media">
-          <img src="/home/sh-momo.png" class="menu-img">
-        </div>
-        <div class="card-body">
-          <div class="card-row">
-            <h3 class="menu-title">Momo</h3>
-            <div class="menu-price">₹10 <small>/ 4 pcs</small></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>SH — The Hunger Point</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <link rel="stylesheet" href="../home/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <div class="resto-info">
+            <div class="resto-tag">📍 Fatehpur</div>
+            <h1 class="resto-name">The Hunger<br /><span>Point</span></h1>
+            <p class="resto-sub">Family · Premium · Fast Food</p>
           </div>
-          <p class="menu-desc">
-            Steam-fresh dumplings — soft, juicy & spicy chutney.
-          </p>
+          <div class="hero-actions">
+            <a href="../help/index.html" class="hero-btn" aria-label="Help">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </a>
+            <a
+              href="../settings/index.html"
+              class="hero-btn"
+              aria-label="Settings"
+            >
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-chip">
+            <div class="dot dot-green"></div>
+            Open Now
+          </div>
+          <div class="status-chip">
+            <div class="dot dot-orange"></div>
+            ~15 min delivery
+          </div>
+          <div class="status-chip">⭐ 4.8 (200+ orders)</div>
+        </div>
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="search"
+            class="search-input"
+            id="searchInput"
+            placeholder="Search for momos, chai, snacks…"
+          />
+        </div>
+      </div>
 
-          <div class="card-actions">
-            <div class="qty-pill">
-              <button class="qty-btn minus">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus">+</button>
+      <!-- OFFERS BANNER -->
+      <div class="offers-section">
+        <div class="offers-slider">
+          <div class="offer-card offer-card-1">
+            <div class="offer-text">
+              <h4>First Order Free!</h4>
+              <p>Use code HUNGRY · Min ₹30</p>
             </div>
-
-            <button class="add-cart-btn">Add</button>
+            <span class="offer-emoji">🎉</span>
           </div>
-        </div>
-      </article>
-
-      <!-- ITEM 2 -->
-      <article class="menu-item" data-item="Finger" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-french-fries.png" class="menu-img">
-        </div>
-        <div class="card-body">
-          <div class="card-row">
-            <h3 class="menu-title">Finger</h3>
-            <div class="menu-price">₹10 <small>/ plate</small></div>
-          </div>
-          <p class="menu-desc">
-            Crispy fries, double-fried — tasty with ketchup.
-          </p>
-
-          <div class="card-actions">
-            <div class="qty-pill">
-              <button class="qty-btn minus">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus">+</button>
+          <div class="offer-card offer-card-2">
+            <div class="offer-text">
+              <h4>Free Delivery</h4>
+              <p>On all orders above ₹50</p>
             </div>
-
-            <button class="add-cart-btn">Add</button>
+            <span class="offer-emoji">🛵</span>
           </div>
-        </div>
-      </article>
-
-      <!-- ITEM 3 -->
-      <article class="menu-item" data-item="Hot Tea" data-price="10" data-cat="tea">
-        <div class="card-media">
-          <img src="/home/sh-hot-tea.png" class="menu-img">
-        </div>
-        <div class="card-body">
-          <div class="card-row">
-            <h3 class="menu-title">Hot Tea</h3>
-            <div class="menu-price">₹10 <small>/ cup</small></div>
-          </div>
-          <p class="menu-desc">
-            Masala or ginger — aromatic & warming.
-          </p>
-
-          <div class="card-actions">
-            <div class="qty-pill">
-              <button class="qty-btn minus">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus">+</button>
+          <div class="offer-card offer-card-3">
+            <div class="offer-text">
+              <h4>Momo Special</h4>
+              <p>4 pcs + Tea combo — ₹18</p>
             </div>
-
-            <button class="add-cart-btn">Add</button>
+            <span class="offer-emoji">🥟</span>
           </div>
         </div>
-      </article>
-
-      <!-- ITEM 4 -->
-      <article class="menu-item" data-item="Bread Pakoda" data-price="10" data-cat="snacks">
-        <div class="card-media">
-          <img src="/home/sh-bread-pakoda.png" class="menu-img">
-        </div>
-
-        <div class="card-body">
-          <div class="card-row">
-            <h3 class="menu-title">B.Pakoda</h3>
-            <div class="menu-price">₹10 <small>/ pcs</small></div>
-          </div>
-
-          <p class="menu-desc">
-            Crispy, spiced batter — perfect chai snack.
-          </p>
-
-          <div class="card-actions">
-            <div class="qty-pill">
-              <button class="qty-btn minus">−</button>
-              <div class="qty-display">1</div>
-              <button class="qty-btn plus">+</button>
-            </div>
-
-            <button class="add-cart-btn">Add</button>
-          </div>
-        </div>
-      </article>
-
-    </section>
-  </main>
-
-  <!-- OVERLAY -->
-  <div id="overlay" class="overlay"></div>
-
-  <!-- CART SHEET -->
-  <div id="cartSheet" class="cart-sheet">
-    <div class="sheet-handle"></div>
-
-    <div class="sheet-head">
-      <h3>Your Cart</h3>
-      <button id="closeSheet" class="cart-close-btn">✕</button>
-    </div>
-
-    <div id="cartItems" class="cart-items">
-      <p class="empty">Cart is empty</p>
-    </div>
-
-    <div class="cart-footer">
-      <div class="cart-total-text">
-        Total: <span id="cartTotal">₹0</span>
       </div>
-      <div class="cart-footer-btns">
-        <button id="clearCart" class="btn-clear">Clear</button>
-        <button id="checkoutBtn" class="btn-checkout">Checkout</button>
+
+      <!-- CATEGORIES -->
+      <div class="cat-section">
+        <p class="cat-label">Categories</p>
+        <div class="cat-tabs" id="catTabs">
+          <button class="cat-tab active" data-cat="all">
+            <span class="cat-icon">🍽️</span> All
+          </button>
+          <button class="cat-tab" data-cat="momos">
+            <span class="cat-icon">🥟</span> Momos
+          </button>
+          <button class="cat-tab" data-cat="snacks">
+            <span class="cat-icon">🍟</span> Snacks
+          </button>
+          <button class="cat-tab" data-cat="tea">
+            <span class="cat-icon">🍵</span> Tea
+          </button>
+          <button class="cat-tab" data-cat="special">
+            <span class="cat-icon">⭐</span> Special
+          </button>
+        </div>
+      </div>
+
+      <!-- MENU -->
+      <div class="menu-section">
+        <div class="section-head" style="padding: 0 0 14px">
+          <h2 class="section-title" id="menuTitle">All Items</h2>
+          <span style="font-size: 12px; color: var(--muted)" id="itemCount"
+            >8 items</span
+          >
+        </div>
+        <div class="menu-grid" id="menuGrid"></div>
+        <div class="no-results" id="noResults" style="display: none">
+          <p>No items found for "<span id="searchTerm"></span>"</p>
+        </div>
       </div>
     </div>
-  </div>
+    <!-- .app -->
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <a href="/home/index.html" class="bn-item" data-nav="home">
-      <i class="ri-home-5-line"></i><small>Home</small>
-    </a>
-
-    <a href="/orders/orders.html" class="bn-item" data-nav="orders">
-      <i class="ri-file-list-3-line"></i><small>Orders</small>
-    </a>
-
-    <button class="bn-center" id="bottomCartBtn" data-nav="cart">
-      <i class="ri-shopping-cart-2-line"></i>
-      <span class="cart-badge" id="cartBadge">0</span>
+    <!-- CART FAB -->
+    <button class="cart-fab hidden" id="cartFab" onclick="openCart()">
+      <div class="cart-fab-left">
+        <div class="cart-fab-count" id="fabCount">0</div>
+        <div class="cart-fab-label">View Cart</div>
+      </div>
+      <div class="cart-fab-total" id="fabTotal">₹0</div>
     </button>
 
-    <a href="/profile/index.html" class="bn-item" data-nav="profile">
-      <i class="ri-user-3-line"></i><small>Profile</small>
-    </a>
+    <!-- CART SHEET -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-sheet" id="cartSheet">
+      <div class="cart-handle"></div>
+      <div class="cart-header">
+        <h3>🛒 Your Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary" id="cartSummary" style="display: none">
+        <div class="summary-row">
+          <span>Item total</span><span id="summaryItems">₹0</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery</span><span style="color: var(--success)">FREE</span>
+        </div>
+        <div class="summary-row">
+          <span>Discount</span><span style="color: var(--success)">-₹0</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span><span id="summaryTotal">₹0</span>
+        </div>
+      </div>
+      <div class="cart-footer">
+        <button
+          class="btn btn-outline btn-sm"
+          onclick="clearCart()"
+          style="flex-shrink: 0"
+        >
+          Clear
+        </button>
+        <button class="btn btn-red btn-full" onclick="checkout()">
+          Place Order →
+        </button>
+      </div>
+    </div>
 
-    <a href="/settings/index.html" class="bn-item" data-nav="settings">
-      <i class="ri-settings-3-line"></i><small>Setting</small>
-    </a>
-  </nav>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="../orders/orders.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+        <span class="nav-label">Orders</span>
+        <span class="nav-badge" id="orderBadge" style="display: none">2</span>
+      </a>
+      <a href="../profile/index.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span class="nav-label">Profile</span>
+      </a>
+      <a href="../settings/index.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+          />
+        </svg>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
 
-  <div id="toast-container" class="toast-container"></div>
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <span class="toast-icon"></span><span id="toastMsg"></span>
+    </div>
 
-</body>
+    <script src="../home/script.js"></script>
+  </body>
 </html>

@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>Track Order — SH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <style>
+      .page-body {
+        padding: 16px 16px calc(var(--nav-h) + 16px);
+      }
+
+      .track-header {
+        background: linear-gradient(160deg, #1a0a0c, #230c10);
+        padding: 20px 16px 24px;
+        border-radius: var(--radius);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .order-num {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--red);
+        margin-bottom: 6px;
+      }
+      .eta-big {
+        font-family: var(--font-head);
+        font-size: 38px;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .eta-label {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .track-steps {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .track-step {
+        display: flex;
+        gap: 16px;
+        padding-bottom: 20px;
+        position: relative;
+      }
+      .track-step:last-child {
+        padding-bottom: 0;
+      }
+      .track-step::before {
+        content: "";
+        position: absolute;
+        left: 19px;
+        top: 38px;
+        width: 2px;
+        bottom: 0;
+      }
+      .track-step.done::before {
+        background: var(--success);
+      }
+      .track-step.active::before {
+        background: linear-gradient(to bottom, var(--red), transparent);
+      }
+      .track-step.pending::before {
+        background: var(--border2);
+      }
+      .track-step:last-child::before {
+        display: none;
+      }
+      .step-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+      }
+      .step-circle.done {
+        background: rgba(34, 197, 94, 0.15);
+        border: 2px solid var(--success);
+      }
+      .step-circle.active {
+        background: var(--red-pale);
+        border: 2px solid var(--red);
+        animation: stepGlow 1.5s infinite;
+      }
+      .step-circle.pending {
+        background: var(--dark3);
+        border: 2px solid var(--border2);
+      }
+      @keyframes stepGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(226, 55, 68, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(226, 55, 68, 0);
+        }
+      }
+      .step-content {
+        flex: 1;
+        padding-top: 6px;
+      }
+      .step-content h4 {
+        font-family: var(--font-head);
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .step-content p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .step-time {
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .step-time.done {
+        color: var(--success);
+      }
+      .step-time.active {
+        color: var(--red);
+      }
+      .step-time.pending {
+        color: var(--muted);
+      }
+
+      .order-summary-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .os-title {
+        font-family: var(--font-head);
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .os-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        padding: 5px 0;
+        border-bottom: 1px solid var(--border);
+        color: var(--light-muted);
+      }
+      .os-row:last-child {
+        border-bottom: none;
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 15px;
+        color: var(--text);
+        padding-top: 10px;
+        margin-top: 4px;
+      }
+
+      .rider-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .rider-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--dark3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+      .rider-info {
+        flex: 1;
+      }
+      .rider-info h4 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .rider-info p {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .rider-call {
+        width: 42px;
+        height: 42px;
+        background: var(--red-pale);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 1px solid rgba(226, 55, 68, 0.2);
+        text-decoration: none;
+      }
+      .rider-call svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--red);
+        fill: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="top-bar">
+        <a href="../orders/orders.html" class="top-bar-back"
+          ><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg
+        ></a>
+        <h2 class="top-bar-title">Track Order</h2>
+        <div style="width: 36px"></div>
+      </div>
+
+      <div class="page-body">
+        <div class="track-header">
+          <div class="order-num" id="trackOrderId">#SH001</div>
+          <div class="eta-big" id="etaDisplay">12 min</div>
+          <div class="eta-label">Estimated delivery time</div>
+        </div>
+
+        <div class="track-steps" id="trackSteps"></div>
+
+        <div class="rider-card" id="riderCard" style="display: none">
+          <div class="rider-avatar">🏍️</div>
+          <div class="rider-info">
+            <h4>Delivery Partner</h4>
+            <p>Raju · ⭐ 4.9 · On the way!</p>
+          </div>
+          <a href="tel:+919999999999" class="rider-call">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"
+              />
+            </svg>
+          </a>
+        </div>
+
+        <div class="order-summary-card" id="trackSummary"></div>
+
+        <button
+          class="btn btn-outline btn-full"
+          onclick="window.location.href = '../home/index.html'"
+        >
+          Order Something Else
+        </button>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="../home/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" /></svg
+        ><span class="nav-label">Home</span></a
+      >
+      <a href="../orders/orders.html" class="nav-item active"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" /></svg
+        ><span class="nav-label">Orders</span></a
+      >
+      <a href="../profile/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" /></svg
+        ><span class="nav-label">Profile</span></a
+      >
+      <a href="../settings/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+          /></svg
+        ><span class="nav-label">Settings</span></a
+      >
+    </nav>
+
+    <script>
+      const STEPS = [
+        {
+          key: "placed",
+          icon: "✅",
+          label: "Order Placed",
+          desc: "Your order has been received.",
+          times: {
+            placed: "Just now",
+            preparing: "–",
+            "on-the-way": "–",
+            delivered: "–",
+          },
+        },
+        {
+          key: "preparing",
+          icon: "👨‍🍳",
+          label: "Preparing",
+          desc: "Kitchen is making your food.",
+          times: {
+            placed: "Done",
+            preparing: "~5 min",
+            "on-the-way": "–",
+            delivered: "–",
+          },
+        },
+        {
+          key: "on-the-way",
+          icon: "🛵",
+          label: "On the Way",
+          desc: "Rider is heading to you!",
+          times: {
+            placed: "Done",
+            preparing: "Done",
+            "on-the-way": "~7 min",
+            delivered: "–",
+          },
+        },
+        {
+          key: "delivered",
+          icon: "🎉",
+          label: "Delivered",
+          desc: "Enjoy your meal!",
+          times: {
+            placed: "Done",
+            preparing: "Done",
+            "on-the-way": "Done",
+            delivered: "Now",
+          },
+        },
+      ];
+      const ETA = {
+        placed: "~15 min",
+        preparing: "~12 min",
+        "on-the-way": "~5 min",
+        delivered: "Delivered!",
+      };
+
+      function getOrder() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const orders = JSON.parse(localStorage.getItem("sh_orders") || "[]");
+        return id ? orders.find((o) => o.id === id) : orders[0];
+      }
+
+      function render() {
+        const order = getOrder();
+        if (!order) return;
+        const status = order.status || "placed";
+        const statusIdx = STEPS.findIndex((s) => s.key === status);
+        document.getElementById("trackOrderId").textContent = "#" + order.id;
+        document.getElementById("etaDisplay").textContent = ETA[status] || "–";
+
+        if (status === "on-the-way" || status === "preparing") {
+          document.getElementById("riderCard").style.display = "flex";
+        }
+
+        const stepsHtml = STEPS.map((step, i) => {
+          const cls =
+            i < statusIdx ? "done" : i === statusIdx ? "active" : "pending";
+          const icon = i < statusIdx ? "✓" : step.icon;
+          const timeStr =
+            i <= statusIdx
+              ? i < statusIdx
+                ? "✓ Done"
+                : "In progress"
+              : "Waiting";
+          const timeCls =
+            i < statusIdx ? "done" : i === statusIdx ? "active" : "pending";
+          return `
+      <div class="track-step ${cls}">
+        <div class="step-circle ${cls}">${icon}</div>
+        <div class="step-content">
+          <h4>${step.label}</h4>
+          <p>${step.desc}</p>
+          <div class="step-time ${timeCls}">${timeStr}</div>
+        </div>
+      </div>`;
+        }).join("");
+        document.getElementById("trackSteps").innerHTML = stepsHtml;
+
+        const total = order.total;
+        const itemsHtml = order.items
+          .map(
+            (i) =>
+              `<div class="os-row"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>₹${i.price * i.qty}</span></div>`,
+          )
+          .join("");
+        document.getElementById("trackSummary").innerHTML = `
+    <div class="os-title">Order Summary</div>
+    ${itemsHtml}
+    <div class="os-row"><span>Total</span><span>₹${total}</span></div>`;
+      }
+
+      render();
+      // Simulate progress for demo
+      let demo = getOrder();
+      if (demo && demo.status === "preparing") {
+        setTimeout(() => {
+          const orders = JSON.parse(localStorage.getItem("sh_orders") || "[]");
+          const idx = orders.findIndex((o) => o.id === demo.id);
+          if (idx !== -1) {
+            orders[idx].status = "on-the-way";
+            localStorage.setItem("sh_orders", JSON.stringify(orders));
+            render();
+          }
+        }, 8000);
+      }
+    </script>
+  </body>
+</html>

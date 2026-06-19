@@ -1,75 +1,219 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>FAQs — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="/home/SH-Favicon.png" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>FAQs — SH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <link rel="stylesheet" href="../settings/faqs.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="top-bar">
+        <a href="index.html" class="top-bar-back"
+          ><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg
+        ></a>
+        <h2 class="top-bar-title">FAQs</h2>
+        <div style="width: 36px"></div>
+      </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+      <div class="page-body">
+        <div class="faq-intro">
+          <div class="faq-icon">🤔</div>
+          <h2>How can we help?</h2>
+          <p>Find answers to the most common questions below.</p>
+        </div>
 
-  <link rel="stylesheet" href="/assets/styles.css">
-</head>
-<body>
+        <div class="faq-search">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="search"
+            id="faqSearch"
+            placeholder="Search questions…"
+            oninput="filterFAQs(this.value)"
+          />
+        </div>
 
-<main class="container faq-shell">
-  <article class="faq-card">
+        <div id="faqContainer"></div>
 
-    <!-- HEADER (same SH theme as profile) -->
-    <div class="faq-header">
-      <button class="back-btn" onclick="history.back()">
-        <i class="ri-arrow-left-line"></i>
-      </button>
-      <h2>FAQs</h2>
+        <div class="still-need">
+          <h4>Still need help?</h4>
+          <p>
+            Our team is available on WhatsApp for instant support during
+            business hours.
+          </p>
+          <a
+            href="https://wa.me/919999999999"
+            class="whatsapp-btn"
+            target="_blank"
+          >
+            💬 Chat on WhatsApp
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- FAQ LIST -->
+    <nav class="bottom-nav">
+      <a href="../home/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" /></svg
+        ><span class="nav-label">Home</span></a
+      >
+      <a href="../orders/orders.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" /></svg
+        ><span class="nav-label">Orders</span></a
+      >
+      <a href="../profile/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" /></svg
+        ><span class="nav-label">Profile</span></a
+      >
+      <a href="index.html" class="nav-item active"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+          /></svg
+        ><span class="nav-label">Settings</span></a
+      >
+    </nav>
+
+    <script>
+      const FAQS = [
+        {
+          cat: "Orders",
+          q: "How do I place an order?",
+          a: 'Browse the menu on the Home page, tap "+ Add" on any item to add it to your cart, then tap "View Cart" and hit "Place Order". Your order will be confirmed instantly.',
+        },
+        {
+          cat: "Orders",
+          q: "Can I change or cancel my order?",
+          a: "Orders can be modified within 2 minutes of placing them. After that, the kitchen starts preparing and changes aren't possible. Contact us on WhatsApp for urgent issues.",
+        },
+        {
+          cat: "Orders",
+          q: "How do I track my order?",
+          a: 'Go to Orders → tap "Track" on any active order to see real-time status: Placed → Preparing → On the Way → Delivered.',
+        },
+        {
+          cat: "Profile",
+          q: "How do I update my profile?",
+          a: 'Go to Profile (bottom nav) → edit your name, phone, gender, and delivery address, then tap "Save Changes".',
+        },
+        {
+          cat: "Profile",
+          q: "How do I change my profile photo?",
+          a: "On the Profile page, tap the pencil icon on your avatar to upload a new photo from your device.",
+        },
+        {
+          cat: "Profile",
+          q: "How do I reset my password?",
+          a: 'Go to Settings → Change Password, enter your current password and a new one, then tap "Update Password". A confirmation will be sent to your email.',
+        },
+        {
+          cat: "Notifications",
+          q: "How do I turn on order notifications?",
+          a: 'Go to Settings → Preferences → toggle on "Push Notifications". You\'ll get updates when your order is confirmed, ready, and delivered.',
+        },
+        {
+          cat: "Payment",
+          q: "What payment methods are accepted?",
+          a: "We accept cash on delivery. UPI and online payments are coming soon!",
+        },
+        {
+          cat: "Payment",
+          q: "Is there a delivery charge?",
+          a: "Delivery is FREE on all orders. We offer free delivery throughout Fatehpur.",
+        },
+        {
+          cat: "General",
+          q: "What are your opening hours?",
+          a: 'We are open daily from 8:00 AM to 9:00 PM. The app shows a live "Open Now" indicator on the home screen.',
+        },
+        {
+          cat: "General",
+          q: "How do I contact support?",
+          a: 'Tap "Help & Support" in Settings or chat with us directly on WhatsApp for the fastest response.',
+        },
+      ];
+
+      let activeId = null;
+
+      function renderFAQs(items) {
+        const cats = [...new Set(items.map((f) => f.cat))];
+        const container = document.getElementById("faqContainer");
+        if (!items.length) {
+          container.innerHTML =
+            '<div class="empty-state"><div class="empty-icon">🔍</div><h3>No results</h3><p>Try a different search term.</p></div>';
+          return;
+        }
+
+        container.innerHTML = cats
+          .map((cat) => {
+            const catItems = items.filter((f) => f.cat === cat);
+            return `<div class="faq-cat-label">${cat}</div>
     <div class="faq-list">
+      ${catItems
+        .map((f, i) => {
+          const id = `faq-${cat}-${i}`;
+          return `<div class="faq-item" id="${id}">
+          <div class="faq-q" onclick="toggleFAQ('${id}')">
+            <span class="faq-q-text">${f.q}</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a" id="${id}-a">
+            <div class="faq-a-inner">${f.a}</div>
+          </div>
+        </div>`;
+        })
+        .join("")}
+    </div>`;
+          })
+          .join("");
+      }
 
-      <details class="faq-item">
-        <summary>
-          <span>How to update my profile?</span>
-          <i class="ri-arrow-down-s-line"></i>
-        </summary>
-        <p>You can update your name, address, and profile photo inside the “User Profile” section of Settings.</p>
-      </details>
+      function toggleFAQ(id) {
+        const item = document.getElementById(id);
+        const answer = document.getElementById(id + "-a");
+        const isOpen = item.classList.contains("open");
+        // Close all
+        document.querySelectorAll(".faq-item").forEach((el) => {
+          el.classList.remove("open");
+          el.querySelector(".faq-a").style.maxHeight = "0";
+        });
+        if (!isOpen) {
+          item.classList.add("open");
+          answer.style.maxHeight =
+            answer.querySelector(".faq-a-inner").offsetHeight + 32 + "px";
+        }
+      }
 
-      <details class="faq-item">
-        <summary>
-          <span>How do I change my password?</span>
-          <i class="ri-arrow-down-s-line"></i>
-        </summary>
-        <p>Go to Settings → Change Password. A reset email will be sent to your registered email.</p>
-      </details>
+      function filterFAQs(q) {
+        const filtered = q
+          ? FAQS.filter(
+              (f) =>
+                f.q.toLowerCase().includes(q.toLowerCase()) ||
+                f.a.toLowerCase().includes(q.toLowerCase()),
+            )
+          : FAQS;
+        renderFAQs(filtered);
+      }
 
-      <details class="faq-item">
-        <summary>
-          <span>How do I enable push notifications?</span>
-          <i class="ri-arrow-down-s-line"></i>
-        </summary>
-        <p>In Settings, turn on the “Push Notifications” switch to receive updates & offers.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>
-          <span>How do I log out?</span>
-          <i class="ri-arrow-down-s-line"></i>
-        </summary>
-        <p>Scroll down to the bottom of Settings and tap “Logout”.</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>
-          <span>How can I contact support?</span>
-          <i class="ri-arrow-down-s-line"></i>
-        </summary>
-        <p>You can message us directly on WhatsApp for instant support.</p>
-      </details>
-
-    </div>
-
-  </article>
-</main>
-
-</body>
+      renderFAQs(FAQS);
+    </script>
+  </body>
 </html>

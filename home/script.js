@@ -1,444 +1,341 @@
-// /home/script.js — Fixed cart + UI behaviour (modular-friendly, uses window.auth/window.db)
-// Keep this file under /home/script.js (same path you already use)
+// ── MENU DATA ──────────────────────────────────────────────────
+const MENU = [
+  {
+    id: 1,
+    name: "Momo",
+    emoji: "🥟",
+    cat: "momos",
+    price: 10,
+    unit: "4 pcs",
+    desc: "Steam-fresh dumplings — soft, juicy & spicy chutney.",
+    badge: "bestseller",
+    veg: true,
+  },
+  {
+    id: 2,
+    name: "Special Momo",
+    emoji: "🥟",
+    cat: "momos",
+    price: 30,
+    unit: "8 pcs",
+    desc: "Loaded pan-fried momos with signature SH sauce.",
+    badge: "new",
+    veg: true,
+  },
+  {
+    id: 3,
+    name: "Fried Momo",
+    emoji: "🥟",
+    cat: "momos",
+    price: 20,
+    unit: "4 pcs",
+    desc: "Golden crispy fried momos — extra crunch, extra love.",
+    badge: null,
+    veg: true,
+  },
+  {
+    id: 4,
+    name: "Finger Fries",
+    emoji: "🍟",
+    cat: "snacks",
+    price: 10,
+    unit: "plate",
+    desc: "Double-fried crispy fries — perfect with ketchup.",
+    badge: "bestseller",
+    veg: true,
+  },
+  {
+    id: 5,
+    name: "Bread Pakoda",
+    emoji: "🧆",
+    cat: "snacks",
+    price: 10,
+    unit: "pcs",
+    desc: "Crispy spiced batter bread — perfect chai snack.",
+    badge: null,
+    veg: true,
+  },
+  {
+    id: 6,
+    name: "Veg Roll",
+    emoji: "🌯",
+    cat: "snacks",
+    price: 25,
+    unit: "roll",
+    desc: "Stuffed veg roll with chutney & onions — filling!",
+    badge: "new",
+    veg: true,
+  },
+  {
+    id: 7,
+    name: "Samosa",
+    emoji: "🥙",
+    cat: "snacks",
+    price: 5,
+    unit: "pcs",
+    desc: "Crispy golden samosa — spiced potato filling.",
+    badge: null,
+    veg: true,
+  },
+  {
+    id: 8,
+    name: "Hot Tea",
+    emoji: "🍵",
+    cat: "tea",
+    price: 10,
+    unit: "cup",
+    desc: "Masala or ginger — aromatic & warming.",
+    badge: null,
+    veg: true,
+  },
+  {
+    id: 9,
+    name: "Special Chai",
+    emoji: "☕",
+    cat: "tea",
+    price: 15,
+    unit: "cup",
+    desc: "Thick SH special brew with cardamom & saffron.",
+    badge: "special",
+    veg: true,
+  },
+  {
+    id: 10,
+    name: "Cold Drink",
+    emoji: "🥤",
+    cat: "tea",
+    price: 20,
+    unit: "bottle",
+    desc: "Chilled soda — refreshing with your order.",
+    badge: null,
+    veg: true,
+  },
+  {
+    id: 11,
+    name: "Combo Plate",
+    emoji: "🍱",
+    cat: "special",
+    price: 40,
+    unit: "plate",
+    desc: "4 Momos + Fries + Chai — the full SH experience!",
+    badge: "bestseller",
+    veg: true,
+  },
+  {
+    id: 12,
+    name: "Family Pack",
+    emoji: "🎁",
+    cat: "special",
+    price: 80,
+    unit: "pack",
+    desc: "8 Momos + 2 Chai + Samosa × 2 — perfect for sharing.",
+    badge: "special",
+    veg: true,
+  },
+];
 
-(() => {
-  const SERVER_URL = "https://sh-thehungerpoint.onrender.com";
+// ── STATE ─────────────────────────────────────────────────────
+let cart = JSON.parse(localStorage.getItem("sh_cart") || "[]");
+let activeCat = "all";
+let searchQ = "";
 
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => Array.from(document.querySelectorAll(s));
+// ── RENDER MENU ───────────────────────────────────────────────
+function renderMenu() {
+  const grid = document.getElementById("menuGrid");
+  const noRes = document.getElementById("noResults");
+  const title = document.getElementById("menuTitle");
+  const count = document.getElementById("itemCount");
 
-  function showToast(msg, dur = 2500) {
-    const wrap = $("#toast-container");
-    if (!wrap) {
-      // Fallback
-      console.log("toast:", msg);
-      return;
-    }
-    const t = document.createElement("div");
-    t.className = "toast";
-    t.textContent = msg;
-    wrap.appendChild(t);
-    // small show animation if CSS present
-    requestAnimationFrame(() => t.classList.add("show"));
-    setTimeout(() => {
-      t.classList.remove("show");
-      setTimeout(() => t.remove(), 220);
-    }, dur);
-  }
+  let items = MENU;
+  if (activeCat !== "all") items = items.filter((i) => i.cat === activeCat);
+  if (searchQ)
+    items = items.filter(
+      (i) =>
+        i.name.toLowerCase().includes(searchQ) ||
+        i.desc.toLowerCase().includes(searchQ),
+    );
 
-  // Use modular auth exposed on window by /auth/sh-auth.js or your inline init
-  const auth = window.auth;
-
-  // cart state
-  let cart = [];
-  const CART_KEY = "sh_cart_v1";
-
-  const findItem = (id) => cart.findIndex((x) => x.id === id);
-
-  const imageMap = {
-    momo: "/home/sh-momo.png",
-    finger: "/home/sh-french-fries.png",
-    "hot tea": "/home/sh-hot-tea.png",
-    tea: "/home/sh-hot-tea.png",
-    "bread pakoda": "/home/sh-bread-pakoda.png",
+  const catNames = {
+    all: "All Items",
+    momos: "Momos",
+    snacks: "Snacks",
+    tea: "Drinks & Tea",
+    special: "Special Combos",
   };
-  const getImg = (name) => imageMap[(name || "").toLowerCase()] || "/home/SH-Favicon.png";
+  title.textContent = catNames[activeCat] || "All Items";
+  count.textContent = items.length + " item" + (items.length !== 1 ? "s" : "");
 
-  // load initial cart from localStorage
-  (function loadLocal() {
-    try {
-      const s = localStorage.getItem(CART_KEY);
-      if (s) cart = JSON.parse(s) || [];
-    } catch (e) {
-      console.warn("Failed to parse cart:", e);
-    }
-  })();
-
-  function saveLocal() {
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-      // notify other tabs / listeners
-      window.dispatchEvent(new Event("storage"));
-      // custom app event
-      document.dispatchEvent(new CustomEvent("cart-updated"));
-    } catch (e) {
-      console.warn("saveLocal failed", e);
-    }
+  if (!items.length) {
+    grid.innerHTML = "";
+    noRes.style.display = "block";
+    document.getElementById("searchTerm").textContent = searchQ;
+    return;
   }
+  noRes.style.display = "none";
 
-  function updateCartCountUI() {
-    const b = $("#bottomCartBtn");
-    if (b) {
-      const n = cart.reduce((s, i) => s + (i.qty || 0), 0);
-      b.setAttribute("data-count", String(n));
-      // update explicit badge if present
-      const badge = document.getElementById("cartBadge");
-      if (badge) {
-        badge.textContent = n;
-        badge.style.display = n > 0 ? "block" : "none";
-      }
-    }
-  }
-
-  function attachCartButtons() {
-    // attach to items inside cart sheet
-    $$(".c-dec").forEach((b) => {
-      b.onclick = (ev) => {
-        const id = b.dataset.id;
-        const idx = findItem(id);
-        if (idx >= 0) {
-          cart[idx].qty = Math.max(1, (cart[idx].qty || 1) - 1);
-          saveLocal();
-          renderCart();
-        }
-        ev.stopPropagation?.();
-      };
-    });
-
-    $$(".c-inc").forEach((b) => {
-      b.onclick = (ev) => {
-        const id = b.dataset.id;
-        const idx = findItem(id);
-        if (idx >= 0) {
-          cart[idx].qty = (cart[idx].qty || 0) + 1;
-          saveLocal();
-          renderCart();
-        }
-        ev.stopPropagation?.();
-      };
-    });
-
-    $$(".c-rem").forEach((b) => {
-      b.onclick = (ev) => {
-        const id = b.dataset.id;
-        cart = cart.filter((x) => x.id !== id);
-        saveLocal();
-        renderCart();
-        ev.stopPropagation?.();
-      };
-    });
-  }
-
-  function renderCart() {
-    const box = $("#cartItems");
-    if (!box) return;
-
-    box.innerHTML = "";
-
-    if (!cart.length) {
-      box.innerHTML = `<p class="empty">Cart is empty</p>`;
-      $("#cartTotal") && ($("#cartTotal").textContent = "₹0");
-      updateCartCountUI();
-      return;
-    }
-
-    let total = 0;
-    cart.forEach((i) => {
-      total += i.qty * i.price;
-
-      const row = document.createElement("div");
-      row.className = "cart-item";
-
-      row.innerHTML = `
-        <img class="cart-img" src="${getImg(i.name)}" />
-        <div class="cart-info" style="flex:1">
-          <div class="cart-name">${i.name}</div>
-          <div class="cart-sub">₹${i.price} × ${i.qty} = ₹${i.qty * i.price}</div>
+  grid.innerHTML = items
+    .map((item) => {
+      const inCart = cart.find((c) => c.id === item.id);
+      const qty = inCart ? inCart.qty : 0;
+      const badgeHtml = item.badge
+        ? `<div class="food-badges"><span class="badge badge-${item.badge === "bestseller" ? "red" : item.badge === "new" ? "blue" : "orange"}">${item.badge}</span></div>`
+        : "";
+      return `
+      <div class="food-card fade-up" data-id="${item.id}">
+        <div class="food-img-wrap">
+          <div class="food-img-placeholder">${item.emoji}</div>
+          ${badgeHtml}
         </div>
-        <div class="cart-actions">
-          <button class="c-dec" data-id="${i.id}">−</button>
-          <span class="cart-qty">${i.qty}</span>
-          <button class="c-inc" data-id="${i.id}">+</button>
-          <button class="c-rem" data-id="${i.id}" title="Remove">✕</button>
+        <div class="food-info">
+          <div class="food-name">${item.name}</div>
+          <div class="food-desc">${item.desc}</div>
+          <div class="food-footer">
+            <div class="food-price">₹${item.price} <span class="unit">/ ${item.unit}</span></div>
+            ${
+              qty === 0
+                ? `<button class="add-btn" onclick="addItem(${item.id})">+ Add</button>`
+                : `<div class="qty-control">
+                  <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+                  <span class="qty-num">${qty}</span>
+                  <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+                 </div>`
+            }
+          </div>
         </div>
-      `;
+      </div>`;
+    })
+    .join("");
+}
 
-      box.appendChild(row);
-    });
-
-    $("#cartTotal") && ($("#cartTotal").textContent = "₹" + total);
-    updateCartCountUI();
-    attachCartButtons();
+// ── CART LOGIC ────────────────────────────────────────────────
+function addItem(id) {
+  const item = MENU.find((i) => i.id === id);
+  const existing = cart.find((c) => c.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ ...item, qty: 1 });
   }
+  saveCart();
+  renderMenu();
+  updateFab();
+  showToast("🥟", item.name + " added to cart!");
+}
+function changeQty(id, delta) {
+  const idx = cart.findIndex((c) => c.id === id);
+  if (idx === -1) return;
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  saveCart();
+  renderMenu();
+  updateFab();
+}
+function clearCart() {
+  cart = [];
+  saveCart();
+  renderMenu();
+  updateFab();
+  closeCart();
+  showToast("🗑️", "Cart cleared");
+}
+function saveCart() {
+  localStorage.setItem("sh_cart", JSON.stringify(cart));
+}
 
-  // INIT menu interactions (qty +/- and add)
-  function initMenu() {
-    $$(".menu-item").forEach((el) => {
-      const minus = el.querySelector(".qty-btn.minus");
-      const plus = el.querySelector(".qty-btn.plus");
-      const disp = el.querySelector(".qty-display");
-      const add = el.querySelector(".add-cart-btn");
-      const img = el.querySelector(".menu-img");
+function updateFab() {
+  const fab = document.getElementById("cartFab");
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const count = cart.reduce((s, c) => s + c.qty, 0);
+  document.getElementById("fabCount").textContent = count;
+  document.getElementById("fabTotal").textContent = "₹" + total;
+  fab.classList.toggle("hidden", count === 0);
+}
 
-      let qty = 1;
-      if (disp) disp.textContent = qty;
+function openCart() {
+  const overlay = document.getElementById("cartOverlay");
+  const sheet = document.getElementById("cartSheet");
+  const itemsEl = document.getElementById("cartItems");
+  const summary = document.getElementById("cartSummary");
+  overlay.classList.add("open");
+  sheet.classList.add("open");
 
-      if (minus) {
-        minus.onclick = (ev) => {
-          qty = Math.max(1, qty - 1);
-          if (disp) disp.textContent = qty;
-          ev.stopPropagation?.();
-        };
-      }
-      if (plus) {
-        plus.onclick = (ev) => {
-          qty++;
-          if (disp) disp.textContent = qty;
-          ev.stopPropagation?.();
-        };
-      }
-
-      if (add) {
-        add.onclick = (ev) => {
-          // animation
-          flyToCart(img);
-
-          const name = el.dataset.item;
-          const price = Number(el.dataset.price) || 10;
-          const id = (name || "").toLowerCase().replace(/\s+/g, "-");
-
-          const idx = findItem(id);
-          if (idx >= 0) cart[idx].qty = (cart[idx].qty || 0) + qty;
-          else cart.push({ id, name, price, qty });
-
-          showToast(`${qty} × ${name} added`);
-          saveLocal();
-          renderCart();
-
-          // reset
-          qty = 1;
-          if (disp) disp.textContent = qty;
-
-          ev.stopPropagation?.();
-        };
-      }
-    });
+  if (!cart.length) {
+    itemsEl.innerHTML =
+      '<div class="empty-state"><div class="empty-icon">🛒</div><h3>Cart is empty</h3><p>Add some delicious items from the menu!</p></div>';
+    summary.style.display = "none";
+    return;
   }
-
-  // Smooth flying animation to cart
-  function flyToCart(img) {
-    try {
-      if (!img) return;
-      const r = img.getBoundingClientRect();
-      const clone = img.cloneNode(true);
-      clone.style.position = "fixed";
-      clone.style.left = r.left + "px";
-      clone.style.top = r.top + "px";
-      clone.style.width = r.width + "px";
-      clone.style.height = r.height + "px";
-      clone.style.transition = "transform .7s ease, opacity .7s ease";
-      clone.style.zIndex = 3000;
-      document.body.appendChild(clone);
-
-      const targetEl = $("#bottomCartBtn");
-      const targetRect = targetEl ? targetEl.getBoundingClientRect() : { left: window.innerWidth - 40, top: window.innerHeight - 40 };
-
-      requestAnimationFrame(() => {
-        const dx = targetRect.left - r.left;
-        const dy = targetRect.top - r.top;
-        clone.style.transform = `translate(${dx}px, ${dy}px) scale(.2)`;
-        clone.style.opacity = "0";
-      });
-
-      setTimeout(() => clone.remove(), 750);
-    } catch (e) {
-      // silent
-    }
-  }
-
-  // Safe overlay open/close helpers (avoid CSS-only reliance)
-  function openCartSheet() {
-    const overlay = $("#overlay");
-    const sheet = $("#cartSheet");
-
-    if (overlay) {
-      overlay.style.display = "block";
-      overlay.style.pointerEvents = "auto";
-      overlay.classList.add("active");
-    }
-    if (sheet) {
-      sheet.classList.add("active");
-      // ensure it's visible even if CSS missing
-      sheet.style.bottom = "0";
-    }
-    document.body.style.overflow = "hidden";
-    renderCart();
-  }
-
-  function closeCartSheet() {
-    const overlay = $("#overlay");
-    const sheet = $("#cartSheet");
-    if (overlay) {
-      overlay.classList.remove("active");
-      // hide after small delay to allow CSS fade (if any)
-      overlay.style.pointerEvents = "none";
-      overlay.style.display = "none";
-    }
-    if (sheet) {
-      sheet.classList.remove("active");
-      sheet.style.bottom = "";
-    }
-    document.body.style.overflow = "";
-  }
-
-  // Attach open/close buttons
-  (function attachSheetControls() {
-    const bottom = $("#bottomCartBtn");
-    if (bottom) {
-      bottom.addEventListener("click", openCartSheet);
-    }
-    const closeBtn = $("#closeSheet");
-    if (closeBtn) closeBtn.addEventListener("click", closeCartSheet);
-    const overlay = $("#overlay");
-    if (overlay) overlay.addEventListener("click", closeCartSheet);
-  })();
-
-  // clear cart
-  $("#clearCart")?.addEventListener("click", () => {
-    cart = [];
-    saveLocal();
-    renderCart();
-    showToast("Cart cleared");
-  });
-
-  // Checkout flow (Cashfree)
-  $("#checkoutBtn")?.addEventListener("click", startCheckout);
-
-  async function startCheckout() {
-    if (!auth) {
-      return showToast("Auth not ready");
-    }
-    if (cart.length === 0) return showToast("Cart is empty");
-
-    const user = auth.currentUser;
-    if (!user) return showToast("Please login");
-
-    showToast("Starting payment...");
-
-    const amount = cart.reduce((s, i) => s + i.qty * i.price, 0);
-    const items = cart.map((i) => ({ name: i.name, qty: i.qty, price: i.price }));
-
-    const payload = { amount, items, phone: user.uid, email: user.email || "guest@sh.com" };
-
-    let res;
-    try {
-      res = await fetch(`${SERVER_URL}/create-cashfree-order`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch (err) {
-      console.error("Network error:", err);
-      return showToast("Payment network error");
-    }
-
-    const data = await res.json().catch(() => ({}));
-    console.log("Cashfree response:", data);
-
-    if (!data.ok || !data.payment_session_id) {
-      console.error("Bad session:", data);
-      return showToast("Payment initialization failed");
-    }
-
-    try {
-      const cf = Cashfree({ mode: "production" });
-      cf.checkout({ paymentSessionId: data.payment_session_id, redirectTarget: "_self" });
-      return;
-    } catch (err) {
-      console.error("Cashfree SDK error:", err);
-      return showToast("Payment system not ready — try again");
-    }
-  }
-
-  /* =====================================================
-     LANG ENGINE — ENGLISH <-> HINDI (FULL AUTO)
-  ==================================================== */
-
-  // Master dictionary (kept short for performance)
-  const DICT = {
-    "Fresh & Fast": "ताज़ा और फास्ट",
-    "Local favorites served hot — tap to add, order in seconds.": "गरमा-गरम स्थानीय पसंद — टैप करें और सेकंडों में ऑर्डर करें।",
-    "Search dishes (momo, tea…)": "व्यंजन खोजें (मोमो, चाय…)",
-    "All": "सभी",
-    "Momos": "मोमोज़",
-    "Snacks": "नाश्ता",
-    "Tea": "चाय",
-    "Special": "विशेष",
-    "Momo": "मोमो",
-    "Finger": "फ्रेंच फ्राइज",
-    "Hot Tea": "गरम चाय",
-    "Bread Pakoda": "ब्रेड पकोड़ा",
-    "Steam-fresh dumplings — soft, juicy & spicy chutney.": "स्टीम मोमो — नरम, रसीले और मसालेदार चटनी के साथ।",
-    "Crispy fries, double-fried — tasty with ketchup.": "कुरकुरे फ्राइज — केचप के साथ स्वादिष्ट।",
-    "Masala or ginger — aromatic & warming.": "मसाला या अदरक — सुगंधित और गर्माहट देने वाला।",
-    "Crispy, spiced batter — perfect chai snack.": "कुरकुरी, मसालेदार परत — चाय के साथ परफेक्ट स्नैक।",
-    "Your Cart": "आपकी टोकरी",
-    "Cart is empty": "टोकरी खाली है",
-    "Total:": "कुल:",
-    "Clear": "खाली करें",
-    "Checkout": "भुगतान करें",
-    "Add": "जोड़ें",
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  itemsEl.innerHTML = cart
+    .map(
+      (c) => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${c.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">₹${c.price} × ${c.qty} = <strong>₹${c.price * c.qty}</strong></div>
+      </div>
+      <div class="qty-control" style="background:var(--dark2)">
+        <button class="qty-btn" onclick="changeQty(${c.id},-1);openCart()">−</button>
+        <span class="qty-num">${c.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${c.id},1);openCart()">+</button>
+      </div>
+    </div>`,
+    )
+    .join("");
+  summary.style.display = "block";
+  document.getElementById("summaryItems").textContent = "₹" + total;
+  document.getElementById("summaryTotal").textContent = "₹" + total;
+}
+function closeCart() {
+  document.getElementById("cartOverlay").classList.remove("open");
+  document.getElementById("cartSheet").classList.remove("open");
+}
+function checkout() {
+  if (!cart.length) return;
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const order = {
+    id: "SH" + Date.now(),
+    items: [...cart],
+    total,
+    status: "preparing",
+    time: new Date().toISOString(),
   };
-  const DICT_REVERSE = {};
-  Object.keys(DICT).forEach(k => DICT_REVERSE[DICT[k]] = k);
+  const orders = JSON.parse(localStorage.getItem("sh_orders") || "[]");
+  orders.unshift(order);
+  localStorage.setItem("sh_orders", JSON.stringify(orders));
+  clearCart();
+  closeCart();
+  window.location.href = "../orders/orders.html";
+}
 
-  function applyTranslation(lang) {
-    const reverse = lang === "en";
-    // Only translate simple text nodes to avoid breaking complex markup
-    document.querySelectorAll("body *:not(script):not(style)").forEach((el) => {
-      // skip form inputs
-      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") return;
-      // translate immediate text nodes
-      el.childNodes.forEach((node) => {
-        if (node.nodeType === 3) {
-          const text = node.nodeValue.trim();
-          if (!text) return;
-          if (!reverse && DICT[text]) node.nodeValue = DICT[text];
-          else if (reverse && DICT_REVERSE[text]) node.nodeValue = DICT_REVERSE[text];
-        }
-      });
-    });
-  }
+// ── CATEGORIES ────────────────────────────────────────────────
+document.getElementById("catTabs").addEventListener("click", (e) => {
+  const btn = e.target.closest(".cat-tab");
+  if (!btn) return;
+  document
+    .querySelectorAll(".cat-tab")
+    .forEach((b) => b.classList.remove("active"));
+  btn.classList.add("active");
+  activeCat = btn.dataset.cat;
+  renderMenu();
+});
 
-  $(".lang-btn")?.addEventListener("click", () => {
-    const prev = localStorage.getItem("sh_lang") || "en";
-    const next = prev === "hi" ? "en" : "hi";
-    localStorage.setItem("sh_lang", next);
-    applyTranslation(next);
-  });
+// ── SEARCH ────────────────────────────────────────────────────
+document.getElementById("searchInput").addEventListener("input", (e) => {
+  searchQ = e.target.value.toLowerCase().trim();
+  renderMenu();
+});
 
-  // apply on load
-  applyTranslation(localStorage.getItem("sh_lang") || "en");
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(icon, msg) {
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  t.querySelector(".toast-icon").textContent = icon;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
 
-  /* -------------------------------------------------
-     EVENTS: listen for storage changes (other tabs)
-  ------------------------------------------------- */
-  window.addEventListener("storage", (e) => {
-    if (e.key === CART_KEY) {
-      // reload cart from storage
-      try {
-        const s = localStorage.getItem(CART_KEY);
-        cart = s ? JSON.parse(s) : [];
-      } catch (err) {
-        cart = [];
-      }
-      renderCart();
-    }
-  });
-
-  // custom cart-updated event should update UI across the app
-  document.addEventListener("cart-updated", () => {
-    updateCartCountUI();
-  });
-
-  // Expose a small API on window for other pages (profile/settings) to update badge
-  window.SH = window.SH || {};
-  window.SH.updateCartBadge = updateCartCountUI;
-
-  // Init
-  document.addEventListener("DOMContentLoaded", () => {
-    initMenu();
-    renderCart();
-    updateCartCountUI();
-  });
-})();
+// ── INIT ──────────────────────────────────────────────────────
+renderMenu();
+updateFab();

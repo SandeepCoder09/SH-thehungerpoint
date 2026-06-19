@@ -5,7 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getAuth,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -19,7 +19,7 @@ export const firebaseConfig = {
   storageBucket: "sh-thehunger-point.firebasestorage.app",
   messagingSenderId: "401237282420",
   appId: "1:401237282420:web:5162604a4bb2b9799b8b21",
-  measurementId: "G-4KP3RJ15E9"
+  measurementId: "G-4KP3RJ15E9",
 };
 
 // Initialize app

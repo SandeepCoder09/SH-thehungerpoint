@@ -1,41 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>09 QR Generator</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>09 QR Generator</title>
+    <link rel="stylesheet" href="../QR_Generater/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  </head>
 
-<body>
+  <body>
+    <!-- Theme Toggle (Top Right) -->
+    <button id="themeToggle" class="toggle-btn">🌙</button>
 
-  <!-- Theme Toggle (Top Right) -->
-  <button id="themeToggle" class="toggle-btn">🌙</button>
+    <!-- Center Title -->
+    <h1 class="main-title">09 QR Generator</h1>
 
-  <!-- Center Title -->
-  <h1 class="main-title">09 QR Generator</h1>
+    <main class="card">
+      <input type="text" id="qrText" placeholder="Enter text or URL" />
 
-  <main class="card">
+      <label class="file-label">
+        <span>Upload Your Brand Logo (Optional)</span>
+        <input type="file" id="logoInput" accept="image/*" />
+      </label>
 
-    <input type="text" id="qrText" placeholder="Enter text or URL">
+      <button id="generateBtn" class="btn">Generate QR</button>
 
-    <label class="file-label">
-      <span>Upload Your Brand Logo (Optional)</span>
-      <input type="file" id="logoInput" accept="image/*">
-    </label>
+      <div class="spinner" id="loadingSpinner"></div>
 
-    <button id="generateBtn" class="btn">Generate QR</button>
+      <div id="qrOutput"></div>
 
-    <div class="spinner" id="loadingSpinner"></div>
+      <a id="downloadBtn" download="qr.png" class="btn-secondary"
+        >Download QR</a
+      >
 
-    <div id="qrOutput"></div>
+      <a href="../QR_Generater/decoder.html" class="switch-page"
+        >Go to Decoder →</a
+      >
+    </main>
 
-    <a id="downloadBtn" download="qr.png" class="btn-secondary">Download QR</a>
-
-    <a href="decoder.html" class="switch-page">Go to Decoder →</a>
-  </main>
-
-<script src="script.js"></script>
-</body>
+    <script src="../QR_Generater/script.js"></script>
+  </body>
 </html>

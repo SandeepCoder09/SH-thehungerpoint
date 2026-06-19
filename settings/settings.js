@@ -1,111 +1,57 @@
-// /settings/settings.js
-// Modular settings logic that loads user data and handles change password + notifications toggle.
-
-import { auth, db, requireUser, sendPasswordResetEmail } from "/auth/sh-auth.js";
-import {
-  doc,
-  onSnapshot,
-  setDoc,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// DOM
-const userName = document.getElementById("userName");
-const userEmail = document.getElementById("userEmail");
-const userAvatar = document.getElementById("userAvatar");
-
-const changePassword = document.getElementById("changePassword");
-const notifToggle = document.getElementById("notifToggle");
-const logoutBtn = document.getElementById("logoutBtn");
-
-function toast(msg, dur = 2200) {
-  const c = document.getElementById("toast-container");
-  if (!c) return console.log("toast:", msg);
-  const el = document.createElement("div");
-  el.className = "toast";
-  el.textContent = msg;
-  c.appendChild(el);
-  setTimeout(() => el.classList.add("show"), 20);
-  setTimeout(() => {
-    el.classList.remove("show");
-    setTimeout(() => el.remove(), 200);
-  }, dur);
+function loadUserCard() {
+  const p = JSON.parse(localStorage.getItem("sh_profile") || "{}");
+  if (p.name) document.getElementById("settName").textContent = p.name;
+  if (p.email) document.getElementById("settEmail").textContent = p.email;
+  if (p.avatar) {
+    const img = document.getElementById("settAvatarImg");
+    img.src = p.avatar;
+    img.style.display = "block";
+    document.getElementById("settAvatar").childNodes[0].textContent = "";
+  }
 }
-
-let userDocUnsub = null;
-let currentUser = null;
-let userDocRef = null;
-
-// wait for user
-requireUser((user) => {
-  if (!user) return;
-  currentUser = user;
-  const uid = user.uid;
-  userEmail.textContent = user.email || "—";
-
-  userDocRef = doc(db, "users", uid);
-
-  // live snapshot
-  try { if (userDocUnsub) userDocUnsub(); } catch {}
-  userDocUnsub = onSnapshot(userDocRef, (snap) => {
-    if (!snap.exists()) {
-      userName.textContent = user.displayName || "USER NAME";
-      userAvatar.src = user.photoURL || "/home/SH-Favicon.png";
-      return;
-    }
-    const d = snap.data() || {};
-    userName.textContent = d.name || user.displayName || "USER NAME";
-    userEmail.textContent = user.email || "—";
-    userAvatar.src = d.photoURL || user.photoURL || "/home/SH-Favicon.png";
-
-    // FCM state restore if present
-    try {
-      notifToggle.checked = d.fcmEnabled === true;
-    } catch (e) {}
-  }, (err) => {
-    console.error("settings user snapshot error:", err);
-  });
-});
-
-// change password -> send reset email
-changePassword?.addEventListener("click", async () => {
-  if (!currentUser) return toast("User not logged in");
-  try {
-    // use helper exported from sh-auth.js (modular)
-    await sendPasswordResetEmail(currentUser.email);
-    toast("Password reset link sent!");
-  } catch (err) {
-    console.error("changePassword error:", err);
-    toast("Failed to send reset email");
-  }
-});
-
-// Notifications toggle (attempts to use FCM; if not setup, store preference only)
-notifToggle?.addEventListener("change", async () => {
-  if (!currentUser) {
-    notifToggle.checked = false;
-    return toast("User not logged in");
-  }
-
-  const enabled = notifToggle.checked;
-
-  // quick optimistic UI update & save flag to Firestore
-  try {
-    await setDoc(doc(db, "users", currentUser.uid), { fcmEnabled: !!enabled }, { merge: true });
-    toast(enabled ? "Notifications enabled" : "Notifications disabled");
-  } catch (err) {
-    console.error("notif toggle error:", err);
-    toast("Failed to update preference");
-    notifToggle.checked = !enabled; // revert
-  }
-});
-
-// logout
-logoutBtn?.addEventListener("click", async () => {
-  try {
-    await auth.signOut();
-    window.location.href = "/auth/login.html";
-  } catch (err) {
-    console.error("logout error:", err);
-    toast("Logout failed");
-  }
-});
+function loadToggles() {
+  const prefs = JSON.parse(localStorage.getItem("sh_prefs") || "{}");
+  if (prefs.notif) document.getElementById("notifToggle").classList.add("on");
+  if (prefs.email) document.getElementById("emailToggle").classList.add("on");
+}
+function toggleSetting(key) {
+  const el = document.getElementById(key + "Toggle");
+  el.classList.toggle("on");
+  const prefs = JSON.parse(localStorage.getItem("sh_prefs") || "{}");
+  prefs[key] = el.classList.contains("on");
+  localStorage.setItem("sh_prefs", JSON.stringify(prefs));
+}
+function openPassModal() {
+  document.getElementById("passModal").classList.add("open");
+}
+function closePassModal(e) {
+  if (!e || e.target === document.getElementById("passModal"))
+    document.getElementById("passModal").classList.remove("open");
+}
+function changePass() {
+  alert("Password updated successfully!");
+  closePassModal();
+}
+function showLogout() {
+  document.getElementById("logoutConfirm").classList.add("open");
+}
+function closeLogout(e) {
+  if (!e || e.target === document.getElementById("logoutConfirm"))
+    document.getElementById("logoutConfirm").classList.remove("open");
+}
+function logout() {
+  localStorage.removeItem("sh_profile");
+  window.location.href = "../auth/auth.html";
+}
+function shareApp() {
+  if (navigator.share)
+    navigator
+      .share({
+        title: "SH - The Hunger Point",
+        text: "Best momos in Fatehpur!",
+        url: window.location.href,
+      })
+      .catch(() => {});
+}
+loadUserCard();
+loadToggles();

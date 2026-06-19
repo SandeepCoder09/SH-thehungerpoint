@@ -1,176 +1,259 @@
-/* ================================================
-   SETTINGS PAGE — SH THEME (Premium Red UI)
-================================================ */
-
-/* Main container */
-.settings-container {
-  padding: 20px;
-  padding-bottom: 120px; /* safe for bottom nav */
-  max-width: 600px;
-  margin: auto;
+.page-body {
+  padding: 0 0 calc(var(--nav-h) + 16px);
 }
-
-/* -----------------------------
-   TOP PROFILE CARD
------------------------------- */
-.settings-top-card {
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 26px 20px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+.user-card {
+  margin: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
   display: flex;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 24px;
-  border: 2px solid #E23744;
+  gap: 14px;
+  cursor: pointer;
+  transition: var(--transition);
 }
-
-.settings-avatar-wrap {
-  width: 72px;
-  height: 72px;
+.user-card:hover {
+  border-color: rgba(226, 55, 68, 0.3);
+}
+.user-avatar {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #ffe6e9;
+  background: var(--dark3);
+  border: 2px solid var(--red);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  font-size: 24px;
   overflow: hidden;
-  border: 2px solid #E23744;
+  flex-shrink: 0;
 }
-
-.settings-avatar-wrap img {
+.user-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: none;
 }
-
-.settings-user-info h2 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #E23744;
+.user-info {
+  flex: 1;
 }
-
-.settings-user-info p {
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
-}
-
-/* -----------------------------
-   SETTINGS LIST
------------------------------- */
-.settings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.settings-item {
-  background: #fff;
-  padding: 18px 18px;
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  box-shadow: 0 3px 14px rgba(226, 55, 68, 0.18);
-  border-left: 5px solid #E23744;
-  transition: 0.2s;
-}
-
-.settings-item:hover {
-  transform: translateX(4px);
-  box-shadow: 0 5px 16px rgba(226, 55, 68, 0.3);
-}
-
-.settings-item h4 {
+.user-info h3 {
+  font-family: var(--font-head);
   font-size: 16px;
   font-weight: 700;
+  margin-bottom: 2px;
 }
-
-.settings-item small {
-  color: #777;
+.user-info p {
   font-size: 13px;
+  color: var(--muted);
+}
+.user-card-arrow {
+  color: var(--muted);
+  font-size: 18px;
 }
 
-/* Setting icons */
-.settings-icon {
-  font-size: 26px;
-  color: #E23744;
+.settings-group {
+  padding: 0 16px 4px;
 }
-
-/* Arrow icon */
-.settings-arrow {
-  margin-left: auto;
-  font-size: 20px;
-  color: #E23744;
+.settings-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 2px 8px;
 }
-
-/* Danger icon (logout) */
-.settings-icon.danger {
-  color: #d9534f !important;
+.settings-list {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
-
-/* -----------------------------
-   SWITCH BUTTON (NOTIFICATIONS)
------------------------------- */
-.switch {
-  margin-left: auto;
-  position: relative;
-  width: 46px;
-  height: 24px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px;
   cursor: pointer;
-  inset: 0;
-  background: #ccc;
-  border-radius: 34px;
-  transition: 0.3s;
+  transition: background var(--transition);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
 }
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
+.setting-row:last-child {
+  border-bottom: none;
+}
+.setting-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.setting-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.setting-icon svg {
   width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.3s;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+}
+.si-red {
+  background: var(--red-pale);
+  color: var(--red);
+}
+.si-blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--info);
+}
+.si-green {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+.si-orange {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+}
+.si-purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+.si-gray {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+}
+.si-danger {
+  background: rgba(226, 55, 68, 0.08);
+  color: var(--red);
 }
 
-input:checked + .slider {
-  background: #E23744;
+.setting-text {
+  flex: 1;
 }
-
-input:checked + .slider:before {
-  transform: translateX(22px);
-}
-
-/* -----------------------------
-   HELP BOX
------------------------------- */
-.settings-help-box {
-  background: #ffeef1;
-  padding: 16px 18px;
-  margin-top: 30px;
-  border-radius: 14px;
-  color: #E23744;
-  font-size: 14px;
-  text-align: center;
+.setting-text h4 {
+  font-size: 14.5px;
   font-weight: 600;
-  border: 1.5px solid #E23744;
+  margin-bottom: 1px;
+}
+.setting-text p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.setting-arrow {
+  color: var(--muted);
+  font-size: 16px;
 }
 
-a {
-   text-decoration: none;
-   color: black;
+/* Change password modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 80;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal {
+  background: var(--dark2);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: var(--app-max);
+  padding: 0 0 32px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.modal-head {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-head h3 {
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 800;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+.modal-body {
+  padding: 20px 18px 0;
+}
+
+/* Logout confirmation */
+.logout-confirm {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 90;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.logout-confirm.open {
+  display: flex;
+}
+.logout-box {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+.logout-box .icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.logout-box h4 {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.logout-box p {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.logout-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.app-version {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--muted);
 }

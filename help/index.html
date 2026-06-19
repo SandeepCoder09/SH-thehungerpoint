@@ -1,103 +1,158 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Help Center — The Hunger Point</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="/home/SH-Favicon.png" />
-
-  <!-- Remix Icons (already used in your app) -->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-
-  <!-- Global styles (keep your SH theme) -->
-  <link rel="stylesheet" href="/assets/styles.css">
-
-  <!-- Help page styles -->
-  <link rel="stylesheet" href="/help/help.css">
-</head>
-<body>
-
-  <!-- Page container -->
-  <main class="container help-shell">
-
-    <!-- Card -->
-    <article class="faq-card">
-
-      <!-- Header -->
-      <div class="faq-header">
-        <button class="back-btn" onclick="history.back()">
-          <i class="ri-arrow-left-line"></i>
-        </button>
-        <h2>Help Center</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>Help & Support — SH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <link rel="stylesheet" href="../help/help.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="top-bar">
+        <a href="../settings/index.html" class="top-bar-back"
+          ><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg
+        ></a>
+        <h2 class="top-bar-title">Help & Support</h2>
+        <div style="width: 36px"></div>
       </div>
-
-      <!-- Top actions / search -->
-      <div class="help-actions" style="padding:18px;">
-        <input id="helpSearch" class="input" placeholder="Search help (e.g., 'profile photo', 'refund')" />
-        <div class="quick-actions" style="margin-top:12px;display:flex;gap:10px;">
-          <button class="btn outline" onclick="location.href='/settings/index.html'">Open Settings</button>
-          <button class="btn outline" onclick="location.href='/settings/faqs.html'">View FAQs</button>
+      <div class="page-body">
+        <div class="help-hero">
+          <div class="icon">🙋</div>
+          <h2>We're here to help!</h2>
+          <p>Choose how you'd like to reach us.</p>
         </div>
-      </div>
 
-      <!-- Popular articles -->
-      <div class="help-articles" style="padding:0 18px 28px;">
-        <h3 style="margin:0 0 12px 0">Popular topics</h3>
-
-        <div class="article-list">
-          <button class="article" data-q="how do i update my profile photo">Update profile photo</button>
-          <button class="article" data-q="how to change password">Change password</button>
-          <button class="article" data-q="how to enable notifications">Enable push notifications</button>
-          <button class="article" data-q="how to contact support">Contact support</button>
+        <div class="help-options">
+          <a
+            href="https://wa.me/919999999999"
+            target="_blank"
+            class="help-option"
+          >
+            <div class="ho-icon ho-bg-green">💬</div>
+            <div class="ho-text">
+              <h4>WhatsApp Support</h4>
+              <p>Fastest — reply within minutes</p>
+            </div>
+            <span class="ho-arrow">›</span>
+          </a>
+          <a href="tel:+919999999999" class="help-option">
+            <div class="ho-icon ho-bg-blue">📞</div>
+            <div class="ho-text">
+              <h4>Call Us</h4>
+              <p>Talk to our team directly</p>
+            </div>
+            <span class="ho-arrow">›</span>
+          </a>
+          <a href="../settings/faqs.html" class="help-option">
+            <div class="ho-icon ho-bg-red">❓</div>
+            <div class="ho-text">
+              <h4>FAQs</h4>
+              <p>Quick answers to common questions</p>
+            </div>
+            <span class="ho-arrow">›</span>
+          </a>
+          <a href="../orders/orders.html" class="help-option">
+            <div class="ho-icon ho-bg-orange">📋</div>
+            <div class="ho-text">
+              <h4>My Orders</h4>
+              <p>View and track your orders</p>
+            </div>
+            <span class="ho-arrow">›</span>
+          </a>
         </div>
-      </div>
 
-      <!-- Static FAQ teaser -->
-      <div style="padding:0 18px 28px;">
-        <h3 style="margin:0 0 12px 0">Quick answers</h3>
-        <div class="answer-card">
-          <strong>Profile photo not uploading?</strong>
-          <p style="margin:8px 0 0;">If Storage is disabled we store avatars in Firestore (Base64). Go to Settings → Update Photo and wait for the confirmation toast.</p>
+        <div class="contact-form-section">
+          <h3>Send us a message</h3>
+          <form onsubmit="sendMsg(event)">
+            <div class="form-group">
+              <label class="form-label">Subject</label
+              ><input
+                type="text"
+                class="form-input"
+                placeholder="e.g. Wrong order received"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message</label
+              ><textarea
+                class="form-input"
+                placeholder="Describe your issue…"
+                style="min-height: 100px; resize: none"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-red btn-full btn-lg">
+              Send Message 📨
+            </button>
+          </form>
         </div>
-      </div>
 
-    </article>
-
-  </main>
-
-  <!-- Floating Chat Button & Widget (bot) -->
-  <div id="sh-chat" aria-live="polite">
-    <button id="chatToggle" aria-label="Open chat" title="Chat with support">
-      <i class="ri-chat-3-line"></i>
-    </button>
-
-    <div id="chatWindow" role="dialog" aria-hidden="true">
-      <div class="chat-header">
-        <div>
-          <div class="chat-title">SH Support</div>
-          <div class="chat-sub">We're here to help — ask me anything</div>
+        <div class="hours-card">
+          <div
+            style="
+              font-family: var(--font-head);
+              font-size: 14px;
+              font-weight: 700;
+              margin-bottom: 10px;
+            "
+          >
+            Business Hours
+          </div>
+          <div class="hours-row">
+            <span>Mon – Fri</span><span>8:00 AM – 9:00 PM</span>
+          </div>
+          <div class="hours-row">
+            <span>Saturday</span><span>9:00 AM – 8:00 PM</span>
+          </div>
+          <div class="hours-row">
+            <span>Sunday</span><span>10:00 AM – 6:00 PM</span>
+          </div>
         </div>
-        <button id="chatClose" aria-label="Close chat"><i class="ri-close-line"></i></button>
-      </div>
-
-      <div id="chatBody" class="chat-body" tabindex="0">
-        <!-- messages injected here -->
-      </div>
-
-      <div class="chat-composer">
-        <input id="chatInput" type="text" placeholder="Type your question..." aria-label="Type message" />
-        <button id="chatSend" aria-label="Send message"><i class="ri-send-plane-2-line"></i></button>
-      </div>
-
-      <div class="chat-quick">
-        <button data-msg="I want to update my profile photo">Update photo</button>
-        <button data-msg="How do I change my password?">Change password</button>
-        <button data-msg="I want to contact support">Contact support</button>
       </div>
     </div>
-  </div>
-
-  <!-- Bot script -->
-  <script src="/help/help.js" defer></script>
-</body>
+    <nav class="bottom-nav">
+      <a href="../home/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" /></svg
+        ><span class="nav-label">Home</span></a
+      >
+      <a href="../orders/orders.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" /></svg
+        ><span class="nav-label">Orders</span></a
+      >
+      <a href="../profile/index.html" class="nav-item"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" /></svg
+        ><span class="nav-label">Profile</span></a
+      >
+      <a href="../settings/index.html" class="nav-item active"
+        ><svg class="nav-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+          /></svg
+        ><span class="nav-label">Settings</span></a
+      >
+    </nav>
+    <script>
+      function sendMsg(e) {
+        e.preventDefault();
+        alert("✅ Message sent! We'll get back to you within 24 hours.");
+        e.target.reset();
+      }
+    </script>
+  </body>
 </html>

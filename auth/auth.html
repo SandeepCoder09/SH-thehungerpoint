@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#E23744" />
+    <title>Sign In — SH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/sh-shared.css" />
+    <link rel="stylesheet" href="../auth/auth.css" />
+  </head>
+  <body>
+    <div class="auth-app">
+      <div class="auth-hero">
+        <div class="brand-logo">🍱</div>
+        <div class="brand-name">The Hunger<span>Point</span></div>
+        <div class="brand-sub">Fresh &amp; Fast · Fatehpur</div>
+      </div>
+
+      <div class="auth-body">
+        <div class="auth-tabs">
+          <button
+            class="auth-tab active"
+            id="tabLogin"
+            onclick="switchTab('login')"
+          >
+            Sign In
+          </button>
+          <button
+            class="auth-tab"
+            id="tabRegister"
+            onclick="switchTab('register')"
+          >
+            Register
+          </button>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="auth-panel active" id="panelLogin">
+          <form onsubmit="doLogin(event)">
+            <div class="form-group">
+              <label class="form-label">Email or Phone</label>
+              <input
+                type="text"
+                class="form-input"
+                id="loginId"
+                placeholder="you@email.com or 9999999999"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="pass-wrap">
+                <input
+                  type="password"
+                  class="form-input"
+                  id="loginPass"
+                  placeholder="Your password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="pass-toggle"
+                  onclick="toggleP('loginPass')"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <a href="#" class="forgot">Forgot password?</a>
+            <button type="submit" class="btn btn-red btn-full btn-lg">
+              Sign In →
+            </button>
+          </form>
+          <div class="or-divider">or continue with</div>
+          <button class="google-btn" onclick="googleLogin()">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path
+                fill="#EA4335"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            Continue with Google
+          </button>
+          <p class="terms">
+            By signing in you agree to our <a href="#">Terms</a> &amp;
+            <a href="#">Privacy Policy</a>
+          </p>
+        </div>
+
+        <!-- REGISTER -->
+        <div class="auth-panel" id="panelRegister">
+          <form onsubmit="doRegister(event)">
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px"
+            >
+              <div class="form-group">
+                <label class="form-label">First Name</label
+                ><input
+                  type="text"
+                  class="form-input"
+                  id="regFirst"
+                  placeholder="Ravi"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label
+                ><input
+                  type="text"
+                  class="form-input"
+                  id="regLast"
+                  placeholder="Kumar"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label
+              ><input
+                type="email"
+                class="form-input"
+                id="regEmail"
+                placeholder="you@email.com"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label
+              ><input
+                type="tel"
+                class="form-input"
+                id="regPhone"
+                placeholder="+91 99999 99999"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="pass-wrap">
+                <input
+                  type="password"
+                  class="form-input"
+                  id="regPass"
+                  placeholder="Min. 8 characters"
+                  required
+                  oninput="checkStrength(this.value)"
+                />
+                <button
+                  type="button"
+                  class="pass-toggle"
+                  onclick="toggleP('regPass')"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+              <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-red btn-full btn-lg"
+              style="margin-top: 4px"
+            >
+              Create Account →
+            </button>
+          </form>
+          <p class="terms" style="margin-top: 12px">
+            By registering you agree to our <a href="#">Terms</a> &amp;
+            <a href="#">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="../auth/auth.js"></script>
+  </body>
+</html>
